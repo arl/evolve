@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"math/rand"
 	"unicode/utf8"
+
+	"github.com/aurelien-rainone/evolve/base"
 )
 
 /**
@@ -59,7 +61,7 @@ type unicodeStringGenerator struct {
  * the string.
  * @return A randomly generated string.
  */
-func (g *unicodeStringGenerator) GenerateRandomCandidate(rng *rand.Rand) Candidate {
+func (g *unicodeStringGenerator) GenerateRandomCandidate(rng *rand.Rand) base.Candidate {
 	var buffer bytes.Buffer
 	for i := 0; i < g.stringLength; i++ {
 		idx := rand.Int31n(int32(len(g.alphabet)))
@@ -83,7 +85,7 @@ type asciiStringGenerator struct {
  * the string.
  * @return A randomly generated string.
  */
-func (g *asciiStringGenerator) GenerateRandomCandidate(rng *rand.Rand) Candidate {
+func (g *asciiStringGenerator) GenerateRandomCandidate(rng *rand.Rand) base.Candidate {
 	var buffer bytes.Buffer
 	for i := 0; i < g.stringLength; i++ {
 		idx := rand.Int31n(int32(len(g.alphabet)))

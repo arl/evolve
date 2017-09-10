@@ -2,6 +2,8 @@ package factory
 
 import (
 	"math/rand"
+
+	"github.com/aurelien-rainone/evolve/base"
 )
 
 /**
@@ -26,9 +28,9 @@ type AbstractCandidateFactory struct {
  */
 func (f *AbstractCandidateFactory) GenerateInitialPopulation(
 	populationSize int,
-	rng *rand.Rand) []Candidate {
+	rng *rand.Rand) []base.Candidate {
 
-	population := make([]Candidate, populationSize)
+	population := make([]base.Candidate, populationSize)
 	for i := range population {
 		population[i] = f.GenerateRandomCandidate(rng)
 	}
@@ -43,13 +45,13 @@ func (f *AbstractCandidateFactory) GenerateInitialPopulation(
  */
 func (f *AbstractCandidateFactory) SeedInitialPopulation(
 	populationSize int,
-	seedCandidates []Candidate,
-	rng *rand.Rand) []Candidate {
+	seedCandidates []base.Candidate,
+	rng *rand.Rand) []base.Candidate {
 
 	if len(seedCandidates) > populationSize {
 		panic("Too many seed candidates for specified population size.")
 	}
-	population := make([]Candidate, populationSize)
+	population := make([]base.Candidate, populationSize)
 	for i := range seedCandidates {
 		population[i] = seedCandidates[i]
 	}

@@ -1,8 +1,10 @@
 package factory
 
-import "math/rand"
+import (
+	"math/rand"
 
-type Candidate interface{}
+	"github.com/aurelien-rainone/evolve/base"
+)
 
 /**
  * Creates new populations of candidates.
@@ -17,7 +19,7 @@ type CandidateFactory interface {
 	 * candidates.
 	 * @return An initial population of candidate solutions.
 	 */
-	GenerateInitialPopulation(populationSize int, rng *rand.Rand) []Candidate
+	GenerateInitialPopulation(populationSize int, rng *rand.Rand) []base.Candidate
 
 	/**
 	 * Sometimes it is desirable to seed the initial population with some
@@ -38,8 +40,8 @@ type CandidateFactory interface {
 	 * specified seed candidates.
 	 */
 	SeedInitialPopulation(populationSize int,
-		seedCandidates []Candidate,
-		rng *rand.Rand) []Candidate
+		seedCandidates []base.Candidate,
+		rng *rand.Rand) []base.Candidate
 }
 
 type RandomCandidateGenerator interface {
@@ -49,5 +51,5 @@ type RandomCandidateGenerator interface {
 	 * candidate.
 	 * @return A randomly-initialised candidate.
 	 */
-	GenerateRandomCandidate(rng *rand.Rand) Candidate
+	GenerateRandomCandidate(rng *rand.Rand) base.Candidate
 }
