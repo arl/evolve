@@ -7,11 +7,10 @@ import (
 )
 
 /**
- * Convenient base class for implementations of
- * {@link org.uncommons.watchmaker.framework.CandidateFactory}.
+* TODO: rename CandidateFactoryImpl
+ * AbstractCandidateFactory is a convenient base class for implementations of
  * @param <T> The type of entity evolved by this engine.
- * @author Daniel Dyer
- */
+*/
 type AbstractCandidateFactory struct {
 	RandomCandidateGenerator
 }
