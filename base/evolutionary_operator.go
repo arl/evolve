@@ -1,9 +1,7 @@
-package evolve
+package base
 
 import (
 	"math/rand"
-
-	"github.com/aurelien-rainone/evolve/base"
 )
 
 /**
@@ -46,5 +44,5 @@ type EvolutionaryOperator interface {
 	 * operators will be stochastic).
 	 * @return The evolved individuals.
 	 */
-	Apply(selectedCandidates []base.Candidate, rng *rand.Rand) []base.Candidate
+	Apply(selectedCandidates []Candidate, rng *rand.Rand) []Candidate
 }
