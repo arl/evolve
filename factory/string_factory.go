@@ -3,6 +3,7 @@ package factory
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"math/rand"
 	"unicode/utf8"
 
@@ -33,25 +34,15 @@ func NewStringFactory(alphabet string, stringLength int) (*StringFactory, error)
 		return nil, errors.New("can't create StringFactory with a string length equals to 0")
 	}
 
-	var sf *StringFactory
-
 	// ascii only alphabet
-	if utf8.RuneCountInString(alphabet) == len(alphabet) {
-		sf = &StringFactory{
-			AbstractCandidateFactory{
-				&asciiStringGenerator{
-					alphabet:     alphabet,
-					stringLength: stringLength,
-				},
-			},
-		}
-
+	if utf8.RuneCountInString(alphabet) != len(alphabet) {
+		return nil, fmt.Errorf("non ascii alphabet is not supported %v", alphabet)
 	}
 	// unicode alphabet
-	sf = &StringFactory{
+	sf := &StringFactory{
 		AbstractCandidateFactory{
-			&unicodeStringGenerator{
-				alphabet:     []rune(alphabet),
+			&stringGenerator{
+				alphabet:     alphabet,
 				stringLength: stringLength,
 			},
 		},
@@ -59,31 +50,7 @@ func NewStringFactory(alphabet string, stringLength int) (*StringFactory, error)
 	return sf, nil
 }
 
-type unicodeStringGenerator struct {
-	alphabet     []rune
-	stringLength int
-}
-
-/**
- * Generates a random string of a pre-configured length.  Each character
- * is randomly selected from the pre-configured alphabet.  The same
- * character may appear multiple times and some characters may not appear
- * at all.
- * @param rng A source of randomness used to select characters to make up
- * the string.
- * @return A randomly generated string.
- */
-func (g *unicodeStringGenerator) GenerateRandomCandidate(rng *rand.Rand) base.Candidate {
-	var buffer bytes.Buffer
-	for i := 0; i < g.stringLength; i++ {
-		idx := rand.Int31n(int32(len(g.alphabet)))
-		r := g.alphabet[idx]
-		buffer.WriteRune(r)
-	}
-	return buffer.String()
-}
-
-type asciiStringGenerator struct {
+type stringGenerator struct {
 	alphabet     string
 	stringLength int
 }
@@ -97,7 +64,7 @@ type asciiStringGenerator struct {
  * the string.
  * @return A randomly generated string.
  */
-func (g *asciiStringGenerator) GenerateRandomCandidate(rng *rand.Rand) base.Candidate {
+func (g *stringGenerator) GenerateRandomCandidate(rng *rand.Rand) base.Candidate {
 	var buffer bytes.Buffer
 	for i := 0; i < g.stringLength; i++ {
 		idx := rand.Int31n(int32(len(g.alphabet)))
