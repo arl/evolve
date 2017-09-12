@@ -6,28 +6,50 @@ import (
 	"testing"
 	"unicode/utf8"
 
+	"github.com/aurelien-rainone/evolve/base"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStringFactory(t *testing.T) {
-	const (
-		stringLength   = 8
-		populationSize = 10
-	)
+const (
+	stringLength   = 8
+	populationSize = 10
+)
+
+// Make sure each candidate is valid (is the right length and contains only
+// valid characters).
+// @param population The population to be validated.
+func validatePopulation(t *testing.T, population []base.Candidate, alphabet string) {
+	for _, candidate := range population {
+		assert.IsType(t, string(""), candidate)
+		s := candidate.(string)
+
+		assert.Len(t, []rune(s), stringLength)
+
+		// check generated string is only made of alphabet characters
+		for _, r := range s {
+			assert.True(t, strings.ContainsRune(alphabet, rune(r)),
+				"%#U is not contained in '%s'\n", r, alphabet)
+		}
+	}
+}
+
+func TestStringPopulation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	t.Run("StringFactory with a ascii only aplhabet", func(*testing.T) {
-		sf, err := NewStringFactory("abcdefg", stringLength)
+	t.Run("string population with ascii-only aplhabet", func(*testing.T) {
+		alphabet := "abcdefgh"
+		sf, err := NewStringFactory(alphabet, stringLength)
 		assert.Nil(t, err)
 		pop := sf.GenerateInitialPopulation(populationSize, rng)
-		assert.Len(t, pop, populationSize)
+		validatePopulation(t, pop, alphabet)
 	})
 
-	t.Run("StringFactory with non-ascii aplhabet", func(*testing.T) {
-		sf, err := NewStringFactory("日本語", stringLength)
+	t.Run("string population with non ascii-only aplhabet", func(*testing.T) {
+		alphabet := "日本語"
+		sf, err := NewStringFactory(alphabet, stringLength)
 		assert.Nil(t, err)
 		pop := sf.GenerateInitialPopulation(populationSize, rng)
-		assert.Len(t, pop, populationSize)
+		validatePopulation(t, pop, alphabet)
 	})
 
 	t.Run("StringFactory with empty aplhabet", func(*testing.T) {

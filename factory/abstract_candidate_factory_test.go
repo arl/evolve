@@ -54,6 +54,7 @@ func TestAbstractCandidateFactoryPopulationCreation(t *testing.T) {
 			preseed[i] = i
 		}
 
+		// TODO: should return error instead of panicking
 		assert.Panics(t, func() {
 			cf.SeedInitialPopulation(5, preseed, rng)
 		})
