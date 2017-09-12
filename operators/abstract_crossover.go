@@ -113,10 +113,13 @@ func (op *AbstractCrossover) Apply(selectedCandidates []base.Candidate, rng *ran
 	base.ShuffleCandidates(selectionClone, rng)
 
 	result := make([]base.Candidate, 0, len(selectedCandidates))
-	for iterator := 0; iterator < len(selectionClone); iterator++ {
+	var iterator = 0
+	for iterator < len(selectionClone) {
 		parent1 := selectionClone[iterator]
+		iterator++
 		if iterator < len(selectionClone) {
 			parent2 := selectionClone[iterator]
+			iterator++
 			// Randomly decide (according to the current cross-over probability)
 			// whether to perform cross-over for these 2 parents.
 			var crossoverPoints int64
