@@ -11,19 +11,25 @@ import (
 // 1 means it is guaranteed to occur.
 type Probability float64
 
-const (
+var (
 	// ProbabilityOne is a convenient constant representing a probability of
 	// one, that is an event with a probability of one is a certainty.
-	ProbabilityOne Probability = 1
+	ProbabilityOne Probability
 
 	// ProbabilityEven is a convenient constant representing a probability of
 	// 0.5 (used to model an event that has a 50/50 chance of occurring).
-	ProbabilityEven = 0.5
+	ProbabilityEven Probability
 
 	// ProbabilityZero is a convenient constant representing a probability of
 	// zero, that is an event that will never happen (it is an impossibility).
-	ProbabilityZero = 0
+	ProbabilityZero Probability
 )
+
+func init() {
+	ProbabilityOne, _ = NewProbability(1)
+	ProbabilityEven, _ = NewProbability(0.5)
+	ProbabilityZero, _ = NewProbability(0)
+}
 
 // NewProbability creates a new Probability value.
 func NewProbability(probability float64) (Probability, error) {
