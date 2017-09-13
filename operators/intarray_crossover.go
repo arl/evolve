@@ -39,8 +39,5 @@ func (m intArrayMater) Mate(parent1, parent2 base.Candidate,
 			offspring1[j], offspring2[j] = offspring2[j], offspring1[j]
 		}
 	}
-	result := make([]base.Candidate, 2)
-	result[0] = offspring1
-	result[1] = offspring2
-	return result
+	return append([]base.Candidate{}, offspring1, offspring2)
 }

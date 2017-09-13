@@ -35,8 +35,5 @@ func (m stringMater) Mate(parent1, parent2 base.Candidate,
 			offspring1[j], offspring2[j] = offspring2[j], offspring1[j]
 		}
 	}
-	result := make([]base.Candidate, 2)
-	result[0] = string(offspring1)
-	result[1] = string(offspring2)
-	return result
+	return append([]base.Candidate{}, string(offspring1), string(offspring2))
 }
