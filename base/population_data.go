@@ -35,3 +35,74 @@ type PopulationData struct {
 	// The number of milliseconds since the start of the algorithm.
 	elapsedTime time.Duration
 }
+
+// NewPopulationData creates a new immutable PopulationData object.
+func NewPopulationData(bestCandidate Candidate,
+	bestCandidateFitness, meanFitness, fitnessStandardDeviation float64,
+	naturalFitness bool,
+	populationSize, eliteCount, generationNumber int,
+	elapsedTime time.Duration) PopulationData {
+	return PopulationData{
+
+		bestCandidate:            bestCandidate,
+		bestCandidateFitness:     bestCandidateFitness,
+		meanFitness:              meanFitness,
+		fitnessStandardDeviation: fitnessStandardDeviation,
+		naturalFitness:           naturalFitness,
+		populationSize:           populationSize,
+		eliteCount:               eliteCount,
+		generationNumber:         generationNumber,
+		elapsedTime:              elapsedTime,
+	}
+}
+
+// BestCandidate returns the fittest candidate present in the population.
+func (pd *PopulationData) BestCandidate() Candidate {
+	return pd.bestCandidate
+}
+
+// BestCandidateFitness returns the fitness score of the fittest candidate.
+func (pd *PopulationData) BestCandidateFitness() float64 {
+	return pd.bestCandidateFitness
+}
+
+// MeanFitness returns the arithmetic mean fitness of individual candidates.
+func (pd *PopulationData) MeanFitness() float64 {
+	return pd.meanFitness
+}
+
+// FitnessStandardDeviation returns a statistical measure of variation in
+// fitness scores within the population.
+func (pd *PopulationData) FitnessStandardDeviation() float64 {
+	return pd.fitnessStandardDeviation
+}
+
+// IsNaturalFitness indicates whether the fitness scores are natural or
+// non-natural.
+//
+// Returns true if higher fitness scores indicate fitter individuals, false
+// otherwise.
+func (pd *PopulationData) IsNaturalFitness() bool {
+	return pd.naturalFitness
+}
+
+// PopulationSize returns the number of individuals in the current population.
+func (pd *PopulationData) PopulationSize() int {
+	return pd.populationSize
+}
+
+// Return the number of candidates preserved via elitism.
+func (pd *PopulationData) EliteCount() int {
+	return pd.eliteCount
+}
+
+// GenerationNumber returns the number of this generation (zero-based).
+func (pd *PopulationData) GenerationNumber() int {
+	return pd.generationNumber
+}
+
+// ElapsedTime returns the amount of time (in milliseconds) since the start of
+// the evolutionary algorithm's execution.
+func (pd *PopulationData) ElapsedTime() time.Duration {
+	return pd.elapsedTime
+}
