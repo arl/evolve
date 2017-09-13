@@ -1,0 +1,46 @@
+package operators
+
+import (
+	"math/rand"
+
+	"github.com/aurelien-rainone/evolve/base"
+)
+
+// NewIntArrayCrossover creates a crossover operator for array of primitive
+// ints.
+func NewIntArrayCrossover(options ...func(*AbstractCrossover) error) (*AbstractCrossover, error) {
+	return NewAbstractCrossover(intArrayMater{}, options...)
+}
+
+type intArrayMater struct{}
+
+func (m intArrayMater) Mate(parent1, parent2 base.Candidate,
+	numberOfCrossoverPoints int64,
+	rng *rand.Rand) []base.Candidate {
+
+	p1, p2 := parent1.([]int), parent2.([]int)
+
+	if len(p1) != len(p2) {
+		panic("Cannot perform cross-over with different length parents.")
+	}
+	offspring1 := make([]int, len(p1))
+	copy(offspring1, p1)
+	offspring2 := make([]int, len(p1))
+	copy(offspring2, p2)
+
+	// Apply as many cross-overs as required.
+	for i := int64(0); i < numberOfCrossoverPoints; i++ {
+		// Cross-over index is always greater than zero and less than
+		// the length of the parent so that we always pick a point that
+		// will result in a meaningful cross-over.
+		crossoverIndex := (1 + rng.Intn(len(p1)-1))
+		for j := 0; j < crossoverIndex; j++ {
+			// swap elements j of both offsprings
+			offspring1[j], offspring2[j] = offspring2[j], offspring1[j]
+		}
+	}
+	result := make([]base.Candidate, 2)
+	result[0] = offspring1
+	result[1] = offspring2
+	return result
+}
