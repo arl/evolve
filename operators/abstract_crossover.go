@@ -22,7 +22,7 @@ type Mater interface {
 }
 
 // WithConstantCrossoverPoints sets up a constant number of cross-over points.
-func WithConstantCrossoverPoints(crossoverPoints int64) func(*AbstractCrossover) error {
+func WithConstantCrossoverPoints(crossoverPoints int64) abstractCrossoverOption {
 	return func(op *AbstractCrossover) error {
 		if crossoverPoints <= 0 {
 			return errors.New("Number of cross-over points must be positive.")
@@ -33,7 +33,7 @@ func WithConstantCrossoverPoints(crossoverPoints int64) func(*AbstractCrossover)
 }
 
 // WithVariableCrossoverPoints sets up a variable number of cross-over points.
-func WithVariableCrossoverPoints(variable number.IntegerGenerator) func(*AbstractCrossover) error {
+func WithVariableCrossoverPoints(variable number.IntegerGenerator) abstractCrossoverOption {
 	return func(op *AbstractCrossover) error {
 		op.crossoverPointsVariable = variable
 		return nil
@@ -43,7 +43,7 @@ func WithVariableCrossoverPoints(variable number.IntegerGenerator) func(*Abstrac
 // WithConstantCrossoverProbability sets up a constant probability that, once
 // selected, a pair of parents will be subjected to cross-over rather than being
 // copied.
-func WithConstantCrossoverProbability(crossoverProbability number.Probability) func(*AbstractCrossover) error {
+func WithConstantCrossoverProbability(crossoverProbability number.Probability) abstractCrossoverOption {
 	return func(op *AbstractCrossover) error {
 		op.crossoverProbabilityVariable = number.NewConstantProbabilityGenerator(crossoverProbability)
 		return nil
@@ -53,12 +53,14 @@ func WithConstantCrossoverProbability(crossoverProbability number.Probability) f
 // WithVariableCrossoverProbability sets up a variable probability that, once
 // selected, a pair of parents will be subjected to cross-over rather than being
 // copied.
-func WithVariableCrossoverProbability(variable number.ProbabilityGenerator) func(*AbstractCrossover) error {
+func WithVariableCrossoverProbability(variable number.ProbabilityGenerator) abstractCrossoverOption {
 	return func(op *AbstractCrossover) error {
 		op.crossoverProbabilityVariable = variable
 		return nil
 	}
 }
+
+type abstractCrossoverOption func(*AbstractCrossover) error
 
 // AbstractCrossover is a generic struct for cross-over implementations.
 //
@@ -77,7 +79,7 @@ type AbstractCrossover struct {
 
 // TODO: documentation
 // TODO: example of use of how setting options with WithXXX functions
-func NewAbstractCrossover(mater Mater, options ...func(*AbstractCrossover) error) (*AbstractCrossover, error) {
+func NewAbstractCrossover(mater Mater, options ...abstractCrossoverOption) (*AbstractCrossover, error) {
 	// create with default options, 1 crossover point with a probability of 1
 	op := &AbstractCrossover{
 		crossoverPointsVariable:      number.NewConstantIntegerGenerator(1),
