@@ -21,5 +21,5 @@ type SelectionStrategy interface {
 	//
 	// Returns a slice containing the selected candidates. Some individual
 	// candidates may potentially have been selected multiple times.
-	Select(population []EvaluatedCandidate, naturalFitnessScores bool, selectionSize int, rng *rand.Rand) []Candidate
+	Select(population []*EvaluatedCandidate, naturalFitnessScores bool, selectionSize int, rng *rand.Rand) []Candidate
 }
