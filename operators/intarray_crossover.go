@@ -8,7 +8,7 @@ import (
 
 // NewIntArrayCrossover creates a crossover operator for array of primitive
 // ints.
-func NewIntArrayCrossover(options ...abstractCrossoverOption) (*AbstractCrossover, error) {
+func NewIntArrayCrossover(options ...AbstractCrossoverOption) (*AbstractCrossover, error) {
 	return NewAbstractCrossover(intArrayMater{}, options...)
 }
 

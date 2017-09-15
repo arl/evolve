@@ -2,6 +2,8 @@ package base
 
 import "math/rand"
 
+// Candidate is the inteface representing a candidate of a population of
+// solutions.
 type Candidate interface{}
 
 // ShuffleCandidates shuffles a slice of candidates.

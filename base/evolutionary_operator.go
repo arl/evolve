@@ -4,7 +4,7 @@ import (
 	"math/rand"
 )
 
-// An evolutionary operator is a function that takes a population of candidates
+// An EvolutionaryOperator is a function that takes a population of candidates
 // as an argument and returns a new population that is the result of applying a
 // transformation to the original population.
 //

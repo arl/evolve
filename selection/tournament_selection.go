@@ -18,14 +18,16 @@ type TournamentSelection struct {
 	description          string
 }
 
-type tournamentSelectionOption func(*TournamentSelection) error
+// TournamentSelectionOption is the type of the functions used to set tournament
+// selection options.
+type TournamentSelectionOption func(*TournamentSelection) error
 
 // WithConstantSelectionProbability sets up a constant probability that the
 // fitter of two randomly chosen candidates will be selected.
-func WithConstantSelectionProbability(selectionProbability number.Probability) tournamentSelectionOption {
+func WithConstantSelectionProbability(selectionProbability number.Probability) TournamentSelectionOption {
 	return func(ts *TournamentSelection) error {
 		if selectionProbability <= 0.5 {
-			return errors.New("Selection threshold must be greater than 0.5.")
+			return errors.New("selection threshold must be greater than 0.5")
 		}
 		ts.selectionProbability = number.NewConstantProbabilityGenerator(selectionProbability)
 		ts.description = fmt.Sprintf("Tournament Selection (p = %v)", selectionProbability)
@@ -39,7 +41,7 @@ func WithConstantSelectionProbability(selectionProbability number.Probability) t
 // variable should be a probability generator that produce values in the range
 // [0.5, 1]. These values are used as the probability of the fittest candidate
 // being selected in any given tournament.
-func WithVariableSelectionProbability(variable number.ProbabilityGenerator) tournamentSelectionOption {
+func WithVariableSelectionProbability(variable number.ProbabilityGenerator) TournamentSelectionOption {
 	return func(ts *TournamentSelection) error {
 		ts.selectionProbability = variable
 		ts.description = "Tournament Selection"
@@ -47,7 +49,9 @@ func WithVariableSelectionProbability(variable number.ProbabilityGenerator) tour
 	}
 }
 
-func NewTournamentSelection(options ...tournamentSelectionOption) (*TournamentSelection, error) {
+// NewTournamentSelection creates a TournamentSelection configured with provided
+// options.
+func NewTournamentSelection(options ...TournamentSelectionOption) (*TournamentSelection, error) {
 	// create with a selection probability of 0.5
 	ts := &TournamentSelection{
 		selectionProbability: number.NewConstantProbabilityGenerator(number.ProbabilityEven),
@@ -63,6 +67,7 @@ func NewTournamentSelection(options ...tournamentSelectionOption) (*TournamentSe
 	return ts, nil
 }
 
+// Select selects the specified number of candidates from the population.
 func (ts *TournamentSelection) Select(population []*base.EvaluatedCandidate, naturalFitnessScores bool, selectionSize int, rng *rand.Rand) []base.Candidate {
 
 	selection := make([]base.Candidate, selectionSize)

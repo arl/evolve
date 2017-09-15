@@ -4,9 +4,9 @@ import (
 	"time"
 )
 
-// Population is an immutable data object containing statistics about the state
-// of an evolved population and a reference to the fittest candidate solution in
-// the population.
+// PopulationData is an immutable data object containing statistics about the
+// state of an evolved population and a reference to the fittest candidate
+// solution in the population.
 type PopulationData struct {
 	// The fittest candidate present in the population.
 	bestCandidate Candidate
@@ -91,7 +91,7 @@ func (pd *PopulationData) PopulationSize() int {
 	return pd.populationSize
 }
 
-// Return the number of candidates preserved via elitism.
+// EliteCount return the number of candidates preserved via elitism.
 func (pd *PopulationData) EliteCount() int {
 	return pd.eliteCount
 }

@@ -10,7 +10,7 @@ import (
 
 // WithConstantStringMutationProbability sets up a constant probability that,
 // once selected, a candidate will be mutated.
-func WithConstantStringMutationProbability(mutationProbability number.Probability) stringMutationOption {
+func WithConstantStringMutationProbability(mutationProbability number.Probability) StringMutationOption {
 	return func(op *StringMutation) error {
 		op.mutationProbability = number.NewConstantProbabilityGenerator(mutationProbability)
 		return nil
@@ -19,23 +19,27 @@ func WithConstantStringMutationProbability(mutationProbability number.Probabilit
 
 // WithVariableStringMutationProbability sets up a variable probability that,
 // once selected, a candidate will be mutated.
-func WithVariableStringMutationProbability(variable number.ProbabilityGenerator) stringMutationOption {
+func WithVariableStringMutationProbability(variable number.ProbabilityGenerator) StringMutationOption {
 	return func(op *StringMutation) error {
 		op.mutationProbability = variable
 		return nil
 	}
 }
 
+// StringMutation is an evolutionary operator that mutates individual
+// characters in a string according to some probability.
 type StringMutation struct {
 	alphabet            string
 	mutationProbability number.ProbabilityGenerator
 }
 
-type stringMutationOption func(*StringMutation) error
+// StringMutationOption is the type of the functions used to set string mutation
+// options.
+type StringMutationOption func(*StringMutation) error
 
-// NewStringMutation creates a evolutionary operator that mutates individual
-// characters in a string according to some probability.
-func NewStringMutation(alphabet string, options ...stringMutationOption) (*StringMutation, error) {
+// NewStringMutation creates a StringMutation configured with the provided
+// options.
+func NewStringMutation(alphabet string, options ...StringMutationOption) (*StringMutation, error) {
 	// create with default options, mutation probability of zero
 	op := &StringMutation{
 		alphabet:            alphabet,
@@ -51,6 +55,8 @@ func NewStringMutation(alphabet string, options ...stringMutationOption) (*Strin
 	return op, nil
 }
 
+// Apply applies the string mutation to each entry in the list of selected
+// candidates.
 func (op *StringMutation) Apply(selectedCandidates []base.Candidate, rng *rand.Rand) []base.Candidate {
 	mutatedPopulation := make([]base.Candidate, len(selectedCandidates))
 	for i, candidate := range selectedCandidates {

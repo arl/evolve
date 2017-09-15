@@ -5,7 +5,7 @@ import (
 	"math/rand"
 )
 
-// Probabilty represents a probability value (a number in the range 0..1 inclusive).
+// Probability represents a probability value (a number in the range 0..1 inclusive).
 //
 // A value of zero means that an event is guaranteed not to happen. A value of
 // 1 means it is guaranteed to occur.
@@ -39,7 +39,7 @@ func NewProbability(probability float64) (Probability, error) {
 	return Probability(probability), nil
 }
 
-// NewEvent generates an event according to the probability value.
+// NextEvent generates an event according to the probability value.
 //
 // In other words NextEvent returns True with a probability of p, false with a
 // probability of 1 - p.
@@ -48,8 +48,9 @@ func (p Probability) NextEvent(rng *rand.Rand) bool {
 	return p == 1 || rng.Float64() < float64(p)
 }
 
-// The Complement of a probability p is 1 - p. For example if p = 0.75, the
-// complement is 0.25.
+// Complement returns, for a probability p, its complement 1 - p.
+//
+// For example if p = 0.75, the complement is 0.25.
 func (p Probability) Complement() Probability {
 	return Probability(1 - p)
 }

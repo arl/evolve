@@ -8,7 +8,7 @@ import (
 
 // NewByteArrayCrossover creates a crossover operator for array of primitive
 // ints.
-func NewByteArrayCrossover(options ...abstractCrossoverOption) (*AbstractCrossover, error) {
+func NewByteArrayCrossover(options ...AbstractCrossoverOption) (*AbstractCrossover, error) {
 	return NewAbstractCrossover(byteArrayMater{}, options...)
 }
 
