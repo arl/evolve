@@ -13,28 +13,28 @@ func TestStringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	crossover, err := NewStringCrossover()
-	assert.Nil(t, err)
+	if assert.NoError(t, err) {
+		population := make([]base.Candidate, 4)
+		population[0] = "abcde"
+		population[1] = "fghij"
+		population[2] = "klmno"
+		population[3] = "pqrst"
 
-	population := make([]base.Candidate, 4)
-	population[0] = "abcde"
-	population[1] = "fghij"
-	population[2] = "klmno"
-	population[3] = "pqrst"
-
-	for i := 0; i < 20; i++ {
-		values := make(map[rune]struct{}, 20) // used as a set of runes
-		population = crossover.Apply(population, rng)
-		assert.Len(t, population, 4, "Population size changed after cross-over.")
-		for _, individual := range population {
-			s := individual.(string)
-			assert.Lenf(t, s, 5, "Invalid candidate length: %v", len(s))
-			for _, value := range s {
-				values[value] = struct{}{}
+		for i := 0; i < 20; i++ {
+			values := make(map[rune]struct{}, 20) // used as a set of runes
+			population = crossover.Apply(population, rng)
+			assert.Len(t, population, 4, "Population size changed after cross-over.")
+			for _, individual := range population {
+				s := individual.(string)
+				assert.Lenf(t, s, 5, "Invalid candidate length: %v", len(s))
+				for _, value := range s {
+					values[value] = struct{}{}
+				}
 			}
+			// All of the individual elements should still be present, just jumbled up
+			// between individuals.
+			assert.Len(t, values, 20, "Information lost during cross-over.")
 		}
-		// All of the individual elements should still be present, just jumbled up
-		// between individuals.
-		assert.Len(t, values, 20, "Information lost during cross-over.")
 	}
 }
 
@@ -50,19 +50,20 @@ func TestStringCrossoverWithDifferentLengthParents(t *testing.T) {
 		WithConstantCrossoverPoints(1),
 		WithConstantCrossoverProbability(number.ProbabilityOne),
 	)
-	assert.Nil(t, err)
+	if assert.NoError(t, err) {
+		population := make([]base.Candidate, 2)
+		population[0] = "abcde"
+		population[1] = "fghijklm"
 
-	population := make([]base.Candidate, 2)
-	population[0] = "abcde"
-	population[1] = "fghijklm"
-
-	// This should panic since the parents are different lengths.
-	// TODO: why panicking and not returning an error?
-	assert.Panics(t, func() {
-		crossover.Apply(population, rng)
-	})
+		// This should panic since the parents are different lengths.
+		// TODO: why panicking and not returning an error?
+		assert.Panics(t, func() {
+			crossover.Apply(population, rng)
+		})
+	}
 }
 
+// TODO
 /**
  * Number of cross-over points must be greater than zero otherwise the operator
  * is a no-op.

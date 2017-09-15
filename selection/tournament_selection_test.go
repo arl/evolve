@@ -15,18 +15,19 @@ func TestTournamentSelectionNaturalFitness(t *testing.T) {
 	p, _ := number.NewProbability(0.7)
 	selector, err := NewTournamentSelection(
 		WithConstantSelectionProbability(p))
-	assert.Nil(t, err)
 
-	steve, _ := base.NewEvaluatedCandidate("Steve", 10.0)
-	mary, _ := base.NewEvaluatedCandidate("Mary", 9.1)
-	john, _ := base.NewEvaluatedCandidate("John", 8.4)
-	gary, _ := base.NewEvaluatedCandidate("Gary", 6.2)
-	population := []*base.EvaluatedCandidate{steve, mary, john, gary}
+	if assert.NoError(t, err) {
+		steve, _ := base.NewEvaluatedCandidate("Steve", 10.0)
+		mary, _ := base.NewEvaluatedCandidate("Mary", 9.1)
+		john, _ := base.NewEvaluatedCandidate("John", 8.4)
+		gary, _ := base.NewEvaluatedCandidate("Gary", 6.2)
+		population := []*base.EvaluatedCandidate{steve, mary, john, gary}
 
-	// Run several iterations so that we get different tournament outcomes.
-	for i := 0; i < 20; i++ {
-		selection := selector.Select(population, true, 2, rng)
-		assert.Len(t, selection, 2, "want selection size = 2, got", len(selection))
+		// Run several iterations so that we get different tournament outcomes.
+		for i := 0; i < 20; i++ {
+			selection := selector.Select(population, true, 2, rng)
+			assert.Len(t, selection, 2, "want selection size = 2, got", len(selection))
+		}
 	}
 }
 
@@ -36,18 +37,19 @@ func TestTournamentSelectionNonNaturalFitness(t *testing.T) {
 	p, _ := number.NewProbability(0.7)
 	selector, err := NewTournamentSelection(
 		WithConstantSelectionProbability(p))
-	assert.Nil(t, err)
 
-	gary, _ := base.NewEvaluatedCandidate("Gary", 6.2)
-	john, _ := base.NewEvaluatedCandidate("John", 8.4)
-	mary, _ := base.NewEvaluatedCandidate("Mary", 9.1)
-	steve, _ := base.NewEvaluatedCandidate("Steve", 10.0)
-	population := []*base.EvaluatedCandidate{gary, john, mary, steve}
+	if assert.NoError(t, err) {
+		gary, _ := base.NewEvaluatedCandidate("Gary", 6.2)
+		john, _ := base.NewEvaluatedCandidate("John", 8.4)
+		mary, _ := base.NewEvaluatedCandidate("Mary", 9.1)
+		steve, _ := base.NewEvaluatedCandidate("Steve", 10.0)
+		population := []*base.EvaluatedCandidate{gary, john, mary, steve}
 
-	// Run several iterations so that we get different tournament outcomes.
-	for i := 0; i < 20; i++ {
-		selection := selector.Select(population, false, 2, rng)
-		assert.Len(t, selection, 2, "want selection size = 2, got", len(selection))
+		// Run several iterations so that we get different tournament outcomes.
+		for i := 0; i < 20; i++ {
+			selection := selector.Select(population, false, 2, rng)
+			assert.Len(t, selection, 2, "want selection size = 2, got", len(selection))
+		}
 	}
 }
 
@@ -60,6 +62,7 @@ func TestTournamentSelectionNonNaturalFitness(t *testing.T) {
 func TestTournamentSelectionProbabilityTooLow(t *testing.T) {
 	ts, err := NewTournamentSelection(
 		WithConstantSelectionProbability(number.ProbabilityEven))
-	assert.Nil(t, ts)
-	assert.NotNil(t, err)
+	if assert.Error(t, err) {
+		assert.Nil(t, ts)
+	}
 }

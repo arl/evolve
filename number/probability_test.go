@@ -10,23 +10,23 @@ import (
 func TestProbability(t *testing.T) {
 	t.Run("a negative probability value is invalid", func(*testing.T) {
 		_, err := NewProbability(-1)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("a probability value greater than 1 is invalid", func(*testing.T) {
 		_, err := NewProbability(1.01)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("a probability of 0 is valid", func(*testing.T) {
 		p, err := NewProbability(0)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, p, ProbabilityZero)
 	})
 
 	t.Run("a probability of 1 is valid", func(*testing.T) {
 		p, err := NewProbability(1)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, p, ProbabilityOne)
 	})
 }

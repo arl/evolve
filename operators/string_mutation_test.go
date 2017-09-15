@@ -14,24 +14,24 @@ func TestStringMutationTest(t *testing.T) {
 	alphabet := []byte{'a', 'b', 'c', 'd'}
 
 	mutation, err := NewStringMutation(string(alphabet), WithConstantStringMutationProbability(number.ProbabilityEven))
-	assert.Nil(t, err)
+	if assert.NoError(t, err) {
+		individual1 := "abcd"
+		individual2 := "abab"
+		individual3 := "cccc"
 
-	individual1 := "abcd"
-	individual2 := "abab"
-	individual3 := "cccc"
+		population := []base.Candidate{individual1, individual2, individual3}
 
-	population := []base.Candidate{individual1, individual2, individual3}
-
-	// Perform several iterations.
-	for i := 0; i < 20; i++ {
-		population = mutation.Apply(population, rng)
-		assert.Lenf(t, population, 3, "Population size changed after mutation: %v", len(population))
-		// Check that each individual is still valid
-		for _, individual := range population {
-			sind := individual.(string)
-			assert.Lenf(t, sind, 4, "Individual size changed after mutation: %d", len(sind))
-			for _, c := range sind {
-				assert.Containsf(t, alphabet, byte(c), "Mutation introduced invalid character: %c", c)
+		// Perform several iterations.
+		for i := 0; i < 20; i++ {
+			population = mutation.Apply(population, rng)
+			assert.Lenf(t, population, 3, "Population size changed after mutation: %v", len(population))
+			// Check that each individual is still valid
+			for _, individual := range population {
+				sind := individual.(string)
+				assert.Lenf(t, sind, 4, "Individual size changed after mutation: %d", len(sind))
+				for _, c := range sind {
+					assert.Containsf(t, alphabet, byte(c), "Mutation introduced invalid character: %c", c)
+				}
 			}
 		}
 	}
