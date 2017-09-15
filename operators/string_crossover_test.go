@@ -63,13 +63,11 @@ func TestStringCrossoverWithDifferentLengthParents(t *testing.T) {
 	}
 }
 
-// TODO
-/**
- * Number of cross-over points must be greater than zero otherwise the operator
- * is a no-op.
- */
-//@Test(expectedExceptions = IllegalArgumentException.class)
-//public void testZeroCrossoverPoints()
-//{
-//new StringCrossover(0, Probability.EVENS); // Should throw an IllegalArgumentException.
-//}
+// Number of cross-over points must be greater than zero otherwise the operator
+// is a no-op.
+func TestStringCrossoverZeroPoints(t *testing.T) {
+	op, err := NewStringCrossover(WithConstantCrossoverPoints(0))
+	if assert.Error(t, err) {
+		assert.Nil(t, op)
+	}
+}
