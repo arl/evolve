@@ -129,10 +129,8 @@ type EvolutionEngine interface {
 	// non-null. The list may be empty because it is possible for evolution to
 	// terminate without any conditions being matched. The only situation in
 	// which this occurs is when the request goroutine is interrupted.
-	// The error value will be ErrIllegalStateI if this method is invoked on an
-	// evolution engine before evolution is started or while it is still in
-	// progress.
+
+	// May return ErrIllegalState if this method is invoked on an evolution
+	// engine before evolution is started or while it is still in progress.
 	SatisfiedTerminationConditions() ([]TerminationCondition, error)
 }
-
-type ErrIllegalState error
