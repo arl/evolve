@@ -1,0 +1,24 @@
+language: go
+
+go: 
+ - 1.8
+ - tip
+
+sudo: false
+
+before_script:
+  - go vet ./...
+  - go get -u -v github.com/golang/lint/golint
+  - go get -u github.com/alecthomas/gometalinter
+  # use golint through gometalinter because it allows to ignore the `vendor` directory
+  - gometalinter --disable-all --enable=golint --min-confidence=0.85 --vendor ./...
+
+before_install:
+- go get -u -v github.com/kardianos/govendor
+- go get -u -v github.com/mattn/goveralls
+- go get -u -v github.com/wadey/gocovmerge
+- if ! go get -u -v github.com/golang/tools/cmd/cover; then go get -u -v golang.org/x/tools/cmd/cover; fi
+
+script:
+- go test -v ./...
+- ./cover.sh -x 'test_helper\.go'
