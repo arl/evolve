@@ -1,4 +1,4 @@
-package base
+package framework
 
 // NullFitnessEvaluator is a fitness evaluator that always return a score of 0.
 //

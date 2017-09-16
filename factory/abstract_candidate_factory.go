@@ -3,7 +3,7 @@ package factory
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 )
 
 // AbstractCandidateFactory is a convenient base class for implementations of
@@ -22,9 +22,9 @@ type AbstractCandidateFactory struct {
 // Returns a randomly generated initial population of candidate solutions.
 func (f *AbstractCandidateFactory) GenerateInitialPopulation(
 	populationSize int,
-	rng *rand.Rand) []base.Candidate {
+	rng *rand.Rand) []framework.Candidate {
 
-	population := make([]base.Candidate, populationSize)
+	population := make([]framework.Candidate, populationSize)
 	for i := range population {
 		population[i] = f.GenerateRandomCandidate(rng)
 	}
@@ -54,13 +54,13 @@ func (f *AbstractCandidateFactory) GenerateInitialPopulation(
 // specified seed candidates.
 func (f *AbstractCandidateFactory) SeedInitialPopulation(
 	populationSize int,
-	seedCandidates []base.Candidate,
-	rng *rand.Rand) []base.Candidate {
+	seedCandidates []framework.Candidate,
+	rng *rand.Rand) []framework.Candidate {
 
 	if len(seedCandidates) > populationSize {
 		panic("Too many seed candidates for specified population size.")
 	}
-	population := make([]base.Candidate, populationSize)
+	population := make([]framework.Candidate, populationSize)
 	for i := range seedCandidates {
 		population[i] = seedCandidates[i]
 	}

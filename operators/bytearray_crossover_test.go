@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/number"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +14,7 @@ func TestByteArrayCrossover(t *testing.T) {
 
 	crossover, err := NewByteArrayCrossover()
 	if assert.NoError(t, err) {
-		population := make([]base.Candidate, 4)
+		population := make([]framework.Candidate, 4)
 		population[0] = []byte{1, 2, 3, 4, 5}
 		population[1] = []byte{6, 7, 8, 9, 10}
 		population[2] = []byte{11, 12, 13, 14, 15}
@@ -51,7 +51,7 @@ func TestByteArrayCrossoverWithDifferentLengthParents(t *testing.T) {
 		WithConstantCrossoverProbability(number.ProbabilityOne),
 	)
 	if assert.NoError(t, err) {
-		population := make([]base.Candidate, 2)
+		population := make([]framework.Candidate, 2)
 		population[0] = []byte{1, 2, 3, 4, 5}
 		population[1] = []byte{2, 4, 8, 10, 12, 14, 16}
 

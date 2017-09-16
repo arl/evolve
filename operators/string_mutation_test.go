@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/number"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +19,7 @@ func TestStringMutationTest(t *testing.T) {
 		individual2 := "abab"
 		individual3 := "cccc"
 
-		population := []base.Candidate{individual1, individual2, individual3}
+		population := []framework.Candidate{individual1, individual2, individual3}
 
 		// Perform several iterations.
 		for i := 0; i < 20; i++ {

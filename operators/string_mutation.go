@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/number"
 )
 
@@ -57,8 +57,8 @@ func NewStringMutation(alphabet string, options ...StringMutationOption) (*Strin
 
 // Apply applies the string mutation to each entry in the list of selected
 // candidates.
-func (op *StringMutation) Apply(selectedCandidates []base.Candidate, rng *rand.Rand) []base.Candidate {
-	mutatedPopulation := make([]base.Candidate, len(selectedCandidates))
+func (op *StringMutation) Apply(selectedCandidates []framework.Candidate, rng *rand.Rand) []framework.Candidate {
+	mutatedPopulation := make([]framework.Candidate, len(selectedCandidates))
 	for i, candidate := range selectedCandidates {
 		mutatedPopulation[i] = op.mutateString(candidate.(string), rng)
 	}

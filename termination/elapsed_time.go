@@ -3,7 +3,7 @@ package termination
 import (
 	"time"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 )
 
 // ElapsedTime terminates evolution after a pre-determined period of time has
@@ -22,6 +22,6 @@ func NewElapsedTime(maxDuration time.Duration) ElapsedTime {
 
 // ShouldTerminate returns true if the pre-configured maximum permitted time
 // has elapsed.
-func (tc ElapsedTime) ShouldTerminate(populationData base.PopulationData) bool {
+func (tc ElapsedTime) ShouldTerminate(populationData framework.PopulationData) bool {
 	return populationData.ElapsedTime() >= tc.maxDuration
 }

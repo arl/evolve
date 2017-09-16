@@ -3,7 +3,7 @@ package factory
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 )
 
 // A CandidateFactory creates new populations of candidates.
@@ -17,7 +17,7 @@ type CandidateFactory interface {
 	// Returns an initial population of candidate solutions.
 	GenerateInitialPopulation(
 		populationSize int,
-		rng *rand.Rand) []base.Candidate
+		rng *rand.Rand) []framework.Candidate
 
 	// SeedInitialPopulation seeds all or a part of an initial population
 	// with some candidates.
@@ -42,8 +42,8 @@ type CandidateFactory interface {
 	// specified seed candidates.
 	SeedInitialPopulation(
 		populationSize int,
-		seedCandidates []base.Candidate,
-		rng *rand.Rand) []base.Candidate
+		seedCandidates []framework.Candidate,
+		rng *rand.Rand) []framework.Candidate
 }
 
 // RandomCandidateGenerator is the interface implemented by objects that
@@ -51,5 +51,5 @@ type CandidateFactory interface {
 type RandomCandidateGenerator interface {
 
 	// GenerateRandomCandidate randomly create a single candidate solution.
-	GenerateRandomCandidate(rng *rand.Rand) base.Candidate
+	GenerateRandomCandidate(rng *rand.Rand) framework.Candidate
 }

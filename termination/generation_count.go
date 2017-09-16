@@ -1,6 +1,6 @@
 package termination
 
-import "github.com/aurelien-rainone/evolve/base"
+import "github.com/aurelien-rainone/evolve/framework"
 
 // GenerationCount terminates evolution after a set number of generations have
 // passed.
@@ -21,6 +21,6 @@ func NewGenerationCount(generationCount int) GenerationCount {
 //
 // populationData is the information about the current state of evolution.
 // This may be used to determine whether evolution should continue or not.
-func (tc GenerationCount) ShouldTerminate(populationData base.PopulationData) bool {
+func (tc GenerationCount) ShouldTerminate(populationData framework.PopulationData) bool {
 	return populationData.GenerationNumber()+1 >= tc.generationCount
 }

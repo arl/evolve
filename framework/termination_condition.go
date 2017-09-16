@@ -1,4 +1,4 @@
-package base
+package framework
 
 // TerminationCondition is the interface implemented by objects used to
 // terminate evolutionary algorithms.

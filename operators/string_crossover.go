@@ -3,7 +3,7 @@ package operators
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 )
 
 // NewStringCrossover creates a crossover operator for string candidates.
@@ -13,9 +13,9 @@ func NewStringCrossover(options ...AbstractCrossoverOption) (*AbstractCrossover,
 
 type stringMater struct{}
 
-func (m stringMater) Mate(parent1, parent2 base.Candidate,
+func (m stringMater) Mate(parent1, parent2 framework.Candidate,
 	numberOfCrossoverPoints int64,
-	rng *rand.Rand) []base.Candidate {
+	rng *rand.Rand) []framework.Candidate {
 
 	p1, p2 := parent1.(string), parent2.(string)
 
@@ -35,5 +35,5 @@ func (m stringMater) Mate(parent1, parent2 base.Candidate,
 			offspring1[j], offspring2[j] = offspring2[j], offspring1[j]
 		}
 	}
-	return append([]base.Candidate{}, string(offspring1), string(offspring2))
+	return append([]framework.Candidate{}, string(offspring1), string(offspring2))
 }

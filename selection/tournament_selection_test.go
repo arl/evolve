@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/number"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,11 +17,11 @@ func TestTournamentSelectionNaturalFitness(t *testing.T) {
 		WithConstantSelectionProbability(p))
 
 	if assert.NoError(t, err) {
-		steve, _ := base.NewEvaluatedCandidate("Steve", 10.0)
-		mary, _ := base.NewEvaluatedCandidate("Mary", 9.1)
-		john, _ := base.NewEvaluatedCandidate("John", 8.4)
-		gary, _ := base.NewEvaluatedCandidate("Gary", 6.2)
-		population := []*base.EvaluatedCandidate{steve, mary, john, gary}
+		steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
+		mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
+		john, _ := framework.NewEvaluatedCandidate("John", 8.4)
+		gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
+		population := []*framework.EvaluatedCandidate{steve, mary, john, gary}
 
 		// Run several iterations so that we get different tournament outcomes.
 		for i := 0; i < 20; i++ {
@@ -39,11 +39,11 @@ func TestTournamentSelectionNonNaturalFitness(t *testing.T) {
 		WithConstantSelectionProbability(p))
 
 	if assert.NoError(t, err) {
-		gary, _ := base.NewEvaluatedCandidate("Gary", 6.2)
-		john, _ := base.NewEvaluatedCandidate("John", 8.4)
-		mary, _ := base.NewEvaluatedCandidate("Mary", 9.1)
-		steve, _ := base.NewEvaluatedCandidate("Steve", 10.0)
-		population := []*base.EvaluatedCandidate{gary, john, mary, steve}
+		gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
+		john, _ := framework.NewEvaluatedCandidate("John", 8.4)
+		mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
+		steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
+		population := []*framework.EvaluatedCandidate{gary, john, mary, steve}
 
 		// Run several iterations so that we get different tournament outcomes.
 		for i := 0; i < 20; i++ {

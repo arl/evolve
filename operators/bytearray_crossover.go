@@ -3,7 +3,7 @@ package operators
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/base"
+	"github.com/aurelien-rainone/evolve/framework"
 )
 
 // NewByteArrayCrossover creates a crossover operator for array of primitive
@@ -14,9 +14,9 @@ func NewByteArrayCrossover(options ...AbstractCrossoverOption) (*AbstractCrossov
 
 type byteArrayMater struct{}
 
-func (m byteArrayMater) Mate(parent1, parent2 base.Candidate,
+func (m byteArrayMater) Mate(parent1, parent2 framework.Candidate,
 	numberOfCrossoverPoints int64,
-	rng *rand.Rand) []base.Candidate {
+	rng *rand.Rand) []framework.Candidate {
 
 	p1, p2 := parent1.([]byte), parent2.([]byte)
 
@@ -39,5 +39,5 @@ func (m byteArrayMater) Mate(parent1, parent2 base.Candidate,
 			offspring1[j], offspring2[j] = offspring2[j], offspring1[j]
 		}
 	}
-	return append([]base.Candidate{}, offspring1, offspring2)
+	return append([]framework.Candidate{}, offspring1, offspring2)
 }
