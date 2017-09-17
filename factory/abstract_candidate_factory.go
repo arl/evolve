@@ -10,7 +10,7 @@ import (
 // the CandidateFactory interface.
 // TODO: rename CandidateFactoryImpl
 type AbstractCandidateFactory struct {
-	RandomCandidateGenerator
+	framework.RandomCandidateGenerator
 }
 
 // GenerateInitialPopulation randomly creates an initial population of
