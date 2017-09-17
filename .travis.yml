@@ -21,4 +21,4 @@ before_install:
 
 script:
 - go test -v ./...
-- ./cover.sh -x 'test_helper\.go'
+- ./cover.sh
