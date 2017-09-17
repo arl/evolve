@@ -1,9 +1,13 @@
 package framework
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
 
 // SelectionStrategy is the interface that implementd "natural" selection.
 type SelectionStrategy interface {
+	fmt.Stringer
 
 	// Select selects the specified number of candidates from the population.
 	//
