@@ -56,3 +56,21 @@ func (ec *EvaluatedCandidate) CompareTo(o *EvaluatedCandidate) int {
 	}
 	return 0
 }
+
+type EvaluatedPopulation []*EvaluatedCandidate
+
+// Len is the number of elements in the collection.
+func (s EvaluatedPopulation) Len() int {
+	return len(s)
+}
+
+// Less reports whether the element with
+// index a should sort before the element with index b.
+func (s EvaluatedPopulation) Less(i, j int) bool {
+	return s[i].Equals(s[j])
+}
+
+// Swap swaps the elements with indexes i and j.
+func (s EvaluatedPopulation) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
