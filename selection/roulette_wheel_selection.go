@@ -30,7 +30,7 @@ type RouletteWheelSelection struct{}
 // fitter individuals, false if lower fitness scores indicate fitter
 // individuals.
 // - selectionSize is the number of selections to make.
-func (rws *RouletteWheelSelection) Select(population []*framework.EvaluatedCandidate, naturalFitnessScores bool, selectionSize int, rng *rand.Rand) []framework.Candidate {
+func (rws RouletteWheelSelection) Select(population []*framework.EvaluatedCandidate, naturalFitnessScores bool, selectionSize int, rng *rand.Rand) []framework.Candidate {
 
 	// Record the cumulative fitness scores. It doesn't matter whether the
 	// population is sorted or not. We will use these cumulative scores to
@@ -59,7 +59,7 @@ func (rws *RouletteWheelSelection) Select(population []*framework.EvaluatedCandi
 	return selection
 }
 
-func (rws *RouletteWheelSelection) String() string {
+func (rws RouletteWheelSelection) String() string {
 	return "Roulette Wheel Selection"
 }
 
