@@ -9,5 +9,5 @@ type TerminationCondition interface {
 	//
 	// populationData is the information about the current state of evolution.
 	// This may be used to determine whether evolution should continue or not.
-	ShouldTerminate(PopulationData) bool
+	ShouldTerminate(*PopulationData) bool
 }

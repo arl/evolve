@@ -41,8 +41,8 @@ func NewPopulationData(bestCandidate Candidate,
 	bestCandidateFitness, meanFitness, fitnessStandardDeviation float64,
 	naturalFitness bool,
 	populationSize, eliteCount, generationNumber int,
-	elapsedTime time.Duration) PopulationData {
-	return PopulationData{
+	elapsedTime time.Duration) *PopulationData {
+	return &PopulationData{
 
 		bestCandidate:            bestCandidate,
 		bestCandidateFitness:     bestCandidateFitness,

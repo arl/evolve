@@ -21,6 +21,6 @@ func NewGenerationCount(generationCount int) GenerationCount {
 //
 // populationData is the information about the current state of evolution.
 // This may be used to determine whether evolution should continue or not.
-func (tc GenerationCount) ShouldTerminate(populationData framework.PopulationData) bool {
+func (tc GenerationCount) ShouldTerminate(populationData *framework.PopulationData) bool {
 	return populationData.GenerationNumber()+1 >= tc.generationCount
 }

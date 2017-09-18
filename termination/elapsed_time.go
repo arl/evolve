@@ -22,6 +22,6 @@ func NewElapsedTime(maxDuration time.Duration) ElapsedTime {
 
 // ShouldTerminate returns true if the pre-configured maximum permitted time
 // has elapsed.
-func (tc ElapsedTime) ShouldTerminate(populationData framework.PopulationData) bool {
+func (tc ElapsedTime) ShouldTerminate(populationData *framework.PopulationData) bool {
 	return populationData.ElapsedTime() >= tc.maxDuration
 }
