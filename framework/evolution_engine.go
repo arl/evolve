@@ -24,7 +24,8 @@ type EvolutionEngine interface {
 	// terminate.
 	//
 	// Return the fittest solution found by the evolutionary process.
-	Evolve(populationSize, eliteCount int, conditions []TerminationCondition) Candidate
+	Evolve(populationSize, eliteCount int,
+		conditions ...TerminationCondition) Candidate
 
 	// EvolveWithSeedCandidates executes the evolutionary algorithm until one of
 	// the termination conditions is met, then return the fittest candidate from
@@ -51,7 +52,7 @@ type EvolutionEngine interface {
 	// Returns the fittest solution found by the evolutionary process.
 	EvolveWithSeedCandidates(populationSize, eliteCount int,
 		seedCandidates []Candidate,
-		conditions []TerminationCondition) Candidate
+		conditions ...TerminationCondition) Candidate
 
 	// EvolvePopulation executes the evolutionary algorithm until one of the
 	// termination conditions is met, then return all of the candidates from the
@@ -73,7 +74,7 @@ type EvolutionEngine interface {
 	//
 	// Return the fittest solution found by the evolutionary process.
 	EvolvePopulation(populationSize, eliteCount int,
-		conditions []TerminationCondition) []*EvaluatedCandidate
+		conditions ...TerminationCondition) EvaluatedPopulation
 
 	// EvolvePopulationWithSeedCandidates executes the evolutionary algorithm
 	// until one of the termination conditions is met, then return all of the
@@ -99,7 +100,7 @@ type EvolutionEngine interface {
 	// Return the fittest solution found by the evolutionary process.
 	EvolvePopulationWithSeedCandidates(populationSize, eliteCount int,
 		seedCandidates []Candidate,
-		conditions []TerminationCondition) []*EvaluatedCandidate
+		conditions ...TerminationCondition) EvaluatedPopulation
 
 	// AddEvolutionObserver adds a listener to receive status updates on the
 	// evolution progress.
