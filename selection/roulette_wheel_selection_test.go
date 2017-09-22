@@ -20,7 +20,7 @@ func TestRouletteWheelSelectionNaturalFitnessSolution(t *testing.T) {
 	mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
 	john, _ := framework.NewEvaluatedCandidate("John", 8.4)
 	gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
-	population := []*framework.EvaluatedCandidate{steve, mary, john, gary}
+	population := framework.EvaluatedPopulation{steve, mary, john, gary}
 
 	// Run several iterations to get different outcomes from the "roulette wheel".
 	for i := 0; i < 20; i++ {
@@ -37,7 +37,7 @@ func TestRouletteWheelSelectionNonNaturalFitnessSolution(t *testing.T) {
 	john, _ := framework.NewEvaluatedCandidate("John", 8.4)
 	mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
 	steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
-	population := []*framework.EvaluatedCandidate{gary, john, mary, steve}
+	population := framework.EvaluatedPopulation{gary, john, mary, steve}
 
 	// Run several iterations to get different outcomes from the "roulette wheel".
 	for i := 0; i < 20; i++ {
@@ -56,7 +56,7 @@ func TestRouletteWheelSelectionNonNaturalFitnessPerfectSolution(t *testing.T) {
 	john, _ := framework.NewEvaluatedCandidate("John", 8.4)
 	mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
 	steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
-	population := []*framework.EvaluatedCandidate{gary, john, mary, steve}
+	population := framework.EvaluatedPopulation{gary, john, mary, steve}
 
 	// Run several iterations to get different outcomes from the "roulette wheel".
 	for i := 0; i < 20; i++ {

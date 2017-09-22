@@ -68,7 +68,11 @@ func NewTournamentSelection(options ...TournamentSelectionOption) (*TournamentSe
 }
 
 // Select selects the specified number of candidates from the population.
-func (ts *TournamentSelection) Select(population []*framework.EvaluatedCandidate, naturalFitnessScores bool, selectionSize int, rng *rand.Rand) []framework.Candidate {
+func (ts *TournamentSelection) Select(
+	population framework.EvaluatedPopulation,
+	naturalFitnessScores bool,
+	selectionSize int,
+	rng *rand.Rand) []framework.Candidate {
 
 	selection := make([]framework.Candidate, selectionSize)
 	for i := 0; i < selectionSize; i++ {
