@@ -16,10 +16,8 @@ type EvolutionPipeline struct {
 	pipeline []framework.EvolutionaryOperator
 }
 
-// Creates a pipeline consisting of the specified operators in
-// the order that they are supplied.
-// @param pipeline An ordered list of operators that make up the
-// pipeline.
+// NewEvolutionPipeline creates a pipeline consisting of the specified operators
+// in the order that they are supplied.
 func NewEvolutionPipeline(pipeline ...framework.EvolutionaryOperator) (*EvolutionPipeline, error) {
 	ep := &EvolutionPipeline{pipeline: pipeline}
 	if len(ep.pipeline) == 0 {
