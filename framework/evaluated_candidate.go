@@ -1,6 +1,9 @@
 package framework
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 // EvaluatedCandidate is an immutable wrapper for associating a candidate
 // solution with its fitness score.
@@ -40,6 +43,15 @@ func (ec *EvaluatedCandidate) Equals(o *EvaluatedCandidate) bool {
 	return ec.Fitness() == o.Fitness()
 }
 
+// Hash returns the candidate's hash code (consistent with Equals)
+func (ec *EvaluatedCandidate) Hash() int64 {
+	var temp uint64
+	if ec.fitness != 0 {
+		temp = math.Float64bits(ec.fitness)
+	}
+	return int64(temp ^ (temp >> 32))
+}
+
 // CompareTo compares this candidate's fitness score with that of the specified
 // candidate.
 //
@@ -67,7 +79,7 @@ func (s EvaluatedPopulation) Len() int {
 // Less reports whether the element with
 // index a should sort before the element with index b.
 func (s EvaluatedPopulation) Less(i, j int) bool {
-	return s[i].Equals(s[j])
+	return s[i].CompareTo(s[j]) == -1
 }
 
 // Swap swaps the elements with indexes i and j.

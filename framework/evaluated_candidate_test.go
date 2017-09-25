@@ -16,8 +16,8 @@ func TestEvaluatedCandidateEquality(t *testing.T) {
 		assert.Truef(t, candidate1.Equals(candidate1), "Equality must be reflexive.")
 		assert.Truef(t, candidate2.Equals(candidate2), "Equality must be reflexive.")
 
-		//assert candidate1.hashCode() == candidate2.hashCode() : "Hash codes must be identical for equal objects.";
-		//assert candidate1.compareTo(candidate2) == 0 : "compareTo() must be consistent with equals()";
+		assert.Equalf(t, candidate1.Hash(), candidate2.Hash(), "Hash codes must be identical for equal objects")
+		assert.Zerof(t, candidate1.CompareTo(candidate2), "CompareTo() must be consistent with Equals()")
 
 		assert.Truef(t, candidate1.Equals(candidate2), "Candidates with equal fitness should be equal.")
 		assert.Truef(t, candidate2.Equals(candidate1), "Equality must be symmetric.")
@@ -33,8 +33,7 @@ func TestEvaluatedCandidateNotEqual(t *testing.T) {
 	if assert.NoError(t, err1) && assert.Nil(t, err2) {
 		assert.False(t, candidate1.Equals(candidate2), "Candidates with equal fitness should be equal.")
 		assert.False(t, candidate2.Equals(candidate1), "Equality must be symmetric.")
-
-		//assert candidate1.compareTo(candidate2) != 0 : "compareTo() must be consistent with equals()";
+		assert.NotZerof(t, candidate1.CompareTo(candidate2), "CompareTo() must be consistent with Equals()")
 	}
 }
 
