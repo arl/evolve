@@ -29,8 +29,7 @@ type Stepper interface {
 // AbstractEvolutionEngine is a base struc for EvolutionEngine implementations.
 type AbstractEvolutionEngine struct {
 	// A single multi-threaded worker is shared among multiple evolution engine instances.
-	// TODO: surement meme pas besoin de ca si on implemente une Queue spécialisée
-	concurrentWorker               *FitnessEvaluationPool
+	concurrentWorker               *fitnessEvaluationPool
 	observers                      map[framework.EvolutionObserver]struct{}
 	rng                            *rand.Rand
 	candidateFactory               framework.CandidateFactory
@@ -257,7 +256,7 @@ func (e *AbstractEvolutionEngine) evaluatePopulation(population []framework.Cand
 		copy(unmodifiablePopulation, population)
 
 		// Submit tasks for execution and wait until all threads have finished fitness evaluations.
-		evaluatedPopulation = e.pool().Submit(
+		evaluatedPopulation = e.pool().submit(
 			newFitnessEvaluationTask(
 				e.fitnessEvaluator,
 				unmodifiablePopulation,
@@ -342,9 +341,9 @@ func (e *AbstractEvolutionEngine) SetSingleThreaded(singleThreaded bool) {
 }
 
 // pool lazily creates the fitness evaluations goroutine pool.
-func (e *AbstractEvolutionEngine) pool() *FitnessEvaluationPool {
+func (e *AbstractEvolutionEngine) pool() *fitnessEvaluationPool {
 	if e.concurrentWorker == nil {
-		e.concurrentWorker = NewFitnessEvaluationWorker()
+		e.concurrentWorker = newFitnessEvaluationPool()
 	}
 	return e.concurrentWorker
 }
