@@ -18,7 +18,7 @@ import (
 func prepareEngine() framework.EvolutionEngine {
 	return NewGenerationalEvolutionEngine(
 		&factory.AbstractCandidateFactory{
-			framework.RandomCandidateGenerator: test.StubIntegerFactory{},
+			RandomCandidateGenerator: test.StubIntegerFactory{},
 		},
 		integerZeroMaker{},
 		test.IntegerEvaluator{},
