@@ -17,14 +17,14 @@ func init() {
 // more values are added.
 func TestDataSetCapacityIncrease(t *testing.T) {
 	data := NewDataSet(WithInitialCapacity(3))
-	assert.Empty(t, data.Size(), "Initial size should be 0.")
+	assert.Empty(t, data.Len(), "Initial size should be 0.")
 	data.AddValue(1)
 	data.AddValue(2)
 	data.AddValue(3)
-	assert.Equal(t, data.Size(), 3)
+	assert.Equal(t, data.Len(), 3)
 	// Add a value to take the size beyond the initial capacity.
 	data.AddValue(4)
-	assert.Equal(t, data.Size(), 4)
+	assert.Equal(t, data.Len(), 4)
 }
 
 func TestDataSetAggregate(t *testing.T) {

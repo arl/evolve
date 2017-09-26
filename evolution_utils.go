@@ -85,7 +85,7 @@ func ComputePopulationData(
 		stats.ArithmeticMean(),
 		stats.StandardDeviation(),
 		naturalFitness,
-		stats.Size(),
+		stats.Len(),
 		eliteCount,
 		iterationNumber,
 		time.Since(startTime))

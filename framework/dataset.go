@@ -89,8 +89,8 @@ func (ds *DataSet) assertNotEmpty() {
 	}
 }
 
-// Size returns the number of values in this data set.
-func (ds *DataSet) Size() int {
+// Len returns the number of values in this data set.
+func (ds *DataSet) Len() int {
 	return len(ds.dataSet)
 }
 
