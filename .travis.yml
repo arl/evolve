@@ -10,8 +10,9 @@ before_script:
   - go vet ./...
   - go get -u -v github.com/golang/lint/golint
   - go get -u github.com/alecthomas/gometalinter
-  # use golint through gometalinter because it allows to ignore the `vendor` directory
-  - gometalinter --disable-all --enable=golint --min-confidence=0.85 --vendor ./...
+  # use golint through gometalinter because it allows to easily ignore the
+  # `vendor` and `internal` directories
+  - gometalinter --disable-all --enable=golint --min-confidence=0.85 --skip=internal --vendor ./...
 
 before_install:
 - go get -u -v github.com/kardianos/govendor
