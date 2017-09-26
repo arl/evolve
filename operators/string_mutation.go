@@ -33,8 +33,8 @@ type StringMutation struct {
 	mutationProbability number.ProbabilityGenerator
 }
 
-// StringMutationOption is the type of the functions used to set string mutation
-// options.
+// StringMutationOption is the type of functions used to specify options during
+// the creation of StringMutation objects.
 type StringMutationOption func(*StringMutation) error
 
 // NewStringMutation creates a StringMutation configured with the provided

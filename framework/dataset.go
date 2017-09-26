@@ -18,11 +18,11 @@ type DataSet struct {
 	minimum, maximum float64
 }
 
+// DataSetOption is the type of functions used to specify options during the
+// creation of DataSet objects.
 type DataSetOption func(*DataSet)
 
-/**
- * Creates an empty data set with a default initial capacity.
- */
+// NewDataSet creates an empty data set with a default initial capacity.
 func NewDataSet(options ...DataSetOption) *DataSet {
 	ds := &DataSet{
 		minimum:       math.MaxFloat64,
@@ -68,11 +68,8 @@ func WithPrePopulatedDataSet(dataSet []float64) DataSetOption {
 	}
 }
 
-//
-// Adds a single value to the data set and updates any
-// statistics that are calculated cumulatively.
-// @param value The value to add.
-//
+// AddValue adds a single value to the data set and updates any statistics that
+// are calculated cumulatively.
 func (ds *DataSet) AddValue(value float64) {
 	ds.dataSet = append(ds.dataSet, value)
 	ds.updateStatsWithNewValue(value)
