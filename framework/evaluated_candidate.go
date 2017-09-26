@@ -69,6 +69,7 @@ func (ec *EvaluatedCandidate) CompareTo(o *EvaluatedCandidate) int {
 	return 0
 }
 
+// EvaluatedPopulation represents a slice of pointers to EvaluatedCandidate.
 type EvaluatedPopulation []*EvaluatedCandidate
 
 // Len is the number of elements in the collection.
