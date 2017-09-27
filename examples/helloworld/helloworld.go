@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aurelien-rainone/evolve"
 	"github.com/aurelien-rainone/evolve/factory"
@@ -14,20 +15,6 @@ import (
 	"github.com/aurelien-rainone/evolve/selection"
 	"github.com/aurelien-rainone/evolve/termination"
 )
-
-func check(err error) {
-	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
-	}
-}
-
-type observer struct{}
-
-func (o observer) PopulationUpdate(data *framework.PopulationData) {
-	fmt.Printf("Generation %d: %s (%v)\n", data.GenerationNumber(), data.BestCandidate(),
-		data.BestCandidateFitness())
-}
 
 func main() {
 	var targetString = "HELLO WORLD"
@@ -83,7 +70,7 @@ func main() {
 	fitnessEvaluator := newStringEvaluator(targetString)
 
 	var selectionStrategy = &selection.RouletteWheelSelection{}
-	rng := rand.New(rand.NewSource(99))
+	rng := rand.New(rand.NewSource(randomSeed()))
 
 	var engine *evolve.AbstractEvolutionEngine
 	engine = evolve.NewGenerationalEvolutionEngine(stringFactory,
@@ -104,4 +91,22 @@ func main() {
 		fmt.Printf("satified termination condition %v %T: %v\n",
 			i, condition, condition)
 	}
+}
+
+func randomSeed() int64 {
+	return int64(time.Now().UnixNano())
+}
+
+func check(err error) {
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(1)
+	}
+}
+
+type observer struct{}
+
+func (o observer) PopulationUpdate(data *framework.PopulationData) {
+	fmt.Printf("Generation %d: %s (%v)\n", data.GenerationNumber(), data.BestCandidate(),
+		data.BestCandidateFitness())
 }
