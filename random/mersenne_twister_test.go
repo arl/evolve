@@ -40,7 +40,7 @@ func TestMersenneTwister(t *testing.T) {
 		// a simple check for major problems with the output.
 		rng := rand.New(NewMT19937(randomSeed()))
 
-		pi := calculateMonteCarloValueForPi(rng, 100000)
+		pi := calculateMonteCarloValueForPi(rng, 1000000)
 		assert.InDeltaf(t, pi, math.Pi, 0.01, "Monte Carlo value for Pi is outside acceptable range: %v", pi)
 	})
 
@@ -54,7 +54,7 @@ func TestMersenneTwister(t *testing.T) {
 		// Expected standard deviation for a uniformly distributed
 		// population of values in the range 0..n approaches n/sqrt(12).
 		const n = 100
-		observedSD := calculateSampleStandardDeviation(rng, n, 1000000)
+		observedSD := calculateSampleStandardDeviation(rng, n, 10000000)
 		expectedSD := 100 / math.Sqrt(12)
 		assert.InDeltaf(t, observedSD, expectedSD, 0.02, "standard deviation outside acceptable range: %f", observedSD)
 	})
