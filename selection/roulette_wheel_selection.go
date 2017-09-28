@@ -1,7 +1,6 @@
 package selection
 
 import (
-	"math"
 	"math/rand"
 	"sort"
 
@@ -65,19 +64,6 @@ func (rws RouletteWheelSelection) Select(
 
 func (rws RouletteWheelSelection) String() string {
 	return "Roulette Wheel Selection"
-}
-
-func adjustedFitness(rawFitness float64, naturalFitness bool) float64 {
-	if naturalFitness {
-		return rawFitness
-	}
-	// If standardised fitness is zero we have found the best possible
-	// solution.  The evolutionary algorithm should not be continuing
-	// after finding it.
-	if rawFitness == 0 {
-		return math.MaxFloat64
-	}
-	return 1 / rawFitness
 }
 
 func abs(a int) int {
