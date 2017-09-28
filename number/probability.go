@@ -34,7 +34,7 @@ func init() {
 // NewProbability creates a new Probability value.
 func NewProbability(probability float64) (Probability, error) {
 	if probability < 0 || probability > 1 {
-		return ProbabilityZero, fmt.Errorf("Probability must be in the range 0..1 inclusive, got%v", probability)
+		return ProbabilityZero, fmt.Errorf("probability must be in the range 0..1 inclusive, got %v", probability)
 	}
 	return Probability(probability), nil
 }
@@ -44,7 +44,7 @@ func NewProbability(probability float64) (Probability, error) {
 // In other words NextEvent returns True with a probability of p, false with a
 // probability of 1 - p.
 func (p Probability) NextEvent(rng *rand.Rand) bool {
-	// Don't bother generating an random value if the result is guaranteed.
+	// Don't bother generating a random value if the result is guaranteed.
 	return p == 1 || rng.Float64() < float64(p)
 }
 
