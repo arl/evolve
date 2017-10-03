@@ -52,5 +52,5 @@ func (p Probability) NextEvent(rng *rand.Rand) bool {
 //
 // For example if p = 0.75, the complement is 0.25.
 func (p Probability) Complement() Probability {
-	return Probability(1 - p)
+	return 1 - p
 }

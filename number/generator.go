@@ -66,7 +66,7 @@ type BoundedFloat64Generator struct {
 // default uniform PRNG.
 func NewBoundedFloat64Generator(min, max float64) *BoundedFloat64Generator {
 	g := &BoundedFloat64Generator{min: min, max: max}
-	g.SetRNG(rand.New(rand.NewSource(int64(time.Now().UnixNano()))))
+	g.SetRNG(rand.New(rand.NewSource(time.Now().UnixNano())))
 	return g
 }
 

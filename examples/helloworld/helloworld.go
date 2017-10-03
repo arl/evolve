@@ -94,7 +94,7 @@ func main() {
 }
 
 func randomSeed() int64 {
-	return int64(time.Now().UnixNano())
+	return time.Now().UnixNano()
 }
 
 func check(err error) {
