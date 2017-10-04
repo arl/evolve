@@ -103,3 +103,37 @@ func TestConcurrentWorkerResults(t *testing.T) {
 		}
 	}
 }
+
+type workWith func() interface{}
+
+func (w workWith) Work() interface{} {
+	// call delegate function
+	return w()
+}
+
+func TestConcurrentWorkerFunction(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping TestConcurrentWorkerFunction in short mode")
+	}
+	workers := make([]Worker, 20)
+	for i := range workers {
+		// create a closure just for the need of the test
+		func(idx int) {
+
+			// the worker is an anonymous function
+			workers[idx] = workWith(func() interface{} {
+				return idx
+			})
+
+		}(i) // pass it to capture the value of i
+	}
+	pool := NewPool(2)
+
+	results, err := pool.Submit(workers)
+	assert.NoError(t, err)
+
+	// check the results slice is indexed as the workers
+	for i, result := range results {
+		assert.Equal(t, result, i)
+	}
+}
