@@ -3,9 +3,11 @@ package evolve
 import (
 	"fmt"
 	"math/rand"
+	"runtime"
 	"time"
 
 	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/worker"
 )
 
 // Stepper is the interface implemented by objects having a NextEvolutionStep
@@ -29,7 +31,7 @@ type Stepper interface {
 // AbstractEvolutionEngine is a base struc for EvolutionEngine implementations.
 type AbstractEvolutionEngine struct {
 	// A single multi-threaded worker is shared among multiple evolution engine instances.
-	concurrentWorker               *fitnessEvaluationPool
+	pool                           *worker.Pool
 	observers                      map[framework.EvolutionObserver]struct{}
 	rng                            *rand.Rand
 	candidateFactory               framework.CandidateFactory
@@ -235,9 +237,8 @@ func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(
 // Returns the evaluated population (a list of candidates with attached fitness
 // scores).
 func (e *AbstractEvolutionEngine) evaluatePopulation(population []framework.Candidate) framework.EvaluatedPopulation {
-	// TODO: change comment about thread
 	var evaluatedPopulation framework.EvaluatedPopulation
-	// Do fitness evaluations on the request thread.
+	// Do fitness evaluations
 	var err error
 	if e.singleThreaded {
 		evaluatedPopulation = make(framework.EvaluatedPopulation, len(population))
@@ -249,18 +250,27 @@ func (e *AbstractEvolutionEngine) evaluatePopulation(population []framework.Cand
 		}
 	} else {
 		// Divide the required number of fitness evaluations equally among the
-		// available processors and coordinate the threads so that we do not
-		// proceed until all threads have finished processing.
-		unmodifiablePopulation := make([]framework.Candidate, len(population))
-		// TODO: is this really necessary?
-		copy(unmodifiablePopulation, population)
-
-		// Submit tasks for execution and wait until all threads have finished fitness evaluations.
-		evaluatedPopulation = e.pool().submit(
-			newFitnessEvaluationTask(
-				e.fitnessEvaluator,
-				unmodifiablePopulation,
-			))
+		// available goroutines and coordinate them so that we do not proceed
+		// until all of them have finished processing.
+		workers := make([]worker.Worker, len(population))
+		evaluatedPopulation = make(framework.EvaluatedPopulation, len(population))
+		var err error
+		for i, candidate := range population {
+			func(i int, candidate framework.Candidate) {
+				workers[i] = worker.WorkWith(func() interface{} {
+					evaluatedPopulation[i], err = framework.NewEvaluatedCandidate(candidate,
+						e.fitnessEvaluator.Fitness(candidate, population))
+					if err != nil {
+						panic(fmt.Sprintf("Error during fitness computation of candidate %v: %v", candidate, err))
+					}
+					return struct{}{}
+				})
+			}(i, candidate) // forces the closure on current value of i and candidate
+		}
+		_, err = e.workerPool().Submit(workers)
+		if err != nil {
+			panic(fmt.Sprintf("Error while submitting workers to the pool: %v", err))
+		}
 
 		// TODO: handle goroutine termination
 		/*
@@ -340,10 +350,13 @@ func (e *AbstractEvolutionEngine) SetSingleThreaded(singleThreaded bool) {
 	e.singleThreaded = singleThreaded
 }
 
-// pool lazily creates the fitness evaluations goroutine pool.
-func (e *AbstractEvolutionEngine) pool() *fitnessEvaluationPool {
-	if e.concurrentWorker == nil {
-		e.concurrentWorker = newFitnessEvaluationPool()
+// workerPool lazily creates the fitness evaluations goroutine pool.
+func (e *AbstractEvolutionEngine) workerPool() *worker.Pool {
+	if e.pool == nil {
+		// create a worker pool and set the maximum number of concurrent
+		// goroutines to the number of logical CPUs usable by the current
+		// process.
+		e.pool = worker.NewPool(runtime.NumCPU())
 	}
-	return e.concurrentWorker
+	return e.pool
 }

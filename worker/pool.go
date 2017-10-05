@@ -23,6 +23,7 @@ type Worker interface {
 //  })
 type WorkWith func() interface{}
 
+// Work performs the work on the delegate function w
 func (w WorkWith) Work() interface{} {
 	// call delegate function
 	return w()
