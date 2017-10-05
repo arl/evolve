@@ -1,4 +1,4 @@
-package pool
+package worker
 
 import (
 	"sync"
@@ -11,6 +11,21 @@ type Worker interface {
 
 	// Work performs the work and returns the result once done.
 	Work() interface{}
+}
+
+// WorkWith is a convenience function implementing the Worker interface,
+// allowing one to use a function as a Worker, even an anonymous one.
+//
+// Example:
+//  var w Worker = WorkWith(func() interface{} {
+//	    // anonymous function used as Worker
+//      return "hello"
+//  })
+type WorkWith func() interface{}
+
+func (w WorkWith) Work() interface{} {
+	// call delegate function
+	return w()
 }
 
 // A Pool manages the concurrent execution of multiple Workers.

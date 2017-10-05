@@ -1,4 +1,4 @@
-package pool
+package worker
 
 import (
 	"math/rand"
@@ -104,13 +104,6 @@ func TestConcurrentWorkerResults(t *testing.T) {
 	}
 }
 
-type workWith func() interface{}
-
-func (w workWith) Work() interface{} {
-	// call delegate function
-	return w()
-}
-
 func TestConcurrentWorkerFunction(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping TestConcurrentWorkerFunction in short mode")
@@ -121,7 +114,7 @@ func TestConcurrentWorkerFunction(t *testing.T) {
 		func(idx int) {
 
 			// the worker is an anonymous function
-			workers[idx] = workWith(func() interface{} {
+			workers[idx] = WorkWith(func() interface{} {
 				return idx
 			})
 
