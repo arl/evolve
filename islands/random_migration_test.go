@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/internal/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,17 +15,17 @@ func TestRandomMigrationZeroMigration(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	islandPopulations := []framework.EvaluatedPopulation{
-		createTestPopulation("A", "A", "A"),
-		createTestPopulation("B", "B", "B"),
-		createTestPopulation("C", "C", "C"),
+		test.CreateTestPopulation("A", "A", "A"),
+		test.CreateTestPopulation("B", "B", "B"),
+		test.CreateTestPopulation("C", "C", "C"),
 	}
 
 	migration.Migrate(islandPopulations, 0, rng)
 	assert.Len(t, islandPopulations, 3, "wrong number of populations after migration")
 
-	testPopulationContents(t, islandPopulations[0], "A", "A", "A")
-	testPopulationContents(t, islandPopulations[1], "B", "B", "B")
-	testPopulationContents(t, islandPopulations[2], "C", "C", "C")
+	test.AssertPopulationContents(t, islandPopulations[0], "A", "A", "A")
+	test.AssertPopulationContents(t, islandPopulations[1], "B", "B", "B")
+	test.AssertPopulationContents(t, islandPopulations[2], "C", "C", "C")
 }
 
 func TestRandomMigrationNonZeroMigration(t *testing.T) {
@@ -33,9 +34,9 @@ func TestRandomMigrationNonZeroMigration(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	islandPopulations := []framework.EvaluatedPopulation{
-		createTestPopulation("A", "A", "A"),
-		createTestPopulation("B", "B", "B"),
-		createTestPopulation("C", "C", "C"),
+		test.CreateTestPopulation("A", "A", "A"),
+		test.CreateTestPopulation("B", "B", "B"),
+		test.CreateTestPopulation("C", "C", "C"),
 	}
 
 	migration.Migrate(islandPopulations, 3, rng)
