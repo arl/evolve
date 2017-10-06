@@ -267,6 +267,7 @@ func (e *AbstractEvolutionEngine) evaluatePopulation(population []framework.Cand
 				})
 			}(i, candidate) // forces the closure on current value of i and candidate
 		}
+
 		_, err = e.workerPool().Submit(workers)
 		if err != nil {
 			panic(fmt.Sprintf("Error while submitting workers to the pool: %v", err))
