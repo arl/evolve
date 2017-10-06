@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/aurelien-rainone/evolve/factory"
 	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,9 +22,20 @@ func (e IntegerEvaluator) IsNatural() bool {
 }
 
 // Stub candidate factory for tests. Always returns zero-valued integers.
-type StubIntegerFactory struct{}
+type StubIntegerFactory struct {
+	factory.AbstractCandidateFactory
+}
 
-func (f StubIntegerFactory) GenerateRandomCandidate(rng *rand.Rand) framework.Candidate {
+func NewStubIntegerFactory() *StubIntegerFactory {
+	return &StubIntegerFactory{
+		factory.AbstractCandidateFactory{
+			ZeroIntegerGenerator{}},
+	}
+}
+
+type ZeroIntegerGenerator struct{}
+
+func (zig ZeroIntegerGenerator) GenerateRandomCandidate(rng *rand.Rand) framework.Candidate {
 	return 0
 }
 
