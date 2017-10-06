@@ -17,9 +17,21 @@ func (e IntegerEvaluator) IsNatural() bool {
 	return true
 }
 
-// Stub candidate factory for tests.  Always returns zero-valued integers.
+// Stub candidate factory for tests. Always returns zero-valued integers.
 type StubIntegerFactory struct{}
 
 func (f StubIntegerFactory) GenerateRandomCandidate(rng *rand.Rand) framework.Candidate {
 	return 0
+}
+
+// IntegerAdjuster is a trivial test operator that mutates all integers by
+// adding a fixed offset.
+type IntegerAdjuster int
+
+func (op IntegerAdjuster) Apply(selectedCandidates []framework.Candidate, rng *rand.Rand) []framework.Candidate {
+	result := make([]framework.Candidate, len(selectedCandidates))
+	for i, c := range selectedCandidates {
+		result[i] = c.(int) + int(op)
+	}
+	return result
 }

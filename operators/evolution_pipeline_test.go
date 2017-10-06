@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/internal/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,8 +19,8 @@ func TestEvolutionPipeline(t *testing.T) {
 	}
 	// Increment 30% of the numbers and decrement the other 70%.
 	operators := make([]framework.EvolutionaryOperator, 2)
-	operators[0] = integerAdjuster(1)
-	operators[1] = integerAdjuster(3)
+	operators[0] = test.IntegerAdjuster(1)
+	operators[1] = test.IntegerAdjuster(3)
 	evolutionScheme, err := NewEvolutionPipeline(operators...)
 	if assert.NoError(t, err) {
 		population = evolutionScheme.Apply(population, rng)
