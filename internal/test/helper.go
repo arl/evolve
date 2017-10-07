@@ -73,6 +73,6 @@ func AssertPopulationContents(t *testing.T, actualPopulation framework.Evaluated
 	for i := range actualPopulation {
 		got := actualPopulation[i].Candidate()
 		want := expectedPopulation[i]
-		assert.Equalf(t, got, want, "wrong candidate at index %v, got %v, want %v", i, got, want)
+		assert.Equalf(t, want, got, "wrong candidate at index %v, want %v, got %v", i, want, got)
 	}
 }

@@ -14,6 +14,6 @@ func (fe NullFitnessEvaluator) Fitness(candidate Candidate, population []Candida
 
 // IsNatural always returns true. However, the return value of this method is
 // irrelevant since no meaningful fitness scores are produced.
-func (fe NullFitnessEvaluator) isNatural() bool {
+func (fe NullFitnessEvaluator) IsNatural() bool {
 	return true
 }

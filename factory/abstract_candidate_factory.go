@@ -61,9 +61,8 @@ func (f *AbstractCandidateFactory) SeedInitialPopulation(
 		panic("Too many seed candidates for specified population size.")
 	}
 	population := make([]framework.Candidate, populationSize)
-	for i := range seedCandidates {
-		population[i] = seedCandidates[i]
-	}
+	copy(population, seedCandidates)
+
 	for i := len(seedCandidates); i < populationSize; i++ {
 		population[i] = f.GenerateRandomCandidate(rng)
 	}

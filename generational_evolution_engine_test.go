@@ -189,8 +189,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	var selectionStrategy = &selection.RouletteWheelSelection{}
 	rng := rand.New(rand.NewSource(99))
 
-	var engine *AbstractEvolutionEngine
-	engine = NewGenerationalEvolutionEngine(stringFactory,
+	engine := NewGenerationalEvolutionEngine(stringFactory,
 		pipeline,
 		fitnessEvaluator,
 		selectionStrategy,

@@ -72,8 +72,7 @@ func main() {
 	var selectionStrategy = &selection.RouletteWheelSelection{}
 	rng := rand.New(rand.NewSource(randomSeed()))
 
-	var engine *evolve.AbstractEvolutionEngine
-	engine = evolve.NewGenerationalEvolutionEngine(stringFactory,
+	engine := evolve.NewGenerationalEvolutionEngine(stringFactory,
 		pipeline,
 		fitnessEvaluator,
 		selectionStrategy,
