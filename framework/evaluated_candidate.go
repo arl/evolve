@@ -3,6 +3,7 @@ package framework
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 // EvaluatedCandidate is an immutable wrapper for associating a candidate
@@ -86,4 +87,16 @@ func (s EvaluatedPopulation) Less(i, j int) bool {
 // Swap swaps the elements with indexes i and j.
 func (s EvaluatedPopulation) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
+}
+
+func (s EvaluatedPopulation) String() string {
+	reprs := make([]string, 0, len(s))
+	for _, cand := range s {
+		if cand != nil {
+			reprs = append(reprs, fmt.Sprintf("%v|%v", cand.candidate, cand.fitness))
+		} else {
+			reprs = append(reprs, "nil")
+		}
+	}
+	return fmt.Sprintf("{%s}", strings.Join(reprs, ", "))
 }
