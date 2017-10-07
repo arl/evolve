@@ -38,24 +38,24 @@ func TestStringFactory(t *testing.T) {
 
 	t.Run("string population with ascii-only aplhabet", func(*testing.T) {
 		sf, err := NewStringFactory(alphabet, stringLength)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		pop := sf.GenerateInitialPopulation(populationSize, rng)
 		validatePopulation(t, pop, alphabet)
 	})
 
 	t.Run("string population with non ascii-only aplhabet", func(*testing.T) {
 		_, err := NewStringFactory("日本語", stringLength)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("StringFactory with empty aplhabet", func(*testing.T) {
 		_, err := NewStringFactory("", stringLength)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
-	t.Run("StringFactory with empty aplhabet", func(*testing.T) {
+	t.Run("StringFactory with zero string length", func(*testing.T) {
 		_, err := NewStringFactory(alphabet, 0)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 }
 
