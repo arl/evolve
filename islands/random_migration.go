@@ -30,26 +30,30 @@ type RandomMigration struct{}
 // moved on from each island.
 // - rng is a source of randomness.
 func (mig RandomMigration) Migrate(islandPopulations []framework.EvaluatedPopulation, migrantCount int, rng *rand.Rand) {
-	migrants := make(framework.EvaluatedPopulation, migrantCount*len(islandPopulations))
+	migrants := make(framework.EvaluatedPopulation, 0, migrantCount*len(islandPopulations))
 
 	var ind *framework.EvaluatedCandidate
 
-	for _, island := range islandPopulations {
+	for iidx, island := range islandPopulations {
 		framework.ShuffleEvaluatedPopulation(island, rng)
 		for i := 0; i < migrantCount; i++ {
 			ind, island = island[len(island)-1], island[:len(island)-1]
 			migrants = append(migrants, ind)
 		}
+		// we modified the slice underlying array but the original slice still
+		// has the same size because we popped from a copy of it
+		islandPopulations[iidx] = island
 	}
 	framework.ShuffleEvaluatedPopulation(migrants, rng)
 
-	//Iterator < EvaluatedCandidate < S>>iterator = migrants.iterator()
 	var migrantIdx int
-	for _, island := range islandPopulations {
+	for iidx, island := range islandPopulations {
 		for i := 0; i < migrantCount; i++ {
-			//island.add(iterator.next());
 			island = append(island, migrants[migrantIdx])
 			migrantIdx++
 		}
+		// we modified the slice underlying array but the original slice still
+		// has the same because we appended to a copy of it
+		islandPopulations[iidx] = island
 	}
 }
