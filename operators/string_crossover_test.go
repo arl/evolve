@@ -67,7 +67,6 @@ func TestStringCrossoverWithDifferentLengthParents(t *testing.T) {
 // is a no-op.
 func TestStringCrossoverZeroPoints(t *testing.T) {
 	op, err := NewStringCrossover(WithConstantCrossoverPoints(0))
-	if assert.Error(t, err) {
-		assert.Nil(t, op)
-	}
+	assert.Error(t, err)
+	assert.Nilf(t, op, "want string crossover to be nil if invalid, got %v", op)
 }

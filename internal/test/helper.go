@@ -70,9 +70,10 @@ func CreateTestPopulation(members ...framework.Candidate) framework.EvaluatedPop
 
 func AssertPopulationContents(t *testing.T, actualPopulation framework.EvaluatedPopulation,
 	expectedPopulation ...string) {
+	t.Helper() // mark current function as helper in case of error
 	assert.Len(t, actualPopulation, len(expectedPopulation), "wrong population size after migration")
-	for i := range actualPopulation {
-		got := actualPopulation[i].Candidate()
+	for i, evCand := range actualPopulation {
+		got := evCand.Candidate()
 		want := expectedPopulation[i]
 		assert.Equalf(t, want, got, "wrong candidate at index %v, want %v, got %v", i, want, got)
 	}
