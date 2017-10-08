@@ -29,7 +29,8 @@ type StubIntegerFactory struct {
 func NewStubIntegerFactory() *StubIntegerFactory {
 	return &StubIntegerFactory{
 		factory.AbstractCandidateFactory{
-			ZeroIntegerGenerator{}},
+			RandomCandidateGenerator: ZeroIntegerGenerator{},
+		},
 	}
 }
 
