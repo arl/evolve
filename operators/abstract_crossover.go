@@ -9,14 +9,15 @@ import (
 	"github.com/aurelien-rainone/evolve/number"
 )
 
-// A Mater performs cross-over on a pair of parents to generate a pair of
-// offspring.
-//
-// parent1 and parent2 are the two individuals that provides the source material
-// for generating offspring.
+// Mater is the interface implemented by objects defining the Mate function.
 type Mater interface {
-	Mate(
-		parent1, parent2 framework.Candidate,
+
+	// Mate performs cross-over on a pair of parents to generate a pair of
+	// offspring.
+	//
+	// parent1 and parent2 are the two individuals that provides the source
+	// material for generating offspring.
+	Mate(parent1, parent2 framework.Candidate,
 		numberOfCrossoverPoints int64,
 		rng *rand.Rand) []framework.Candidate
 }
