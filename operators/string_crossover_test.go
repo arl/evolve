@@ -63,10 +63,32 @@ func TestStringCrossoverWithDifferentLengthParents(t *testing.T) {
 	}
 }
 
-// Number of cross-over points must be greater than zero otherwise the operator
-// is a no-op.
 func TestStringCrossoverZeroPoints(t *testing.T) {
-	op, err := NewStringCrossover(WithConstantCrossoverPoints(0))
-	assert.Error(t, err)
-	assert.Nilf(t, op, "want string crossover to be nil if invalid, got %v", op)
+	rng := rand.New(rand.NewSource(99))
+
+	t.Run("constant_crossover_points_cant_be_zero", func(t *testing.T) {
+		// If created with a specified (constant) number of crossover points,
+		// this number must be greater than 0 or the operator is a no-op.
+		op, err := NewStringCrossover(WithConstantCrossoverPoints(0))
+		assert.Error(t, err)
+		assert.Nilf(t, op, "want string crossover to be nil if invalid, got %v", op)
+	})
+
+	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
+		// If created with a variable number of crossover points,
+		// verifies that when this number happens to be 0, the operator is a
+		// no-op.
+		crossover, err := NewStringCrossover(WithVariableCrossoverPoints(zeroGenerator{}))
+		if assert.NoError(t, err) {
+			population := []framework.Candidate{"abcde", "fghij"}
+			crossed := crossover.Apply([]framework.Candidate{population[0], population[1]}, rng)
+			assert.Equal(t, crossed, population)
+		}
+	})
+}
+
+type zeroGenerator struct{}
+
+func (g zeroGenerator) NextValue() int64 {
+	return 0
 }
