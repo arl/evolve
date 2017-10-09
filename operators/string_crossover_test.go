@@ -51,9 +51,7 @@ func TestStringCrossoverWithDifferentLengthParents(t *testing.T) {
 		WithConstantCrossoverProbability(number.ProbabilityOne),
 	)
 	if assert.NoError(t, err) {
-		population := make([]framework.Candidate, 2)
-		population[0] = "abcde"
-		population[1] = "fghijklm"
+		population := []framework.Candidate{"abcde", "fghijklm"}
 
 		// This should panic since the parents are different lengths.
 		// TODO: why panicking and not returning an error?
@@ -63,7 +61,7 @@ func TestStringCrossoverWithDifferentLengthParents(t *testing.T) {
 	}
 }
 
-func TestStringCrossoverZeroPoints(t *testing.T) {
+func TestStringCrossoverNoop(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	t.Run("constant_crossover_points_cant_be_zero", func(t *testing.T) {
@@ -79,6 +77,18 @@ func TestStringCrossoverZeroPoints(t *testing.T) {
 		// verifies that when this number happens to be 0, the operator is a
 		// no-op.
 		crossover, err := NewStringCrossover(WithVariableCrossoverPoints(zeroGenerator{}))
+		if assert.NoError(t, err) {
+			population := []framework.Candidate{"abcde", "fghij"}
+			crossed := crossover.Apply([]framework.Candidate{population[0], population[1]}, rng)
+			assert.Equal(t, crossed, population)
+		}
+	})
+
+	t.Run("zero_crossover_probability_is_noop", func(t *testing.T) {
+		// If created wit a variable number of crossover probability,
+		// verifies that when this number happens to be 0, the operator is a
+		// no-op.
+		crossover, err := NewStringCrossover(WithConstantCrossoverProbability(number.ProbabilityZero))
 		if assert.NoError(t, err) {
 			population := []framework.Candidate{"abcde", "fghij"}
 			crossed := crossover.Apply([]framework.Candidate{population[0], population[1]}, rng)
