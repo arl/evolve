@@ -170,6 +170,7 @@ func TestBitStringEquality(t *testing.T) {
 	// be considered equal.
 	var shortBitString *BitString
 	shortBitString, err = New(9)
+	assert.NoError(t, err)
 	shortBitString.SetBit(2, true)
 	shortBitString.SetBit(5, true)
 	shortBitString.SetBit(8, true)

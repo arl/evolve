@@ -80,7 +80,7 @@ func NewFromString(value string) (*BitString, error) {
 	for i, c := range value {
 		switch c {
 		case '0':
-			break
+			continue
 		case '1':
 			bt.SetBit(len(value)-i-1, true)
 		default:
