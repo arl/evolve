@@ -61,5 +61,4 @@ func TestBitStringFactory(t *testing.T) {
 				rng)
 		})
 	})
-
 }
