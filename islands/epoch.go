@@ -26,6 +26,10 @@ func newEpoch(
 	}
 }
 
-func (e *epoch) Work() interface{} {
-	return e.island.EvolvePopulationWithSeedCandidates(e.populationSize, e.eliteCount, e.seedCandidates, e.terminationConditions...)
+func (e *epoch) Work() (interface{}, error) {
+	return e.island.EvolvePopulationWithSeedCandidates(
+		e.populationSize,
+		e.eliteCount,
+		e.seedCandidates,
+		e.terminationConditions...), nil
 }

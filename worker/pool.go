@@ -10,7 +10,7 @@ import (
 type Worker interface {
 
 	// Work performs the work and returns the result once done.
-	Work() interface{}
+	Work() (interface{}, error)
 }
 
 // WorkWith is a convenience function implementing the Worker interface,
@@ -21,10 +21,10 @@ type Worker interface {
 //	    // anonymous function used as Worker
 //      return "hello"
 //  })
-type WorkWith func() interface{}
+type WorkWith func() (interface{}, error)
 
 // Work performs the work on the delegate function w
-func (w WorkWith) Work() interface{} {
+func (w WorkWith) Work() (interface{}, error) {
 	// call delegate function
 	return w()
 }
@@ -54,6 +54,7 @@ func NewPool(maxConcurrency int) *Pool {
 func (w *Pool) Submit(workers []Worker) (results []interface{}, err error) {
 	var (
 		throttle = make(chan int, w.maxConcurrency) // used as a limiter
+		done     = make(chan struct{})              // for premature cancellation
 		wg       sync.WaitGroup
 	)
 
@@ -70,19 +71,32 @@ func (w *Pool) Submit(workers []Worker) (results []interface{}, err error) {
 		go func(idx int) {
 
 			// ensure the waitgroup is decremented, as well as the throttle
-			// channel, once the worker has eneded
+			// channel, once the worker has ended
 			defer func() {
 				wg.Done()
 				<-throttle
 			}()
 
-			// perform the work
-			results[idx] = workers[idx].Work()
+			var errw error
+			select {
+			case <-done:
+				// abort this work if done is closed
+				return
+			default:
+				// perform the work
+				results[idx], errw = workers[idx].Work()
+			}
+
+			// if this worker errored, set the global error
+			if errw != nil {
+				err = errw
+				close(done)
+			}
 		}(i)
 	}
 
 	// wait for all the tasks to be completed
 	wg.Wait()
 	close(throttle)
-	return results, nil
+	return results, err
 }
