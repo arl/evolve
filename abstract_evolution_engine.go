@@ -237,42 +237,43 @@ func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(
 // Returns the evaluated population (a list of candidates with attached fitness
 // scores).
 func (e *AbstractEvolutionEngine) evaluatePopulation(population []framework.Candidate) framework.EvaluatedPopulation {
-	var evaluatedPopulation framework.EvaluatedPopulation
+
 	// Do fitness evaluations
-	var err error
+	evaluatedPopulation := make(framework.EvaluatedPopulation, len(population))
+
 	if e.singleThreaded {
-		evaluatedPopulation = make(framework.EvaluatedPopulation, len(population))
+
+		var err error
 		for i, candidate := range population {
 			evaluatedPopulation[i], err = framework.NewEvaluatedCandidate(candidate, e.fitnessEvaluator.Fitness(candidate, population))
 			if err != nil {
 				panic(fmt.Sprintf("Can't evaluate candidate %v: %v", candidate, err))
 			}
 		}
+
 	} else {
-		// Divide the required number of fitness evaluations equally among the
-		// available goroutines and coordinate them so that we do not proceed
-		// until all of them have finished processing.
+
+		// Create a worker pool that will divides the required number of fitness
+		// evaluations equally among the available goroutines and coordinate
+		// them so that we do not proceed until all of them have finished
+		// processing.
 		workers := make([]worker.Worker, len(population))
-		evaluatedPopulation = make(framework.EvaluatedPopulation, len(population))
-		var err error
-		for i, candidate := range population {
-			func(i int, candidate framework.Candidate) {
-				workers[i] = worker.WorkWith(func() interface{} {
-					evaluatedPopulation[i], err = framework.NewEvaluatedCandidate(candidate,
-						e.fitnessEvaluator.Fitness(candidate, population))
-					if err != nil {
-						panic(fmt.Sprintf("Error during fitness computation of candidate %v: %v", candidate, err))
-					}
-					return struct{}{}
-				})
-			}(i, candidate) // forces the closure on current value of i and candidate
+		for i := range population {
+			workers[i] = &fitnessEvaluationWorker{
+				idx:       i,
+				pop:       population,
+				evaluator: e.fitnessEvaluator,
+			}
 		}
 
-		_, err = e.workerPool().Submit(workers)
+		results, err := e.workerPool().Submit(workers)
 		if err != nil {
 			panic(fmt.Sprintf("Error while submitting workers to the pool: %v", err))
 		}
 
+		for i, result := range results {
+			evaluatedPopulation[i] = result.(*framework.EvaluatedCandidate)
+		}
 		// TODO: handle goroutine termination
 		/*
 		   catch (InterruptedException ex)
@@ -285,6 +286,17 @@ func (e *AbstractEvolutionEngine) evaluatePopulation(population []framework.Cand
 	}
 
 	return evaluatedPopulation
+}
+
+type fitnessEvaluationWorker struct {
+	idx       int                   // index of candidate to evaluate
+	pop       []framework.Candidate // full population
+	evaluator framework.FitnessEvaluator
+}
+
+func (w *fitnessEvaluationWorker) Work() (interface{}, error) {
+	return framework.NewEvaluatedCandidate(w.pop[w.idx],
+		w.evaluator.Fitness(w.pop[w.idx], w.pop))
 }
 
 // SatisfiedTerminationConditions returns a slice of all TerminationCondition's
