@@ -32,28 +32,28 @@ type RandomMigration struct{}
 func (mig RandomMigration) Migrate(islandPopulations []framework.EvaluatedPopulation, migrantCount int, rng *rand.Rand) {
 	migrants := make(framework.EvaluatedPopulation, 0, migrantCount*len(islandPopulations))
 
-	var ind *framework.EvaluatedCandidate
+	var island framework.EvaluatedPopulation
 
-	for iidx, island := range islandPopulations {
+	for i := 0; i < len(islandPopulations); i++ {
+		island = islandPopulations[i]
+		// because we shuffle island population ...
 		framework.ShuffleEvaluatedPopulation(island, rng)
-		for i := 0; i < migrantCount; i++ {
-			ind, island = island[len(island)-1], island[:len(island)-1]
-			migrants = append(migrants, ind)
+		// taking N migrants is the same as taking N random individuals from the
+		// island. Keep those migrants in a slice
+		for j := 0; j < migrantCount; j++ {
+			migrants = append(migrants, island[len(island)-1])
 		}
-		// we modified the slice underlying array but the original slice still
-		// has the same size because we popped from a copy of it
-		islandPopulations[iidx] = island
 	}
+	// shuffle the migrants
 	framework.ShuffleEvaluatedPopulation(migrants, rng)
 
 	var migrantIdx int
-	for iidx, island := range islandPopulations {
-		for i := 0; i < migrantCount; i++ {
-			island = append(island, migrants[migrantIdx])
+	for i := 0; i < len(islandPopulations); i++ {
+		island = islandPopulations[i]
+		// replace the last N individuals of an island with N random migrants
+		for j := 0; j < migrantCount; j++ {
+			island[len(island)-migrantCount+j] = migrants[migrantIdx]
 			migrantIdx++
 		}
-		// we modified the slice underlying array but the original slice still
-		// has the same because we appended to a copy of it
-		islandPopulations[iidx] = island
 	}
 }
