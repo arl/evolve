@@ -61,7 +61,7 @@ func WithVariableCrossoverProbability(variable number.ProbabilityGenerator) Abst
 	}
 }
 
-// AbstractCrossoverOption is the type of the functions used to set abstract
+// AbstractCrossoverOption is the type of functions used to set abstract
 // crossover options.
 type AbstractCrossoverOption func(*AbstractCrossover) error
 

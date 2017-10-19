@@ -18,7 +18,7 @@ type TournamentSelection struct {
 	description          string
 }
 
-// TournamentSelectionOption is the type of the functions used to set tournament
+// TournamentSelectionOption is the type of functions used to set tournament
 // selection options.
 type TournamentSelectionOption func(*TournamentSelection) error
 
