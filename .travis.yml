@@ -11,7 +11,8 @@ before_script:
   - go get -u github.com/alecthomas/gometalinter
   # use golint through gometalinter because it allows to easily ignore the
   # `vendor` and `internal` directories
-  - gometalinter --disable-all --enable=golint --min-confidence=0.85 --skip=internal --vendor ./...
+  - gometalinter --disable-all --enable=golint --skip=internal --vendor ./... -e 'unexported type.*GeneratorOption, which can be annoying to use'
+
 
 before_install:
 - go get -u -v github.com/kardianos/govendor
