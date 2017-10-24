@@ -43,7 +43,7 @@ type AbstractCrossover struct {
 // NewAbstractCrossover creates an AbstractCrossover configured with the
 // provided options.
 //
-// TODO: example of use of how setting options with WithXXX functions
+// TODO: example of use of how setting options
 func NewAbstractCrossover(mater Mater, options ...OperatorOption) (*AbstractCrossover, error) {
 	// create with default options, 1 crossover point with a probability of 1
 	op := &AbstractCrossover{
@@ -88,7 +88,7 @@ func (op *AbstractCrossover) Apply(selectedCandidates []framework.Candidate, rng
 			parent2 := selectionClone[iterator]
 			iterator++
 			// Randomly decide (according to the current cross-over probability)
-			// whether to perform cross-over for these 2 parents.
+			// whether to perform crossover for these 2 parents.
 			var crossoverPoints int64
 			if op.crossoverProbabilityVariable.NextValue().NextEvent(rng) {
 				crossoverPoints = op.crossoverPointsVariable.NextValue()
@@ -97,10 +97,9 @@ func (op *AbstractCrossover) Apply(selectedCandidates []framework.Candidate, rng
 			if crossoverPoints > 0 {
 				result = append(result, op.Mate(parent1, parent2, crossoverPoints, rng)...)
 			} else {
-				// If there is no cross-over to perform, just add the parents to the
+				// If there is no crossover to perform, just add the parents to the
 				// results unaltered.
-				result = append(result, parent1)
-				result = append(result, parent2)
+				result = append(result, parent1, parent2)
 			}
 		} else {
 			// If we have an odd number of selected candidates, we can't pair up
