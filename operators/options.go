@@ -15,16 +15,16 @@ type Option interface {
 
 // ConstantProbability configures a constant probability that a genetic operator
 // applies.
-func ConstantProbability(prob number.Probability) *probabilityGeneratorOption {
-	return &probabilityGeneratorOption{
+func ConstantProbability(prob number.Probability) probabilityGeneratorOption {
+	return probabilityGeneratorOption{
 		gen: number.NewConstantProbabilityGenerator(prob),
 	}
 }
 
 // VariableProbability configures, via a number.ProbabilityGenerator, the
 // probability that a genetic operator applies to an individual.
-func VariableProbability(gen number.ProbabilityGenerator) *probabilityGeneratorOption {
-	return &probabilityGeneratorOption{
+func VariableProbability(gen number.ProbabilityGenerator) probabilityGeneratorOption {
+	return probabilityGeneratorOption{
 		gen: gen,
 	}
 }
@@ -34,7 +34,7 @@ type probabilityGeneratorOption struct {
 	err error
 }
 
-func (opt *probabilityGeneratorOption) Apply(ope interface{}) error {
+func (opt probabilityGeneratorOption) Apply(ope interface{}) error {
 	switch ope.(type) {
 	case *AbstractCrossover:
 		if opt.err == nil {
@@ -49,14 +49,14 @@ func (opt *probabilityGeneratorOption) Apply(ope interface{}) error {
 // ConstantCrossoverPoints configures a constant number of crossover points.
 //
 // This option only applies to crossover operators.
-func ConstantCrossoverPoints(points int64) *integerGeneratorOption {
+func ConstantCrossoverPoints(points int64) integerGeneratorOption {
 	var err error
 	if points <= 0 {
 		err = errors.New("number of crossover points must be positive")
 	} else {
 		err = nil
 	}
-	return &integerGeneratorOption{
+	return integerGeneratorOption{
 		gen: number.NewConstantIntegerGenerator(points),
 		err: err,
 	}
@@ -66,8 +66,8 @@ func ConstantCrossoverPoints(points int64) *integerGeneratorOption {
 // crossover such as the number of crossover points varies.
 //
 // This option only applies to crossover operators.
-func VariableCrossoverPoints(gen number.IntegerGenerator) *integerGeneratorOption {
-	return &integerGeneratorOption{
+func VariableCrossoverPoints(gen number.IntegerGenerator) integerGeneratorOption {
+	return integerGeneratorOption{
 		gen: gen,
 	}
 }
@@ -77,7 +77,7 @@ type integerGeneratorOption struct {
 	err error
 }
 
-func (opt *integerGeneratorOption) Apply(ope interface{}) error {
+func (opt integerGeneratorOption) Apply(ope interface{}) error {
 	switch ope.(type) {
 	case *AbstractCrossover:
 		if opt.err == nil {
