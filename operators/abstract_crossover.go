@@ -44,7 +44,7 @@ type AbstractCrossover struct {
 // provided options.
 //
 // TODO: example of use of how setting options
-func NewAbstractCrossover(mater Mater, options ...OperatorOption) (*AbstractCrossover, error) {
+func NewAbstractCrossover(mater Mater, options ...Option) (*AbstractCrossover, error) {
 	// create with default options, 1 crossover point with a probability of 1
 	op := &AbstractCrossover{
 		crossoverPointsVariable:      number.NewConstantIntegerGenerator(1),

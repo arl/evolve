@@ -7,9 +7,9 @@ import (
 	"github.com/aurelien-rainone/evolve/number"
 )
 
-// OperatorOption is the interface implemented by objects configuring a
+// Option is the interface implemented by objects configuring a
 // particular option of a genetic operator.
-type OperatorOption interface {
+type Option interface {
 	Apply(interface{}) error
 }
 

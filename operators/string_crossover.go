@@ -7,7 +7,7 @@ import (
 )
 
 // NewStringCrossover creates a crossover operator for string candidates.
-func NewStringCrossover(options ...OperatorOption) (*AbstractCrossover, error) {
+func NewStringCrossover(options ...Option) (*AbstractCrossover, error) {
 	return NewAbstractCrossover(stringMater{}, options...)
 }
 
