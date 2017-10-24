@@ -16,7 +16,7 @@ func TestBitStringCrossover(t *testing.T) {
 	factory := factory.NewBitStringFactory(50)
 
 	population := factory.GenerateInitialPopulation(2, rng)
-	// Test to make sure that cross-over correctly preserves all genetic material
+	// Test to make sure that crossover correctly preserves all genetic material
 	// originally present in the population and does not introduce anything new.
 	totalSetBits := population[0].(*bitstring.BitString).CountSetBits() +
 		population[1].(*bitstring.BitString).CountSetBits()

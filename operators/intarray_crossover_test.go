@@ -23,7 +23,7 @@ func TestIntArrayCrossover(t *testing.T) {
 		for i := 0; i < 20; i++ {
 			values := make(map[int]struct{}, 20) // used as a set of runes
 			population = crossover.Apply(population, rng)
-			assert.Len(t, population, 4, "Population size changed after cross-over.")
+			assert.Len(t, population, 4, "Population size changed after crossover.")
 			for _, individual := range population {
 				s := individual.([]int)
 				assert.Lenf(t, s, 5, "Invalid candidate length: %v", len(s))
@@ -33,7 +33,7 @@ func TestIntArrayCrossover(t *testing.T) {
 			}
 			// All of the individual elements should still be present, just jumbled up
 			// between individuals.
-			assert.Len(t, values, 20, "Information lost during cross-over.")
+			assert.Len(t, values, 20, "Information lost during crossover.")
 		}
 	}
 }

@@ -21,18 +21,18 @@ func (m byteArrayMater) Mate(parent1, parent2 framework.Candidate,
 	p1, p2 := parent1.([]byte), parent2.([]byte)
 
 	if len(p1) != len(p2) {
-		panic("Cannot perform cross-over with different length parents.")
+		panic("Cannot perform crossover with different length parents.")
 	}
 	offspring1 := make([]byte, len(p1))
 	copy(offspring1, p1)
 	offspring2 := make([]byte, len(p1))
 	copy(offspring2, p2)
 
-	// Apply as many cross-overs as required.
+	// Apply as many crossovers as required.
 	for i := int64(0); i < numberOfCrossoverPoints; i++ {
 		// Cross-over index is always greater than zero and less than
 		// the length of the parent so that we always pick a point that
-		// will result in a meaningful cross-over.
+		// will result in a meaningful crossover.
 		crossoverIndex := (1 + rng.Intn(len(p1)-1))
 		for j := 0; j < crossoverIndex; j++ {
 			// swap elements j of both offsprings

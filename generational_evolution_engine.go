@@ -12,7 +12,7 @@ import (
 // It supports optional concurrent fitness evaluations to take full advantage of
 // multi-processor, multi-core and hyper-threaded machines.
 //
-// If multi-threading is enabled, evolution (mutation, cross-over, etc.) occurs
+// If multi-threading is enabled, evolution (mutation, crossover, etc.) occurs
 // on the request thread but fitness evaluations are delegated to a pool of
 // worker threads. All of the host's available processing units are used (i.e.
 // on a quad-core machine there will be four fitness evaluation worker threads).
