@@ -37,7 +37,7 @@ func TestBitStringCrossoveWithDifferentLengthParents(t *testing.T) {
 	// panicking should be considered a bug since it could lead to hard to trace
 	// bugs elsewhere.
 	rng := rand.New(rand.NewSource(99))
-	crossover, _ := NewBitStringCrossover(WithConstantCrossoverPoints(1))
+	crossover, _ := NewBitStringCrossover(ConstantCrossoverPoints(1))
 
 	bs1, _ := bitstring.NewRandom(32, rng)
 	bs2, _ := bitstring.NewRandom(33, rng)

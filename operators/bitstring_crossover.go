@@ -9,7 +9,7 @@ import (
 
 // NewBitStringCrossover creates a crossover operator with a configurable number
 // of points (fixed or random) for bit strings candidates.
-func NewBitStringCrossover(options ...AbstractCrossoverOption) (*AbstractCrossover, error) {
+func NewBitStringCrossover(options ...OperatorOption) (*AbstractCrossover, error) {
 	return NewAbstractCrossover(bitStringMater{}, options...)
 }
 

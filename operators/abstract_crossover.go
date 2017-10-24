@@ -1,7 +1,6 @@
 package operators
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 
@@ -20,45 +19,6 @@ type Mater interface {
 	Mate(parent1, parent2 framework.Candidate,
 		numberOfCrossoverPoints int64,
 		rng *rand.Rand) []framework.Candidate
-}
-
-// WithConstantCrossoverPoints sets up a constant number of cross-over points.
-func WithConstantCrossoverPoints(crossoverPoints int64) AbstractCrossoverOption {
-	return func(op *AbstractCrossover) error {
-		if crossoverPoints <= 0 {
-			return errors.New("number of cross-over points must be positive")
-		}
-		op.crossoverPointsVariable = number.NewConstantIntegerGenerator(crossoverPoints)
-		return nil
-	}
-}
-
-// WithVariableCrossoverPoints sets up a variable number of cross-over points.
-func WithVariableCrossoverPoints(variable number.IntegerGenerator) AbstractCrossoverOption {
-	return func(op *AbstractCrossover) error {
-		op.crossoverPointsVariable = variable
-		return nil
-	}
-}
-
-// WithConstantCrossoverProbability sets up a constant probability that, once
-// selected, a pair of parents will be subjected to cross-over rather than being
-// copied.
-func WithConstantCrossoverProbability(crossoverProbability number.Probability) AbstractCrossoverOption {
-	return func(op *AbstractCrossover) error {
-		op.crossoverProbabilityVariable = number.NewConstantProbabilityGenerator(crossoverProbability)
-		return nil
-	}
-}
-
-// WithVariableCrossoverProbability sets up a variable probability that, once
-// selected, a pair of parents will be subjected to cross-over rather than being
-// copied.
-func WithVariableCrossoverProbability(variable number.ProbabilityGenerator) AbstractCrossoverOption {
-	return func(op *AbstractCrossover) error {
-		op.crossoverProbabilityVariable = variable
-		return nil
-	}
 }
 
 // AbstractCrossoverOption is the type of functions used to set abstract
@@ -84,7 +44,7 @@ type AbstractCrossover struct {
 // provided options.
 //
 // TODO: example of use of how setting options with WithXXX functions
-func NewAbstractCrossover(mater Mater, options ...AbstractCrossoverOption) (*AbstractCrossover, error) {
+func NewAbstractCrossover(mater Mater, options ...OperatorOption) (*AbstractCrossover, error) {
 	// create with default options, 1 crossover point with a probability of 1
 	op := &AbstractCrossover{
 		crossoverPointsVariable:      number.NewConstantIntegerGenerator(1),
@@ -94,7 +54,7 @@ func NewAbstractCrossover(mater Mater, options ...AbstractCrossoverOption) (*Abs
 
 	// set client options
 	for _, option := range options {
-		if err := option(op); err != nil {
+		if err := option.Apply(op); err != nil {
 			return nil, fmt.Errorf("can't apply abstract crossover options: %v", err)
 		}
 	}

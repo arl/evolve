@@ -47,8 +47,8 @@ func TestByteArrayCrossoverWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	crossover, err := NewByteArrayCrossover(
-		WithConstantCrossoverPoints(1),
-		WithConstantCrossoverProbability(number.ProbabilityOne),
+		ConstantCrossoverPoints(1),
+		ConstantProbability(number.ProbabilityOne),
 	)
 	if assert.NoError(t, err) {
 		population := make([]framework.Candidate, 2)
