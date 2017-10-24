@@ -21,10 +21,6 @@ type Mater interface {
 		rng *rand.Rand) []framework.Candidate
 }
 
-// AbstractCrossoverOption is the type of functions used to set abstract
-// crossover options.
-type AbstractCrossoverOption func(*AbstractCrossover) error
-
 // AbstractCrossover is a generic struct for cross-over implementations.
 //
 // It supports all cross-over processes that operate on a pair of parent
