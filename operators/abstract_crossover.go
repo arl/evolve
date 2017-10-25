@@ -51,7 +51,7 @@ func NewAbstractCrossover(mater Mater, options ...Option) (*AbstractCrossover, e
 	// set client options
 	for _, option := range options {
 		if err := option.Apply(op); err != nil {
-			return nil, fmt.Errorf("can't apply abstract crossover options: %v", err)
+			return nil, fmt.Errorf("can't apply abstract crossover option: %v", err)
 		}
 	}
 	return op, nil
