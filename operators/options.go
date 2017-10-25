@@ -85,12 +85,53 @@ type integerGeneratorOption struct {
 
 func (opt integerGeneratorOption) Apply(ope interface{}) error {
 	switch ope.(type) {
+
 	case *AbstractCrossover:
 		if opt.err == nil {
 			crossover := ope.(*AbstractCrossover)
 			crossover.crossoverPointsVariable = opt.gen
 		}
 		return opt.err
+
+	case *AbstractMutation:
+		mutation := ope.(*AbstractMutation)
+
+		if opt.err == nil {
+
+			switch mutation.Mutater.(type) {
+			case *bitStringMutater:
+				mutation.Mutater.(*bitStringMutater).mutationCount = opt.gen
+			}
+		}
+		return opt.err
 	}
 	return fmt.Errorf("can't apply option to object of type %T", ope)
+}
+
+// ConstantMutationCount configures a constant number for the number of
+// mutations in a candidate selected for mutation.
+//
+// This option only applies to some mutation operators.
+func ConstantMutationCount(points int64) integerGeneratorOption {
+	var err error
+	if points <= 0 {
+		err = errors.New("number of mutation count must be positive")
+	} else {
+		err = nil
+	}
+	return integerGeneratorOption{
+		gen: number.NewConstantIntegerGenerator(points),
+		err: err,
+	}
+}
+
+// VariableMutationCount configures, via a number.IntegerGenerator, a
+// mutation such as the number of mutations varies in a candidate selected for
+// mutation.
+//
+// This option only applies to some mutation operators.
+func VariableMutationCount(gen number.IntegerGenerator) integerGeneratorOption {
+	return integerGeneratorOption{
+		gen: gen,
+	}
 }
