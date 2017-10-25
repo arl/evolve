@@ -42,6 +42,12 @@ func (opt probabilityGeneratorOption) Apply(ope interface{}) error {
 			crossover.crossoverProbabilityVariable = opt.gen
 		}
 		return opt.err
+	case *AbstractMutation:
+		if opt.err == nil {
+			mutation := ope.(*AbstractMutation)
+			mutation.mutationProbability = opt.gen
+		}
+		return opt.err
 	}
 	return fmt.Errorf("can't apply option to object of type %T", ope)
 }

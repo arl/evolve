@@ -13,7 +13,7 @@ func TestStringMutationTest(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	alphabet := []byte{'a', 'b', 'c', 'd'}
 
-	mutation, err := NewStringMutation(string(alphabet), WithConstantStringMutationProbability(number.ProbabilityEven))
+	mutation, err := NewStringMutation(string(alphabet), ConstantProbability(number.ProbabilityEven))
 	if assert.NoError(t, err) {
 		individual1 := "abcd"
 		individual2 := "abab"
