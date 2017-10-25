@@ -55,7 +55,7 @@ func main() {
 	check(err)
 	mutation, err = operators.NewStringMutation(
 		string(alphabet),
-		operators.WithConstantStringMutationProbability(mutationProb),
+		operators.ConstantProbability(mutationProb),
 	)
 	check(err)
 

@@ -172,7 +172,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	checkB(b, err)
 	mutation, err = operators.NewStringMutation(
 		string(alphabet),
-		operators.WithConstantStringMutationProbability(mutationProb),
+		operators.ConstantProbability(mutationProb),
 	)
 	checkB(b, err)
 

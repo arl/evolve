@@ -34,7 +34,7 @@ type EvolutionaryOperator interface {
 	//
 	// The ordering of the selection should be totally irrelevant for operators
 	// that process each candidate in isolation, such as mutation.  It should
-	// only be an issue for operators, such as cross-over, that deal with
+	// only be an issue for operators, such as crossover, that deal with
 	// multiple candidates in a single operation.
 	//
 	// The operator must not modify any of the candidates passed. Instead it

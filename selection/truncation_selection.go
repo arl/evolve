@@ -13,14 +13,12 @@ import (
 // simply selecting the n candidates with the highest fitness scores (the rest
 // are discarded). A candidate is never selected more than once.
 type TruncationSelection struct {
-	//private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("#0.###%");
 	selectionRatio number.Float64Generator
-
-	description string
+	description    string
 }
 
-// TruncationSelectionOption is the type of functions used to specify options during
-// the creation of TruncationSelection objects.
+// TruncationSelectionOption is the type of functions used to specify options
+// during the creation of TruncationSelection objects.
 type TruncationSelectionOption func(*TruncationSelection) error
 
 // NewTruncationSelection creates a TruncationSelection configured with the
@@ -41,7 +39,6 @@ func NewTruncationSelection(options ...TruncationSelectionOption) (*TruncationSe
 		}
 	}
 	return sel, nil
-
 }
 
 // WithVariableSelectionRatio sets up a variable selection ratio provided by the
@@ -67,7 +64,7 @@ func WithConstantSelectionRatio(ratio float64) TruncationSelectionOption {
 			return errors.New("selection ratio must be positive and less than 1")
 		}
 		sel.selectionRatio = number.NewConstantFloat64Generator(ratio)
-		sel.description = "Truncation Selection (" + fmt.Sprintf("%.3f", ratio) + ")"
+		sel.description = "Truncation Selection (" + fmt.Sprintf("%5.2f%%", 100*ratio) + ")"
 		return nil
 	}
 }
