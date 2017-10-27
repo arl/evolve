@@ -18,9 +18,9 @@ import (
 //
 // Given data about the current population and a set of termination conditions,
 // determines whether or not the evolution should continue.
-// - data is the current state of the population.
-// - conditions represents one or more termination conditions. The evolution
-// should not continue if any of these is satisfied.
+//  - data is the current state of the population.
+//  - conditions represents one or more termination conditions. The evolution
+//  should not continue if any of these is satisfied.
 func ShouldContinue(
 	data *framework.PopulationData,
 	conditions ...framework.TerminationCondition) []framework.TerminationCondition {
@@ -62,13 +62,13 @@ func SortEvaluatedPopulation(evaluatedPopulation framework.EvaluatedPopulation, 
 // ComputePopulationData computes statistics about the current generation of
 // evolved individuals, including the fittest candidate.
 //
-// - evaluatedPopulation is the population of candidate solutions with their
-// associated fitness scores.
-// - naturalFitness should be true if higher fitness scores mean fitter
-// individuals, false otherwise.
-// - eliteCount is the number of candidates preserved via elitism.
-// - iterationNumber is the zero-based index of the current generation/epoch.
-// - startTime is the time at which the evolution began.
+//  - evaluatedPopulation is the population of candidate solutions with their
+//  associated fitness scores.
+//  - naturalFitness should be true if higher fitness scores mean fitter
+//  individuals, false otherwise.
+//  - eliteCount is the number of candidates preserved via elitism.
+//  - iterationNumber is the zero-based index of the current generation/epoch.
+//  - startTime is the time at which the evolution began.
 func ComputePopulationData(
 	evaluatedPopulation framework.EvaluatedPopulation,
 	naturalFitness bool,

@@ -33,17 +33,18 @@ type GenerationalEvolutionEngine struct {
 // NewGenerationalEvolutionEngine creates a new evolution engine by specifying
 // the various components required by a generational evolutionary algorithm.
 //
-// - candidateFactory is the factory used to create the initial population that
-// is iteratively evolved.
-// - evolutionScheme is the combination of evolutionary operators used to evolve
-// the population at each generation.
-// - fitnessEvaluator is a function for assigning fitness scores to candidate
-// solutions.
-// - selectionStrategy is a strategy for selecting which candidates survive to
-// be evolved.
-// - rng is the source of randomness used by all stochastic processes (including
-// evolutionary operators and selection strategies).
-func NewGenerationalEvolutionEngine(candidateFactory framework.CandidateFactory,
+//  - candidateFactory is the factory used to create the initial population that
+//  is iteratively evolved.
+//  - evolutionScheme is the combination of evolutionary operators used to
+//  evolve the population at each generation.
+//  - fitnessEvaluator is a function for assigning fitness scores to candidate
+//  solutions.
+//  - selectionStrategy is a strategy for selecting which candidates survive to
+//  be evolved.
+//  - rng is the source of randomness used by all stochastic processes
+//  (including evolutionary operators and selection strategies).
+func NewGenerationalEvolutionEngine(
+	candidateFactory framework.CandidateFactory,
 	evolutionScheme framework.EvolutionaryOperator,
 	fitnessEvaluator framework.FitnessEvaluator,
 	selectionStrategy framework.SelectionStrategy,
@@ -71,12 +72,12 @@ func NewGenerationalEvolutionEngine(candidateFactory framework.CandidateFactory,
 
 // NextEvolutionStep performs a single step/iteration of the evolutionary process.
 //
-// - evaluatedPopulation is the population at the beginning of the process.
-// - eliteCount is the number of the fittest individuals that must be
-// preserved.
+//  - evaluatedPopulation is the population at the beginning of the process.
+//  - eliteCount is the number of the fittest individuals that must be
+//  preserved.
 //
-// Returns the updated population after the evolutionary process has
-// proceeded by one step/iteration.
+// Returns the updated population after the evolutionary process has proceeded
+// by one step/iteration.
 func (e *GenerationalEvolutionEngine) NextEvolutionStep(
 	evaluatedPopulation framework.EvaluatedPopulation,
 	eliteCount int,
