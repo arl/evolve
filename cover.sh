@@ -10,6 +10,7 @@
 ##   -h, --help    Display this message.
 ##   -n            Dry-run; only show what would be done.
 ##   -k, --keep    Do not remove generated report profiles.
+##   -s, --short   Tell long-running tests to shorten their run time.
 ##   --dont-send   Do not send to goveralls nor open the browser
 ##                 (implies --keep)
 ##   -x, --exclude Exclude package paths containing a given string.
@@ -33,6 +34,7 @@ main() {
   KEEP=0
   DONT_SEND=0
   EXCLUDE='^$'
+  SHORT=''
 
   while [ $# -gt 0 ]; do
     case $1 in
@@ -42,6 +44,10 @@ main() {
       ;;
     (-k|--keep)
       KEEP=1;
+      shift
+      ;;
+    (-s|--short)
+      SHORT='-short';
       shift
       ;;
     (--dont-send)
@@ -99,10 +105,10 @@ main() {
 
   if [ $DRY_RUN -eq 0 ]; then
     # run with full coverage (including other packages) with govendor
-    go list -f "{{if or (len .TestGoFiles) (len .XTestGoFiles)}}$GOVENDOR test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -coverpkg '$PKGS_DELIM' {{.ImportPath}}{{end}}" $PKGS | xargs -I {} bash -c {}
+    go list -f "{{if or (len .TestGoFiles) (len .XTestGoFiles)}}$GOVENDOR test $SHORT -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -coverpkg '$PKGS_DELIM' {{.ImportPath}}{{end}}" $PKGS | xargs -I {} bash -c {}
   else
     # dry-run: shows command line
-    go list -f "{{if or (len .TestGoFiles) (len .XTestGoFiles)}}$GOVENDOR test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -coverpkg '$PKGS_DELIM' {{.ImportPath}}{{end}}" $PKGS
+    go list -f "{{if or (len .TestGoFiles) (len .XTestGoFiles)}}$GOVENDOR test $SHORT -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -coverpkg '$PKGS_DELIM' {{.ImportPath}}{{end}}" $PKGS
     exit
   fi
   # merge the package specific coverage profiles into one
