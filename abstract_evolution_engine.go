@@ -28,7 +28,7 @@ type Stepper interface {
 		rng *rand.Rand) framework.EvaluatedPopulation
 }
 
-// AbstractEvolutionEngine is a base struc for EvolutionEngine implementations.
+// AbstractEvolutionEngine is a base struct for EvolutionEngine implementations.
 type AbstractEvolutionEngine struct {
 	pool                           *worker.Pool // shared concurrent worker
 	observers                      map[framework.EvolutionObserver]struct{}

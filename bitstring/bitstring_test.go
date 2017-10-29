@@ -234,7 +234,7 @@ func TestBitStringSetBit(t *testing.T) {
 	})
 }
 
-func TestBitStringSwapSubstringWordAligned(t *testing.T) {
+func TestBitStringSwapSubstring(t *testing.T) {
 	tests := []struct {
 		name              string
 		ones, zeros       string

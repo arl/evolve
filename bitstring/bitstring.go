@@ -1,3 +1,5 @@
+// Package bitstring implmements a fixed length bit string type and common
+// operations on bit strings.
 package bitstring
 
 import (
@@ -38,7 +40,7 @@ func New(length int) (*BitString, error) {
 
 // NewRandom creates a BitString of the specified length with each bit set
 // randomly (the distribution of bits is uniform so long as the output
-// from the provided PRNG is also uniform).
+// from the provided pseudo-random number generator is also uniform).
 //
 // Using NewRandom is more efficient than creating a bit string and then
 // randomly setting each bit individually.
@@ -63,7 +65,7 @@ func NewRandom(length int, rng *rand.Rand) (*BitString, error) {
 	bitsUsed := uint32(length % wordLength)
 	if bitsUsed < wordLength {
 		unusedBits := wordLength - bitsUsed
-		mask := uint32(0xFFFFFFFF >> unusedBits)
+		mask := uint32(0xffffffff >> unusedBits)
 		bt.data[len(bt.data)-1] &= mask
 	}
 	return bt, nil
@@ -97,8 +99,9 @@ func (bt *BitString) Len() int {
 
 // Bit returns the bit at the specified index.
 //
-// - index is the index of the bit to look-up (0 is the least-significant
-// bit).
+//  - index is the index of the bit to look-up (0 is the least-significant
+//  bit).
+//
 // Returns a boolean indicating whether the bit is set or not.
 //
 // Will panic if the specified index is not a bit position in this bit string.
@@ -111,8 +114,8 @@ func (bt *BitString) Bit(index int) bool {
 
 // SetBit sets the bit at the specified index.
 //
-// - index is the index of the bit to set (0 is the least-significant bit).
-// - set is a boolean indicating whether the bit should be set or not.
+//  - index is the index of the bit to set (0 is the least-significant bit).
+//  - set is a boolean indicating whether the bit should be set or not.
 //
 // Will panic if the specified index is not a bit position in this bit string.
 func (bt *BitString) SetBit(index int, set bool) {
@@ -181,10 +184,10 @@ func (bt *BitString) ToBigInt() *big.Int {
 // strings. Both bit strings must be long enough that they contain the full
 // length of the specified substring.
 //
-// - other is the bitstring with which this bitstring should swap bits.
-// - start is the start position for the substrings to be exchanged. All bit
-// indices are big-endian, which means position 0 is the rightmost bit.
-// - length is the number of contiguous bits to swap.
+//  - other is the bitstring with which this bitstring should swap bits.
+//  - start is the start position for the substrings to be exchanged. All bit
+//  indices are big-endian, which means position 0 is the rightmost bit.
+//  - length is the number of contiguous bits to swap.
 func (bt *BitString) SwapSubstring(other *BitString, start, length int) {
 	bt.assertValidIndex(start)
 	other.assertValidIndex(start)
@@ -209,11 +212,10 @@ func (bt *BitString) SwapSubstring(other *BitString, start, length int) {
 	}
 }
 
-// - other is the BitString to exchange bits with.
-// - word is the word index of the word that will be swapped between the two
-// bit strings.
-// - swapMask is a mask that specifies which bits in the word will be
-// swapped.
+//  - other is the BitString to exchange bits with.
+//  - word is the word index of the word that will be swapped between the two
+//  bit strings.
+//  - swapMask is a mask that specifies which bits in the word will be swapped.
 func (bt *BitString) swapBits(other *BitString, word, swapMask uint32) {
 	preserveMask := ^swapMask
 	preservedThis := bt.data[word] & preserveMask
@@ -227,7 +229,7 @@ func (bt *BitString) swapBits(other *BitString, word, swapMask uint32) {
 // String creates a textual representation of this bit string in big-endian
 // order (index 0 is the right-most bit).
 //
-// Return this bit string rendered as a string of 1s and 0s.
+// Returns this bit string rendered as a string of 1s and 0s.
 func (bt *BitString) String() string {
 	buf := bytes.NewBuffer(make([]byte, 0, bt.length))
 	for i := bt.length - 1; i >= 0; i-- {
