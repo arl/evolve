@@ -192,15 +192,14 @@ func (bt *BitString) SwapSubstring(other *BitString, start, length int) {
 	bt.assertValidIndex(start)
 	other.assertValidIndex(start)
 
-	word := uint32(start / wordLength)
-
-	partialWordSize := uint32(wordLength-start) % wordLength
+	word := start / wordLength
+	partialWordSize := (wordLength - start) % wordLength
 	if partialWordSize > 0 {
-		bt.swapBits(other, word, 0xFFFFFFFF<<(wordLength-partialWordSize))
+		bt.swapBits(other, word, 0xffffffff<<uint32(wordLength-partialWordSize))
 		word++
 	}
 
-	remainingBits := uint32(length) - partialWordSize
+	remainingBits := length - partialWordSize
 	stop := remainingBits / wordLength
 	for i := word; i < stop; i++ {
 		bt.data[i], other.data[i] = other.data[i], bt.data[i]
@@ -208,7 +207,7 @@ func (bt *BitString) SwapSubstring(other *BitString, start, length int) {
 
 	remainingBits %= wordLength
 	if remainingBits > 0 {
-		bt.swapBits(other, word, 0xFFFFFFFF>>(wordLength-remainingBits))
+		bt.swapBits(other, len(bt.data)-1, 0xffffffff>>uint32(wordLength-remainingBits))
 	}
 }
 
@@ -216,7 +215,7 @@ func (bt *BitString) SwapSubstring(other *BitString, start, length int) {
 //  - word is the word index of the word that will be swapped between the two
 //  bit strings.
 //  - swapMask is a mask that specifies which bits in the word will be swapped.
-func (bt *BitString) swapBits(other *BitString, word, swapMask uint32) {
+func (bt *BitString) swapBits(other *BitString, word int, swapMask uint32) {
 	preserveMask := ^swapMask
 	preservedThis := bt.data[word] & preserveMask
 	preservedThat := other.data[word] & preserveMask
