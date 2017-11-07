@@ -48,6 +48,11 @@ func NewAbstractMutation(mutater Mutater, options ...Option) (*AbstractMutation,
 	return op, nil
 }
 
+// MutationProbability returns the mutation probability generator.
+func (op *AbstractMutation) MutationProbability() number.ProbabilityGenerator {
+	return op.mutationProbability
+}
+
 // Apply applies the mutation operation to each entry in the list of selected
 // candidates.
 func (op *AbstractMutation) Apply(selectedCandidates []framework.Candidate, rng *rand.Rand) []framework.Candidate {

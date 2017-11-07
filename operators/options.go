@@ -39,7 +39,7 @@ func (opt probabilityGeneratorOption) Apply(ope interface{}) error {
 	case *AbstractCrossover:
 		if opt.err == nil {
 			crossover := ope.(*AbstractCrossover)
-			crossover.crossoverProbabilityVariable = opt.gen
+			crossover.crossoverProbability = opt.gen
 		}
 		return opt.err
 	case *AbstractMutation:
@@ -89,7 +89,7 @@ func (opt integerGeneratorOption) Apply(ope interface{}) error {
 	case *AbstractCrossover:
 		if opt.err == nil {
 			crossover := ope.(*AbstractCrossover)
-			crossover.crossoverPointsVariable = opt.gen
+			crossover.crossoverPoints = opt.gen
 		}
 		return opt.err
 
