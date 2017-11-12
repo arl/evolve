@@ -27,16 +27,16 @@ type CandidateFactory interface {
 	// less than the required population size, the factory should generate
 	// additional candidates to fill the remaining spaces in the population.
 	//
-	// - populationSize is the size of the initial population.
-	// - seedCandidates is the slice of candidates to seed the population with.
+	// populationSize is the size of the initial population.
+	// seedCandidates is the slice of candidates to seed the population with.
 	// Number of candidates must be no bigger than the population size.
-	// - rng is the random number generator to use when creating additional
+	// rng is the random number generator to use when creating additional
 	// candidates to fill the population when the number of seed candidates is
 	// insufficient. This can be null if and only if the number of seed
 	// candidates provided is sufficient to fully populate the initial
 	// population.
 	//
-	// Return an initial population of candidate solutions, including the
+	// Returns an initial population of candidate solutions, including the
 	// specified seed candidates.
 	SeedInitialPopulation(
 		populationSize int,

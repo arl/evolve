@@ -24,11 +24,10 @@ type RankSelection struct {
 // NewRankSelection creates a rank-based selector with a linear mapping
 // function.
 //
-// - delegate is the proprtionate selector that will be delegated to after
-// converting rankings into relative fitness scores. The delegate parameter
-// may be nil, in which case the RankSelection is created with a default
-// rank-based selector and selection frequencies that correspond to expected
-// values. T
+// delegate is the proprtionate selector that will be delegated to after
+// converting rankings into relative fitness scores. The delegate parameter may
+// be nil, in which case the RankSelection is created with a default rank-based
+// selector and selection frequencies that correspond to expected values.
 func NewRankSelection(delegate framework.SelectionStrategy) *RankSelection {
 	if delegate == nil {
 		delegate = StochasticUniversalSampling{}
@@ -43,12 +42,12 @@ func NewRankSelection(delegate framework.SelectionStrategy) *RankSelection {
 // in the list).
 // NOTE: It is an error to call this method with an empty or null population.
 //
-// - population is the population from which to select.
-// naturalFitnessScores indicates whether higher fitness values represent
-// - fitter individuals or not.
-// - selectionSize is the number of individual selections to make (not
-// necessarily the number of distinct candidates to select, since the same
-// individual may potentially be selected more than once).
+// population is the population from which to select.
+// naturalFitnessScores indicates whether higher fitness values represent fitter
+// individuals or not.
+// selectionSize is the number of individual selections to make (not necessarily
+// the number of distinct candidates to select, since the same individual may
+// potentially be selected more than once).
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
@@ -83,9 +82,9 @@ func (sel *RankSelection) String() string {
 // The default mapping function is a simple linear transformation, but this
 // can be over-ridden by composition. Alternative implementations can be
 // linear or non-linear and either natural or non-natural.
-// - rank is a zero-based index into the population
-//  (0 <= rank < populationSize)
-// return populationSize - rank
+// rank is a zero-based index into the population (0 <= rank < populationSize)
+//
+// Returns populationSize - rank
 func mapRankToScore(rank, populationSize int) float64 {
 	return float64(populationSize - rank)
 }

@@ -25,10 +25,10 @@ type RandomMigration struct{}
 // that migrants from the same island will be moved to different islands. It
 // is also possible that when a migrant's destination is randomly chosen, it
 // gets sent back to the island that it came from.
-// - islandPopulations is a list of the populations of each island.
-// - migrantCount is the number of (randomly selected) individuals to be
-// moved on from each island.
-// - rng is a source of randomness.
+// islandPopulations is a list of the populations of each island.
+// migrantCount is the number of (randomly selected) individuals to be moved on
+// from each island.
+// rng is a source of randomness.
 func (mig RandomMigration) Migrate(islandPopulations []framework.EvaluatedPopulation, migrantCount int, rng *rand.Rand) {
 	migrants := make(framework.EvaluatedPopulation, 0, migrantCount*len(islandPopulations))
 

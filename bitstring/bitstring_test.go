@@ -1,6 +1,7 @@
 package bitstring
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 
@@ -234,7 +235,7 @@ func TestBitStringSetBit(t *testing.T) {
 	})
 }
 
-func TestBitStringSwapSubstringWordAligned(t *testing.T) {
+func TestBitStringSwapSubstring(t *testing.T) {
 	tests := []struct {
 		name              string
 		ones, zeros       string
@@ -265,6 +266,70 @@ func TestBitStringSwapSubstringWordAligned(t *testing.T) {
 			"1111111000",
 			"0000000111",
 		},
+		{
+			"smaller than word length",
+			"111",
+			"000",
+			1, 2,
+			"001",
+			"110",
+		},
+		{
+			"smaller than word length, full swap",
+			"111",
+			"000",
+			0, 3,
+			"000",
+			"111",
+		},
+		{
+			"word length full swap",
+			"11111111111111111111111111111111",
+			"00000000000000000000000000000000",
+			0, 32,
+			"00000000000000000000000000000000",
+			"11111111111111111111111111111111",
+		},
+		{
+			"greater than word length full swap",
+			"111111111111111111111111111111111",
+			"000000000000000000000000000000000",
+			0, 33,
+			"000000000000000000000000000000000",
+			"111111111111111111111111111111111",
+		},
+		{
+			"smaller than 2 times word length full swap",
+			"111111111111111111111111111111111111111111111111111111111111111",
+			"000000000000000000000000000000000000000000000000000000000000000",
+			0, 63,
+			"000000000000000000000000000000000000000000000000000000000000000",
+			"111111111111111111111111111111111111111111111111111111111111111",
+		},
+		{
+			"2 times word length full swap",
+			"1111111111111111111111111111111111111111111111111111111111111111",
+			"0000000000000000000000000000000000000000000000000000000000000000",
+			0, 64,
+			"0000000000000000000000000000000000000000000000000000000000000000",
+			"1111111111111111111111111111111111111111111111111111111111111111",
+		},
+		{
+			"greater than 2 times word length full swap",
+			"11111111111111111111111111111111111111111111111111111111111111111",
+			"00000000000000000000000000000000000000000000000000000000000000000",
+			0, 65,
+			"00000000000000000000000000000000000000000000000000000000000000000",
+			"11111111111111111111111111111111111111111111111111111111111111111",
+		},
+		{
+			"greater than 3 times word length",
+			"1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+			"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+			94, 1,
+			"0111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+			"1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -274,8 +339,88 @@ func TestBitStringSwapSubstringWordAligned(t *testing.T) {
 			assert.NoError(t, err2)
 			ones.SwapSubstring(zeros, tt.lo, tt.hi)
 
-			assert.Equalf(t, tt.expOnes, ones.String(), "want %s, got %s", tt.expOnes, ones.String())
-			assert.Equalf(t, tt.expZeros, zeros.String(), "want %s, got %s", tt.expZeros, zeros.String())
+			assert.Equalf(t, tt.expOnes, ones.String(),
+				"want %s, got %s", tt.expOnes, ones.String())
+			assert.Equalf(t, tt.expZeros, zeros.String(),
+				"want %s, got %s", tt.expZeros, zeros.String())
 		})
 	}
+}
+
+func ExampleNew() {
+	// create a 8 bits BitString
+	bitstring, _ := New(8)
+	// upon creation all bits are unset
+	fmt.Println(bitstring)
+	// Output: 00000000
+}
+
+func ExampleNewFromString() {
+	// create a BitString from string
+	bitstring, _ := NewFromString("101001")
+	fmt.Println(bitstring)
+	// Output: 101001
+}
+
+func ExampleBitString_Len() {
+	// create a 8 bits BitString
+	bitstring, _ := New(8)
+	fmt.Println(bitstring.Len())
+	// Output: 8
+}
+
+func ExampleBitString_Bit() {
+	// create a 8 bits BitString
+	bitstring, _ := New(8)
+	fmt.Println(bitstring.Bit(7))
+	// Output: false
+}
+
+func ExampleBitString_SetBit() {
+	// create a 8 bits BitString
+	bitstring, _ := New(8)
+	bitstring.SetBit(2, true)
+	fmt.Println(bitstring)
+	// Output: 00000100
+}
+
+func ExampleBitString_FlipBit() {
+	// create a 8 bits BitString
+	bitstring, _ := New(8)
+	bitstring.FlipBit(2)
+	fmt.Println(bitstring)
+	// Output: 00000100
+}
+
+func ExampleBitString_CountUnsetBits() {
+	// create a 8 bits BitString
+	bitstring, _ := New(8)
+	// upon creation all bits are unset
+	fmt.Println(bitstring.CountUnsetBits())
+	// Output: 8
+}
+
+func ExampleBitString_CountSetBits() {
+	// create a 8 bits BitString
+	bitstring, _ := New(8)
+	// upon creation all bits are unset
+	fmt.Println(bitstring.CountSetBits())
+	// Output: 0
+}
+
+func ExampleBitString_ToBigInt() {
+	// create a 8 bits BitString
+	bitstring, _ := NewFromString("100")
+	bi := bitstring.ToBigInt()
+	fmt.Println(bi.Int64())
+	// Output: 4
+}
+
+func ExampleBitString_SwapSubstring() {
+	bs1, _ := NewFromString("111")
+	bs2, _ := NewFromString("000")
+	// starting from bit 2 of bs1, swap 1 bit with bs2
+	bs1.SwapSubstring(bs2, 2, 1)
+	fmt.Println(bs1)
+	// Output: 011
 }

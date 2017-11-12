@@ -10,10 +10,11 @@ import (
 // evolutionary algorithm.
 //
 // It supports optional concurrent fitness evaluations to take full advantage of
-// multi-processor, multi-core and hyper-threaded machines.
+// multi-processor, multi-core and hyper-threaded machines through the
+// concurrent evaluation of candidate's fitness.
 //
 // If multi-threading is enabled, evolution (mutation, crossover, etc.) occurs
-// on the request thread but fitness evaluations are delegated to a pool of
+// on the request goroutine but fitness evaluations are delegated to a pool of
 // worker threads. All of the host's available processing units are used (i.e.
 // on a quad-core machine there will be four fitness evaluation worker threads).
 //
@@ -32,17 +33,18 @@ type GenerationalEvolutionEngine struct {
 // NewGenerationalEvolutionEngine creates a new evolution engine by specifying
 // the various components required by a generational evolutionary algorithm.
 //
-// - candidateFactory is the factory used to create the initial population that
-// is iteratively evolved.
-// - evolutionScheme is the combination of evolutionary operators used to evolve
+// candidateFactory is the factory used to create the initial population that is
+// iteratively evolved.
+// evolutionScheme is the combination of evolutionary operators used to evolve
 // the population at each generation.
-// - fitnessEvaluator is a function for assigning fitness scores to candidate
+// fitnessEvaluator is a function for assigning fitness scores to candidate
 // solutions.
-// - selectionStrategy is a strategy for selecting which candidates survive to
-// be evolved.
-// - rng is the source of randomness used by all stochastic processes (including
+// selectionStrategy is a strategy for selecting which candidates survive to be
+// evolved.
+// rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewGenerationalEvolutionEngine(candidateFactory framework.CandidateFactory,
+func NewGenerationalEvolutionEngine(
+	candidateFactory framework.CandidateFactory,
 	evolutionScheme framework.EvolutionaryOperator,
 	fitnessEvaluator framework.FitnessEvaluator,
 	selectionStrategy framework.SelectionStrategy,
@@ -70,12 +72,11 @@ func NewGenerationalEvolutionEngine(candidateFactory framework.CandidateFactory,
 
 // NextEvolutionStep performs a single step/iteration of the evolutionary process.
 //
-// - evaluatedPopulation is the population at the beginning of the process.
-// - eliteCount is the number of the fittest individuals that must be
-// preserved.
+// evaluatedPopulation is the population at the beginning of the process.
+// eliteCount is the number of the fittest individuals that must be preserved.
 //
-// Returns the updated population after the evolutionary process has
-// proceeded by one step/iteration.
+// Returns the updated population after the evolutionary process has proceeded
+// by one step/iteration.
 func (e *GenerationalEvolutionEngine) NextEvolutionStep(
 	evaluatedPopulation framework.EvaluatedPopulation,
 	eliteCount int,

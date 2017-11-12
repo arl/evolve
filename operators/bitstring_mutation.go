@@ -12,10 +12,10 @@ import (
 // bits in a bitstring.BitString according to some probability.
 //
 // Possible options:
-// - the mutation probability is the (possibly variable) probability of a
+// the mutation probability is the (possibly variable) probability of a
 // candidate bit string being mutated at all; set it with ConstantProbability or
 // VariableProbability. The default is a constant probability of 1.
-// - the mutation count is the (possibly variable) number of bits that will be
+// the mutation count is the (possibly variable) number of bits that will be
 // flipped on any candidate bit string that is selected for mutation; set it
 // with ConstantMutationCount or VariableMutationCount. The default is a
 // constant mutation count of exactly 1 bit flipped.

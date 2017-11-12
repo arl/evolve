@@ -73,12 +73,11 @@ func WithConstantSelectionRatio(ratio float64) TruncationSelectionOption {
 // fewer selected candidates than required, then these candidates are
 // selected multiple times to make up the shortfall.
 //
-// - population is the population of evolved and evaluated candidates
-// from which to select.
-// - naturalFitnessScores indicates whether higher fitness values represent fitter
+// population is the population of evolved and evaluated candidates from which
+// to select.
+// naturalFitnessScores indicates whether higher fitness values represent fitter
 // individuals or not.
-// - selectionSize The number of candidates to select from the
-// evolved population.
+// selectionSize The number of candidates to select from the evolved population.
 //
 // Returns the selected candidates.
 func (sel TruncationSelection) Select(

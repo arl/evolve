@@ -16,8 +16,8 @@ type Stepper interface {
 
 	// NextEvolutionStep performs a single step/iteration of the evolutionary process.
 	//
-	// - evaluatedPopulation is the population at the beginning of the process.
-	// - eliteCount is the number of the fittest individuals that must be
+	// evaluatedPopulation is the population at the beginning of the process.
+	// eliteCount is the number of the fittest individuals that must be
 	// preserved.
 	//
 	// Returns the updated population after the evolutionary process has
@@ -28,10 +28,9 @@ type Stepper interface {
 		rng *rand.Rand) framework.EvaluatedPopulation
 }
 
-// AbstractEvolutionEngine is a base struc for EvolutionEngine implementations.
+// AbstractEvolutionEngine is a base struct for EvolutionEngine implementations.
 type AbstractEvolutionEngine struct {
-	// A single multi-threaded worker is shared among multiple evolution engine instances.
-	pool                           *worker.Pool
+	pool                           *worker.Pool // shared concurrent worker
 	observers                      map[framework.EvolutionObserver]struct{}
 	rng                            *rand.Rand
 	candidateFactory               framework.CandidateFactory
@@ -44,13 +43,14 @@ type AbstractEvolutionEngine struct {
 // NewAbstractEvolutionEngine creates a new evolution engine by specifying the
 // various components required by an evolutionary algorithm.
 //
-// - candidateFactory is the factory used to create the initial population that
-// is iteratively evolved.
-// - fitnessEvaluator is a function for assigning fitness scores to candidate
+// candidateFactory is the factory used to create the initial population that is
+// iteratively evolved.
+// fitnessEvaluator is a function for assigning fitness scores to candidate
 // solutions.
-// - rng is the source of randomness used by all stochastic processes (including
+// rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewAbstractEvolutionEngine(candidateFactory framework.CandidateFactory,
+func NewAbstractEvolutionEngine(
+	candidateFactory framework.CandidateFactory,
 	fitnessEvaluator framework.FitnessEvaluator,
 	rng *rand.Rand,
 	stepper Stepper) *AbstractEvolutionEngine {
@@ -71,20 +71,22 @@ func NewAbstractEvolutionEngine(candidateFactory framework.CandidateFactory,
 // To return the entire population rather than just the fittest candidate,
 // use the EvolvePopulation method instead.
 //
-// - populationSize is the number of candidate solutions present in the
-// population at any point in time.
-// - eliteCount is the number of candidates preserved via elitism. In
-// elitism, a sub-set of the population with the best fitness scores are
-// preserved unchanged in the subsequent generation. Candidate solutions
-// that are preserved unchanged through elitism remain eligible for
-// selection for breeding the remainder of the next generation. This value
-// must be non-negative and less than the population size. A value of zero
-// means that no elitism will be applied.
-// - conditions is a slice of conditions that may cause the evolution to
+// populationSize is the number of candidate solutions present in the population
+// at any point in time.
+// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// sub-set of the population with the best fitness scores are preserved
+// unchanged in the subsequent generation. Candidate solutions that are
+// preserved unchanged through elitism remain eligible for selection for
+// breeding the remainder of the next generation. This value must be
+// non-negative and less than the population size. A value of zero means that no
+// elitism will be applied.
+// conditions is a slice of conditions that may cause the evolution to
 // terminate.
 //
-// Return the fittest solution found by the evolutionary process.
-func (e *AbstractEvolutionEngine) Evolve(populationSize, eliteCount int,
+// Returns the fittest solution found by the evolutionary process.
+func (e *AbstractEvolutionEngine) Evolve(
+	populationSize,
+	eliteCount int,
 	conditions ...framework.TerminationCondition) framework.Candidate {
 
 	return e.EvolveWithSeedCandidates(populationSize,
@@ -100,23 +102,24 @@ func (e *AbstractEvolutionEngine) Evolve(populationSize, eliteCount int,
 //
 // To return the entire population rather than just the fittest candidate,
 // use the EvolvePopulationWithSeedCandidates method instead.
-// - populationSize is the number of candidate solutions present in the
+// populationSize is the number of candidate solutions present in the
 // population at any point in time.
-// - eliteCount is the number of candidates preserved via elitism. In
-// elitism, a sub-set of the population with the best fitness scores are
-// preserved unchanged in the subsequent generation. Candidate solutions
-// that are preserved unchanged through elitism remain eligible for
-// selection for breeding the remainder of the next generation.  This value
-// must be non-negative and less than the population size. A value of zero
-// means that no elitism will be applied.
-// - seedCandidates is a set of candidates to seed the population with. The
-// size of this collection must be no greater than the specified population
-// size.
-// - conditions is a slice of conditions that may cause the evolution to
+// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// sub-set of the population with the best fitness scores are preserved
+// unchanged in the subsequent generation. Candidate solutions that are
+// preserved unchanged through elitism remain eligible for selection for
+// breeding the remainder of the next generation.  This value must be
+// non-negative and less than the population size. A value of zero means that no
+// elitism will be applied.
+// seedCandidates is a set of candidates to seed the population with. The size
+// of this collection must be no greater than the specified population size.
+// conditions is a slice of conditions that may cause the evolution to
 // terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *AbstractEvolutionEngine) EvolveWithSeedCandidates(populationSize, eliteCount int,
+func (e *AbstractEvolutionEngine) EvolveWithSeedCandidates(
+	populationSize,
+	eliteCount int,
 	seedCandidates []framework.Candidate,
 	conditions ...framework.TerminationCondition) framework.Candidate {
 
@@ -132,20 +135,22 @@ func (e *AbstractEvolutionEngine) EvolveWithSeedCandidates(populationSize, elite
 //
 // To return just the fittest candidate rather than the entire population,
 // use the Evolve method instead.
-// - populationSize is the number of candidate solutions present in the
-// population at any point in time.
-// - eliteCount is the number of candidates preserved via elitism. In
-// elitism, a sub-set of the population with the best fitness scores are
-// preserved unchanged in the subsequent generation. Candidate solutions
-// that are preserved unchanged through elitism remain eligible for
-// selection for breeding the remainder of the next generation.  This value
-// must be non-negative and less than the population size. A value of zero
-// means that no elitism will be applied.
-// -  conditions is a slice of conditions that may cause the evolution to
+// populationSize is the number of candidate solutions present in the population
+// at any point in time.
+// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// sub-set of the population with the best fitness scores are preserved
+// unchanged in the subsequent generation. Candidate solutions that are
+// preserved unchanged through elitism remain eligible for selection for
+// breeding the remainder of the next generation.  This value must be
+// non-negative and less than the population size. A value of zero means that no
+// elitism will be applied.
+// conditions is a slice of conditions that may cause the evolution to
 // terminate.
 //
-// Return the fittest solution found by the evolutionary process.
-func (e *AbstractEvolutionEngine) EvolvePopulation(populationSize, eliteCount int,
+// Returns the fittest solution found by the evolutionary process.
+func (e *AbstractEvolutionEngine) EvolvePopulation(
+	populationSize,
+	eliteCount int,
 	conditions ...framework.TerminationCondition) framework.EvaluatedPopulation {
 
 	return e.EvolvePopulationWithSeedCandidates(populationSize,
@@ -160,22 +165,20 @@ func (e *AbstractEvolutionEngine) EvolvePopulation(populationSize, eliteCount in
 //
 // To return just the fittest candidate rather than the entire population,
 // use the EvolveWithSeedCandidates method instead.
-// - populationSize is the number of candidate solutions present in the
-// population at any point in time.
-// - eliteCount The number of candidates preserved via elitism.  In elitism,
-// a sub-set of the population with the best fitness scores are preserved
+// populationSize is the number of candidate solutions present in the population
+// at any point in time.
+// eliteCount The number of candidates preserved via elitism.  In elitism, a
+// sub-set of the population with the best fitness scores are preserved
 // unchanged in the subsequent generation.  Candidate solutions that are
 // preserved unchanged through elitism remain eligible for selection for
 // breeding the remainder of the next generation.  This value must be
-// non-negative and less than the population size.  A value of zero means
-// that no elitism will be applied.
-// - seedCandidates A set of candidates to seed the population with.  The
-// size of this collection must be no greater than the specified population
-// size.
-// - conditions One or more conditions that may cause the evolution to
-// terminate.
+// non-negative and less than the population size.  A value of zero means that
+// no elitism will be applied.
+// seedCandidates A set of candidates to seed the population with. The size of
+// this collection must be no greater than the specified population size.
+// conditions One or more conditions that may cause the evolution to terminate.
 //
-// Return the fittest solution found by the evolutionary process.
+// Returns the fittest solution found by the evolutionary process.
 func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(
 	populationSize, eliteCount int,
 	seedCandidates []framework.Candidate,
@@ -227,16 +230,17 @@ func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(
 	return evaluatedPopulation
 }
 
-// Takes a population, assigns a fitness score to each member and returns
-// the members with their scores attached, sorted in descending order of
-// fitness (descending order of fitness score for natural scores, ascending
-// order of scores for non-natural scores).
-// - population is the population to evaluate (each candidate is assigned a
+// evaluatePopulation takes a population, assigns a fitness score to each member
+// and returns the members with their scores attached, sorted in descending
+// order of fitness (descending order of fitness score for natural scores,
+// ascending order of scores for non-natural scores).
+// population is the population to evaluate (each candidate is assigned a
 // fitness score).
 //
 // Returns the evaluated population (a list of candidates with attached fitness
 // scores).
-func (e *AbstractEvolutionEngine) evaluatePopulation(population []framework.Candidate) framework.EvaluatedPopulation {
+func (e *AbstractEvolutionEngine) evaluatePopulation(
+	population []framework.Candidate) framework.EvaluatedPopulation {
 
 	// Do fitness evaluations
 	evaluatedPopulation := make(framework.EvaluatedPopulation, len(population))

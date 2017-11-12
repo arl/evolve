@@ -31,8 +31,8 @@ type Mater interface {
 // this evolved proportion is controlled by the code crossoverProbability
 // parameter.
 type AbstractCrossover struct {
-	crossoverPointsVariable      number.IntegerGenerator
-	crossoverProbabilityVariable number.ProbabilityGenerator
+	crossoverPoints      number.IntegerGenerator
+	crossoverProbability number.ProbabilityGenerator
 	Mater
 }
 
@@ -43,9 +43,9 @@ type AbstractCrossover struct {
 func NewAbstractCrossover(mater Mater, options ...Option) (*AbstractCrossover, error) {
 	// create with default options, 1 crossover point with a probability of 1
 	op := &AbstractCrossover{
-		crossoverPointsVariable:      number.NewConstantIntegerGenerator(1),
-		crossoverProbabilityVariable: number.NewConstantProbabilityGenerator(number.ProbabilityOne),
-		Mater: mater,
+		crossoverPoints:      number.NewConstantIntegerGenerator(1),
+		crossoverProbability: number.NewConstantProbabilityGenerator(number.ProbabilityOne),
+		Mater:                mater,
 	}
 
 	// set client options
@@ -55,6 +55,16 @@ func NewAbstractCrossover(mater Mater, options ...Option) (*AbstractCrossover, e
 		}
 	}
 	return op, nil
+}
+
+// CrossoverPoints returns the crossover points generator.
+func (op *AbstractCrossover) CrossoverPoints() number.IntegerGenerator {
+	return op.crossoverPoints
+}
+
+// CrossoverProbability returns the crossover probability generator.
+func (op *AbstractCrossover) CrossoverProbability() number.ProbabilityGenerator {
+	return op.crossoverProbability
 }
 
 // Apply applies the crossover operation to the selected candidates.
@@ -86,8 +96,8 @@ func (op *AbstractCrossover) Apply(selectedCandidates []framework.Candidate, rng
 			// Randomly decide (according to the current crossover probability)
 			// whether to perform crossover for these 2 parents.
 			var crossoverPoints int64
-			if op.crossoverProbabilityVariable.NextValue().NextEvent(rng) {
-				crossoverPoints = op.crossoverPointsVariable.NextValue()
+			if op.crossoverProbability.NextValue().NextEvent(rng) {
+				crossoverPoints = op.crossoverPoints.NextValue()
 			}
 
 			if crossoverPoints > 0 {
