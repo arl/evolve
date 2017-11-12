@@ -17,10 +17,10 @@ type RingMigration struct{}
 // migration occurring in a clockwise direction. The individuals to be migrated
 // are chosen completely at random.
 //
-// - islandPopulations is a list of the populations of each island.
-// - migrantCount is the number of (randomly selected) individuals to be
-// moved on from each island.
-// - rng is a source of randomness.
+// islandPopulations is a list of the populations of each island.
+// migrantCount is the number of (randomly selected) individuals to be moved on
+// from each island.
+// rng is a source of randomness.
 func (mig RingMigration) Migrate(islandPopulations []framework.EvaluatedPopulation, migrantCount int, rng *rand.Rand) {
 	// The first batch of immigrants is from the last island to the first.
 	lastIslandIdx := len(islandPopulations) - 1

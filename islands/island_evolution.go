@@ -31,16 +31,16 @@ type IslandEvolution struct {
 // use NewIslandEvolutionWithPreconfiguredIslands function, which accepts a list
 // of pre-created islands (each is an instance of EvolutionEngine).
 //
-// - islandCount is the number of separate islands that will be part of the
+// islandCount is the number of separate islands that will be part of the
 // system.
-// - migration is a migration strategy for moving individuals between islands at
+// migration is a migration strategy for moving individuals between islands at
 // the end of an epoch.
-// - candidateFactory generates the initial population for each island.
-// - evolutionScheme is the evolutionary operator, or combination of
-// evolutionary operators, used on each island.
-// - fitnessEvaluator is the fitness function used on each island.
-// - selectionStrategy is the selection strategy used on each island.
-// - rng is a source of randomness, used by all islands.
+// candidateFactory generates the initial population for each island.
+// evolutionScheme is the evolutionary operator, or combination of evolutionary
+// operators, used on each island.
+// fitnessEvaluator is the fitness function used on each island.
+// selectionStrategy is the selection strategy used on each island.
+// rng is a source of randomness, used by all islands.
 func NewIslandEvolution(islandCount int,
 	migration Migration,
 	candidateFactory framework.CandidateFactory,
@@ -81,13 +81,13 @@ func (upd *islandPopulationUpdater) PopulationUpdate(data *framework.PopulationD
 // than the alternative constructor. The other construction function should be
 // used where possible to avoid having to explicitly create each island.
 //
-// - islands is a list of pre-configured islands.
-// - migration is a migration strategy for moving individuals between islands at
+// islands is a list of pre-configured islands.
+// migration is a migration strategy for moving individuals between islands at
 // the end of an epoch.
-// - naturalFitness indicates, if true, that higher fitness values mean fitter
+// naturalFitness indicates, if true, that higher fitness values mean fitter
 // individuals. If false, indicates that fitter individuals will have lower
 // scores.
-// - rng A source of randomness, used by all islands.
+// rng A source of randomness, used by all islands.
 func NewIslandEvolutionWithPreconfiguredIslands(
 	islands []framework.EvolutionEngine,
 	migration Migration,
@@ -150,23 +150,22 @@ func createIslands(islandCount int,
 // set.  It is preferable to use an appropritate framework.TerminationCondition
 // rather than interrupting the evolution in this way.
 //
-// - populationSize is the population size "for each island". Therefore, if you
+// populationSize is the population size "for each island". Therefore, if you
 // have 5 islands, setting this parameter to 200 will result in 1000 individuals
 // overall, 200 on each island.
-// - eliteCount is the number of candidates preserved via elitism "on each
+// eliteCount is the number of candidates preserved via elitism "on each
 // island".  In elitism, a sub-set of the population with the best fitness
 // scores are preserved unchanged in the subsequent generation. Candidate
 // solutions that are preserved unchanged through elitism remain eligible for
 // selection for breeding the remainder of the next generation.  This value must
 // be non-negative and less than the population size. A value of zero means that
 // no elitism will be applied.
-// - epochLength is the number of generations that make up an epoch. Islands
+// epochLength is the number of generations that make up an epoch. Islands
 // evolve independently for this number of generations and then migration occurs
 // at the end of the epoch and the next epoch starts.
-// - migrantCount is the number of individuals that will be migrated from each
-// island at the end of each
-// epoch.
-// - conditions are one or more conditions that may cause the evolution to
+// migrantCount is the number of individuals that will be migrated from each
+// island at the end of each epoch.
+// conditions are one or more conditions that may cause the evolution to
 // terminate.
 //
 // Returns the fittest solution found by the evolutionary process on any of the
@@ -282,7 +281,7 @@ func (ie *IslandEvolution) createEpochTasks(
 // candidateList converts a slice of framework.EvaluatedCandidate's into a
 // simple list of candidates.
 //
-// - evaluatedCandidates is the population of candidate objects to relieve of
+// evaluatedCandidates is the population of candidate objects to relieve of
 // their evaluation wrappers.
 //
 // Returns the candidates, stripped of their fitness scores.

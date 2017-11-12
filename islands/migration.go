@@ -13,8 +13,8 @@ type Migration interface {
 	// Migrate performs the actual migration of individual. It moves candidates
 	// betweens islands.
 	//
-	// - islandPopulations is the populations of each island in the system.
-	// - migrantCount is the number of individuals to move from each island.
-	// - rng is a source of randomness.
+	// islandPopulations is the populations of each island in the system.
+	// migrantCount is the number of individuals to move from each island.
+	// rng is a source of randomness.
 	Migrate(islandPopulations []framework.EvaluatedPopulation, migrantCount int, rng *rand.Rand)
 }

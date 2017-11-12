@@ -13,8 +13,8 @@ type IslandEvolutionObserver interface {
 	// the population of an individual island.
 	//
 	// This will be called once for each generation on each island.
-	// - islandIndex identifies which individual island the data comes from.
+	// islandIndex identifies which individual island the data comes from.
 	// Indices start at zero and are sequential.
-	// - data is the latest data from the evolution on the specified island.
+	// data is the latest data from the evolution on the specified island.
 	IslandPopulationUpdate(islandIndex int, data *framework.PopulationData)
 }
