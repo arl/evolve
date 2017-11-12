@@ -25,10 +25,9 @@ type RouletteWheelSelection struct{}
 // candidate's fitness score.  Selection is with replacement (the same candidate
 // may be selected multiple times).
 //
-// - naturalFitnessScores should be true if higher fitness scores indicate
-// fitter individuals, false if lower fitness scores indicate fitter
-// individuals.
-// - selectionSize is the number of selections to make.
+// naturalFitnessScores should be true if higher fitness scores indicate fitter
+// individuals, false if lower fitness scores indicate fitter individuals.
+// selectionSize is the number of selections to make.
 func (rws RouletteWheelSelection) Select(
 	population framework.EvaluatedPopulation,
 	naturalFitnessScores bool,

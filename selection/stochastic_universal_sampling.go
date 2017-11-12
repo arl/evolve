@@ -20,12 +20,12 @@ type StochasticUniversalSampling struct{}
 // in the list).
 // NOTE: It is an error to call this method with an empty or null population.
 //
-// - population is the population from which to select.
-// - naturalFitnessScores indicates whether higher fitness values represent
-// - fitter individuals or not.
-// - selectionSize is the number of individual selections to make (not
-// necessarily the number of distinct candidates to select, since the same
-// individual may potentially be selected more than once).
+// population is the population from which to select.
+// naturalFitnessScores indicates whether higher fitness values represent fitter
+// individuals or not.
+// selectionSize is the number of individual selections to make (not necessarily
+// the number of distinct candidates to select, since the same individual may
+// potentially be selected more than once).
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.

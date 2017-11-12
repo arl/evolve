@@ -23,11 +23,10 @@ type SigmaScaling struct {
 
 // NewSigmaScaling creates a sigma-scaled selection strategy.
 //
-// - delegate is the proprtionate selector that will be delegated to after
-// after fitness scores have been adjusted using sigma scaling. The delegate
-// parameter
-// may be nil, in which case the SigmaScaling is created with a default
-// delegate using stochastic universal sampling
+// delegate is the proprtionate selector that will be delegated to after after
+// fitness scores have been adjusted using sigma scaling. The delegate
+// parameter. It may be nil, in which case the SigmaScaling is created with a
+// default delegate using stochastic universal sampling
 func NewSigmaScaling(delegate framework.SelectionStrategy) *SigmaScaling {
 	if delegate == nil {
 		delegate = StochasticUniversalSampling{}
@@ -42,12 +41,12 @@ func NewSigmaScaling(delegate framework.SelectionStrategy) *SigmaScaling {
 // in the list).
 // NOTE: It is an error to call this method with an empty or null population.
 //
-// - population is the population from which to select.
-// naturalFitnessScores indicates whether higher fitness values represent
-// - fitter individuals or not.
-// - selectionSize is the number of individual selections to make (not
-// necessarily the number of distinct candidates to select, since the same
-// individual may potentially be selected more than once).
+// population is the population from which to select.
+// naturalFitnessScores indicates whether higher fitness values represent fitter
+// individuals or not.
+// selectionSize is the number of individual selections to make (not necessarily
+// the number of distinct candidates to select, since the same individual may
+// potentially be selected more than once).
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
