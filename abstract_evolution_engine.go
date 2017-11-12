@@ -16,8 +16,8 @@ type Stepper interface {
 
 	// NextEvolutionStep performs a single step/iteration of the evolutionary process.
 	//
-	// - evaluatedPopulation is the population at the beginning of the process.
-	// - eliteCount is the number of the fittest individuals that must be
+	// evaluatedPopulation is the population at the beginning of the process.
+	// eliteCount is the number of the fittest individuals that must be
 	// preserved.
 	//
 	// Returns the updated population after the evolutionary process has
@@ -43,12 +43,12 @@ type AbstractEvolutionEngine struct {
 // NewAbstractEvolutionEngine creates a new evolution engine by specifying the
 // various components required by an evolutionary algorithm.
 //
-//  - candidateFactory is the factory used to create the initial population that
-//  is iteratively evolved.
-//  - fitnessEvaluator is a function for assigning fitness scores to candidate
-//  solutions.
-//  - rng is the source of randomness used by all stochastic processes
-//  (including evolutionary operators and selection strategies).
+// candidateFactory is the factory used to create the initial population that is
+// iteratively evolved.
+// fitnessEvaluator is a function for assigning fitness scores to candidate
+// solutions.
+// rng is the source of randomness used by all stochastic processes (including
+// evolutionary operators and selection strategies).
 func NewAbstractEvolutionEngine(
 	candidateFactory framework.CandidateFactory,
 	fitnessEvaluator framework.FitnessEvaluator,
@@ -71,19 +71,19 @@ func NewAbstractEvolutionEngine(
 // To return the entire population rather than just the fittest candidate,
 // use the EvolvePopulation method instead.
 //
-//  - populationSize is the number of candidate solutions present in the
-//  population at any point in time.
-//  - eliteCount is the number of candidates preserved via elitism. In elitism,
-//  a sub-set of the population with the best fitness scores are preserved
-//  unchanged in the subsequent generation. Candidate solutions that are
-//  preserved unchanged through elitism remain eligible for selection for
-//  breeding the remainder of the next generation. This value must be
-//  non-negative and less than the population size. A value of zero means that
-//  no elitism will be applied.
-//  - conditions is a slice of conditions that may cause the evolution to
-//  terminate.
+// populationSize is the number of candidate solutions present in the population
+// at any point in time.
+// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// sub-set of the population with the best fitness scores are preserved
+// unchanged in the subsequent generation. Candidate solutions that are
+// preserved unchanged through elitism remain eligible for selection for
+// breeding the remainder of the next generation. This value must be
+// non-negative and less than the population size. A value of zero means that no
+// elitism will be applied.
+// conditions is a slice of conditions that may cause the evolution to
+// terminate.
 //
-// Return the fittest solution found by the evolutionary process.
+// Returns the fittest solution found by the evolutionary process.
 func (e *AbstractEvolutionEngine) Evolve(
 	populationSize,
 	eliteCount int,
@@ -102,20 +102,19 @@ func (e *AbstractEvolutionEngine) Evolve(
 //
 // To return the entire population rather than just the fittest candidate,
 // use the EvolvePopulationWithSeedCandidates method instead.
-//  - populationSize is the number of candidate solutions present in the
-//  population at any point in time.
-//  - eliteCount is the number of candidates preserved via elitism. In elitism,
-//  a sub-set of the population with the best fitness scores are preserved
-//  unchanged in the subsequent generation. Candidate solutions that are
-//  preserved unchanged through elitism remain eligible for selection for
-//  breeding the remainder of the next generation.  This value must be
-//  non-negative and less than the population size. A value of zero means that
-//  no elitism will be applied.
-//  - seedCandidates is a set of candidates to seed the population with. The
-//  size of this collection must be no greater than the specified population
-//  size.
-//  - conditions is a slice of conditions that may cause the evolution to
-//  terminate.
+// populationSize is the number of candidate solutions present in the
+// population at any point in time.
+// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// sub-set of the population with the best fitness scores are preserved
+// unchanged in the subsequent generation. Candidate solutions that are
+// preserved unchanged through elitism remain eligible for selection for
+// breeding the remainder of the next generation.  This value must be
+// non-negative and less than the population size. A value of zero means that no
+// elitism will be applied.
+// seedCandidates is a set of candidates to seed the population with. The size
+// of this collection must be no greater than the specified population size.
+// conditions is a slice of conditions that may cause the evolution to
+// terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
 func (e *AbstractEvolutionEngine) EvolveWithSeedCandidates(
@@ -136,19 +135,19 @@ func (e *AbstractEvolutionEngine) EvolveWithSeedCandidates(
 //
 // To return just the fittest candidate rather than the entire population,
 // use the Evolve method instead.
-//  - populationSize is the number of candidate solutions present in the
-//  population at any point in time.
-//  - eliteCount is the number of candidates preserved via elitism. In elitism,
-//  a sub-set of the population with the best fitness scores are preserved
-//  unchanged in the subsequent generation. Candidate solutions that are
-//  preserved unchanged through elitism remain eligible for selection for
-//  breeding the remainder of the next generation.  This value must be
-//  non-negative and less than the population size. A value of zero means that
-//  no elitism will be applied.
-//  -  conditions is a slice of conditions that may cause the evolution to
-//  terminate.
+// populationSize is the number of candidate solutions present in the population
+// at any point in time.
+// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// sub-set of the population with the best fitness scores are preserved
+// unchanged in the subsequent generation. Candidate solutions that are
+// preserved unchanged through elitism remain eligible for selection for
+// breeding the remainder of the next generation.  This value must be
+// non-negative and less than the population size. A value of zero means that no
+// elitism will be applied.
+// conditions is a slice of conditions that may cause the evolution to
+// terminate.
 //
-// Return the fittest solution found by the evolutionary process.
+// Returns the fittest solution found by the evolutionary process.
 func (e *AbstractEvolutionEngine) EvolvePopulation(
 	populationSize,
 	eliteCount int,
@@ -166,21 +165,20 @@ func (e *AbstractEvolutionEngine) EvolvePopulation(
 //
 // To return just the fittest candidate rather than the entire population,
 // use the EvolveWithSeedCandidates method instead.
-//  - populationSize is the number of candidate solutions present in the
-//  population at any point in time.
-//  - eliteCount The number of candidates preserved via elitism.  In elitism, a
-//  sub-set of the population with the best fitness scores are preserved
-//  unchanged in the subsequent generation.  Candidate solutions that are
-//  preserved unchanged through elitism remain eligible for selection for
-//  breeding the remainder of the next generation.  This value must be
-//  non-negative and less than the population size.  A value of zero means that
-//  no elitism will be applied.
-//  - seedCandidates A set of candidates to seed the population with. The size
-//  of this collection must be no greater than the specified population size.
-//  - conditions One or more conditions that may cause the evolution to
-//  terminate.
+// populationSize is the number of candidate solutions present in the population
+// at any point in time.
+// eliteCount The number of candidates preserved via elitism.  In elitism, a
+// sub-set of the population with the best fitness scores are preserved
+// unchanged in the subsequent generation.  Candidate solutions that are
+// preserved unchanged through elitism remain eligible for selection for
+// breeding the remainder of the next generation.  This value must be
+// non-negative and less than the population size.  A value of zero means that
+// no elitism will be applied.
+// seedCandidates A set of candidates to seed the population with. The size of
+// this collection must be no greater than the specified population size.
+// conditions One or more conditions that may cause the evolution to terminate.
 //
-// Return the fittest solution found by the evolutionary process.
+// Returns the fittest solution found by the evolutionary process.
 func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(
 	populationSize, eliteCount int,
 	seedCandidates []framework.Candidate,
@@ -232,12 +230,12 @@ func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(
 	return evaluatedPopulation
 }
 
-// Takes a population, assigns a fitness score to each member and returns
-// the members with their scores attached, sorted in descending order of
-// fitness (descending order of fitness score for natural scores, ascending
-// order of scores for non-natural scores).
-//  - population is the population to evaluate (each candidate is assigned a
-//  fitness score).
+// evaluatePopulation takes a population, assigns a fitness score to each member
+// and returns the members with their scores attached, sorted in descending
+// order of fitness (descending order of fitness score for natural scores,
+// ascending order of scores for non-natural scores).
+// population is the population to evaluate (each candidate is assigned a
+// fitness score).
 //
 // Returns the evaluated population (a list of candidates with attached fitness
 // scores).
