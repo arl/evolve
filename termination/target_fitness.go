@@ -11,15 +11,13 @@ type TargetFitness struct {
 
 // NewTargetFitness returns a TargetFitness termination condition.
 //
-// - targetFitness represents the fitness score that must be achieved by at
-// least one individual in the population in order for this condition to be
-// satisfied.
-// - natural indicates whether fitness scores are natural or non-natural. If
-// fitness is natural, the condition will be satisfied if any individual has
-// a fitness that is greater than or equal to the target fitness.  If
-// fitness is non-natural, the condition will be satisfied in any individual
-// has a fitness that is less
-// than or equal to the target fitness.
+// targetFitness represents the fitness score that must be achieved by at least
+// one individual in the population in order for this condition to be satisfied.
+// natural indicates whether fitness scores are natural or non-natural. If
+// fitness is natural, the condition will be satisfied if any individual has a
+// fitness that is greater than or equal to the target fitness. If fitness is
+// non-natural, the condition will be satisfied in any individual has a fitness
+// that is less than or equal to the target fitness.
 func NewTargetFitness(targetFitness float64, natural bool) *TargetFitness {
 	return &TargetFitness{
 		targetFitness: targetFitness,
