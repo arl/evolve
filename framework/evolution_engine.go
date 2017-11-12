@@ -11,19 +11,19 @@ type EvolutionEngine interface {
 	// To return the entire population rather than just the fittest candidate,
 	// use the EvolvePopulation method instead.
 	//
-	// - populationSize is the number of candidate solutions present in the
+	// populationSize is the number of candidate solutions present in the
 	// population at any point in time.
-	// - eliteCount is the number of candidates preserved via elitism. In
-	// elitism, a sub-set of the population with the best fitness scores are
-	// preserved unchanged in the subsequent generation. Candidate solutions
-	// that are preserved unchanged through elitism remain eligible for
-	// selection for breeding the remainder of the next generation. This value
-	// must be non-negative and less than the population size. A value of zero
-	// means that no elitism will be applied.
-	// - conditions is a slice of conditions that may cause the evolution to
+	// eliteCount is the number of candidates preserved via elitism. In elitism,
+	// a sub-set of the population with the best fitness scores are preserved
+	// unchanged in the subsequent generation. Candidate solutions that are
+	// preserved unchanged through elitism remain eligible for selection for
+	// breeding the remainder of the next generation. This value must be
+	// non-negative and less than the population size. A value of zero means
+	// that no elitism will be applied.
+	// conditions is a slice of conditions that may cause the evolution to
 	// terminate.
 	//
-	// Return the fittest solution found by the evolutionary process.
+	// Returns the fittest solution found by the evolutionary process.
 	Evolve(populationSize, eliteCount int,
 		conditions ...TerminationCondition) Candidate
 
@@ -34,19 +34,19 @@ type EvolutionEngine interface {
 	//
 	// To return the entire population rather than just the fittest candidate,
 	// use the EvolvePopulationWithSeedCandidates method instead.
-	// - populationSize is the number of candidate solutions present in the
+	// populationSize is the number of candidate solutions present in the
 	// population at any point in time.
-	// - eliteCount is the number of candidates preserved via elitism. In
-	// elitism, a sub-set of the population with the best fitness scores are
-	// preserved unchanged in the subsequent generation. Candidate solutions
-	// that are preserved unchanged through elitism remain eligible for
-	// selection for breeding the remainder of the next generation.  This value
-	// must be non-negative and less than the population size. A value of zero
-	// means that no elitism will be applied.
-	// - seedCandidates is a set of candidates to seed the population with. The
+	// eliteCount is the number of candidates preserved via elitism. In elitism,
+	// a sub-set of the population with the best fitness scores are preserved
+	// unchanged in the subsequent generation. Candidate solutions that are
+	// preserved unchanged through elitism remain eligible for selection for
+	// breeding the remainder of the next generation.  This value must be
+	// non-negative and less than the population size. A value of zero means
+	// that no elitism will be applied.
+	// seedCandidates is a set of candidates to seed the population with. The
 	// size of this collection must be no greater than the specified population
 	// size.
-	// - conditions is a slice of conditions that may cause the evolution to
+	// conditions is a slice of conditions that may cause the evolution to
 	// terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
@@ -60,19 +60,19 @@ type EvolutionEngine interface {
 	//
 	// To return just the fittest candidate rather than the entire population,
 	// use the Evolve method instead.
-	// - populationSize is the number of candidate solutions present in the
+	// populationSize is the number of candidate solutions present in the
 	// population at any point in time.
-	// - eliteCount is the number of candidates preserved via elitism. In
-	// elitism, a sub-set of the population with the best fitness scores are
-	// preserved unchanged in the subsequent generation. Candidate solutions
-	// that are preserved unchanged through elitism remain eligible for
-	// selection for breeding the remainder of the next generation.  This value
-	// must be non-negative and less than the population size. A value of zero
-	// means that no elitism will be applied.
-	// -  conditions is a slice of conditions that may cause the evolution to
+	// eliteCount is the number of candidates preserved via elitism. In elitism,
+	// a sub-set of the population with the best fitness scores are preserved
+	// unchanged in the subsequent generation. Candidate solutions that are
+	// preserved unchanged through elitism remain eligible for selection for
+	// breeding the remainder of the next generation.  This value must be
+	// non-negative and less than the population size. A value of zero means
+	// that no elitism will be applied.
+	// conditions is a slice of conditions that may cause the evolution to
 	// terminate.
 	//
-	// Return the fittest solution found by the evolutionary process.
+	// Returns the fittest solution found by the evolutionary process.
 	EvolvePopulation(populationSize, eliteCount int,
 		conditions ...TerminationCondition) EvaluatedPopulation
 
@@ -82,22 +82,21 @@ type EvolutionEngine interface {
 	//
 	// To return just the fittest candidate rather than the entire population,
 	// use the EvolveWithSeedCandidates method instead.
-	// - populationSize is the number of candidate solutions present in the
+	// populationSize is the number of candidate solutions present in the
 	// population at any point in time.
-	// - eliteCount The number of candidates preserved via elitism.  In elitism,
-	// a sub-set of the population with the best fitness scores are preserved
+	// eliteCount The number of candidates preserved via elitism.  In elitism, a
+	// sub-set of the population with the best fitness scores are preserved
 	// unchanged in the subsequent generation.  Candidate solutions that are
 	// preserved unchanged through elitism remain eligible for selection for
 	// breeding the remainder of the next generation.  This value must be
 	// non-negative and less than the population size.  A value of zero means
 	// that no elitism will be applied.
-	// - seedCandidates A set of candidates to seed the population with.  The
-	// size of this collection must be no greater than the specified population
-	// size.
-	// - conditions One or more conditions that may cause the evolution to
+	// seedCandidates A set of candidates to seed the population with.  The size
+	// of this collection must be no greater than the specified population size.
+	// conditions One or more conditions that may cause the evolution to
 	// terminate.
 	//
-	// Return the fittest solution found by the evolutionary process.
+	// Returns the fittest solution found by the evolutionary process.
 	EvolvePopulationWithSeedCandidates(populationSize, eliteCount int,
 		seedCandidates []Candidate,
 		conditions ...TerminationCondition) EvaluatedPopulation
