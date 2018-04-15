@@ -266,3 +266,8 @@ func (bt *BitString) Equals(other *BitString) bool {
 	}
 	return false
 }
+
+// Data returns the bitstring underlying slice
+func (bt *BitString) Data() []uint32 {
+	return bt.data
+}
