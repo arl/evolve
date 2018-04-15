@@ -1,6 +1,10 @@
 package termination
 
-import "github.com/aurelien-rainone/evolve/framework"
+import (
+	"fmt"
+
+	"github.com/aurelien-rainone/evolve/framework"
+)
 
 // TargetFitness terminates evolution once at least one candidate in the
 // population has equalled or bettered a pre-determined fitness score.
@@ -37,4 +41,9 @@ func (tc *TargetFitness) ShouldTerminate(populationData *framework.PopulationDat
 	}
 	// If we're using "non-natural" fitness scores, lower values are better.
 	return populationData.BestCandidateFitness() <= tc.targetFitness
+}
+
+// String returns the termination condition representation as a string
+func (tc *TargetFitness) String() string {
+	return fmt.Sprintf("Reached target fitness of %f", tc.targetFitness)
 }

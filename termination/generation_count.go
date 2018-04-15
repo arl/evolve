@@ -1,6 +1,10 @@
 package termination
 
-import "github.com/aurelien-rainone/evolve/framework"
+import (
+	"fmt"
+
+	"github.com/aurelien-rainone/evolve/framework"
+)
 
 // GenerationCount terminates evolution after a set number of generations have
 // passed.
@@ -21,4 +25,9 @@ func NewGenerationCount(generationCount int) GenerationCount {
 // This may be used to determine whether evolution should continue or not.
 func (tc GenerationCount) ShouldTerminate(populationData *framework.PopulationData) bool {
 	return populationData.GenerationNumber()+1 >= int(tc)
+}
+
+// String returns the termination condition representation as a string
+func (tc GenerationCount) String() string {
+	return fmt.Sprintf("Reached %d generations", tc)
 }

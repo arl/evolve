@@ -1,6 +1,7 @@
 package termination
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/aurelien-rainone/evolve/framework"
@@ -24,4 +25,9 @@ func NewElapsedTime(maxDuration time.Duration) ElapsedTime {
 // has elapsed.
 func (tc ElapsedTime) ShouldTerminate(populationData *framework.PopulationData) bool {
 	return populationData.ElapsedTime() >= tc.maxDuration
+}
+
+// String returns the termination condition representation as a string
+func (tc ElapsedTime) String() string {
+	return fmt.Sprintf("Elapsed Time (duration: %v)", tc.maxDuration)
 }

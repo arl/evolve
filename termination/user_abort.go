@@ -57,3 +57,8 @@ func (ua *UserAbort) Reset() {
 	ua.aborted = false
 	ua.mutex.Unlock()
 }
+
+// String returns the termination condition representation as a string
+func (ua *UserAbort) String() string {
+	return "User aborted evolution"
+}
