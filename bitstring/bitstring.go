@@ -4,7 +4,6 @@ package bitstring
 
 import (
 	"bytes"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"math/big"
@@ -50,13 +49,9 @@ func NewRandom(length int, rng *rand.Rand) (*BitString, error) {
 		return nil, err
 	}
 
-	// Instead of setting each bit with a random boolean, we create a random
-	// byte buffer and fill the data field with it.
-	buf := make([]byte, len(bt.data)*4)
-	rng.Read(buf) // no need for error checking on Rand.Read
+	// fill the slice with random values
 	for i := 0; i < len(bt.data); i++ {
-		randomInt, _ := binary.Varint(buf[i : i+4])
-		bt.data[i] = uint32(randomInt)
+		bt.data[i] = rng.Uint32()
 	}
 
 	// If the last word is not fully utilised, zero any out-of-bounds bits.
