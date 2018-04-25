@@ -50,7 +50,7 @@ type bitStringMutater struct {
 func (op *bitStringMutater) Mutate(c framework.Candidate, rng *rand.Rand) framework.Candidate {
 	if op.impl.mutationProbability.NextValue().NextEvent(rng) {
 		bitString := c.(*bitstring.BitString)
-		mutatedBitString := bitString.Clone()
+		mutatedBitString := bitString.Copy()
 		mutations := op.mutationCount.NextValue()
 		for i := int64(0); i < mutations; i++ {
 			mutatedBitString.FlipBit(rng.Intn(mutatedBitString.Len()))

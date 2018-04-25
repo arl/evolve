@@ -116,7 +116,8 @@ func (bs *BitString) Data() []uint32 {
 // Index 0 index is the index of the bit to look-up (0 is the least-significant bit).
 // Returns a boolean indicating whether the bit is set or not.
 //
-// Will panic if the specified index is not a bit position in this bit string.
+// If index is negative or greater than bs.Len(), Bit will panic with
+// ErrIndexOutOfRange.
 func (bs *BitString) Bit(i int) bool {
 	bs.mustExist(i)
 
@@ -146,7 +147,8 @@ func (bs *BitString) SetBit(i int, v bool) {
 //
 // param index is the bit to flip (0 is the least-significant bit).
 //
-// Will panic if the specified index is not a valid bit position in bs
+// If index is negative or greater than bs.Len(), FlipBit will panic with
+// ErrIndexOutOfRange.
 func (bs *BitString) FlipBit(i int) {
 	bs.mustExist(i)
 
@@ -248,8 +250,10 @@ func (bs *BitString) String() string {
 	return buf.String()
 }
 
-// Clone returns an identical copy of this bit string.
-func (bs *BitString) Clone() *BitString {
+// Copy returns an identical copy of bs.
+//
+// The new BitString is based off of a new backing array.
+func (bs *BitString) Copy() *BitString {
 	clone, _ := New(bs.length)
 	copy(clone.data, bs.data)
 	return clone

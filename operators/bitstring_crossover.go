@@ -29,8 +29,8 @@ func (m bitStringMater) Mate(parent1, parent2 framework.Candidate,
 	if p1.Len() != p2.Len() {
 		panic("Cannot perform crossover with different length parents")
 	}
-	offspring1 := p1.Clone()
-	offspring2 := p2.Clone()
+	offspring1 := p1.Copy()
+	offspring2 := p2.Copy()
 
 	// Apply as many crossovers as required.
 	for i := int64(0); i < numberOfCrossoverPoints; i++ {

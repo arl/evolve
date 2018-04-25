@@ -134,7 +134,7 @@ func TestBitStringClone(t *testing.T) {
 	bitString.SetBit(3, true)
 	bitString.SetBit(7, true)
 	bitString.SetBit(8, true)
-	clone := bitString.Clone()
+	clone := bitString.Copy()
 
 	// Check the clone is a bit-for-bit duplicate.
 	for i := 0; i < bitString.Len(); i++ {
@@ -159,7 +159,7 @@ func TestBitStringEquality(t *testing.T) {
 	assert.False(t, bitString.Equals(nil), "Valid BitString should never equal nil.")
 	assert.False(t, bitString.Equals(&BitString{}), "BitString should not equal another instance")
 
-	clone := bitString.Clone()
+	clone := bitString.Copy()
 	assert.True(t, clone.Equals(bitString), "Freshly cloned BitString should equal original")
 
 	// Changing one of the objects should result in them no longer being
