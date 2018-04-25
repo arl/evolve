@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	// ErrIndexOutOfRange is passed to panic if a bit index is out of the valid
-	// range for a a given BitString.
+	// ErrIndexOutOfRange is passed to panic if a bit index is out of range
 	ErrIndexOutOfRange = errors.New("bitstring.BitString: index out of range")
 
+	// ErrInvalidLength is returned when the provided bitstring length is
+	// invalid.
 	ErrInvalidLength = errors.New("bitstring.BitString: invalid length")
 )
 
