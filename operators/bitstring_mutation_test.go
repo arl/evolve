@@ -24,7 +24,7 @@ func TestBitStringMutationRandom(t *testing.T) {
 	mutation, err = NewBitStringMutation(ConstantProbability(number.ProbabilityEven))
 	assert.NoError(t, err)
 
-	original, err = bitstring.NewFromString("111100101")
+	original, err = bitstring.MakeFromString("111100101")
 	assert.NoError(t, err)
 
 	population := []framework.Candidate{original}
@@ -51,7 +51,7 @@ func TestBitStringMutationSingleBit(t *testing.T) {
 	mutation, err = NewBitStringMutation()
 	assert.NoError(t, err)
 
-	original, err = bitstring.NewFromString("111100101")
+	original, err = bitstring.MakeFromString("111100101")
 	assert.NoError(t, err)
 
 	population := []framework.Candidate{original}
@@ -63,8 +63,8 @@ func TestBitStringMutationSingleBit(t *testing.T) {
 
 	assert.False(t, ms.Equals(original), "want mutant to be different from original, got equals")
 	assert.Equalf(t, 9, ms.Len(), "want mutated bit string to not change length, 9, got %v", ms.Len())
-	set := ms.CountSetBits()
-	unset := ms.CountUnsetBits()
+	set := ms.OnesCount()
+	unset := ms.ZeroesCount()
 	assert.Truef(t, set == 5 || set == 7, "want 5 or 7 set bits in mutated bit string, got %v", set)
 	assert.Truef(t, unset == 2 || unset == 4, "want 2 or 4 unset bits in mutated bit string, got %v", unset)
 }

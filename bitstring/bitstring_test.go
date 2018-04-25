@@ -22,7 +22,7 @@ func TestBitStringCreation(t *testing.T) {
 func TestBitStringCreateRandomBitString(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	// Check that a random bit string of the correct length is constructed.
-	bitString, err := NewRandom(100, rng)
+	bitString, err := Random(100, rng)
 	assert.NoError(t, err)
 	assert.Equalf(t, bitString.Len(), 100, "want BitString length 100, got: %v", bitString.Len())
 }
@@ -79,7 +79,7 @@ func TestBitStringParsing(t *testing.T) {
 	// Checks that the String-parsing constructor works correctly.
 	// Use a 33-bit string to check that word boundaries are dealt with correctly.
 	fromString := "111010101110101100010100101000101"
-	bitString, err := NewFromString(fromString)
+	bitString, err := MakeFromString(fromString)
 	assert.NoError(t, err)
 	toString := bitString.String()
 	assert.Equal(t, toString, fromString, "Failed parsing: String representations do not match.")
@@ -92,7 +92,7 @@ func TestBitStringToNumber(t *testing.T) {
 
 	bitString.SetBit(0, true)
 	bitString.SetBit(9, true)
-	bint := bitString.ToBigInt()
+	bint := bitString.BigInt()
 	assert.True(t, bint.IsInt64())
 	assert.EqualValuesf(t, 513, bint.Int64(), "Incorrect big.Int conversion, want %v, got: %v", 513, bint.Int64())
 }
@@ -101,7 +101,7 @@ func TestBitStringCountSetBits(t *testing.T) {
 	// Checks that the bit string can correctly count its number of set bits.
 	bitString, err := New(64)
 	assert.NoError(t, err)
-	assert.Zerof(t, bitString.CountSetBits(), "Initial string should have no 1s, got: %v, repr \"%v\"", bitString.CountSetBits(), bitString)
+	assert.Zerof(t, bitString.OnesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bitString.OnesCount(), bitString)
 
 	// The bits to set have been chosen because they deal with boundary cases.
 	bitString.SetBit(0, true)
@@ -109,7 +109,7 @@ func TestBitStringCountSetBits(t *testing.T) {
 	bitString.SetBit(32, true)
 	bitString.SetBit(33, true)
 	bitString.SetBit(63, true)
-	setBits := bitString.CountSetBits()
+	setBits := bitString.OnesCount()
 	assert.Equalf(t, 5, setBits, "want set bits = 5, got: %v", setBits)
 }
 
@@ -117,14 +117,14 @@ func TestBitStringCountSetBits(t *testing.T) {
 func TestBitStringCountUnsetBits(t *testing.T) {
 	bitString, err := New(12)
 	assert.NoError(t, err)
-	assert.Equalf(t, 12, bitString.CountUnsetBits(), "Initial string should have no 1s, got: %v, repr \"%v\"", bitString.CountUnsetBits(), bitString)
+	assert.Equalf(t, 12, bitString.ZeroesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bitString.ZeroesCount(), bitString)
 
 	bitString.SetBit(0, true)
 	bitString.SetBit(5, true)
 	bitString.SetBit(6, true)
 	bitString.SetBit(9, true)
 	bitString.SetBit(10, true)
-	setBits := bitString.CountUnsetBits()
+	setBits := bitString.ZeroesCount()
 	assert.Equalf(t, 7, setBits, "want set bits = 7, got: %v", setBits)
 }
 
@@ -198,12 +198,12 @@ func TestBitStringFromString(t *testing.T) {
 		{"only 0s", "0000", true},
 		{"only 1s", "1111111", true},
 		{"mixed 0s and 1s", "1000111011", true},
-		{"empty string", "", true},
+		{"empty string", "", false},
 		{"with spaces", "11 ", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewFromString(tt.str)
+			got, err := MakeFromString(tt.str)
 			if tt.valid {
 				assert.NotNil(t, got)
 				assert.NoError(t, err)
@@ -333,11 +333,11 @@ func TestBitStringSwapSubstring(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ones, err1 := NewFromString(tt.ones)
+			ones, err1 := MakeFromString(tt.ones)
 			assert.NoError(t, err1)
-			zeros, err2 := NewFromString(tt.zeros)
+			zeros, err2 := MakeFromString(tt.zeros)
 			assert.NoError(t, err2)
-			ones.SwapSubstring(zeros, tt.lo, tt.hi)
+			ones.SwapRange(zeros, tt.lo, tt.hi)
 
 			assert.Equalf(t, tt.expOnes, ones.String(),
 				"want %s, got %s", tt.expOnes, ones.String())
@@ -357,7 +357,7 @@ func ExampleNew() {
 
 func ExampleNewFromString() {
 	// create a BitString from string
-	bitstring, _ := NewFromString("101001")
+	bitstring, _ := MakeFromString("101001")
 	fmt.Println(bitstring)
 	// Output: 101001
 }
@@ -392,35 +392,35 @@ func ExampleBitString_FlipBit() {
 	// Output: 00000100
 }
 
-func ExampleBitString_CountUnsetBits() {
+func ExampleBitString_ZeroesCount() {
 	// create a 8 bits BitString
 	bitstring, _ := New(8)
 	// upon creation all bits are unset
-	fmt.Println(bitstring.CountUnsetBits())
+	fmt.Println(bitstring.ZeroesCount())
 	// Output: 8
 }
 
-func ExampleBitString_CountSetBits() {
+func ExampleBitString_OnesCount() {
 	// create a 8 bits BitString
 	bitstring, _ := New(8)
 	// upon creation all bits are unset
-	fmt.Println(bitstring.CountSetBits())
+	fmt.Println(bitstring.OnesCount())
 	// Output: 0
 }
 
-func ExampleBitString_ToBigInt() {
+func ExampleBitString_BigInt() {
 	// create a 8 bits BitString
-	bitstring, _ := NewFromString("100")
-	bi := bitstring.ToBigInt()
+	bitstring, _ := MakeFromString("100")
+	bi := bitstring.BigInt()
 	fmt.Println(bi.Int64())
 	// Output: 4
 }
 
 func ExampleBitString_SwapSubstring() {
-	bs1, _ := NewFromString("111")
-	bs2, _ := NewFromString("000")
+	bs1, _ := MakeFromString("111")
+	bs2, _ := MakeFromString("000")
 	// starting from bit 2 of bs1, swap 1 bit with bs2
-	bs1.SwapSubstring(bs2, 2, 1)
+	bs1.SwapRange(bs2, 2, 1)
 	fmt.Println(bs1)
 	// Output: 011
 }

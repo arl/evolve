@@ -38,7 +38,7 @@ func (m bitStringMater) Mate(parent1, parent2 framework.Candidate,
 		// length of the parent so that we always pick a point that will
 		// result in a meaningful crossover.
 		crossoverIndex := (1 + rng.Intn(p1.Len()-1))
-		offspring1.SwapSubstring(offspring2, 0, crossoverIndex)
+		offspring1.SwapRange(offspring2, 0, crossoverIndex)
 	}
 	return []framework.Candidate{offspring1, offspring2}
 }

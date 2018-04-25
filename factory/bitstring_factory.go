@@ -32,6 +32,6 @@ type bitStringGenerator struct {
 // GenerateRandomCandidate generates a random bit string, with a uniform
 // distribution of ones and zeroes.
 func (g *bitStringGenerator) GenerateRandomCandidate(rng *rand.Rand) framework.Candidate {
-	bs, _ := bitstring.NewRandom(g.length, rng)
+	bs, _ := bitstring.Random(g.length, rng)
 	return bs
 }

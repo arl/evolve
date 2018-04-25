@@ -1,5 +1,5 @@
-// Package bitstring implmements a fixed length bit string type and common
-// operations on bit strings.
+// Package bitstring implements a fixed length bit string type and bit string
+// manipulation functions
 package bitstring
 
 import (
@@ -10,13 +10,21 @@ import (
 	"math/rand"
 )
 
+var (
+	// ErrIndexOutOfRange is passed to panic if a bit index is out of the valid
+	// range for a a given BitString.
+	ErrIndexOutOfRange = errors.New("bitstring.BitString: index out of range")
+
+	ErrInvalidLength = errors.New("bitstring.BitString: invalid length")
+)
+
 const wordLength = 32
 
-// BitString implements a fixed-length bit-string.
+// BitString implements a fixed-length bit string.
 //
-// Internally, bits are packed into an array of ints. This implementation makes
-// more efficient use of space than the alternative approach of using an array
-// of booleans.
+// Internally, bits are packed into an array of uint32. This implementation
+// makes more efficient use of space than the alternative approach of using an
+// array of booleans.
 type BitString struct {
 	// length in bits of the bit string
 	length int
@@ -28,22 +36,28 @@ type BitString struct {
 // New creates a bit string of the specified length (in bits) with all bits
 // initially set to zero (off).
 func New(length int) (*BitString, error) {
-	if length < 0 {
-		return nil, errors.New("BitString length must be non-negative")
+	var (
+		bt  *BitString
+		err = ErrInvalidLength
+	)
+	if length > 0 {
+		slicelen := (length + wordLength - 1) / wordLength
+		bt = &BitString{
+			length: length,
+			data:   make([]uint32, slicelen),
+		}
+		err = nil
 	}
-	return &BitString{
-		length: length,
-		data:   make([]uint32, (length+wordLength-1)/wordLength),
-	}, nil
+	return bt, err
 }
 
-// NewRandom creates a BitString of the specified length with each bit set
-// randomly (the distribution of bits is uniform so long as the output
-// from the provided pseudo-random number generator is also uniform).
+// Random creates a BitString of the length l in which each bit is assigned a
+// random value using rng.
 //
-// Using NewRandom is more efficient than creating a bit string and then
-// randomly setting each bit individually.
-func NewRandom(length int, rng *rand.Rand) (*BitString, error) {
+// Random randomly sets the uint32 values of the underlying slice, so it should
+// be faster than creating a bit string and then randomly setting each
+// individual bits.
+func Random(length int, rng *rand.Rand) (*BitString, error) {
 	bt, err := New(length)
 	if err != nil {
 		return nil, err
@@ -55,7 +69,7 @@ func NewRandom(length int, rng *rand.Rand) (*BitString, error) {
 	}
 
 	// If the last word is not fully utilised, zero any out-of-bounds bits.
-	// This is necessary because the CountSetBits() methods will count
+	// This is necessary because OnesCount and ZeroesCount count the
 	// out-of-bounds bits.
 	bitsUsed := uint32(length % wordLength)
 	if bitsUsed < wordLength {
@@ -66,20 +80,20 @@ func NewRandom(length int, rng *rand.Rand) (*BitString, error) {
 	return bt, nil
 }
 
-// NewFromString creates a new BitString from a character string of 1s and 0s
-// in big-endian order.
-func NewFromString(value string) (*BitString, error) {
-	bt, err := New(len(value))
+// MakeFromString returns the corresponding BitString for the given string of 1s
+// and 0s in big endian order.
+func MakeFromString(from string) (*BitString, error) {
+	bt, err := New(len(from))
 	if err != nil {
 		return nil, err
 	}
 
-	for i, c := range value {
+	for i, c := range from {
 		switch c {
 		case '0':
 			continue
 		case '1':
-			bt.SetBit(len(value)-i-1, true)
+			bt.SetBit(len(from)-i-1, true)
 		default:
 			return nil, fmt.Errorf("illegal character at position %v: %#U", i, c)
 		}
@@ -87,35 +101,35 @@ func NewFromString(value string) (*BitString, error) {
 	return bt, nil
 }
 
-// Len returns the length of the BitString in bits.
+// Len returns the number of bits of bt.
 func (bt *BitString) Len() int {
 	return bt.length
 }
 
-// Bit returns the bit at the specified index.
+// Bit returns the bit at index i.
 //
-// index is the index of the bit to look-up (0 is the least-significant bit).
+// Index 0 index is the index of the bit to look-up (0 is the least-significant bit).
 // Returns a boolean indicating whether the bit is set or not.
 //
 // Will panic if the specified index is not a bit position in this bit string.
-func (bt *BitString) Bit(index int) bool {
-	bt.assertValidIndex(index)
-	word := uint32(index / wordLength)
-	offset := uint32(index % wordLength)
+func (bt *BitString) Bit(i int) bool {
+	bt.mustExist(i)
+
+	word := uint32(i / wordLength)
+	offset := uint32(i % wordLength)
 	return (bt.data[word] & (1 << offset)) != 0
 }
 
-// SetBit sets the bit at the specified index.
+// SetBit sets the bit at index i. Index 0 is the LSB.
 //
-// index is the index of the bit to set (0 is the least-significant bit).
-// set is a boolean indicating whether the bit should be set or not.
-//
-// Will panic if the specified index is not a bit position in this bit string.
-func (bt *BitString) SetBit(index int, set bool) {
-	bt.assertValidIndex(index)
-	word := uint32(index / wordLength)
-	offset := uint32(index % wordLength)
-	if set {
+// If index is negative or greater than bt.Len(), SetBit will panic with
+// ErrIndexOutOfRange.
+func (bt *BitString) SetBit(i int, v bool) {
+	bt.mustExist(i)
+
+	word := uint32(i / wordLength)
+	offset := uint32(i % wordLength)
+	if v {
 		bt.data[word] |= (1 << offset)
 	} else {
 		// Unset the bit.
@@ -123,28 +137,29 @@ func (bt *BitString) SetBit(index int, set bool) {
 	}
 }
 
-// FlipBit inverts the value of the bit at the specified index.
+// FlipBit flips the bit at index i.
 //
 // param index is the bit to flip (0 is the least-significant bit).
 //
-// Will panic if the specified index is not a bit position in this bit string.
-func (bt *BitString) FlipBit(index int) {
-	bt.assertValidIndex(index)
-	word := uint32(index / wordLength)
-	offset := uint32(index % wordLength)
+// Will panic if the specified index is not a valid bit position in bt
+func (bt *BitString) FlipBit(i int) {
+	bt.mustExist(i)
+
+	word := uint32(i / wordLength)
+	offset := uint32(i % wordLength)
 	bt.data[word] ^= (1 << offset)
 }
 
-// Helper method to check whether a bit index is valid or not.
-// Will panic if the index is not valid.
-func (bt *BitString) assertValidIndex(index int) {
-	if index >= bt.length || index < 0 {
-		panic(fmt.Sprintf("invalid index: %v (length: %v)", index, bt.length))
+// Ensures i is a valid index for bt, if the index is negative or greater than
+// bt.length mustExist will panic with ErrIndexOutOfRange.
+func (bt *BitString) mustExist(i int) {
+	if i >= bt.length || i < 0 {
+		panic(ErrIndexOutOfRange)
 	}
 }
 
-// CountSetBits returns the number of bits that are 1s rather than 0s.
-func (bt *BitString) CountSetBits() int {
+// OnesCount returns the number of one bits.
+func (bt *BitString) OnesCount() int {
 	var count int
 	for _, x := range bt.data {
 		for x != 0 {
@@ -155,35 +170,32 @@ func (bt *BitString) CountSetBits() int {
 	return count
 }
 
-// CountUnsetBits returns the number of bits that are 0s rather than 1s.
-func (bt *BitString) CountUnsetBits() int {
-	return bt.length - bt.CountSetBits()
+// ZeroesCount returns the number of zero bits.
+func (bt *BitString) ZeroesCount() int {
+	return bt.length - bt.OnesCount()
 }
 
-// ToBigInt interprets this bit string as being a binary numeric value and returns
-// the integer that it represents.
-//
-// Returns a big.Int that contains the numeric value represented by this bit
-// string.
-func (bt *BitString) ToBigInt() *big.Int {
+// BigInt returns the big.Int representation of bt.
+func (bt *BitString) BigInt() *big.Int {
 	bi := new(big.Int)
 	if _, ok := bi.SetString(bt.String(), 2); !ok {
+		// XXX: by design, this panic should only happen when something very
+		// wrong happens. For bi.SetString to fail the string passed should
+		// contain other runes other than 0's and 1's, or be empty.
+		// bt.String() guarantees the string is made of 0's and 1's and all the
+		// ways to create BitString prevent construction them with 0-length.
 		panic(fmt.Sprintf("couldn't convert bit string \"%s\" to big.Int", bt.String()))
 	}
 	return bi
 }
 
-// SwapSubstring is an efficient method for exchanging data between two bit
-// strings. Both bit strings must be long enough that they contain the full
-// length of the specified substring.
+// SwapRange efficiently swaps the same range of bits between bt and other.
 //
-// other is the bitstring with which this bitstring should swap bits.
-// start is the start position for the substrings to be exchanged. All bit
-// indices are big-endian, which means position 0 is the rightmost bit.
-// length is the number of contiguous bits to swap.
-func (bt *BitString) SwapSubstring(other *BitString, start, length int) {
-	bt.assertValidIndex(start)
-	other.assertValidIndex(start)
+// Both BitString should not necessarily have the same length but should contain
+// the range of bits specified by start and length.
+func (bt *BitString) SwapRange(other *BitString, start, length int) {
+	bt.mustExist(start)
+	other.mustExist(start)
 
 	word := start / wordLength
 	partialWordSize := (wordLength - start) % wordLength
@@ -218,10 +230,7 @@ func (bt *BitString) swapBits(other *BitString, word int, swapMask uint32) {
 	other.data[word] = preservedThat | swapThis
 }
 
-// String creates a textual representation of this bit string in big-endian
-// order (index 0 is the right-most bit).
-//
-// Returns this bit string rendered as a string of 1s and 0s.
+// String returns a string representation of bt in big endian order.
 func (bt *BitString) String() string {
 	buf := bytes.NewBuffer(make([]byte, 0, bt.length))
 	for i := bt.length - 1; i >= 0; i-- {

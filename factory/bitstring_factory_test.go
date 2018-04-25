@@ -38,8 +38,8 @@ func TestBitStringFactory(t *testing.T) {
 	t.Run("seeded population", func(t *testing.T) {
 
 		f := NewBitStringFactory(candidateLength)
-		seed1, _ := bitstring.NewFromString("1111100000")
-		seed2, _ := bitstring.NewFromString("1010101010")
+		seed1, _ := bitstring.MakeFromString("1111100000")
+		seed2, _ := bitstring.MakeFromString("1010101010")
 		seeds := []framework.Candidate{seed1, seed2}
 		population := f.SeedInitialPopulation(populationSize, seeds, rng)
 
