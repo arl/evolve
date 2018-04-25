@@ -3,7 +3,6 @@
 package bitstring
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"math/big"
@@ -240,15 +239,15 @@ func (bs *BitString) swapBits(other *BitString, word int, swapMask uint32) {
 
 // String returns a string representation of bs in big endian order.
 func (bs *BitString) String() string {
-	buf := bytes.NewBuffer(make([]byte, 0, bs.length))
-	for i := bs.length - 1; i >= 0; i-- {
+	buf := make([]byte, bs.length)
+	for i := 0; i < bs.length; i++ {
 		if bs.Bit(i) {
-			buf.WriteString("1")
+			buf[bs.length-1-i] = '1'
 		} else {
-			buf.WriteString("0")
+			buf[bs.length-1-i] = '0'
 		}
 	}
-	return buf.String()
+	return string(buf)
 }
 
 // Copy returns an identical copy of bs.
