@@ -3,8 +3,8 @@ package operators
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/bitstring"
 	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
 // NewBitStringCrossover creates a crossover operator with a configurable number

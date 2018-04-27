@@ -3,9 +3,9 @@ package operators
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/bitstring"
 	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/number"
+	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
 // NewBitStringMutation creates an evolutionary operator that mutates individual

@@ -3,8 +3,8 @@ package factory
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/bitstring"
 	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
 // BitStringFactory is a general purpose candidate factory for generating bit

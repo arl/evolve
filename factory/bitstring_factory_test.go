@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/bitstring"
 	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 	"github.com/stretchr/testify/assert"
 )
 
