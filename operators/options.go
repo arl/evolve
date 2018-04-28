@@ -36,10 +36,10 @@ type probabilityGeneratorOption struct {
 
 func (opt probabilityGeneratorOption) Apply(ope interface{}) error {
 	switch ope.(type) {
-	case *AbstractCrossover:
+	case *Crossover:
 		if opt.err == nil {
-			crossover := ope.(*AbstractCrossover)
-			crossover.crossoverProbability = opt.gen
+			crossover := ope.(*Crossover)
+			crossover.prob = opt.gen
 		}
 		return opt.err
 	case *AbstractMutation:
@@ -86,10 +86,10 @@ type integerGeneratorOption struct {
 func (opt integerGeneratorOption) Apply(ope interface{}) error {
 	switch ope.(type) {
 
-	case *AbstractCrossover:
+	case *Crossover:
 		if opt.err == nil {
-			crossover := ope.(*AbstractCrossover)
-			crossover.crossoverPoints = opt.gen
+			crossover := ope.(*Crossover)
+			crossover.npts = opt.gen
 		}
 		return opt.err
 

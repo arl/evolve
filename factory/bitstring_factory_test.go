@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBitStringFactory(t *testing.T) {
+func TestBitstringFactory(t *testing.T) {
 	const (
 		candidateLength = 10
 		populationSize  = 5
@@ -21,7 +21,7 @@ func TestBitStringFactory(t *testing.T) {
 		assert.Lenf(t, population, populationSize, "want population size = %v, got %v", populationSize, len(population))
 		// Make sure that each individual is the right length.
 		for _, cand := range population {
-			bitString := cand.(*bitstring.BitString)
+			bitString := cand.(*bitstring.Bitstring)
 			assert.Equalf(t, candidateLength, bitString.Len(), "want bitstring length = %v, got %v", candidateLength, bitString.Len())
 		}
 	}
@@ -30,14 +30,14 @@ func TestBitStringFactory(t *testing.T) {
 
 	t.Run("unseed population", func(t *testing.T) {
 
-		f := NewBitStringFactory(candidateLength)
+		f := NewBitstringFactory(candidateLength)
 		population := f.GenerateInitialPopulation(populationSize, rng)
 		validatePopulation(population)
 	})
 
 	t.Run("seeded population", func(t *testing.T) {
 
-		f := NewBitStringFactory(candidateLength)
+		f := NewBitstringFactory(candidateLength)
 		seed1, _ := bitstring.MakeFromString("1111100000")
 		seed2, _ := bitstring.MakeFromString("1010101010")
 		seeds := []framework.Candidate{seed1, seed2}
@@ -51,7 +51,7 @@ func TestBitStringFactory(t *testing.T) {
 
 	t.Run("too many seed candidates", func(t *testing.T) {
 
-		f := NewBitStringFactory(candidateLength)
+		f := NewBitstringFactory(candidateLength)
 		candidate, _ := bitstring.New(candidateLength)
 		// The following call should panic since the 3 seed candidates won't fit
 		// into a population of size 2.

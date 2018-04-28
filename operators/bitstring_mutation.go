@@ -8,8 +8,8 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
-// NewBitStringMutation creates an evolutionary operator that mutates individual
-// bits in a bitstring.BitString according to some probability.
+// NewBitstringMutation creates an evolutionary operator that mutates individual
+// bits in a bitstring.Bitstring according to some probability.
 //
 // Possible options:
 // the mutation probability is the (possibly variable) probability of a
@@ -19,7 +19,7 @@ import (
 // flipped on any candidate bit string that is selected for mutation; set it
 // with ConstantMutationCount or VariableMutationCount. The default is a
 // constant mutation count of exactly 1 bit flipped.
-func NewBitStringMutation(options ...Option) (*AbstractMutation, error) {
+func NewBitstringMutation(options ...Option) (*AbstractMutation, error) {
 	// set default mutation count to 1
 	mutater := &bitStringMutater{
 		mutationCount: number.NewConstantIntegerGenerator(1),
@@ -49,13 +49,13 @@ type bitStringMutater struct {
 // generator configured for this mutation operator.
 func (op *bitStringMutater) Mutate(c framework.Candidate, rng *rand.Rand) framework.Candidate {
 	if op.impl.mutationProbability.NextValue().NextEvent(rng) {
-		bitString := c.(*bitstring.BitString)
-		mutatedBitString := bitString.Copy()
-		mutations := op.mutationCount.NextValue()
-		for i := int64(0); i < mutations; i++ {
-			mutatedBitString.FlipBit(rng.Intn(mutatedBitString.Len()))
+		bs := c.(*bitstring.Bitstring)
+		mutated := bs.Copy()
+		nmuts := op.mutationCount.NextValue()
+		for i := int64(0); i < nmuts; i++ {
+			mutated.FlipBit(rng.Intn(mutated.Len()))
 		}
-		return mutatedBitString
+		return mutated
 	}
 	return c
 }

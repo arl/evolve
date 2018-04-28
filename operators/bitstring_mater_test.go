@@ -10,41 +10,41 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBitStringCrossover(t *testing.T) {
+func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	crossover, _ := NewBitStringCrossover()
-	factory := factory.NewBitStringFactory(50)
+	xover, _ := NewCrossover(BitstringMater{})
+	f := factory.NewBitstringFactory(50)
 
-	population := factory.GenerateInitialPopulation(2, rng)
+	pop := f.GenerateInitialPopulation(2, rng)
 	// Test to make sure that crossover correctly preserves all genetic material
 	// originally present in the population and does not introduce anything new.
-	totalSetBits := population[0].(*bitstring.BitString).OnesCount() +
-		population[1].(*bitstring.BitString).OnesCount()
+	want := pop[0].(*bitstring.Bitstring).OnesCount() +
+		pop[1].(*bitstring.Bitstring).OnesCount()
 	for i := 0; i < 50; i++ {
 		// Test several generations.
-		population = crossover.Apply(population, rng)
+		pop = xover.Apply(pop, rng)
 
-		setBits := population[0].(*bitstring.BitString).OnesCount() +
-			population[1].(*bitstring.BitString).OnesCount()
-		assert.Equal(t, setBits, totalSetBits, "bitstring crossover should not change the total number of set bits in population")
+		got := pop[0].(*bitstring.Bitstring).OnesCount() +
+			pop[1].(*bitstring.Bitstring).OnesCount()
+		assert.Equal(t, got, want, "bitstring crossover should not change the total number of set bits in population")
 	}
 }
 
-func TestBitStringCrossoveWithDifferentLengthParents(t *testing.T) {
-	// The BitStringCrossover operator is only defined to work on populations
+func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
+	// The BitstringCrossover operator is only defined to work on populations
 	// containing Strings of equal lengths. Any attempt to apply the operation
 	// to populations that contain different length strings should panic. Not
 	// panicking should be considered a bug since it could lead to hard to trace
 	// bugs elsewhere.
 	rng := rand.New(rand.NewSource(99))
-	crossover, _ := NewBitStringCrossover(ConstantCrossoverPoints(1))
+	xover, _ := NewCrossover(BitstringMater{}, ConstantCrossoverPoints(1))
 
 	bs1, _ := bitstring.Random(32, rng)
 	bs2, _ := bitstring.Random(33, rng)
-	population := []framework.Candidate{bs1, bs2}
+	pop := []framework.Candidate{bs1, bs2}
 
 	assert.Panics(t, func() {
 		// This should panic since the parents are different lengths.
-		crossover.Apply(population, rng)
+		xover.Apply(pop, rng)
 	})
 }

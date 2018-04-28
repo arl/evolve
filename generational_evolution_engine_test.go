@@ -177,7 +177,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	checkB(b, err)
 
 	// 2nd operator: string crossover
-	crossover, err = operators.NewStringCrossover()
+	crossover, err = operators.NewCrossover(operators.StringMater{})
 	checkB(b, err)
 
 	// Create a pipeline that applies mutation then crossover

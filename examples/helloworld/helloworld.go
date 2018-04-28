@@ -60,7 +60,7 @@ func main() {
 	check(err)
 
 	// 2nd operator: string crossover
-	crossover, err = operators.NewStringCrossover()
+	crossover, err = operators.NewCrossover(operators.StringMater{})
 	check(err)
 
 	// Create a pipeline that applies mutation then crossover

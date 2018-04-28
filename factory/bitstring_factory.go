@@ -7,16 +7,16 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
-// BitStringFactory is a general purpose candidate factory for generating bit
+// BitstringFactory is a general purpose candidate factory for generating bit
 // strings for genetic algorithms.
-type BitStringFactory struct {
+type BitstringFactory struct {
 	AbstractCandidateFactory
 }
 
-// NewBitStringFactory creates a factory that generates bit strings of the
+// NewBitstringFactory creates a factory that generates bit strings of the
 // specified length
-func NewBitStringFactory(length int) *BitStringFactory {
-	return &BitStringFactory{
+func NewBitstringFactory(length int) *BitstringFactory {
+	return &BitstringFactory{
 		AbstractCandidateFactory{
 			&bitStringGenerator{
 				length: length,

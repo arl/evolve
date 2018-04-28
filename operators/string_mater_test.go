@@ -12,7 +12,7 @@ import (
 func TestStringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	crossover, err := NewStringCrossover()
+	xover, err := NewCrossover(StringMater{})
 	if assert.NoError(t, err) {
 		population := make([]framework.Candidate, 4)
 		population[0] = "abcde"
@@ -22,7 +22,7 @@ func TestStringCrossover(t *testing.T) {
 
 		for i := 0; i < 20; i++ {
 			values := make(map[rune]struct{}, 20) // used as a set of runes
-			population = crossover.Apply(population, rng)
+			population = xover.Apply(population, rng)
 			assert.Len(t, population, 4, "Population size changed after crossover.")
 			for _, individual := range population {
 				s := individual.(string)
@@ -46,7 +46,7 @@ func TestStringCrossover(t *testing.T) {
 func TestStringCrossoverWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	crossover, err := NewStringCrossover(
+	xover, err := NewCrossover(StringMater{},
 		ConstantCrossoverPoints(1),
 		ConstantProbability(number.ProbabilityOne),
 	)
@@ -56,7 +56,7 @@ func TestStringCrossoverWithDifferentLengthParents(t *testing.T) {
 		// This should panic since the parents are different lengths.
 		// TODO: why panicking and not returning an error?
 		assert.Panics(t, func() {
-			crossover.Apply(population, rng)
+			xover.Apply(population, rng)
 		})
 	}
 }
@@ -67,19 +67,19 @@ func TestStringCrossoverNoop(t *testing.T) {
 	t.Run("constant_crossover_points_cant_be_zero", func(t *testing.T) {
 		// If created with a specified (constant) number of crossover points,
 		// this number must be greater than 0 or the operator is a no-op.
-		op, err := NewStringCrossover(ConstantCrossoverPoints(0))
+		xover, err := NewCrossover(StringMater{}, ConstantCrossoverPoints(0))
 		assert.Error(t, err)
-		assert.Nilf(t, op, "want string crossover to be nil if invalid, got %v", op)
+		assert.Nilf(t, xover, "want string crossover to be nil if invalid, got %v", xover)
 	})
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
 		// If created with a variable number of crossover points,
 		// verifies that when this number happens to be 0, the operator is a
 		// no-op.
-		crossover, err := NewStringCrossover(VariableCrossoverPoints(zeroGenerator{}))
+		xover, err := NewCrossover(StringMater{}, VariableCrossoverPoints(zeroGenerator{}))
 		if assert.NoError(t, err) {
 			population := []framework.Candidate{"abcde", "fghij"}
-			crossed := crossover.Apply([]framework.Candidate{population[0], population[1]}, rng)
+			crossed := xover.Apply([]framework.Candidate{population[0], population[1]}, rng)
 			assert.Equal(t, population, crossed)
 		}
 	})
@@ -88,10 +88,10 @@ func TestStringCrossoverNoop(t *testing.T) {
 		// If created wit a variable number of crossover probability,
 		// verifies that when this number happens to be 0, the operator is a
 		// no-op.
-		crossover, err := NewStringCrossover(ConstantProbability(number.ProbabilityZero))
+		xover, err := NewCrossover(StringMater{}, ConstantProbability(number.ProbabilityZero))
 		if assert.NoError(t, err) {
 			population := []framework.Candidate{"abcde", "fghij"}
-			crossed := crossover.Apply([]framework.Candidate{population[0], population[1]}, rng)
+			crossed := xover.Apply([]framework.Candidate{population[0], population[1]}, rng)
 			assert.Equal(t, population, crossed)
 		}
 	})

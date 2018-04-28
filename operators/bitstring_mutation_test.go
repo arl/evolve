@@ -14,14 +14,14 @@ import (
 // can't actually make many assertions. This just ensures that there are no
 // unexpected exceptions and that the length of the bit strings remains as
 // expected.
-func TestBitStringMutationRandom(t *testing.T) {
+func TestBitstringMutationRandom(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	var (
 		mutation *AbstractMutation
-		original *bitstring.BitString
+		original *bitstring.Bitstring
 		err      error
 	)
-	mutation, err = NewBitStringMutation(ConstantProbability(number.ProbabilityEven))
+	mutation, err = NewBitstringMutation(ConstantProbability(number.ProbabilityEven))
 	assert.NoError(t, err)
 
 	original, err = bitstring.MakeFromString("111100101")
@@ -32,23 +32,23 @@ func TestBitStringMutationRandom(t *testing.T) {
 		// Perform several iterations to get different mutations.
 		population = mutation.Apply(population, rng)
 		mutated := population[0]
-		assert.IsType(t, &bitstring.BitString{}, mutated)
-		ms := mutated.(*bitstring.BitString)
+		assert.IsType(t, &bitstring.Bitstring{}, mutated)
+		ms := mutated.(*bitstring.Bitstring)
 		assert.Equalf(t, 9, ms.Len(), "want mutated bit string to not change length, 9, got %v", ms.Len())
 	}
 }
 
 // Ensures that mutation occurs correctly.  Uses a probability of 1 to
 // make the outcome predictable (all bits will be flipped).
-func TestBitStringMutationSingleBit(t *testing.T) {
+func TestBitstringMutationSingleBit(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	var (
 		mutation *AbstractMutation
-		original *bitstring.BitString
+		original *bitstring.Bitstring
 		err      error
 	)
 
-	mutation, err = NewBitStringMutation()
+	mutation, err = NewBitstringMutation()
 	assert.NoError(t, err)
 
 	original, err = bitstring.MakeFromString("111100101")
@@ -58,8 +58,8 @@ func TestBitStringMutationSingleBit(t *testing.T) {
 	population = mutation.Apply(population, rng)
 
 	mutated := population[0]
-	assert.IsType(t, &bitstring.BitString{}, mutated)
-	ms := mutated.(*bitstring.BitString)
+	assert.IsType(t, &bitstring.Bitstring{}, mutated)
+	ms := mutated.(*bitstring.Bitstring)
 
 	assert.False(t, ms.Equals(original), "want mutant to be different from original, got equals")
 	assert.Equalf(t, 9, ms.Len(), "want mutated bit string to not change length, 9, got %v", ms.Len())
@@ -69,5 +69,5 @@ func TestBitStringMutationSingleBit(t *testing.T) {
 	assert.Truef(t, unset == 2 || unset == 4, "want 2 or 4 unset bits in mutated bit string, got %v", unset)
 }
 
-// TODO:  test BitStringMutation constructed with options other than default ones
+// TODO:  test BitstringMutation constructed with options other than default ones
 //func
