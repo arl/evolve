@@ -46,7 +46,7 @@ type Crossover struct {
 	probmin, probmax float64
 }
 
-// NewCrossover creates a Crossover operator based off the provided mater.
+// NewCrossover creates a Crossover operator based off the provided Mater.
 //
 // The returned Crossover performs a one point crossover with 1.0 (i.e always)
 // probabilty.
