@@ -27,7 +27,7 @@ type Mater interface {
 		rng *rand.Rand) []framework.Candidate
 }
 
-// Crossover is a generic struct for crossover implementations.
+// Crossover implements a standard crossover operator.
 //
 // It supports all crossover processes that operate on a pair of parent
 // candidates.
