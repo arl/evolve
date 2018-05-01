@@ -104,7 +104,7 @@ func (op *Crossover) SetPointsRange(min, max int) error {
 // If min and max are not bounded by [0.0,1.0] SetProbRange will panic.
 func (op *Crossover) SetProbRange(min, max float64) error {
 	if min > max || min < 0.0 || max > 1.0 {
-		return (ErrInvalidXOverProb)
+		return ErrInvalidXOverProb
 	}
 	op.probmin = min
 	op.probmax = max
