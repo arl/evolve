@@ -1,4 +1,4 @@
-package operators
+package operator
 
 import (
 	"math/rand"
@@ -12,7 +12,7 @@ import (
 
 func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	xover, _ := NewCrossover(BitstringMater{})
+	xover := NewCrossover(BitstringMater{})
 	f := factory.NewBitstringFactory(50)
 
 	pop := f.GenerateInitialPopulation(2, rng)
@@ -37,7 +37,7 @@ func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
 	// panicking should be considered a bug since it could lead to hard to trace
 	// bugs elsewhere.
 	rng := rand.New(rand.NewSource(99))
-	xover, _ := NewCrossover(BitstringMater{}, ConstantCrossoverPoints(1))
+	xover := NewCrossover(BitstringMater{})
 
 	bs1, _ := bitstring.Random(32, rng)
 	bs2, _ := bitstring.Random(33, rng)

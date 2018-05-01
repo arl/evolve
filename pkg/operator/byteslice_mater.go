@@ -1,4 +1,4 @@
-package operators
+package operator
 
 import (
 	"math/rand"
@@ -6,19 +6,21 @@ import (
 	"github.com/aurelien-rainone/evolve/framework"
 )
 
-// StringMater mates a pair of strings to produce a new pair of bit strings
-type StringMater struct{}
+type ByteSliceMater struct{}
 
-func (m StringMater) Mate(
+func (m ByteSliceMater) Mate(
 	p1, p2 framework.Candidate, nxpts int64,
 	rng *rand.Rand) []framework.Candidate {
 
-	p1_, p2_ := p1.(string), p2.(string)
+	p1_, p2_ := p1.([]byte), p2.([]byte)
+
 	if len(p1_) != len(p2_) {
 		panic("Cannot perform crossover with different length parents.")
 	}
-
-	off1, off2 := []byte(p1_), []byte(p2_)
+	off1 := make([]byte, len(p1_))
+	copy(off1, p1_)
+	off2 := make([]byte, len(p1_))
+	copy(off2, p2_)
 
 	// Apply as many crossovers as required.
 	for i := int64(0); i < nxpts; i++ {
@@ -31,5 +33,5 @@ func (m StringMater) Mate(
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return append([]framework.Candidate{}, string(off1), string(off2))
+	return append([]framework.Candidate{}, off1, off2)
 }

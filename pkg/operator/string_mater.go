@@ -1,4 +1,4 @@
-package operators
+package operator
 
 import (
 	"math/rand"
@@ -6,28 +6,22 @@ import (
 	"github.com/aurelien-rainone/evolve/framework"
 )
 
-// TODO: couldn't all slice crossover tests be shared, with interfaces and table
-// driven tests?
+// StringMater mates a pair of strings to produce a new pair of bit strings
+type StringMater struct{}
 
-// IntSliceMater mates a pair of int slices to produce a new pair of int slices
-type IntSliceMater struct{}
-
-func (m IntSliceMater) Mate(p1, p2 framework.Candidate,
-	npts int64,
+func (m StringMater) Mate(
+	p1, p2 framework.Candidate, nxpts int64,
 	rng *rand.Rand) []framework.Candidate {
 
-	p1_, p2_ := p1.([]int), p2.([]int)
-
+	p1_, p2_ := p1.(string), p2.(string)
 	if len(p1_) != len(p2_) {
 		panic("Cannot perform crossover with different length parents.")
 	}
-	off1 := make([]int, len(p1_))
-	copy(off1, p1_)
-	off2 := make([]int, len(p1_))
-	copy(off2, p2_)
+
+	off1, off2 := []byte(p1_), []byte(p2_)
 
 	// Apply as many crossovers as required.
-	for i := int64(0); i < npts; i++ {
+	for i := int64(0); i < nxpts; i++ {
 		// Cross-over index is always greater than zero and less than
 		// the length of the parent so that we always pick a point that
 		// will result in a meaningful crossover.
@@ -37,5 +31,5 @@ func (m IntSliceMater) Mate(p1, p2 framework.Candidate,
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return append([]framework.Candidate{}, off1, off2)
+	return append([]framework.Candidate{}, string(off1), string(off2))
 }
