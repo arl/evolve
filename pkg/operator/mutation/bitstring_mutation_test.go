@@ -5,10 +5,16 @@ import (
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/aurelien-rainone/evolve/number"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 	"github.com/stretchr/testify/assert"
 )
+
+func errcheck(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("want error = nil, got %v", err)
+	}
+}
 
 // Ensures that mutation occurs correctly. Because of the random aspect we
 // can't actually make many assertions. This just ensures that there are no
@@ -16,25 +22,21 @@ import (
 // expected.
 func TestBitstringMutationRandom(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	var (
-		mutation *AbstractMutation
-		original *bitstring.Bitstring
-		err      error
-	)
-	mutation, err = NewBitstringMutation(ConstantProbability(number.ProbabilityEven))
-	assert.NoError(t, err)
 
-	original, err = bitstring.MakeFromString("111100101")
-	assert.NoError(t, err)
+	mut := NewBitstringMutation()
+	errcheck(t, mut.SetProb(0.5))
 
-	population := []framework.Candidate{original}
+	org, err := bitstring.MakeFromString("111100101")
+	errcheck(t, err)
+
+	pop := []framework.Candidate{org}
 	for i := 0; i < 20; i++ {
 		// Perform several iterations to get different mutations.
-		population = mutation.Apply(population, rng)
-		mutated := population[0]
+		pop = mut.Apply(pop, rng)
+		mutated := pop[0]
 		assert.IsType(t, &bitstring.Bitstring{}, mutated)
 		ms := mutated.(*bitstring.Bitstring)
-		assert.Equalf(t, 9, ms.Len(), "want mutated bit string to not change length, 9, got %v", ms.Len())
+		assert.Equalf(t, 9, ms.Len(), "want ms.Len() = 9, got %v", ms.Len())
 	}
 }
 
@@ -42,26 +44,21 @@ func TestBitstringMutationRandom(t *testing.T) {
 // make the outcome predictable (all bits will be flipped).
 func TestBitstringMutationSingleBit(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	var (
-		mutation *AbstractMutation
-		original *bitstring.Bitstring
-		err      error
-	)
 
-	mutation, err = NewBitstringMutation()
-	assert.NoError(t, err)
+	mut := NewBitstringMutation()
+	errcheck(t, mut.SetProb(1.0))
 
-	original, err = bitstring.MakeFromString("111100101")
-	assert.NoError(t, err)
+	org, err := bitstring.MakeFromString("111100101")
+	errcheck(t, err)
 
-	population := []framework.Candidate{original}
-	population = mutation.Apply(population, rng)
+	pop := []framework.Candidate{org}
+	pop = mut.Apply(pop, rng)
 
-	mutated := population[0]
+	mutated := pop[0]
 	assert.IsType(t, &bitstring.Bitstring{}, mutated)
 	ms := mutated.(*bitstring.Bitstring)
 
-	assert.False(t, ms.Equals(original), "want mutant to be different from original, got equals")
+	assert.False(t, ms.Equals(org), "want mutant to be different from original, got equals")
 	assert.Equalf(t, 9, ms.Len(), "want mutated bit string to not change length, 9, got %v", ms.Len())
 	set := ms.OnesCount()
 	unset := ms.ZeroesCount()

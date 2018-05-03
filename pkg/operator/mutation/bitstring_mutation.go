@@ -1,12 +1,23 @@
 package operators
 
 import (
+	"errors"
+	"math"
 	"math/rand"
 
 	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/aurelien-rainone/evolve/number"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
+
+var ErrInvalidMutationCount = errors.New("mutation count must be in the [0,MaxInt32] range")
+
+// TODO: document + rename (with pkg name it could be named mutation.Bitstring)
+type BitStringMutation struct {
+	*Mutation
+	nmut             int
+	varnmut          bool
+	nmutmin, nmutmax int
+}
 
 // NewBitstringMutation creates an evolutionary operator that mutates individual
 // bits in a bitstring.Bitstring according to some probability.
@@ -15,44 +26,74 @@ import (
 // the mutation probability is the (possibly variable) probability of a
 // candidate bit string being mutated at all; set it with ConstantProbability or
 // VariableProbability. The default is a constant probability of 1.
-// the mutation count is the (possibly variable) number of bits that will be
+// The mutation count is the (possibly variable) number of bits that will be
 // flipped on any candidate bit string that is selected for mutation; set it
 // with ConstantMutationCount or VariableMutationCount. The default is a
 // constant mutation count of exactly 1 bit flipped.
-func NewBitstringMutation(options ...Option) (*AbstractMutation, error) {
-	// set default mutation count to 1
-	mutater := &bitStringMutater{
-		mutationCount: number.NewConstantIntegerGenerator(1),
+func NewBitstringMutation() *BitStringMutation {
+	bsmut := &BitStringMutation{
+		nmut: 1, varnmut: false, nmutmin: 1, nmutmax: 1,
 	}
-	// set default mutation probability to 1, this option is prepended to the
-	// client slice of options, so it will be applied before and remains as
-	// default if ever it's not overwritten by subsequent (in the slice)
-	// options.
-	impl, err := NewAbstractMutation(
-		mutater,
-		append([]Option{ConstantProbability(number.ProbabilityOne)}, options...)...,
-	)
-	// in the current case the actual mutater needs the abstract mutation
-	// implementation back in order to access the mutation probability.
-	mutater.impl = impl
-	return impl, err
+	bsmut.Mutation = NewMutation(bsmut)
+	return bsmut
 }
 
-type bitStringMutater struct {
-	mutationCount number.IntegerGenerator
-	impl          *AbstractMutation
+// SetMutations sets the number of mutations (i.e the number of bits that will
+// be flipped if the bitstring candidate is selected for mutation).
+//
+// If nmut is not in the [0,MaxInt32] range SetMutations will return
+// ErrInvalidMutationCount.
+func (op *BitStringMutation) SetMutations(nmut int) error {
+	if nmut < 0 || nmut > math.MaxInt32 {
+		return ErrInvalidMutationCount
+	}
+	op.nmut = nmut
+	op.varnmut = false
+	return nil
+}
+
+// SetMutationsRange sets the range of possible number of mutations (i.e the
+// numnber of bits that will be filpped if the bitstring candidate is selected
+// for mutation).
+//
+// The specific number of mutations will be randomly chosen with the pseudo
+// random number generator argument of Apply, by linearly converting from
+// [0,MaxInt32) to [min,max).
+//
+// If min and max are not bounded by [0,MaxInt32] SetMutationsRange will return
+func (op *BitStringMutation) SetMutationsRange(min, max int) error {
+	if min > max || min < 0 || max > math.MaxInt32 {
+		return ErrInvalidMutationCount
+	}
+	op.nmutmin = min
+	op.nmutmax = max
+	op.varnmut = true
+	return nil
 }
 
 // Mutate mutates a single bit string. Zero or more bits may be flipped.
 //
 // The probability of any given bit being flipped is governed by the probability
 // generator configured for this mutation operator.
-func (op *bitStringMutater) Mutate(c framework.Candidate, rng *rand.Rand) framework.Candidate {
-	if op.impl.mutationProbability.NextValue().NextEvent(rng) {
+func (op *BitStringMutation) Mutate(c framework.Candidate, rng *rand.Rand) framework.Candidate {
+	// get/decide a probability for this run
+	prob := op.prob
+	if op.varprob {
+		prob = op.probmin + (op.probmax-op.probmin)*rng.Float64()
+	}
+
+	if rng.Float64() < prob {
 		bs := c.(*bitstring.Bitstring)
 		mutated := bs.Copy()
-		nmuts := op.mutationCount.NextValue()
-		for i := int64(0); i < nmuts; i++ {
+		// there is a mutation to perform, get/decide how many bits to flip
+		var nmut int
+		if op.varnmut {
+			nmut = op.nmutmin + rng.Intn(op.nmutmax-op.nmutmin)
+		} else {
+			nmut = op.nmut
+		}
+
+		for i := 0; i < nmut; i++ {
 			mutated.FlipBit(rng.Intn(mutated.Len()))
 		}
 		return mutated

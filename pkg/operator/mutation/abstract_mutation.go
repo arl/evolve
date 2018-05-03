@@ -1,12 +1,13 @@
 package operators
 
 import (
-	"fmt"
+	"errors"
 	"math/rand"
 
 	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/aurelien-rainone/evolve/number"
 )
+
+var ErrInvalidMutationProb = errors.New("mutation probability must be in the [0.0,1.0] range")
 
 // Mutater is the interface implemented by objects defining the Mutate function.
 type Mutater interface {
@@ -17,48 +18,70 @@ type Mutater interface {
 	Mutate(framework.Candidate, *rand.Rand) framework.Candidate
 }
 
-// AbstractMutation is a generic struct for mutation implementations.
+// Mutation implements a mutation operator.
 //
 // It supports all mutation processes that operate on an unique candidate.
 // The mutation probability is configurable, its effect depends on the specific
 // mutation implementation, where it will be documented.
-type AbstractMutation struct {
-	mutationProbability number.ProbabilityGenerator
-	Mutater
-}
-
-// NewAbstractMutation creates an AbstractMutation configured with the
-// provided options.
 //
-// TODO: example of use of how setting options
-func NewAbstractMutation(mutater Mutater, options ...Option) (*AbstractMutation, error) {
-	// create with default options, a mutation probability of zero (the default
-	// may be changed by the specific mutation implementation)
-	op := &AbstractMutation{
-		mutationProbability: number.NewConstantProbabilityGenerator(number.ProbabilityZero),
-		Mutater:             mutater,
-	}
-
-	// set client options
-	for _, option := range options {
-		if err := option.Apply(op); err != nil {
-			return nil, fmt.Errorf("can't apply abstract mutation option: %v", err)
-		}
-	}
-	return op, nil
+// Note: unless you are implementing your own mutation operator, you generally
+// don't need to directly instantiate a Mutation as specific mutation operators
+// like BitStringMutation, StringMutation, etc. already create and embed a
+// Mutation.
+type Mutation struct {
+	Mutater
+	prob             float64
+	varprob          bool
+	probmin, probmax float64
 }
 
-// MutationProbability returns the mutation probability generator.
-func (op *AbstractMutation) MutationProbability() number.ProbabilityGenerator {
-	return op.mutationProbability
+// NewMutation creates a Mutation operator with rhe provided Mutater.
+//
+// The returned Mutation is preconfigured with a 0.01 mutation probability.
+func NewMutation(mut Mutater) *Mutation {
+	return &Mutation{
+		Mutater: mut,
+		prob:    0.01, varprob: false, probmin: 0.01, probmax: 0.01,
+	}
 }
 
-// Apply applies the mutation operation to each entry in the list of selected
+// SetProb sets the mutation probability,
+//
+// If prob is not in the [0.1,1.0] range SetProb will return
+// ErrInvalidMutationCount.
+func (op *Mutation) SetProb(prob float64) error {
+	if prob < 0.0 || prob > 1.0 {
+		return ErrInvalidMutationProb
+	}
+	op.prob = prob
+	op.varprob = false
+	return nil
+}
+
+// SetProbRange sets the range of possible mutation probabilities.
+//
+// The specific mutation probability will be randomly chosen with the pseudo
+// random number generator argument of Apply, by linearly converting from
+// [0.0,1.0) to [min,max).
+//
+// If min and max are not bounded by [0.0,1.0] SetProbRange will return
+// ErrInvalidMutationProb.
+func (op *Mutation) SetProbRange(min, max float64) error {
+	if min > max || min < 0.0 || max > 1.0 {
+		return ErrInvalidMutationProb
+	}
+	op.probmin = min
+	op.probmax = max
+	op.varprob = true
+	return nil
+}
+
+// Apply applies the mutation operator to each entry in the list of selected
 // candidates.
-func (op *AbstractMutation) Apply(selectedCandidates []framework.Candidate, rng *rand.Rand) []framework.Candidate {
-	mutatedPopulation := make([]framework.Candidate, len(selectedCandidates))
-	for i, candidate := range selectedCandidates {
-		mutatedPopulation[i] = op.Mutate(candidate, rng)
+func (op *Mutation) Apply(sel []framework.Candidate, rng *rand.Rand) []framework.Candidate {
+	mutpop := make([]framework.Candidate, len(sel))
+	for i, cand := range sel {
+		mutpop[i] = op.Mutate(cand, rng)
 	}
-	return mutatedPopulation
+	return mutpop
 }
