@@ -9,8 +9,12 @@ import (
 )
 
 var (
+	// ErrInvalidXOverNumPoints is the error returned when trying to set an
+	// invalid number of crossover points
 	ErrInvalidXOverNumPoints = errors.New("crossover points must be in the [0,MaxInt32] range")
-	ErrInvalidXOverProb      = errors.New("crossover probability must be in the [0.0,1.0] range")
+	// ErrInvalidXOverProb is the error returned when trying to set an invalid
+	// probability of crossover
+	ErrInvalidXOverProb = errors.New("crossover probability must be in the [0.0,1.0] range")
 )
 
 // Mater is the interface implemented by objects defining the Mate function.

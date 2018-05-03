@@ -9,6 +9,8 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
+// ErrInvalidMutationCount is the error returned when trying to set an invalid
+// mutation count
 var ErrInvalidMutationCount = errors.New("mutation count must be in the [0,MaxInt32] range")
 
 // TODO: document + rename (with pkg name it could be named mutation.Bitstring)

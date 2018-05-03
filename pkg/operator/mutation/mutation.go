@@ -7,6 +7,8 @@ import (
 	"github.com/aurelien-rainone/evolve/framework"
 )
 
+// ErrInvalidMutationProb is the error returned when trying to set an invalid
+// mutation probability
 var ErrInvalidMutationProb = errors.New("mutation probability must be in the [0.0,1.0] range")
 
 // Mutater is the interface implemented by objects defining the Mutate function.
