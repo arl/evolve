@@ -8,8 +8,9 @@ import (
 	"github.com/aurelien-rainone/evolve/factory"
 	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/internal/test"
-	"github.com/aurelien-rainone/evolve/number"
-	"github.com/aurelien-rainone/evolve/operators"
+	"github.com/aurelien-rainone/evolve/pkg/operator"
+	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
+	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
 	"github.com/aurelien-rainone/evolve/selection"
 	"github.com/aurelien-rainone/evolve/termination"
 	"github.com/stretchr/testify/assert"
@@ -160,29 +161,16 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	stringFactory, err = factory.NewStringFactory(string(alphabet), len(targetString))
 	checkB(b, err)
 
-	var (
-		mutationProb number.Probability
-		mutation     framework.EvolutionaryOperator
-		crossover    framework.EvolutionaryOperator
-		pipeline     *operators.EvolutionPipeline
-	)
-
 	// 1st operator: string mutation
-	mutationProb, err = number.NewProbability(0.02)
 	checkB(b, err)
-	mutation, err = operators.NewStringMutation(
-		string(alphabet),
-		operators.ConstantProbability(mutationProb),
-	)
-	checkB(b, err)
+	mut := mutation.NewStringMutation(string(alphabet))
+	checkB(b, mut.SetProb(0.02))
 
 	// 2nd operator: string crossover
-	crossover, err = operators.NewCrossover(operators.StringMater{})
-	checkB(b, err)
+	xover := xover.NewCrossover(xover.StringMater{})
 
 	// Create a pipeline that applies mutation then crossover
-	pipeline, err = operators.NewEvolutionPipeline(mutation, crossover)
-	checkB(b, err)
+	pipe := operator.Pipeline{mut, xover}
 
 	fitnessEvaluator := newStringEvaluator(targetString)
 
@@ -190,7 +178,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	rng := rand.New(rand.NewSource(99))
 
 	engine := NewGenerationalEvolutionEngine(stringFactory,
-		pipeline,
+		pipe,
 		fitnessEvaluator,
 		selectionStrategy,
 		rng)
