@@ -154,15 +154,10 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	}
 	alphabet[26] = ' '
 
-	var (
-		stringFactory *factory.StringFactory
-		err           error
-	)
-	stringFactory, err = factory.NewStringFactory(string(alphabet), len(targetString))
+	stringFactory, err := factory.NewStringFactory(string(alphabet), len(targetString))
 	checkB(b, err)
 
 	// 1st operator: string mutation
-	checkB(b, err)
 	mut := mutation.NewStringMutation(string(alphabet))
 	checkB(b, mut.SetProb(0.02))
 
@@ -174,13 +169,13 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 
 	fitnessEvaluator := newStringEvaluator(targetString)
 
-	var selectionStrategy = &selection.RouletteWheelSelection{}
+	var strategy = &selection.RouletteWheelSelection{}
 	rng := rand.New(rand.NewSource(99))
 
 	engine := NewGenerationalEvolutionEngine(stringFactory,
 		pipe,
 		fitnessEvaluator,
-		selectionStrategy,
+		strategy,
 		rng)
 
 	//engine.SetSingleThreaded(true)
@@ -201,14 +196,10 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	}
 }
 
-type stringEvaluator struct {
-	targetString string
-}
+type stringEvaluator struct{ targetString string }
 
 func newStringEvaluator(targetString string) stringEvaluator {
-	return stringEvaluator{
-		targetString: targetString,
-	}
+	return stringEvaluator{targetString: targetString}
 }
 
 // Assigns one "fitness point" for every character in the candidate string that
