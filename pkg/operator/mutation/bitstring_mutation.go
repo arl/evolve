@@ -1,4 +1,4 @@
-package operators
+package mutation
 
 import (
 	"errors"
