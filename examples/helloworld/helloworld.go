@@ -10,8 +10,10 @@ import (
 	"github.com/aurelien-rainone/evolve"
 	"github.com/aurelien-rainone/evolve/factory"
 	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/aurelien-rainone/evolve/number"
-	"github.com/aurelien-rainone/evolve/operators"
+
+	"github.com/aurelien-rainone/evolve/pkg/operator"
+	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
+	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
 	"github.com/aurelien-rainone/evolve/selection"
 	"github.com/aurelien-rainone/evolve/termination"
 )
@@ -43,29 +45,15 @@ func main() {
 	stringFactory, err = factory.NewStringFactory(string(alphabet), len(targetString))
 	check(err)
 
-	var (
-		mutationProb number.Probability
-		mutation     framework.EvolutionaryOperator
-		crossover    framework.EvolutionaryOperator
-		pipeline     *operators.EvolutionPipeline
-	)
-
 	// 1st operator: string mutation
-	mutationProb, err = number.NewProbability(0.02)
-	check(err)
-	mutation, err = operators.NewStringMutation(
-		string(alphabet),
-		operators.ConstantProbability(mutationProb),
-	)
-	check(err)
+	mutation := mutation.NewStringMutation(string(alphabet))
+	check(mutation.SetProb(0.02))
 
 	// 2nd operator: string crossover
-	crossover, err = operators.NewCrossover(operators.StringMater{})
-	check(err)
+	xover := xover.NewCrossover(xover.StringMater{})
 
-	// Create a pipeline that applies mutation then crossover
-	pipeline, err = operators.NewEvolutionPipeline(mutation, crossover)
-	check(err)
+	// Create a en operator pipeline applying first mutation, then crossover
+	pipeline := operator.Pipeline{mutation, xover}
 
 	fitnessEvaluator := newStringEvaluator(targetString)
 
