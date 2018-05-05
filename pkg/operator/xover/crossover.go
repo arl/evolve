@@ -155,11 +155,10 @@ func (op *Crossover) Apply(sel []framework.Candidate, rng *rand.Rand) []framewor
 				prob = op.probmin + (op.probmax-op.probmin)*rng.Float64()
 			}
 
-			// TODO: could maybe use an int here
 			var npts int
 			if rng.Float64() < prob {
-				// there is a crossover to perform, get/decide the number of
-				// points
+				// we got a crossover to perform, get/decide the number of
+				// crossover points
 				if op.varnpts {
 					npts = op.nptsmin + rng.Intn(op.nptsmax-op.nptsmin)
 				} else {
