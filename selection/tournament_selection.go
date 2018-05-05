@@ -2,69 +2,69 @@ package selection
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 
 	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/aurelien-rainone/evolve/number"
 )
+
+// ErrInvalidTournamentProb is the error returned when trying to set an invalid
+// tournament selection probability
+var ErrInvalidTournamentProb = errors.New("crossover probability must be in the [0.0,1.0] range")
 
 // TournamentSelection is a selection strategy that picks a pair of candidates
 // at random and then selects the fitter of the two candidates with probability
 // p, where p is the configured selection probability (therefore the probability
 // of the less fit candidate being selected is 1 - p).
 type TournamentSelection struct {
-	selectionProbability number.ProbabilityGenerator
-	description          string
+	prob             float64
+	varprob          bool
+	probmin, probmax float64
+	description      string
 }
 
-// TournamentSelectionOption is the type of functions used to set tournament
-// selection options.
-type TournamentSelectionOption func(*TournamentSelection) error
-
-// WithConstantSelectionProbability sets up a constant probability that the
-// fitter of two randomly chosen candidates will be selected.
-func WithConstantSelectionProbability(selectionProbability number.Probability) TournamentSelectionOption {
-	return func(ts *TournamentSelection) error {
-		if selectionProbability <= 0.5 {
-			return errors.New("selection threshold must be greater than 0.5")
-		}
-		ts.selectionProbability = number.NewConstantProbabilityGenerator(selectionProbability)
-		ts.description = fmt.Sprintf("Tournament Selection (p = %v)", selectionProbability)
-		return nil
+// NewTournamentSelection creates a TournamentSelection selection strategy where
+// the probability of selecting the fitter of two randomly chosen candidates is
+// set to 0.7.
+func NewTournamentSelection() TournamentSelection {
+	// create with a selection probability of 0.7
+	return TournamentSelection{
+		prob: 0.7, varprob: false, probmin: 0.7, probmax: 0.7,
 	}
 }
 
-// WithVariableSelectionProbability sets up a variable probability that the
-// fittest candidate is being selected in any given tournament.
+// SetProb sets a constant probability that fitter of two randomly chosen
+// candidates will be selected.
 //
-// variable should be a probability generator that produce values in the range
-// [0.5, 1]. These values are used as the probability of the fittest candidate
-// being selected in any given tournament.
-func WithVariableSelectionProbability(variable number.ProbabilityGenerator) TournamentSelectionOption {
-	return func(ts *TournamentSelection) error {
-		ts.selectionProbability = variable
-		ts.description = "Tournament Selection"
-		return nil
+// The probability of selecting the fitter of two candidates must be greater
+// than 0.5 to be useful (if it is not, there is no selection pressure, or the
+// pressure is in favour of weaker candidates, which is counter-productive).
+// If prob is not in the (0.5,1.0] range SetProb will return
+// ErrInvalidTournamentProb
+func (ts TournamentSelection) SetProb(prob float64) error {
+	if prob < 0.5 || prob > 1.0 {
+		return ErrInvalidTournamentProb
 	}
+	op.prob = prob
+	op.varprob = false
+	return nil
 }
 
-// NewTournamentSelection creates a TournamentSelection configured with provided
-// options.
-func NewTournamentSelection(options ...TournamentSelectionOption) (*TournamentSelection, error) {
-	// create with a selection probability of 0.5
-	ts := &TournamentSelection{
-		selectionProbability: number.NewConstantProbabilityGenerator(number.ProbabilityEven),
+// SetProbRange sets the range of possible tournament selection probabilities.
+//
+// The specific probability will be randomly chosen with the pseudo random
+// number generator argument of Apply, by linearly converting from (0.5,1.0) to
+// [min,max).
+//
+// If min and max are not bounded by (0.5,1.0] SetProbRange will return
+// ErrInvalidTournamentProb.
+func (ts TournamentSelection) SetProbRange(min, max float64) error {
+	if min > max || min < 0.5 || max > 1.0 {
+		return ErrInvalidTournamentProb
 	}
-
-	// set client options
-	for _, option := range options {
-		if err := option(ts); err != nil {
-			return nil, fmt.Errorf("can't apply tournament selection options: %v", err)
-		}
-	}
-
-	return ts, nil
+	op.probmin = min
+	op.probmax = max
+	op.varprob = true
+	return nil
 }
 
 // Select selects the specified number of candidates from the population.
@@ -104,6 +104,4 @@ func (ts *TournamentSelection) Select(
 	return selection
 }
 
-func (ts *TournamentSelection) String() string {
-	return ts.description
-}
+func (ts *TournamentSelection) String() string { return "Tournament Selection" }

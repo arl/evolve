@@ -5,64 +5,64 @@ import (
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/aurelien-rainone/evolve/number"
 	"github.com/stretchr/testify/assert"
 )
+
+func errcheck(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("want error = nil, got %v", err)
+	}
+}
 
 func TestTournamentSelectionNaturalFitness(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	p, _ := number.NewProbability(0.7)
-	selector, err := NewTournamentSelection(
-		WithConstantSelectionProbability(p))
+	tournament := NewTournamentSelection()
+	errcheck(tournament.SetProb(0.7))
 
-	if assert.NoError(t, err) {
-		steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
-		mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
-		john, _ := framework.NewEvaluatedCandidate("John", 8.4)
-		gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
-		population := framework.EvaluatedPopulation{steve, mary, john, gary}
+	steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
+	mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
+	john, _ := framework.NewEvaluatedCandidate("John", 8.4)
+	gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
+	pop := framework.EvaluatedPopulation{steve, mary, john, gary}
 
-		// Run several iterations so that we get different tournament outcomes.
-		for i := 0; i < 20; i++ {
-			selection := selector.Select(population, true, 2, rng)
-			assert.Len(t, selection, 2, "want selection size = 2, got", len(selection))
-		}
+	// Run several iterations so that we get different tournament outcomes.
+	for i := 0; i < 20; i++ {
+		selection := tournament.Select(pop, true, 2, rng)
+		assert.Len(t, selection, 2, "want len(selection) = 2, got", len(selection))
 	}
 }
 
 func TestTournamentSelectionNonNaturalFitness(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	p, _ := number.NewProbability(0.7)
-	selector, err := NewTournamentSelection(
-		WithConstantSelectionProbability(p))
+	tournament := NewTournamentSelection()
+	errcheck(tournament.SetProb(0.7))
 
-	if assert.NoError(t, err) {
-		gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
-		john, _ := framework.NewEvaluatedCandidate("John", 8.4)
-		mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
-		steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
-		population := framework.EvaluatedPopulation{gary, john, mary, steve}
+	gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
+	john, _ := framework.NewEvaluatedCandidate("John", 8.4)
+	mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
+	steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
+	pop := framework.EvaluatedPopulation{gary, john, mary, steve}
 
-		// Run several iterations so that we get different tournament outcomes.
-		for i := 0; i < 20; i++ {
-			selection := selector.Select(population, false, 2, rng)
-			assert.Len(t, selection, 2, "want selection size = 2, got", len(selection))
-		}
+	// Run several iterations so that we get different tournament outcomes.
+	for i := 0; i < 20; i++ {
+		selection := selector.Select(pop, false, 2, rng)
+		assert.Len(t, selection, 2, "want len(selection) = 2, got", len(selection))
 	}
 }
 
-// The probability of selecting the fitter of two candidates must be greater
-// than 0.5 to be useful (if it is not, there is no selection pressure, or the
-// pressure is in favour of weaker candidates, which is counter-productive).
-// This test ensures that an appropriate exception is thrown if the probability
-// is 0.5 or less. Not throwing an exception is an error because it permits
-// undetected bugs in evolutionary programs.
+// This test ensures that an error is returned if the probability is 0.5 or
+// less.
 func TestTournamentSelectionProbabilityTooLow(t *testing.T) {
-	ts, err := NewTournamentSelection(
-		WithConstantSelectionProbability(number.ProbabilityEven))
-	if assert.Error(t, err) {
-		assert.Nil(t, ts)
+	ts := NewTournamentSelection()
+	err := ts.SetProb(0.5)
+	if err != ErrInvalidTournamentProb {
+		t.Errorf("want ts.SetProb(0.5) = ErrInvalidTournamentProb, got %v", err)
+	}
+	err := ts.SetProbRange(0.4, 0.6)
+	if err != ErrInvalidTournamentProb {
+		t.Errorf("want ts.SetProb(0.4, 0.6) = ErrInvalidTournamentProb, got %v", err)
 	}
 }
