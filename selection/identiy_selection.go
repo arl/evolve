@@ -10,19 +10,17 @@ import (
 type Identity struct{}
 
 // Select selects the specified number of candidates from the population.
-func (sel Identity) Select(
-	population framework.EvaluatedPopulation,
-	naturalFitnessScores bool,
-	selectionSize int,
+func (ids Identity) Select(
+	pop framework.EvaluatedPopulation,
+	natural bool,
+	size int,
 	rng *rand.Rand) []framework.Candidate {
 
-	selection := make([]framework.Candidate, selectionSize)
-	for i := 0; i < selectionSize; i++ {
-		selection[i] = population[i].Candidate()
+	sel := make([]framework.Candidate, size)
+	for i := 0; i < size; i++ {
+		sel[i] = pop[i].Candidate()
 	}
-	return selection
+	return sel
 }
 
-func (sel Identity) String() string {
-	return "Identity Selection"
-}
+func (Identity) String() string { return "Identity Selection" }
