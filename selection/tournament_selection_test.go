@@ -1,56 +1,34 @@
 package selection
 
 import (
-	"math/rand"
+	"fmt"
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/stretchr/testify/assert"
 )
 
-func errcheck(t *testing.T, err error) {
-	t.Helper()
-	if err != nil {
-		t.Fatalf("want error = nil, got %v", err)
-	}
-}
-
-func TestTournamentSelectionNaturalFitness(t *testing.T) {
-	rng := rand.New(rand.NewSource(99))
-
-	tournament := NewTournamentSelection()
-	errcheck(t, tournament.SetProb(0.7))
-
-	steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
-	mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
-	john, _ := framework.NewEvaluatedCandidate("John", 8.4)
-	gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
-	pop := framework.EvaluatedPopulation{steve, mary, john, gary}
-
-	// Run several iterations so that we get different tournament outcomes.
-	for i := 0; i < 20; i++ {
-		selection := tournament.Select(pop, true, 2, rng)
-		assert.Len(t, selection, 2, "want len(selection) = 2, got", len(selection))
-	}
-}
-
-func TestTournamentSelectionNonNaturalFitness(t *testing.T) {
-	rng := rand.New(rand.NewSource(99))
-
+func TestTournamentSelectionNatural(t *testing.T) {
 	ts := NewTournamentSelection()
 	errcheck(t, ts.SetProb(0.7))
+	testRandomBasedSelection(t, ts, randomBasedPopNatural, true, 2,
+		func(selected []framework.Candidate) error {
+			if len(selected) != 2 {
+				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
+			}
+			return nil
+		})
+}
 
-	gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
-	john, _ := framework.NewEvaluatedCandidate("John", 8.4)
-	mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
-	steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
-	pop := framework.EvaluatedPopulation{gary, john, mary, steve}
-
-	// Run several iterations so that we get different tournament outcomes.
-	for i := 0; i < 20; i++ {
-		selection := ts.Select(pop, false, 2, rng)
-		assert.Len(t, selection, 2, "want len(selection) = 2, got", len(selection))
-	}
+func TestTournamentSelectionNonNatural(t *testing.T) {
+	ts := NewTournamentSelection()
+	errcheck(t, ts.SetProb(0.7))
+	testRandomBasedSelection(t, ts, randomBasedPopNonNatural, false, 2,
+		func(selected []framework.Candidate) error {
+			if len(selected) != 2 {
+				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
+			}
+			return nil
+		})
 }
 
 func TestTournamentSelectionSetProb(t *testing.T) {

@@ -102,7 +102,7 @@ func (ts TruncationSelection) Select(pop framework.EvaluatedPopulation, natural 
 	return sel
 }
 
-func (ts *TruncationSelection) String() string {
+func (ts TruncationSelection) String() string {
 	s := "Truncation Selection (%v%%)"
 	if ts.varratio {
 		return fmt.Sprintf(s, fmt.Sprintf("%5.2f-%5.2f", 100*ts.minratio, 100*ts.maxratio))

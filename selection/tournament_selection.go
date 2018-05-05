@@ -66,7 +66,7 @@ func (ts TournamentSelection) SetProbRange(min, max float64) error {
 }
 
 // Select selects the specified number of candidates from the population.
-func (ts *TournamentSelection) Select(
+func (ts TournamentSelection) Select(
 	pop framework.EvaluatedPopulation,
 	natural bool,
 	size int,
@@ -102,7 +102,7 @@ func (ts *TournamentSelection) Select(
 	return sel
 }
 
-func (ts *TournamentSelection) String() string {
+func (ts TournamentSelection) String() string {
 	s := "Tournament Selection (p = %v)"
 	if ts.varprob {
 		return fmt.Sprintf(s, fmt.Sprintf("[%v,%v]", ts.probmin, ts.probmax))

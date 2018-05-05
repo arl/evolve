@@ -7,33 +7,28 @@ import (
 	"github.com/aurelien-rainone/evolve/framework"
 )
 
-// RankSelection is a selection strategy that is similar to
+type rank struct{ selector framework.SelectionStrategy }
+
+// NewRank returns a rank selection stragy rank, that is similar to
 // fitness-proportionate selection except that is uses relative fitness rather
 // than absolute fitness in order to determine the probability of selection for
 // a given individual (i.e. the actual numerical fitness values are ignored and
 // only the ordering of the sorted population is considered).
 //
+// selector is the proportionate selector that will be delegated to after
+// converting rankings into relative fitness scores.
+//
 // Rank selection is implemented in terms of a mapping function
 // mapRankToScore(int, int) and delegation to a fitness-proportionate selector.
 // The mapping function converts ranks into relative fitness scores that are
 // used to drive the delegate selector.
-type RankSelection struct {
-	delegate framework.SelectionStrategy
+func NewRank(selector framework.SelectionStrategy) framework.SelectionStrategy {
+	return rank{selector: selector}
 }
 
-// NewRankSelection creates a rank-based selector with a linear mapping
-// function.
-//
-// delegate is the proprtionate selector that will be delegated to after
-// converting rankings into relative fitness scores. The delegate parameter may
-// be nil, in which case the RankSelection is created with a default rank-based
-// selector and selection frequencies that correspond to expected values.
-func NewRankSelection(delegate framework.SelectionStrategy) *RankSelection {
-	if delegate == nil {
-		delegate = StochasticUniversalSampling{}
-	}
-	return &RankSelection{delegate: delegate}
-}
+// Rank is the default rank based selection strategy. It uses
+// StochasticUniversalSampling as its selector.
+var Rank = NewRank(StochasticUniversalSampling{})
 
 // Select selects the specified number of candidates from the population.
 //
@@ -51,27 +46,25 @@ func NewRankSelection(delegate framework.SelectionStrategy) *RankSelection {
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
-func (sel *RankSelection) Select(
-	population framework.EvaluatedPopulation,
-	naturalFitnessScores bool,
-	selectionSize int,
+func (rs rank) Select(
+	pop framework.EvaluatedPopulation,
+	natural bool,
+	size int,
 	rng *rand.Rand) []framework.Candidate {
 
-	rankedPopulation := make(framework.EvaluatedPopulation, len(population))
+	ranked := make(framework.EvaluatedPopulation, len(pop))
 	var err error
-	for index, candidate := range population {
-		rankedPopulation[index], err = framework.NewEvaluatedCandidate(candidate.Candidate(),
-			mapRankToScore(index+1, len(population)))
+	for i, cand := range pop {
+		ranked[i], err = framework.NewEvaluatedCandidate(cand.Candidate(),
+			mapRankToScore(i+1, len(pop)))
 		if err != nil {
 			panic(fmt.Sprintln("couldn't create evaluated candidate: ", err))
 		}
 	}
-	return sel.delegate.Select(rankedPopulation, true, selectionSize, rng)
+	return rs.selector.Select(ranked, true, size, rng)
 }
 
-func (sel *RankSelection) String() string {
-	return "Rank Selection"
-}
+func (rank) String() string { return "Rank Selection" }
 
 // mapRankToScore maps a population index to a relative pseudo-fitness score
 // that can be used for fitness-proportionate selection. The general

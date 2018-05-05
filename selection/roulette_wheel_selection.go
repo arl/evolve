@@ -18,7 +18,9 @@ import (
 // excessively high occurrences of particular candidates. If this is a problem,
 // StochasticUniversalSampling provides an alternative fitness-proportionate
 // strategy for selection.
-type RouletteWheelSelection struct{}
+var RouletteWheelSelection = rouletteWheelSelection{}
+
+type rouletteWheelSelection struct{}
 
 // Select selects the required number of candidates from the population with the
 // probability of selecting any particular candidate being proportional to that
@@ -28,10 +30,10 @@ type RouletteWheelSelection struct{}
 // naturalFitnessScores should be true if higher fitness scores indicate fitter
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
-func (rws RouletteWheelSelection) Select(
-	population framework.EvaluatedPopulation,
-	naturalFitnessScores bool,
-	selectionSize int,
+func (rouletteWheelSelection) Select(
+	pop framework.EvaluatedPopulation,
+	natural bool,
+	size int,
 	rng *rand.Rand) []framework.Candidate {
 
 	// Record the cumulative fitness scores. It doesn't matter whether the
@@ -41,29 +43,27 @@ func (rws RouletteWheelSelection) Select(
 	// previous one. The numerical difference between an element and the
 	// previous one is directly proportional to the probability of the
 	// corresponding candidate in the population being selected.
-	cumulativeFitnesses := make([]float64, len(population))
-	cumulativeFitnesses[0] = adjustedFitness(population[0].Fitness(), naturalFitnessScores)
-	for i := 1; i < len(population); i++ {
-		fitness := adjustedFitness(population[i].Fitness(), naturalFitnessScores)
-		cumulativeFitnesses[i] = cumulativeFitnesses[i-1] + fitness
+	cumfitness := make([]float64, len(pop))
+	cumfitness[0] = adjustedFitness(pop[0].Fitness(), natural)
+	for i := 1; i < len(pop); i++ {
+		fitness := adjustedFitness(pop[i].Fitness(), natural)
+		cumfitness[i] = cumfitness[i-1] + fitness
 	}
 
-	selection := make([]framework.Candidate, selectionSize)
-	for i := 0; i < selectionSize; i++ {
-		randomFitness := rng.Float64() * cumulativeFitnesses[len(cumulativeFitnesses)-1]
-		index := sort.SearchFloat64s(cumulativeFitnesses, randomFitness)
+	sel := make([]framework.Candidate, size)
+	for i := 0; i < size; i++ {
+		rand := rng.Float64() * cumfitness[len(cumfitness)-1]
+		index := sort.SearchFloat64s(cumfitness, rand)
 		if index < 0 {
 			// Convert negative insertion point to array index.
 			index = abs(index + 1)
 		}
-		selection[i] = population[index].Candidate()
+		sel[i] = pop[index].Candidate()
 	}
-	return selection
+	return sel
 }
 
-func (rws RouletteWheelSelection) String() string {
-	return "Roulette Wheel Selection"
-}
+func (rouletteWheelSelection) String() string { return "Roulette Wheel Selection" }
 
 func abs(a int) int {
 	if a < 0 {

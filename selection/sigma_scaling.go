@@ -7,32 +7,29 @@ import (
 	"github.com/aurelien-rainone/evolve/framework"
 )
 
-// SigmaScaling is an alternative to straightforward fitness-proportionate
+type sigmaScaling struct{ selector framework.SelectionStrategy }
+
+// NewSigmaScaling creates a sigma-scaled selection strategy. This is an
+// alternative to straightforward fitness-proportionate
 // selection such as that offered by RouletteWheelSelection and
-// StochasticUniversalSampling. Uses the mean population fitness and fitness
+// StochasticUniversalSampling. It uses the mean population fitness and fitness
 // standard deviation to adjust individual fitness scores.
+//
+// selector is the proportionate selector that will be delegated to after
+// fitness scores have been adjusted using sigma scaling.
 //
 // Early on in an evolutionary algorithm this helps to avoid premature
 // convergence caused by the dominance of one or two relatively fit candidates
 // in a population of mostly unfit individuals. It also helps to amplify minor
 // fitness differences in a more mature population where the rate of improvement
 // has slowed.
-type SigmaScaling struct {
-	delegate framework.SelectionStrategy
+func NewSigmaScaling(selector framework.SelectionStrategy) framework.SelectionStrategy {
+	return &sigmaScaling{selector: selector}
 }
 
-// NewSigmaScaling creates a sigma-scaled selection strategy.
-//
-// delegate is the proprtionate selector that will be delegated to after after
-// fitness scores have been adjusted using sigma scaling. The delegate
-// parameter. It may be nil, in which case the SigmaScaling is created with a
-// default delegate using stochastic universal sampling
-func NewSigmaScaling(delegate framework.SelectionStrategy) *SigmaScaling {
-	if delegate == nil {
-		delegate = StochasticUniversalSampling{}
-	}
-	return &SigmaScaling{delegate: delegate}
-}
+// SigmaScaling is the default sigma scaling selection strategy. It uses
+// StochasticUniversalSampling as its selector.
+var SigmaScaling = NewSigmaScaling(StochasticUniversalSampling{})
 
 // Select selects the specified number of candidates from the population.
 //
@@ -50,7 +47,7 @@ func NewSigmaScaling(delegate framework.SelectionStrategy) *SigmaScaling {
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
-func (sel *SigmaScaling) Select(
+func (sel *sigmaScaling) Select(
 	population framework.EvaluatedPopulation,
 	naturalFitnessScores bool,
 	selectionSize int,
@@ -73,12 +70,10 @@ func (sel *SigmaScaling) Select(
 			panic(fmt.Sprintln("couldn't create evaluated candidate: ", err))
 		}
 	}
-	return sel.delegate.Select(scaledPopulation, naturalFitnessScores, selectionSize, rng)
+	return sel.selector.Select(scaledPopulation, naturalFitnessScores, selectionSize, rng)
 }
 
-func (sel *SigmaScaling) String() string {
-	return "Sigma Scaling"
-}
+func (sigmaScaling) String() string { return "Sigma Scaling" }
 
 func sigmaScaledFitness(candidateFitness, populationMeanFitness, fitnessStandardDeviation float64) float64 {
 	if fitnessStandardDeviation == 0 {
