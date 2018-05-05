@@ -3,123 +3,111 @@ package selection
 import (
 	"errors"
 	"fmt"
+	"math"
 	"math/rand"
 
 	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/aurelien-rainone/evolve/number"
 )
 
-// TruncationSelection implements selection of n candidates from a population by
-// simply selecting the n candidates with the highest fitness scores (the rest
-// are discarded). A candidate is never selected more than once.
-type TruncationSelection struct {
-	selectionRatio number.Float64Generator
-	description    string
-}
+// ErrInvalidTruncRatio is the error returned when trying to set an invalid
+// selection ratio for truncation selection
+var ErrInvalidTruncRatio = errors.New("truncation selection ratio must be in the (0,1] range")
 
-// TruncationSelectionOption is the type of functions used to specify options
-// during the creation of TruncationSelection objects.
-type TruncationSelectionOption func(*TruncationSelection) error
+// TruncationSelection implements the selection of n candidates from a
+// population by simply selecting the n candidates with the highest fitness
+// scores (the rest is discarded). The same candidate is never selected more
+// than once.
+type TruncationSelection struct {
+	ratio              float64
+	minratio, maxratio float64
+	varratio           bool
+}
 
 // NewTruncationSelection creates a TruncationSelection configured with the
 // provided options.
 //
 // If no options are provided the selection ratio will vary uniformly between 0
 // and 1.
-func NewTruncationSelection(options ...TruncationSelectionOption) (*TruncationSelection, error) {
-	sel := &TruncationSelection{
-		selectionRatio: number.NewBoundedFloat64Generator(0, 1),
-		description:    "Truncation Selection",
-	}
-
-	// set client options
-	for _, option := range options {
-		if err := option(sel); err != nil {
-			return nil, fmt.Errorf("can't apply truncation selection options: %v", err)
-		}
-	}
-	return sel, nil
+func NewTruncationSelection() TruncationSelection {
+	return TruncationSelection{varratio: true, minratio: 0.5, maxratio: 1.0}
 }
 
-// WithVariableSelectionRatio sets up a variable selection ratio provided by the
-// specified number.Float64Generator.
+// SetRatio sets a constant selection ratio, that is the proportion of the
+// highest ranked candidates to select from the population.
 //
-// variable is a number generator that produce values in the range
-// "0 < r < 1". These values are used to determine the proportion of the
-// population that is retained in any given selection.
-func WithVariableSelectionRatio(variable number.Float64Generator) TruncationSelectionOption {
-	return func(sel *TruncationSelection) error {
-		sel.selectionRatio = variable
-		return nil
+// If ratio is not in the (0,1] range SetRatio will return ErrInvalidTruncRatio
+func (ts TruncationSelection) SetRatio(ratio float64) error {
+	if ratio <= 0.0 || ratio > 1.0 {
+		return ErrInvalidTruncRatio
 	}
+	ts.ratio = ratio
+	ts.varratio = false
+	return nil
 }
 
-// WithConstantSelectionRatio sets up the selection ration, that is the
-// proportion of the highest ranked candidates to selection from the population.
+// SetRatioRange sets the range of possible truncation selection ratio.
 //
-// ratio must be positive and less than 1.
-func WithConstantSelectionRatio(ratio float64) TruncationSelectionOption {
-	return func(sel *TruncationSelection) error {
-		if ratio <= 0 || ratio >= 1 {
-			return errors.New("selection ratio must be positive and less than 1")
-		}
-		sel.selectionRatio = number.NewConstantFloat64Generator(ratio)
-		sel.description = "Truncation Selection (" + fmt.Sprintf("%5.2f%%", 100*ratio) + ")"
-		return nil
+// The specific ratio will be randomly chosen with the pseudo random number
+// generator argument of Select, by linearly converting from (0.5,1.0) to
+// [min,max).
+//
+// If min and max are not bounded by [0,1] SetRatioRange will return
+// ErrInvalidTruncRatio.
+func (ts TruncationSelection) SetRatioRange(min, max float64) error {
+	if min > max || min <= 0.0 || max > 1.0 {
+		return ErrInvalidTruncRatio
 	}
+	ts.minratio = min
+	ts.maxratio = max
+	ts.varratio = true
+	return nil
 }
 
 // Select selects the fittest candidates. If the selectionRatio results in
 // fewer selected candidates than required, then these candidates are
 // selected multiple times to make up the shortfall.
 //
-// population is the population of evolved and evaluated candidates from which
-// to select.
-// naturalFitnessScores indicates whether higher fitness values represent fitter
-// individuals or not.
-// selectionSize The number of candidates to select from the evolved population.
+// pop is the population of evolved and evaluated candidates from which to
+// select.
+// natural indicates whether higher fitness values represent fitter individuals
+// or not.
+// size is the number of candidates to select from the evolved population.
 //
 // Returns the selected candidates.
-func (sel TruncationSelection) Select(
-	population framework.EvaluatedPopulation,
-	naturalFitnessScores bool,
-	selectionSize int,
-	rng *rand.Rand) []framework.Candidate {
-	selection := make([]framework.Candidate, 0, selectionSize)
+func (ts TruncationSelection) Select(pop framework.EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []framework.Candidate {
 
-	ratio := sel.selectionRatio.NextValue()
-	if ratio < 0 || ratio > 1 {
-		panic(fmt.Sprintln("Selection ratio out-of-range:", ratio))
+	sel := make([]framework.Candidate, 0, size)
+
+	// get a random value to decide wether to select the fitter individual
+	// or the weaker one.
+	ratio := ts.ratio
+	if ts.varratio {
+		ratio = ts.minratio + (ts.maxratio-ts.minratio)*rng.Float64()
 	}
 
-	eligibleCount := round(ratio * float64(len(population)))
-	if eligibleCount > selectionSize {
-		eligibleCount = selectionSize
+	eligible := int(math.Round(ratio * float64(len(pop))))
+	if eligible > size {
+		eligible = size
 	}
 
 	for {
-		count := minint(eligibleCount, selectionSize-len(selection))
+		count := minint(eligible, size-len(sel))
 		for i := 0; i < count; i++ {
-			selection = append(selection, population[i].Candidate())
+			sel = append(sel, pop[i].Candidate())
 		}
-		if len(selection) >= selectionSize {
+		if len(sel) >= size {
 			break
 		}
 	}
-	return selection
+	return sel
 }
 
-func (sel *TruncationSelection) String() string {
-	return sel.description
-}
-
-// round rounds floats into integer numbers.
-// FIXME: Remove this function when math.Round will exist (in Go 1.10)
-func round(a float64) int {
-	if a < 0 {
-		return int(a - 0.5)
+func (ts *TruncationSelection) String() string {
+	s := "Truncation Selection (%v%%)"
+	if ts.varratio {
+		return fmt.Sprintf(s, fmt.Sprintf("%5.2f-%5.2f", 100*ts.minratio, 100*ts.maxratio))
 	}
-	return int(a + 0.5)
+	return fmt.Sprintf(s, fmt.Sprintf("%5.2f", 100*ts.ratio))
 }
 
 // minint returns the minimum of two int values.

@@ -19,7 +19,7 @@ func TestTournamentSelectionNaturalFitness(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	tournament := NewTournamentSelection()
-	errcheck(tournament.SetProb(0.7))
+	errcheck(t, tournament.SetProb(0.7))
 
 	steve, _ := framework.NewEvaluatedCandidate("Steve", 10.0)
 	mary, _ := framework.NewEvaluatedCandidate("Mary", 9.1)
@@ -37,8 +37,8 @@ func TestTournamentSelectionNaturalFitness(t *testing.T) {
 func TestTournamentSelectionNonNaturalFitness(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	tournament := NewTournamentSelection()
-	errcheck(tournament.SetProb(0.7))
+	ts := NewTournamentSelection()
+	errcheck(t, ts.SetProb(0.7))
 
 	gary, _ := framework.NewEvaluatedCandidate("Gary", 6.2)
 	john, _ := framework.NewEvaluatedCandidate("John", 8.4)
@@ -48,20 +48,17 @@ func TestTournamentSelectionNonNaturalFitness(t *testing.T) {
 
 	// Run several iterations so that we get different tournament outcomes.
 	for i := 0; i < 20; i++ {
-		selection := selector.Select(pop, false, 2, rng)
+		selection := ts.Select(pop, false, 2, rng)
 		assert.Len(t, selection, 2, "want len(selection) = 2, got", len(selection))
 	}
 }
 
-// This test ensures that an error is returned if the probability is 0.5 or
-// less.
-func TestTournamentSelectionProbabilityTooLow(t *testing.T) {
-	ts := NewTournamentSelection()
-	err := ts.SetProb(0.5)
+func TestTournamentSelectionSetProb(t *testing.T) {
+	err := NewTournamentSelection().SetProb(0.5)
 	if err != ErrInvalidTournamentProb {
 		t.Errorf("want ts.SetProb(0.5) = ErrInvalidTournamentProb, got %v", err)
 	}
-	err := ts.SetProbRange(0.4, 0.6)
+	err = NewTournamentSelection().SetProbRange(0.4, 0.6)
 	if err != ErrInvalidTournamentProb {
 		t.Errorf("want ts.SetProb(0.4, 0.6) = ErrInvalidTournamentProb, got %v", err)
 	}
