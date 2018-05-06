@@ -14,7 +14,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
-	"github.com/aurelien-rainone/evolve/selection"
+	"github.com/aurelien-rainone/evolve/pkg/selection"
 	"github.com/aurelien-rainone/evolve/termination"
 )
 
@@ -57,7 +57,7 @@ func main() {
 
 	fitnessEvaluator := newStringEvaluator(targetString)
 
-	var selectionStrategy = &selection.RouletteWheelSelection{}
+	var selectionStrategy = selection.RouletteWheelSelection
 	rng := rand.New(rand.NewSource(randomSeed()))
 
 	engine := evolve.NewGenerationalEvolutionEngine(stringFactory,

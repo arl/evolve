@@ -11,7 +11,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
-	"github.com/aurelien-rainone/evolve/selection"
+	"github.com/aurelien-rainone/evolve/pkg/selection"
 	"github.com/aurelien-rainone/evolve/termination"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +23,7 @@ func prepareEngine() framework.EvolutionEngine {
 		},
 		integerZeroMaker{},
 		test.IntegerEvaluator{},
-		selection.RouletteWheelSelection{},
+		selection.RouletteWheelSelection,
 		rand.New(rand.NewSource(99)))
 }
 
@@ -169,7 +169,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 
 	fitnessEvaluator := newStringEvaluator(targetString)
 
-	var strategy = &selection.RouletteWheelSelection{}
+	var strategy = selection.RouletteWheelSelection
 	rng := rand.New(rand.NewSource(99))
 
 	engine := NewGenerationalEvolutionEngine(stringFactory,

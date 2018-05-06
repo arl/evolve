@@ -6,7 +6,7 @@ import (
 
 	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/internal/test"
-	"github.com/aurelien-rainone/evolve/selection"
+	"github.com/aurelien-rainone/evolve/pkg/selection"
 	"github.com/aurelien-rainone/evolve/termination"
 	"github.com/stretchr/testify/assert"
 )
@@ -39,7 +39,7 @@ func TestIslandEvolutionObservers(t *testing.T) {
 		test.NewStubIntegerFactory(),
 		test.IntegerAdjuster(2),
 		dummyFitnessEvaluator{},
-		selection.RouletteWheelSelection{},
+		selection.RouletteWheelSelection,
 		rand.New(rand.NewSource(99)),
 	)
 
@@ -102,7 +102,7 @@ func TestGetSatisfiedTerminationConditionsBeforeStart(t *testing.T) {
 		test.NewStubIntegerFactory(),
 		test.IntegerAdjuster(2),
 		dummyFitnessEvaluator{},
-		selection.RouletteWheelSelection{},
+		selection.RouletteWheelSelection,
 		rand.New(rand.NewSource(99)),
 	)
 	// Should return an error and nil as the slice of satisfied termination
