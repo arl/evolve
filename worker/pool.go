@@ -1,8 +1,6 @@
 package worker
 
-import (
-	"sync"
-)
+import "sync"
 
 // A Worker represents a self-contained worker and its load of work, performed
 // when Work is called. It should be self-contained as Worker objects are meant
