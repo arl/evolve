@@ -12,6 +12,8 @@ import (
 // IntSliceMater mates a pair of int slices to produce a new pair of int slices
 type IntSliceMater struct{}
 
+// Mate performs crossover on a pair of parents to generate a pair of
+// offspring.
 func (m IntSliceMater) Mate(
 	parent1, parent2 api.Candidate, npts int64,
 	rng *rand.Rand) []api.Candidate {

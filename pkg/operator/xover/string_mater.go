@@ -9,6 +9,8 @@ import (
 // StringMater mates a pair of strings to produce a new pair of bit strings
 type StringMater struct{}
 
+// Mate performs crossover on a pair of parents to generate a pair of
+// offspring.
 func (m StringMater) Mate(
 	parent1, parent2 api.Candidate, nxpts int64,
 	rng *rand.Rand) []api.Candidate {

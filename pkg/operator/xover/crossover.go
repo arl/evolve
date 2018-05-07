@@ -42,12 +42,9 @@ type Mater interface {
 // parameter.
 type Crossover struct {
 	Mater
-	npts             int
-	varnpts          bool
-	nptsmin, nptsmax int
-	prob             float64
-	varprob          bool
-	probmin, probmax float64
+	prob, probmin, probmax float64
+	npts, nptsmin, nptsmax int
+	varprob, varnpts       bool
 }
 
 // New creates a Crossover operator based off the provided Mater.

@@ -12,22 +12,22 @@ import (
 // tournament selection probability
 var ErrInvalidTournamentProb = errors.New("crossover probability must be in the [0.0,1.0] range")
 
-// TournamentSelection is a selection strategy that picks a pair of candidates
-// at random and then selects the fitter of the two candidates with probability
-// p, where p is the configured selection probability (therefore the probability
-// of the less fit candidate being selected is 1 - p).
-type TournamentSelection struct {
+// Tournament is a selection strategy that picks a pair of candidates at random
+// and then selects the fitter of the two candidates with probability p, where p
+// is the configured selection probability (therefore the probability of the
+// less fit candidate being selected is 1 - p).
+type Tournament struct {
 	prob             float64
 	varprob          bool
 	probmin, probmax float64
 }
 
-// NewTournamentSelection creates a TournamentSelection selection strategy where
+// NewTournamentcreates a TournamentSelection selection strategy where
 // the probability of selecting the fitter of two randomly chosen candidates is
 // set to 0.7.
-func NewTournamentSelection() TournamentSelection {
+func NewTournament() *Tournament {
 	// create with a selection probability of 0.7
-	return TournamentSelection{prob: 0.7, varprob: false, probmin: 0.7, probmax: 0.7}
+	return &Tournament{prob: 0.7, varprob: false, probmin: 0.7, probmax: 0.7}
 }
 
 // SetProb sets a constant probability that fitter of two randomly chosen
@@ -38,7 +38,7 @@ func NewTournamentSelection() TournamentSelection {
 // pressure is in favour of weaker candidates, which is counter-productive).
 // If prob is not in the (0.5,1] range SetProb will return
 // ErrInvalidTournamentProb
-func (ts TournamentSelection) SetProb(prob float64) error {
+func (ts *Tournament) SetProb(prob float64) error {
 	if prob <= 0.5 || prob > 1.0 {
 		return ErrInvalidTournamentProb
 	}
@@ -55,7 +55,7 @@ func (ts TournamentSelection) SetProb(prob float64) error {
 //
 // If min and max are not bounded by (0.5,1] SetProbRange will return
 // ErrInvalidTournamentProb.
-func (ts TournamentSelection) SetProbRange(min, max float64) error {
+func (ts *Tournament) SetProbRange(min, max float64) error {
 	if min > max || min < 0.5 || max > 1.0 {
 		return ErrInvalidTournamentProb
 	}
@@ -66,7 +66,7 @@ func (ts TournamentSelection) SetProbRange(min, max float64) error {
 }
 
 // Select selects the specified number of candidates from the population.
-func (ts TournamentSelection) Select(
+func (ts *Tournament) Select(
 	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
@@ -102,7 +102,7 @@ func (ts TournamentSelection) Select(
 	return sel
 }
 
-func (ts TournamentSelection) String() string {
+func (ts *Tournament) String() string {
 	s := "Tournament Selection (p = %v)"
 	if ts.varprob {
 		return fmt.Sprintf(s, fmt.Sprintf("[%v,%v]", ts.probmin, ts.probmax))

@@ -8,7 +8,7 @@ import (
 )
 
 func TestTournamentSelectionNatural(t *testing.T) {
-	ts := NewTournamentSelection()
+	ts := NewTournament()
 	errcheck(t, ts.SetProb(0.7))
 	testRandomBasedSelection(t, ts, randomBasedPopNatural, true, 2,
 		func(selected []api.Candidate) error {
@@ -20,7 +20,7 @@ func TestTournamentSelectionNatural(t *testing.T) {
 }
 
 func TestTournamentSelectionNonNatural(t *testing.T) {
-	ts := NewTournamentSelection()
+	ts := NewTournament()
 	errcheck(t, ts.SetProb(0.7))
 	testRandomBasedSelection(t, ts, randomBasedPopNonNatural, false, 2,
 		func(selected []api.Candidate) error {
@@ -32,11 +32,11 @@ func TestTournamentSelectionNonNatural(t *testing.T) {
 }
 
 func TestTournamentSelectionSetProb(t *testing.T) {
-	err := NewTournamentSelection().SetProb(0.5)
+	err := NewTournament().SetProb(0.5)
 	if err != ErrInvalidTournamentProb {
 		t.Errorf("want ts.SetProb(0.5) = ErrInvalidTournamentProb, got %v", err)
 	}
-	err = NewTournamentSelection().SetProbRange(0.4, 0.6)
+	err = NewTournament().SetProbRange(0.4, 0.6)
 	if err != ErrInvalidTournamentProb {
 		t.Errorf("want ts.SetProb(0.4, 0.6) = ErrInvalidTournamentProb, got %v", err)
 	}

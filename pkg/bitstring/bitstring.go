@@ -254,7 +254,10 @@ func (bs *Bitstring) String() string {
 //
 // The new Bitstring is based off of a new backing array.
 func (bs *Bitstring) Copy() *Bitstring {
-	clone, _ := New(bs.length)
+	clone, err := New(bs.length)
+	if err != nil {
+		panic(fmt.Errorf("internal error, couldn't copy bitstring: %v", err))
+	}
 	copy(clone.data, bs.data)
 	return clone
 }
