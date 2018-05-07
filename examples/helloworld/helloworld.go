@@ -18,6 +18,29 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/termination"
 )
 
+// This 'evaluator' assigns one "fitness point" for every character in the
+// candidate string that doesn't match the corresponding position in the target
+// string.
+type evaluator string
+
+func (s evaluator) Fitness(
+	cand api.Candidate,
+	pop []api.Candidate) float64 {
+
+	var errors float64
+	sc := cand.(string)
+	for i := range sc {
+		if sc[i] != string(s)[i] {
+			errors++
+		}
+	}
+	return errors
+}
+
+// Fitness is not natural, one fitness point represents an error, so the lower
+// is better
+func (evaluator) IsNatural() bool { return false }
+
 func main() {
 	var targetString = "HELLO WORLD"
 	if len(os.Args) == 2 {
@@ -55,15 +78,15 @@ func main() {
 	// Create a en operator pipeline applying first mutation, then crossover
 	pipeline := operator.Pipeline{mutation, xover}
 
-	fitnessEvaluator := newStringEvaluator(targetString)
+	eval := evaluator(targetString)
 
-	var selectionStrategy = selection.RouletteWheelSelection
+	var selector = selection.RouletteWheelSelection
 	rng := rand.New(rand.NewSource(randomSeed()))
 
 	engine := evolve.NewGenerationalEvolutionEngine(stringFactory,
 		pipeline,
-		fitnessEvaluator,
-		selectionStrategy,
+		eval,
+		selector,
 		rng)
 
 	//engine.SetSingleThreaded(true)
@@ -75,8 +98,8 @@ func main() {
 	conditions, err = engine.SatisfiedTerminationConditions()
 	check(err)
 	for i, condition := range conditions {
-		fmt.Printf("satified termination condition %v %T: %v\n",
-			i, condition, condition)
+		fmt.Printf("satified termination condition %v: %v\n",
+			i, condition)
 	}
 }
 
