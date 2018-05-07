@@ -12,28 +12,30 @@ func TestTargetFitness(t *testing.T) {
 
 	t.Run("natural fitness", func(t *testing.T) {
 		cond := TargetFitness{Fitness: 10.0, Natural: true}
+		popdata := &api.PopulationData{Natural: true}
 
-		if cond.ShouldTerminate(
-			&api.PopulationData{struct{}{}, 5.0, 4.0, 0, true, 2, 0, 0, 100}) {
+		popdata.BestFitness = 5.0
+		if cond.ShouldTerminate(popdata) {
 			t.Errorf("should not terminate before target fitness has been reached")
 		}
 
-		if !cond.ShouldTerminate(
-			&api.PopulationData{struct{}{}, 10.0, 8.0, 0, true, 2, 0, 0, 100}) {
+		popdata.BestFitness = 10.0
+		if !cond.ShouldTerminate(popdata) {
 			t.Errorf("should terminate once target fitness has been reached")
 		}
 	})
 
 	t.Run("non-natural fitness", func(t *testing.T) {
 		cond := TargetFitness{Fitness: 1.0, Natural: false}
+		popdata := &api.PopulationData{Natural: true}
 
-		if cond.ShouldTerminate(
-			&api.PopulationData{struct{}{}, 5.0, 4.0, 0, true, 2, 0, 0, 100}) {
+		popdata.BestFitness = 5.0
+		if cond.ShouldTerminate(popdata) {
 			t.Errorf("should not terminate before target fitness has been reached")
 		}
 
-		if !cond.ShouldTerminate(
-			&api.PopulationData{struct{}{}, 1.0, 3.1, 0, true, 2, 0, 0, 100}) {
+		popdata.BestFitness = 1.0
+		if !cond.ShouldTerminate(popdata) {
 			t.Errorf("should terminate once target fitness has been reached")
 		}
 	})

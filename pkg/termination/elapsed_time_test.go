@@ -9,14 +9,15 @@ import (
 
 func TestElapsedTime(t *testing.T) {
 	cond := 1 * ElapsedTime(time.Second)
+	popdata := &api.PopulationData{}
 
-	if cond.ShouldTerminate(
-		&api.PopulationData{struct{}{}, 0, 0, 0, true, 2, 0, 0, 100 * time.Millisecond}) {
+	popdata.Elapsed = 100 * time.Millisecond
+	if cond.ShouldTerminate(popdata) {
 		t.Errorf("should not terminate before elapsed time")
 	}
 
-	if !cond.ShouldTerminate(
-		&api.PopulationData{struct{}{}, 0, 0, 0, true, 2, 0, 0, time.Second}) {
+	popdata.Elapsed = time.Second
+	if !cond.ShouldTerminate(popdata) {
 		t.Errorf("should terminate after elapsed time")
 	}
 }
