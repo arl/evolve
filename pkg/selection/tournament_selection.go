@@ -22,9 +22,9 @@ type Tournament struct {
 	probmin, probmax float64
 }
 
-// NewTournamentcreates a TournamentSelection selection strategy where
-// the probability of selecting the fitter of two randomly chosen candidates is
-// set to 0.7.
+// NewTournament creates a TournamentSelection selection strategy where the
+// probability of selecting the fitter of two randomly chosen candidates is set
+// to 0.7.
 func NewTournament() *Tournament {
 	// create with a selection probability of 0.7
 	return &Tournament{prob: 0.7, varprob: false, probmin: 0.7, probmax: 0.7}

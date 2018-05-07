@@ -12,7 +12,7 @@ import (
 // Unit test for truncation selection strategy ensures the 2 best candidates are
 // selected.
 func testTruncationSelection(t *testing.T, tpop testPopulation, natural bool) {
-	ts := NewTruncationSelection()
+	ts := NewTruncation()
 	errcheck(t, ts.SetRatio(0.5))
 	testRandomBasedSelection(t, ts, tpop, natural, 2,
 		func(selected []api.Candidate) error {
@@ -52,7 +52,7 @@ func TestTruncationSelectionSetRatio(t *testing.T) {
 		{ratio: 1.0, wantErr: nil},
 	}
 	for _, tt := range tests {
-		if got := NewTruncationSelection().SetRatio(tt.ratio); got != tt.wantErr {
+		if got := NewTruncation().SetRatio(tt.ratio); got != tt.wantErr {
 			t.Errorf("SetRatio(%v), got err = %v, wantErr = %v", tt.ratio, got, tt.wantErr)
 		}
 	}
@@ -72,7 +72,7 @@ func TestTruncationSelectionSetRatioRange(t *testing.T) {
 		{min: 0.1, max: 1.01, wantErr: ErrInvalidTruncRatio},
 	}
 	for _, tt := range tests {
-		if got := NewTruncationSelection().SetRatioRange(tt.min, tt.max); got != tt.wantErr {
+		if got := NewTruncation().SetRatioRange(tt.min, tt.max); got != tt.wantErr {
 			t.Errorf("SetRatioRange(%v, %v), got err = %v, wantErr = %v", tt.min, tt.max, got, tt.wantErr)
 		}
 	}

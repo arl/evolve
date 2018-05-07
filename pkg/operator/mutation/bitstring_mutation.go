@@ -2,6 +2,7 @@ package mutation
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -36,7 +37,10 @@ func NewBitstring() *Bitstring {
 		nmut: 1, varnmut: false, nmutmin: 1, nmutmax: 1,
 	}
 	bsmut.Mutation = New(bsmut)
-	bsmut.SetProb(1.0)
+	err := bsmut.SetProb(1.0)
+	if err != nil {
+		panic(fmt.Errorf("cannot set mutation probability: %v", err))
+	}
 	return bsmut
 }
 

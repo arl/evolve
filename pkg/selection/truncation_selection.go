@@ -13,30 +13,28 @@ import (
 // selection ratio for truncation selection
 var ErrInvalidTruncRatio = errors.New("truncation selection ratio must be in the (0,1] range")
 
-// TruncationSelection implements the selection of n candidates from a
-// population by simply selecting the n candidates with the highest fitness
-// scores (the rest is discarded). The same candidate is never selected more
-// than once.
-type TruncationSelection struct {
-	ratio              float64
-	minratio, maxratio float64
-	varratio           bool
+// Truncation implements the selection of n candidates from a population by
+// simply selecting the n candidates with the highest fitness scores (the rest
+// is discarded). The same candidate is never selected more than once.
+type Truncation struct {
+	ratio, minratio, maxratio float64
+	varratio                  bool
 }
 
-// NewTruncationSelection creates a TruncationSelection configured with the
+// NewTruncation creates a TruncationSelection configured with the
 // provided options.
 //
 // If no options are provided the selection ratio will vary uniformly between 0
 // and 1.
-func NewTruncationSelection() TruncationSelection {
-	return TruncationSelection{varratio: true, minratio: 0.5, maxratio: 1.0}
+func NewTruncation() *Truncation {
+	return &Truncation{varratio: true, minratio: 0.5, maxratio: 1.0}
 }
 
 // SetRatio sets a constant selection ratio, that is the proportion of the
 // highest ranked candidates to select from the population.
 //
 // If ratio is not in the (0,1] range SetRatio will return ErrInvalidTruncRatio
-func (ts TruncationSelection) SetRatio(ratio float64) error {
+func (ts *Truncation) SetRatio(ratio float64) error {
 	if ratio <= 0.0 || ratio > 1.0 {
 		return ErrInvalidTruncRatio
 	}
@@ -53,7 +51,7 @@ func (ts TruncationSelection) SetRatio(ratio float64) error {
 //
 // If min and max are not bounded by [0,1] SetRatioRange will return
 // ErrInvalidTruncRatio.
-func (ts TruncationSelection) SetRatioRange(min, max float64) error {
+func (ts *Truncation) SetRatioRange(min, max float64) error {
 	if min > max || min <= 0.0 || max > 1.0 {
 		return ErrInvalidTruncRatio
 	}
@@ -74,7 +72,7 @@ func (ts TruncationSelection) SetRatioRange(min, max float64) error {
 // size is the number of candidates to select from the evolved population.
 //
 // Returns the selected candidates.
-func (ts TruncationSelection) Select(pop api.EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []api.Candidate {
+func (ts *Truncation) Select(pop api.EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []api.Candidate {
 
 	sel := make([]api.Candidate, 0, size)
 
@@ -102,7 +100,7 @@ func (ts TruncationSelection) Select(pop api.EvaluatedPopulation, natural bool, 
 	return sel
 }
 
-func (ts TruncationSelection) String() string {
+func (ts *Truncation) String() string {
 	s := "Truncation Selection (%v%%)"
 	if ts.varratio {
 		return fmt.Sprintf(s, fmt.Sprintf("%5.2f-%5.2f", 100*ts.minratio, 100*ts.maxratio))
