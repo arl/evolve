@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/aurelien-rainone/evolve"
-	"github.com/aurelien-rainone/evolve/factory"
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/aurelien-rainone/evolve/pkg/factory"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"

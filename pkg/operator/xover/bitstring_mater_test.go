@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/factory"
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
+	"github.com/aurelien-rainone/evolve/pkg/factory"
 	"github.com/stretchr/testify/assert"
 )
 
