@@ -16,9 +16,9 @@ matrix:
 
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
-  #- go get -u github.com/alecthomas/gometalinter
   # use golint through gometalinter because it allows to easily ignore the
   # `vendor` and `internal` directories
+  - go get -u github.com/alecthomas/gometalinter
 
 script:
   - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
