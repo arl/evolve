@@ -3,7 +3,7 @@ package islands
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // RandomMigration migrates a fixed number of candidates away from each island.
@@ -29,15 +29,15 @@ type RandomMigration struct{}
 // migrantCount is the number of (randomly selected) individuals to be moved on
 // from each island.
 // rng is a source of randomness.
-func (mig RandomMigration) Migrate(islandPopulations []framework.EvaluatedPopulation, migrantCount int, rng *rand.Rand) {
-	migrants := make(framework.EvaluatedPopulation, 0, migrantCount*len(islandPopulations))
+func (mig RandomMigration) Migrate(islandPopulations []api.EvaluatedPopulation, migrantCount int, rng *rand.Rand) {
+	migrants := make(api.EvaluatedPopulation, 0, migrantCount*len(islandPopulations))
 
-	var island framework.EvaluatedPopulation
+	var island api.EvaluatedPopulation
 
 	for i := 0; i < len(islandPopulations); i++ {
 		island = islandPopulations[i]
 		// because we shuffle island population ...
-		framework.ShuffleEvaluatedPopulation(island, rng)
+		api.ShuffleEvaluatedPopulation(island, rng)
 		// taking N migrants is the same as taking N random individuals from the
 		// island. Keep those migrants in a slice
 		for j := 0; j < migrantCount; j++ {
@@ -45,7 +45,7 @@ func (mig RandomMigration) Migrate(islandPopulations []framework.EvaluatedPopula
 		}
 	}
 	// shuffle the migrants
-	framework.ShuffleEvaluatedPopulation(migrants, rng)
+	api.ShuffleEvaluatedPopulation(migrants, rng)
 
 	var migrantIdx int
 	for i := 0; i < len(islandPopulations); i++ {

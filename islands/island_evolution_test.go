@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/internal/test"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/selection"
 	"github.com/aurelien-rainone/evolve/termination"
 	"github.com/stretchr/testify/assert"
@@ -16,11 +16,11 @@ type countObserver struct {
 	observedGenerationCounts []int
 }
 
-func (obs *countObserver) PopulationUpdate(data *framework.PopulationData) {
+func (obs *countObserver) PopulationUpdate(data *api.PopulationData) {
 	obs.observedEpochCount++
 }
 
-func (obs *countObserver) IslandPopulationUpdate(islandIndex int, data *framework.PopulationData) {
+func (obs *countObserver) IslandPopulationUpdate(islandIndex int, data *api.PopulationData) {
 	obs.observedGenerationCounts[islandIndex]++
 }
 
@@ -69,7 +69,7 @@ func TestIslandEvolutionObservers(t *testing.T) {
                                                                                new IntegerAdjuster(2),
                                                                                new DummyFitnessEvaluator(),
                                                                                new RouletteWheelSelection(),
-                                                                               FrameworkTestUtils.getRNG());
+                                                                               apiTestUtils.getRNG());
        final long timeout = 1000L;
        final Thread requestThread = Thread.currentThread();
        islandEvolution.addEvolutionObserver(new IslandEvolutionObserver<Integer>()
@@ -114,7 +114,7 @@ func TestGetSatisfiedTerminationConditionsBeforeStart(t *testing.T) {
 
 type dummyFitnessEvaluator struct{}
 
-func (dfe dummyFitnessEvaluator) Fitness(candidate framework.Candidate, population []framework.Candidate) float64 {
+func (dfe dummyFitnessEvaluator) Fitness(candidate api.Candidate, population []api.Candidate) float64 {
 	return 0
 }
 

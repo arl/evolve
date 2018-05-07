@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/factory"
-	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/internal/test"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func prepareEngine() framework.EvolutionEngine {
+func prepareEngine() api.EvolutionEngine {
 	return NewGenerationalEvolutionEngine(
 		&factory.AbstractCandidateFactory{
 			RandomCandidateGenerator: test.NewStubIntegerFactory(),
@@ -28,10 +28,10 @@ func prepareEngine() framework.EvolutionEngine {
 }
 
 type elitismObserver struct {
-	data *framework.PopulationData
+	data *api.PopulationData
 }
 
-func (o *elitismObserver) PopulationUpdate(data *framework.PopulationData) {
+func (o *elitismObserver) PopulationUpdate(data *api.PopulationData) {
 	o.data = data
 }
 
@@ -43,7 +43,7 @@ func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 	observer := new(elitismObserver)
 	engine := prepareEngine()
 	engine.AddEvolutionObserver(observer)
-	elite := make([]framework.Candidate, 3)
+	elite := make([]api.Candidate, 3)
 	// Add the following seed candidates, all better than any others that can possibly
 	// get into the population (since every other candidate will always be zero).
 	elite[0] = 7 // This candidate should be discarded by elitism.
@@ -130,8 +130,8 @@ func TestGenerationalEvolutionEngineSatisfiedTerminationConditionsBeforeStart(t 
 // Trivial test operator that mutates all integers into zeroes.
 type integerZeroMaker struct{}
 
-func (op integerZeroMaker) Apply(selectedCandidates []framework.Candidate, rng *rand.Rand) []framework.Candidate {
-	result := make([]framework.Candidate, len(selectedCandidates))
+func (op integerZeroMaker) Apply(selectedCandidates []api.Candidate, rng *rand.Rand) []api.Candidate {
+	result := make([]api.Candidate, len(selectedCandidates))
 	for i := range selectedCandidates {
 		result[i] = 0
 	}
@@ -181,13 +181,13 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	//engine.SetSingleThreaded(true)
 
 	b.ResetTimer()
-	var result framework.Candidate
+	var result api.Candidate
 	for n := 0; n < b.N; n++ {
 		result = engine.Evolve(100000, 5, termination.NewTargetFitness(0, false))
 	}
 	fmt.Println(result)
 
-	var conditions []framework.TerminationCondition
+	var conditions []api.TerminationCondition
 	conditions, err = engine.SatisfiedTerminationConditions()
 	checkB(b, err)
 	for i, condition := range conditions {
@@ -205,8 +205,8 @@ func newStringEvaluator(targetString string) stringEvaluator {
 // Assigns one "fitness point" for every character in the candidate string that
 // doesn't match the corresponding position in the target string.
 func (se stringEvaluator) Fitness(
-	candidate framework.Candidate,
-	population []framework.Candidate) float64 {
+	candidate api.Candidate,
+	population []api.Candidate) float64 {
 
 	var errors float64
 	sc := candidate.(string)

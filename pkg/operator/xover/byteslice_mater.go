@@ -3,14 +3,14 @@ package xover
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 type ByteSliceMater struct{}
 
 func (m ByteSliceMater) Mate(
-	parent1, parent2 framework.Candidate, nxpts int64,
-	rng *rand.Rand) []framework.Candidate {
+	parent1, parent2 api.Candidate, nxpts int64,
+	rng *rand.Rand) []api.Candidate {
 
 	p1, p2 := parent1.([]byte), parent2.([]byte)
 
@@ -33,5 +33,5 @@ func (m ByteSliceMater) Mate(
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return append([]framework.Candidate{}, off1, off2)
+	return append([]api.Candidate{}, off1, off2)
 }

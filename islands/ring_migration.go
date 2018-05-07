@@ -3,7 +3,7 @@ package islands
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // RingMigration migrates a fixed number of individuals from each island to the
@@ -21,13 +21,13 @@ type RingMigration struct{}
 // migrantCount is the number of (randomly selected) individuals to be moved on
 // from each island.
 // rng is a source of randomness.
-func (mig RingMigration) Migrate(islandPopulations []framework.EvaluatedPopulation, migrantCount int, rng *rand.Rand) {
+func (mig RingMigration) Migrate(islandPopulations []api.EvaluatedPopulation, migrantCount int, rng *rand.Rand) {
 	// The first batch of immigrants is from the last island to the first.
 	lastIslandIdx := len(islandPopulations) - 1
 	lastIsland := islandPopulations[lastIslandIdx]
-	framework.ShuffleEvaluatedPopulation(lastIsland, rng)
+	api.ShuffleEvaluatedPopulation(lastIsland, rng)
 	migrants := lastIsland[len(lastIsland)-migrantCount:]
-	immigrants := make(framework.EvaluatedPopulation, len(migrants))
+	immigrants := make(api.EvaluatedPopulation, len(migrants))
 
 	for iidx, island := range islandPopulations {
 
@@ -39,7 +39,7 @@ func (mig RingMigration) Migrate(islandPopulations []framework.EvaluatedPopulati
 			// room for the immigrants here. Randomise the population so
 			// that there is no bias concerning which individuals are
 			// migrated.
-			framework.ShuffleEvaluatedPopulation(island, rng)
+			api.ShuffleEvaluatedPopulation(island, rng)
 
 			copy(migrants, island[len(island)-migrantCount:])
 		}

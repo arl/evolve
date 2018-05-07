@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // Provides methods used for testing the operation of RNG implementations.
@@ -72,7 +72,7 @@ func isInQuadrant(x, y float64) bool {
 //
 // Returns the standard deviation of the generated sample.
 func calculateSampleStandardDeviation(rng *rand.Rand, maxValue int64, iterations int) float64 {
-	dataSet := framework.NewDataSet(framework.WithInitialCapacity(iterations))
+	dataSet := api.NewDataSet(api.WithInitialCapacity(iterations))
 	for i := 0; i < iterations; i++ {
 		dataSet.AddValue(float64(rng.Int63n(maxValue)))
 	}

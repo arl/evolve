@@ -3,7 +3,7 @@ package mutation
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // NewStringMutation creates an operator that mutates individual characters in a
@@ -22,7 +22,7 @@ type stringMutater struct {
 	alphabet string
 }
 
-func (op *stringMutater) Mutate(c framework.Candidate, rng *rand.Rand) framework.Candidate {
+func (op *stringMutater) Mutate(c api.Candidate, rng *rand.Rand) api.Candidate {
 	s := c.(string)
 	buffer := make([]byte, len(s))
 	copy(buffer, []byte(s))

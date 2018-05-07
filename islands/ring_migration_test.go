@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
 	"github.com/aurelien-rainone/evolve/internal/test"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +14,7 @@ func TestRingMigrationZeroMigration(t *testing.T) {
 	migration := RingMigration{}
 	rng := rand.New(rand.NewSource(99))
 
-	islandPopulations := []framework.EvaluatedPopulation{
+	islandPopulations := []api.EvaluatedPopulation{
 		test.CreateTestPopulation("A", "A", "A"),
 		test.CreateTestPopulation("B", "B", "B"),
 		test.CreateTestPopulation("C", "C", "C"),
@@ -32,7 +32,7 @@ func TestRingMigrationFullMigration(t *testing.T) {
 	migration := RingMigration{}
 	rng := rand.New(rand.NewSource(99))
 
-	islandPopulations := []framework.EvaluatedPopulation{
+	islandPopulations := []api.EvaluatedPopulation{
 		test.CreateTestPopulation("A", "A", "A"),
 		test.CreateTestPopulation("B", "B", "B"),
 		test.CreateTestPopulation("C", "C", "C"),

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +18,7 @@ const (
 // Make sure each candidate is valid (is the right length and contains only
 // valid characters).
 // @param population The population to be validated.
-func validatePopulation(t *testing.T, population []framework.Candidate, alphabet string) {
+func validatePopulation(t *testing.T, population []api.Candidate, alphabet string) {
 	for _, candidate := range population {
 		assert.IsType(t, string(""), candidate)
 		s := candidate.(string)

@@ -3,7 +3,7 @@ package islands
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // Migration is a strategy interface for different ways of migrating individuals
@@ -16,5 +16,5 @@ type Migration interface {
 	// islandPopulations is the populations of each island in the system.
 	// migrantCount is the number of individuals to move from each island.
 	// rng is a source of randomness.
-	Migrate(islandPopulations []framework.EvaluatedPopulation, migrantCount int, rng *rand.Rand)
+	Migrate(islandPopulations []api.EvaluatedPopulation, migrantCount int, rng *rand.Rand)
 }

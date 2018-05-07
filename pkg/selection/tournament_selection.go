@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // ErrInvalidTournamentProb is the error returned when trying to set an invalid
@@ -67,12 +67,12 @@ func (ts TournamentSelection) SetProbRange(min, max float64) error {
 
 // Select selects the specified number of candidates from the population.
 func (ts TournamentSelection) Select(
-	pop framework.EvaluatedPopulation,
+	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []framework.Candidate {
+	rng *rand.Rand) []api.Candidate {
 
-	sel := make([]framework.Candidate, size)
+	sel := make([]api.Candidate, size)
 	for i := 0; i < size; i++ {
 		// Pick two candidates at random.
 		cand1 := pop[rng.Intn(len(pop))]

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-type sigmaScaling struct{ selector framework.SelectionStrategy }
+type sigmaScaling struct{ selector api.SelectionStrategy }
 
 // NewSigmaScaling creates a sigma-scaled selection strategy. This is an
 // alternative to straightforward fitness-proportionate
@@ -23,7 +23,7 @@ type sigmaScaling struct{ selector framework.SelectionStrategy }
 // in a population of mostly unfit individuals. It also helps to amplify minor
 // fitness differences in a more mature population where the rate of improvement
 // has slowed.
-func NewSigmaScaling(selector framework.SelectionStrategy) framework.SelectionStrategy {
+func NewSigmaScaling(selector api.SelectionStrategy) api.SelectionStrategy {
 	return &sigmaScaling{selector: selector}
 }
 
@@ -48,23 +48,23 @@ var SigmaScaling = NewSigmaScaling(StochasticUniversalSampling{})
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
 func (sel *sigmaScaling) Select(
-	population framework.EvaluatedPopulation,
+	population api.EvaluatedPopulation,
 	naturalFitnessScores bool,
 	selectionSize int,
-	rng *rand.Rand) []framework.Candidate {
+	rng *rand.Rand) []api.Candidate {
 
-	statistics := framework.NewDataSet(framework.WithInitialCapacity(len(population)))
+	statistics := api.NewDataSet(api.WithInitialCapacity(len(population)))
 	for _, candidate := range population {
 		statistics.AddValue(candidate.Fitness())
 	}
 
-	scaledPopulation := make(framework.EvaluatedPopulation, len(population))
+	scaledPopulation := make(api.EvaluatedPopulation, len(population))
 	var err error
 	for i, candidate := range population {
 		scaledFitness := sigmaScaledFitness(candidate.Fitness(),
 			statistics.ArithmeticMean(),
 			statistics.StandardDeviation())
-		scaledPopulation[i], err = framework.NewEvaluatedCandidate(candidate.Candidate(),
+		scaledPopulation[i], err = api.NewEvaluatedCandidate(candidate.Candidate(),
 			scaledFitness)
 		if err != nil {
 			panic(fmt.Sprintln("couldn't create evaluated candidate: ", err))

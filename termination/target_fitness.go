@@ -3,11 +3,12 @@ package termination
 import (
 	"fmt"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // TargetFitness terminates evolution once at least one candidate in the
 // population has equalled or bettered a pre-determined fitness score.
+// TODO: export fields
 type TargetFitness struct {
 	targetFitness float64
 	natural       bool
@@ -34,7 +35,7 @@ func NewTargetFitness(targetFitness float64, natural bool) *TargetFitness {
 //
 // populationData is the information about the current state of evolution.
 // This may be used to determine whether evolution should continue or not.
-func (tc *TargetFitness) ShouldTerminate(populationData *framework.PopulationData) bool {
+func (tc *TargetFitness) ShouldTerminate(populationData *api.PopulationData) bool {
 	if tc.natural {
 		// If we're using "natural" fitness scores, higher values are better.
 		return populationData.BestCandidateFitness() >= tc.targetFitness

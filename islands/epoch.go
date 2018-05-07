@@ -1,21 +1,21 @@
 package islands
 
-import "github.com/aurelien-rainone/evolve/framework"
+import "github.com/aurelien-rainone/evolve/pkg/api"
 
 type epoch struct {
-	island                framework.EvolutionEngine
+	island                api.EvolutionEngine
 	populationSize        int
 	eliteCount            int
-	seedCandidates        []framework.Candidate
-	terminationConditions []framework.TerminationCondition
+	seedCandidates        []api.Candidate
+	terminationConditions []api.TerminationCondition
 }
 
 func newEpoch(
-	island framework.EvolutionEngine,
+	island api.EvolutionEngine,
 	populationSize int,
 	eliteCount int,
-	seedCandidates []framework.Candidate,
-	terminationConditions ...framework.TerminationCondition) *epoch {
+	seedCandidates []api.Candidate,
+	terminationConditions ...api.TerminationCondition) *epoch {
 
 	return &epoch{
 		island:                island,

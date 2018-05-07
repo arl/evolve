@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +16,7 @@ func TestBitstringFactory(t *testing.T) {
 	)
 
 	// local test function
-	validatePopulation := func(population []framework.Candidate) {
+	validatePopulation := func(population []api.Candidate) {
 		// Make sure the correct number of candidates were generated.
 		assert.Lenf(t, population, populationSize, "want population size = %v, got %v", populationSize, len(population))
 		// Make sure that each individual is the right length.
@@ -40,7 +40,7 @@ func TestBitstringFactory(t *testing.T) {
 		f := NewBitstringFactory(candidateLength)
 		seed1, _ := bitstring.MakeFromString("1111100000")
 		seed2, _ := bitstring.MakeFromString("1010101010")
-		seeds := []framework.Candidate{seed1, seed2}
+		seeds := []api.Candidate{seed1, seed2}
 		population := f.SeedInitialPopulation(populationSize, seeds, rng)
 
 		// Check that the seed candidates appear in the generated population.
@@ -57,7 +57,7 @@ func TestBitstringFactory(t *testing.T) {
 		// into a population of size 2.
 		assert.Panics(t, func() {
 			f.SeedInitialPopulation(2,
-				[]framework.Candidate{candidate, candidate, candidate},
+				[]api.Candidate{candidate, candidate, candidate},
 				rng)
 		})
 	})

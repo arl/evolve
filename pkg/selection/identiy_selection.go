@@ -3,7 +3,7 @@ package selection
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // Identity is a selection strategy that returns identical candidates
@@ -11,12 +11,12 @@ type Identity struct{}
 
 // Select selects the specified number of candidates from the population.
 func (ids Identity) Select(
-	pop framework.EvaluatedPopulation,
+	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []framework.Candidate {
+	rng *rand.Rand) []api.Candidate {
 
-	sel := make([]framework.Candidate, size)
+	sel := make([]api.Candidate, size)
 	for i := 0; i < size; i++ {
 		sel[i] = pop[i].Candidate()
 	}

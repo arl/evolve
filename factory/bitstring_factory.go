@@ -3,7 +3,7 @@ package factory
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
@@ -31,7 +31,7 @@ type bitStringGenerator struct {
 
 // GenerateRandomCandidate generates a random bit string, with a uniform
 // distribution of ones and zeroes.
-func (g *bitStringGenerator) GenerateRandomCandidate(rng *rand.Rand) framework.Candidate {
+func (g *bitStringGenerator) GenerateRandomCandidate(rng *rand.Rand) api.Candidate {
 	bs, _ := bitstring.Random(g.length, rng)
 	return bs
 }

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // ErrInvalidMutationProb is the error returned when trying to set an invalid
@@ -17,7 +17,7 @@ type Mutater interface {
 	// Mutate performs mutation on a candidate.
 	//
 	// The original candidate is let untouched while the mutant is returned.
-	Mutate(framework.Candidate, *rand.Rand) framework.Candidate
+	Mutate(api.Candidate, *rand.Rand) api.Candidate
 }
 
 // Mutation implements a mutation operator.
@@ -80,8 +80,8 @@ func (op *Mutation) SetProbRange(min, max float64) error {
 
 // Apply applies the mutation operator to each entry in the list of selected
 // candidates.
-func (op *Mutation) Apply(sel []framework.Candidate, rng *rand.Rand) []framework.Candidate {
-	mutpop := make([]framework.Candidate, len(sel))
+func (op *Mutation) Apply(sel []api.Candidate, rng *rand.Rand) []api.Candidate {
+	mutpop := make([]api.Candidate, len(sel))
 	for i, cand := range sel {
 		mutpop[i] = op.Mutate(cand, rng)
 	}

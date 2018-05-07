@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"sort"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // RouletteWheelSelection implements selection of N candidates from a population
@@ -31,10 +31,10 @@ type rouletteWheelSelection struct{}
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
 func (rouletteWheelSelection) Select(
-	pop framework.EvaluatedPopulation,
+	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []framework.Candidate {
+	rng *rand.Rand) []api.Candidate {
 
 	// Record the cumulative fitness scores. It doesn't matter whether the
 	// population is sorted or not. We will use these cumulative scores to
@@ -50,7 +50,7 @@ func (rouletteWheelSelection) Select(
 		cumfitness[i] = cumfitness[i-1] + fitness
 	}
 
-	sel := make([]framework.Candidate, size)
+	sel := make([]api.Candidate, size)
 	for i := 0; i < size; i++ {
 		rand := rng.Float64() * cumfitness[len(cumfitness)-1]
 		index := sort.SearchFloat64s(cumfitness, rand)

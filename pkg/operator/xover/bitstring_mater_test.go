@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/factory"
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 	"github.com/stretchr/testify/assert"
 )
@@ -41,7 +41,7 @@ func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
 
 	bs1, _ := bitstring.Random(32, rng)
 	bs2, _ := bitstring.Random(33, rng)
-	pop := []framework.Candidate{bs1, bs2}
+	pop := []api.Candidate{bs1, bs2}
 
 	assert.Panics(t, func() {
 		// This should panic since the parents are different lengths.

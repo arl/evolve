@@ -6,7 +6,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // ErrInvalidTruncRatio is the error returned when trying to set an invalid
@@ -74,9 +74,9 @@ func (ts TruncationSelection) SetRatioRange(min, max float64) error {
 // size is the number of candidates to select from the evolved population.
 //
 // Returns the selected candidates.
-func (ts TruncationSelection) Select(pop framework.EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []framework.Candidate {
+func (ts TruncationSelection) Select(pop api.EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []api.Candidate {
 
-	sel := make([]framework.Candidate, 0, size)
+	sel := make([]api.Candidate, 0, size)
 
 	// get a random value to decide wether to select the fitter individual
 	// or the weaker one.

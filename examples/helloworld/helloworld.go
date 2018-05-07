@@ -9,8 +9,8 @@ import (
 
 	"github.com/aurelien-rainone/evolve"
 	"github.com/aurelien-rainone/evolve/factory"
-	"github.com/aurelien-rainone/evolve/framework"
 
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
@@ -71,7 +71,7 @@ func main() {
 	result := engine.Evolve(100, 5, termination.NewTargetFitness(0, false))
 	fmt.Println(result)
 
-	var conditions []framework.TerminationCondition
+	var conditions []api.TerminationCondition
 	conditions, err = engine.SatisfiedTerminationConditions()
 	check(err)
 	for i, condition := range conditions {
@@ -93,7 +93,7 @@ func check(err error) {
 
 type observer struct{}
 
-func (o observer) PopulationUpdate(data *framework.PopulationData) {
+func (o observer) PopulationUpdate(data *api.PopulationData) {
 	fmt.Printf("Generation %d: %s (%v)\n", data.GenerationNumber(), data.BestCandidate(),
 		data.BestCandidateFitness())
 }

@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,7 @@ func newIntFactory() *intFactory {
 
 type intGenerator struct{}
 
-func (ig intGenerator) GenerateRandomCandidate(rng *rand.Rand) framework.Candidate { return rng.Int() }
+func (ig intGenerator) GenerateRandomCandidate(rng *rand.Rand) api.Candidate { return rng.Int() }
 
 func TestAbstractCandidateFactoryPopulationCreation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
@@ -36,7 +36,7 @@ func TestAbstractCandidateFactoryPopulationCreation(t *testing.T) {
 		cf := newIntFactory()
 
 		// preseed 5 candidates over 10
-		preseed := make([]framework.Candidate, 5)
+		preseed := make([]api.Candidate, 5)
 		for i := range preseed {
 			preseed[i] = i
 		}
@@ -49,7 +49,7 @@ func TestAbstractCandidateFactoryPopulationCreation(t *testing.T) {
 		cf := newIntFactory()
 
 		// preseed 10 candidates
-		preseed := make([]framework.Candidate, 10)
+		preseed := make([]api.Candidate, 10)
 		for i := range preseed {
 			preseed[i] = i
 		}

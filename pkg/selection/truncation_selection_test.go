@@ -5,7 +5,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +15,7 @@ func testTruncationSelection(t *testing.T, tpop testPopulation, natural bool) {
 	ts := NewTruncationSelection()
 	errcheck(t, ts.SetRatio(0.5))
 	testRandomBasedSelection(t, ts, tpop, natural, 2,
-		func(selected []framework.Candidate) error {
+		func(selected []api.Candidate) error {
 			if len(selected) != 2 {
 				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
 			}

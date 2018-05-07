@@ -1,10 +1,8 @@
 package main
 
-import "github.com/aurelien-rainone/evolve/framework"
+import "github.com/aurelien-rainone/evolve/pkg/api"
 
-type stringEvaluator struct {
-	targetString string
-}
+type stringEvaluator struct{ targetString string }
 
 func newStringEvaluator(targetString string) stringEvaluator {
 	return stringEvaluator{
@@ -15,11 +13,11 @@ func newStringEvaluator(targetString string) stringEvaluator {
 // Assigns one "fitness point" for every character in the candidate string that
 // doesn't match the corresponding position in the target string.
 func (se stringEvaluator) Fitness(
-	candidate framework.Candidate,
-	population []framework.Candidate) float64 {
+	cand api.Candidate,
+	pop []api.Candidate) float64 {
 
 	var errors float64
-	sc := candidate.(string)
+	sc := cand.(string)
 	for i := range sc {
 		if sc[i] != se.targetString[i] {
 			errors++
@@ -28,6 +26,4 @@ func (se stringEvaluator) Fitness(
 	return errors
 }
 
-func (se stringEvaluator) IsNatural() bool {
-	return false
-}
+func (se stringEvaluator) IsNatural() bool { return false }

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -95,7 +95,7 @@ func TestCrossover_SetProbRange(t *testing.T) {
 	}
 }
 
-func sameStringPop(t *testing.T, a, b []framework.Candidate) {
+func sameStringPop(t *testing.T, a, b []api.Candidate) {
 	t.Helper()
 
 	s1 := make([]string, 0)
@@ -113,7 +113,7 @@ func sameStringPop(t *testing.T, a, b []framework.Candidate) {
 
 func TestCrossover_Apply(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	pop := []framework.Candidate{"abcde", "fghij", "klmno", "pqrst", "uvwxy"}
+	pop := []api.Candidate{"abcde", "fghij", "klmno", "pqrst", "uvwxy"}
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
 		xover := NewCrossover(StringMater{})

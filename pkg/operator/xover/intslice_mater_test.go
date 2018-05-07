@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,7 +12,7 @@ func TestIntSliceMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := NewCrossover(IntSliceMater{})
-	pop := make([]framework.Candidate, 4)
+	pop := make([]api.Candidate, 4)
 	pop[0] = []int{1, 2, 3, 4, 5}
 	pop[1] = []int{6, 7, 8, 9, 10}
 	pop[2] = []int{11, 12, 13, 14, 15}
@@ -44,7 +44,7 @@ func TestIntArrayCrossoverWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := NewCrossover(IntSliceMater{})
-	pop := make([]framework.Candidate, 2)
+	pop := make([]api.Candidate, 2)
 	pop[0] = []int{1, 2, 3, 4, 5}
 	pop[1] = []int{2}
 

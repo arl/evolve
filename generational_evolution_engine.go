@@ -3,7 +3,7 @@ package evolve
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // GenerationalEvolutionEngine implements a general-purpose generational
@@ -24,9 +24,9 @@ import (
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
 type GenerationalEvolutionEngine struct {
-	evolutionScheme   framework.EvolutionaryOperator
-	fitnessEvaluator  framework.FitnessEvaluator
-	selectionStrategy framework.SelectionStrategy
+	evolutionScheme   api.EvolutionaryOperator
+	fitnessEvaluator  api.FitnessEvaluator
+	selectionStrategy api.SelectionStrategy
 	engine            *AbstractEvolutionEngine
 }
 
@@ -44,10 +44,10 @@ type GenerationalEvolutionEngine struct {
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
 func NewGenerationalEvolutionEngine(
-	candidateFactory framework.CandidateFactory,
-	evolutionScheme framework.EvolutionaryOperator,
-	fitnessEvaluator framework.FitnessEvaluator,
-	selectionStrategy framework.SelectionStrategy,
+	candidateFactory api.CandidateFactory,
+	evolutionScheme api.EvolutionaryOperator,
+	fitnessEvaluator api.FitnessEvaluator,
+	selectionStrategy api.SelectionStrategy,
 	rng *rand.Rand) *AbstractEvolutionEngine {
 
 	// create the Stepper implementation
@@ -78,14 +78,14 @@ func NewGenerationalEvolutionEngine(
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
 func (e *GenerationalEvolutionEngine) NextEvolutionStep(
-	evaluatedPopulation framework.EvaluatedPopulation,
+	evaluatedPopulation api.EvaluatedPopulation,
 	eliteCount int,
-	rng *rand.Rand) framework.EvaluatedPopulation {
+	rng *rand.Rand) api.EvaluatedPopulation {
 
-	population := make([]framework.Candidate, 0, len(evaluatedPopulation))
+	population := make([]api.Candidate, 0, len(evaluatedPopulation))
 
 	// First perform any elitist selection.
-	elite := make([]framework.Candidate, eliteCount)
+	elite := make([]api.Candidate, eliteCount)
 	for i := 0; i < eliteCount; i++ {
 		elite[i] = evaluatedPopulation[i].Candidate()
 	}

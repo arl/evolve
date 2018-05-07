@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // StochasticUniversalSampling is an alternative to RouletteWheelSelection as a
@@ -30,10 +30,10 @@ type StochasticUniversalSampling struct{}
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
 func (StochasticUniversalSampling) Select(
-	pop framework.EvaluatedPopulation,
+	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []framework.Candidate {
+	rng *rand.Rand) []api.Candidate {
 
 	// Calculate the sum of all fitness values.
 	var sum float64
@@ -41,7 +41,7 @@ func (StochasticUniversalSampling) Select(
 		sum += adjustedFitness(cand.Fitness(), natural)
 	}
 
-	sel := make([]framework.Candidate, 0, size)
+	sel := make([]api.Candidate, 0, size)
 
 	// Pick a random offset between 0 and 1 as the starting point for
 	// selection.

@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 	"github.com/stretchr/testify/assert"
 )
@@ -29,7 +29,7 @@ func TestBitstringMutationRandom(t *testing.T) {
 	org, err := bitstring.MakeFromString("111100101")
 	errcheck(t, err)
 
-	pop := []framework.Candidate{org}
+	pop := []api.Candidate{org}
 	for i := 0; i < 20; i++ {
 		// Perform several iterations to get different mutations.
 		pop = mut.Apply(pop, rng)
@@ -51,7 +51,7 @@ func TestBitstringMutationSingleBit(t *testing.T) {
 	org, err := bitstring.MakeFromString("111100101")
 	errcheck(t, err)
 
-	pop := []framework.Candidate{org}
+	pop := []api.Candidate{org}
 	pop = mut.Apply(pop, rng)
 
 	mutated := pop[0]

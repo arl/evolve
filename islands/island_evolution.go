@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/aurelien-rainone/evolve"
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/termination"
 	"github.com/aurelien-rainone/evolve/worker"
 )
@@ -16,12 +16,12 @@ import (
 // independent populations are evolved in parallel with periodic migration of
 // individuals between islands.
 type IslandEvolution struct {
-	islands                        []framework.EvolutionEngine
+	islands                        []api.EvolutionEngine
 	migration                      Migration
 	naturalFitness                 bool
 	rng                            *rand.Rand
 	observers                      map[IslandEvolutionObserver]struct{}
-	satisfiedTerminationConditions []framework.TerminationCondition
+	satisfiedTerminationConditions []api.TerminationCondition
 }
 
 // NewIslandEvolution creates an island system with the specified number of
@@ -43,10 +43,10 @@ type IslandEvolution struct {
 // rng is a source of randomness, used by all islands.
 func NewIslandEvolution(islandCount int,
 	migration Migration,
-	candidateFactory framework.CandidateFactory,
-	evolutionScheme framework.EvolutionaryOperator,
-	fitnessEvaluator framework.FitnessEvaluator,
-	selectionStrategy framework.SelectionStrategy,
+	candidateFactory api.CandidateFactory,
+	evolutionScheme api.EvolutionaryOperator,
+	fitnessEvaluator api.FitnessEvaluator,
+	selectionStrategy api.SelectionStrategy,
 	rng *rand.Rand) *IslandEvolution {
 
 	ie := NewIslandEvolutionWithPreconfiguredIslands(
@@ -68,7 +68,7 @@ type islandPopulationUpdater struct {
 	islandIndex int
 }
 
-func (upd *islandPopulationUpdater) PopulationUpdate(data *framework.PopulationData) {
+func (upd *islandPopulationUpdater) PopulationUpdate(data *api.PopulationData) {
 	for islandObserver := range *upd.observers {
 		islandObserver.IslandPopulationUpdate(upd.islandIndex, data)
 	}
@@ -89,7 +89,7 @@ func (upd *islandPopulationUpdater) PopulationUpdate(data *framework.PopulationD
 // scores.
 // rng A source of randomness, used by all islands.
 func NewIslandEvolutionWithPreconfiguredIslands(
-	islands []framework.EvolutionEngine,
+	islands []api.EvolutionEngine,
 	migration Migration,
 	naturalFitness bool,
 	rng *rand.Rand) *IslandEvolution {
@@ -116,13 +116,13 @@ func NewIslandEvolutionWithPreconfiguredIslands(
 // individual islands if they haven't been provided already (via
 // NewIslandEvolutionWithPreconfiguredIslands).
 func createIslands(islandCount int,
-	candidateFactory framework.CandidateFactory,
-	evolutionScheme framework.EvolutionaryOperator,
-	fitnessEvaluator framework.FitnessEvaluator,
-	selectionStrategy framework.SelectionStrategy,
-	rng *rand.Rand) []framework.EvolutionEngine {
+	candidateFactory api.CandidateFactory,
+	evolutionScheme api.EvolutionaryOperator,
+	fitnessEvaluator api.FitnessEvaluator,
+	selectionStrategy api.SelectionStrategy,
+	rng *rand.Rand) []api.EvolutionEngine {
 
-	islands := make([]framework.EvolutionEngine, islandCount)
+	islands := make([]api.EvolutionEngine, islandCount)
 	for i := 0; i < islandCount; i++ {
 		island := evolve.NewGenerationalEvolutionEngine(
 			candidateFactory,
@@ -147,7 +147,7 @@ func createIslands(islandCount int,
 //
 // TODO: REWRITE THIS PART OF THE OCUMENTATION
 // After returning in this way, the current goroutine's interrupted flag will be
-// set.  It is preferable to use an appropritate framework.TerminationCondition
+// set.  It is preferable to use an appropritate api.TerminationCondition
 // rather than interrupting the evolution in this way.
 //
 // populationSize is the population size "for each island". Therefore, if you
@@ -174,15 +174,15 @@ func (ie *IslandEvolution) Evolve(populationSize int,
 	eliteCount int,
 	epochLength int,
 	migrantCount int,
-	conditions ...framework.TerminationCondition) framework.Candidate {
+	conditions ...api.TerminationCondition) api.Candidate {
 
 	//threadPool := Executors.newFixedThreadPool(len(ie.islands))
-	islandPopulations := make([][]framework.Candidate, len(ie.islands))
-	evaluatedCombinedPopulation := make(framework.EvaluatedPopulation, 0)
+	islandPopulations := make([][]api.Candidate, len(ie.islands))
+	evaluatedCombinedPopulation := make(api.EvaluatedPopulation, 0)
 
 	var (
-		data                *framework.PopulationData
-		satisfiedConditions []framework.TerminationCondition
+		data                *api.PopulationData
+		satisfiedConditions []api.TerminationCondition
 		currentEpochIndex   int
 		startTime           = time.Now()
 	)
@@ -203,10 +203,10 @@ func (ie *IslandEvolution) Evolve(populationSize int,
 			panic(fmt.Sprintf("errors during island fitness evaluation island: %v", err))
 		}
 		evaluatedCombinedPopulation = nil
-		evaluatedPopulations := make([]framework.EvaluatedPopulation, len(ie.islands))
+		evaluatedPopulations := make([]api.EvaluatedPopulation, len(ie.islands))
 
 		for i, result := range results {
-			evaluatedIslandPopulation, ok := result.(framework.EvaluatedPopulation)
+			evaluatedIslandPopulation, ok := result.(api.EvaluatedPopulation)
 			if !ok {
 				panic(fmt.Sprintf("result is not of the expected type, got %T", evaluatedIslandPopulation))
 			}
@@ -255,14 +255,14 @@ func (ie *IslandEvolution) createEpochTasks(
 	populationSize,
 	eliteCount,
 	epochLength int,
-	islandPopulations [][]framework.Candidate) []worker.Worker {
+	islandPopulations [][]api.Candidate) []worker.Worker {
 
 	islandEpochs := make([]worker.Worker, len(ie.islands))
 	for i := 0; i < len(ie.islands); i++ {
 
-		var pop []framework.Candidate
+		var pop []api.Candidate
 		if len(islandPopulations) == 0 {
-			pop = make([]framework.Candidate, 0)
+			pop = make([]api.Candidate, 0)
 		} else {
 			pop = islandPopulations[i]
 		}
@@ -278,15 +278,15 @@ func (ie *IslandEvolution) createEpochTasks(
 	return islandEpochs
 }
 
-// candidateList converts a slice of framework.EvaluatedCandidate's into a
+// candidateList converts a slice of api.EvaluatedCandidate's into a
 // simple list of candidates.
 //
 // evaluatedCandidates is the population of candidate objects to relieve of
 // their evaluation wrappers.
 //
 // Returns the candidates, stripped of their fitness scores.
-func (ie *IslandEvolution) candidateSlice(evaluatedCandidates framework.EvaluatedPopulation) []framework.Candidate {
-	candidates := make([]framework.Candidate, len(evaluatedCandidates))
+func (ie *IslandEvolution) candidateSlice(evaluatedCandidates api.EvaluatedPopulation) []api.Candidate {
+	candidates := make([]api.Candidate, len(evaluatedCandidates))
 	for i, evaluatedCandidate := range evaluatedCandidates {
 		candidates[i] = evaluatedCandidate.Candidate()
 	}
@@ -294,7 +294,7 @@ func (ie *IslandEvolution) candidateSlice(evaluatedCandidates framework.Evaluate
 }
 
 // SatisfiedTerminationConditions returns a list of all
-// framework.TerminationCondition's that are satisfied by the current state of
+// api.TerminationCondition's that are satisfied by the current state of
 // the island evolution.
 //
 // Usually this list will contain only one item, but it is possible that
@@ -310,19 +310,19 @@ func (ie *IslandEvolution) candidateSlice(evaluatedCandidates framework.Evaluate
 // any termination conditions were satisfied then this method will return an
 // empty list.
 //
-// May return framework.ErrIllegalState if this method is invoked on an island
+// May return api.ErrIllegalState if this method is invoked on an island
 // system before evolution is started or while it is still in progress.
 //
 // Returns a list of statisfied conditions. The list is guaranteed to be
 // non-null. The list may be empty because it is possible for evolution to
 // terminate without any conditions being matched. The only situation in which
 // this occurs is when the request thread is interrupted.
-func (ie *IslandEvolution) SatisfiedTerminationConditions() ([]framework.TerminationCondition, error) {
+func (ie *IslandEvolution) SatisfiedTerminationConditions() ([]api.TerminationCondition, error) {
 
 	if ie.satisfiedTerminationConditions == nil {
-		return nil, framework.ErrIllegalState("evolution engine has not terminated")
+		return nil, api.ErrIllegalState("evolution engine has not terminated")
 	}
-	satisfiedTerminationConditions := make([]framework.TerminationCondition, len(ie.satisfiedTerminationConditions))
+	satisfiedTerminationConditions := make([]api.TerminationCondition, len(ie.satisfiedTerminationConditions))
 	copy(satisfiedTerminationConditions, ie.satisfiedTerminationConditions)
 	return satisfiedTerminationConditions, nil
 }
@@ -347,7 +347,7 @@ func (ie *IslandEvolution) RemoveEvolutionObserver(observer IslandEvolutionObser
 
 // notifyPopulationChange send the population data to all registered
 // observers.
-func (ie *IslandEvolution) notifyPopulationChange(data *framework.PopulationData) {
+func (ie *IslandEvolution) notifyPopulationChange(data *api.PopulationData) {
 	for observer := range ie.observers {
 		observer.PopulationUpdate(data)
 	}

@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"unicode/utf8"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // StringFactory is a general-purpose candidate factory for EAs that use a
@@ -57,7 +57,7 @@ type stringGenerator struct {
 // Each character is randomly selected from the pre-configured alphabet. The
 // same character may appear multiple times and some characters may not appear
 // at all.
-func (g *stringGenerator) GenerateRandomCandidate(rng *rand.Rand) framework.Candidate {
+func (g *stringGenerator) GenerateRandomCandidate(rng *rand.Rand) api.Candidate {
 	var buffer bytes.Buffer
 	for i := 0; i < g.stringLength; i++ {
 		idx := rand.Int31n(int32(len(g.alphabet)))

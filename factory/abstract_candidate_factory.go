@@ -3,14 +3,14 @@ package factory
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // AbstractCandidateFactory is a convenient base class for implementations of
 // the CandidateFactory interface.
 // TODO: rename CandidateFactoryImpl
 type AbstractCandidateFactory struct {
-	framework.RandomCandidateGenerator
+	api.RandomCandidateGenerator
 }
 
 // GenerateInitialPopulation randomly creates an initial population of
@@ -22,9 +22,9 @@ type AbstractCandidateFactory struct {
 // Returns a randomly generated initial population of candidate solutions.
 func (f *AbstractCandidateFactory) GenerateInitialPopulation(
 	populationSize int,
-	rng *rand.Rand) []framework.Candidate {
+	rng *rand.Rand) []api.Candidate {
 
-	population := make([]framework.Candidate, populationSize)
+	population := make([]api.Candidate, populationSize)
 	for i := range population {
 		population[i] = f.GenerateRandomCandidate(rng)
 	}
@@ -53,13 +53,13 @@ func (f *AbstractCandidateFactory) GenerateInitialPopulation(
 // specified seed candidates.
 func (f *AbstractCandidateFactory) SeedInitialPopulation(
 	populationSize int,
-	seedCandidates []framework.Candidate,
-	rng *rand.Rand) []framework.Candidate {
+	seedCandidates []api.Candidate,
+	rng *rand.Rand) []api.Candidate {
 
 	if len(seedCandidates) > populationSize {
 		panic("Too many seed candidates for specified population size.")
 	}
-	population := make([]framework.Candidate, populationSize)
+	population := make([]api.Candidate, populationSize)
 	copy(population, seedCandidates)
 
 	for i := len(seedCandidates); i < populationSize; i++ {

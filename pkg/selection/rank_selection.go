@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-type rank struct{ selector framework.SelectionStrategy }
+type rank struct{ selector api.SelectionStrategy }
 
 // NewRank returns a rank selection stragy rank, that is similar to
 // fitness-proportionate selection except that is uses relative fitness rather
@@ -22,7 +22,7 @@ type rank struct{ selector framework.SelectionStrategy }
 // mapRankToScore(int, int) and delegation to a fitness-proportionate selector.
 // The mapping function converts ranks into relative fitness scores that are
 // used to drive the delegate selector.
-func NewRank(selector framework.SelectionStrategy) framework.SelectionStrategy {
+func NewRank(selector api.SelectionStrategy) api.SelectionStrategy {
 	return rank{selector: selector}
 }
 
@@ -47,15 +47,15 @@ var Rank = NewRank(StochasticUniversalSampling{})
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
 func (rs rank) Select(
-	pop framework.EvaluatedPopulation,
+	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []framework.Candidate {
+	rng *rand.Rand) []api.Candidate {
 
-	ranked := make(framework.EvaluatedPopulation, len(pop))
+	ranked := make(api.EvaluatedPopulation, len(pop))
 	var err error
 	for i, cand := range pop {
-		ranked[i], err = framework.NewEvaluatedCandidate(cand.Candidate(),
+		ranked[i], err = api.NewEvaluatedCandidate(cand.Candidate(),
 			mapRankToScore(i+1, len(pop)))
 		if err != nil {
 			panic(fmt.Sprintln("couldn't create evaluated candidate: ", err))
