@@ -31,7 +31,7 @@ func TestBitstringFactory(t *testing.T) {
 	t.Run("unseed population", func(t *testing.T) {
 
 		f := NewBitstring(candidateLength)
-		population := f.GenerateInitialPopulation(populationSize, rng)
+		population := f.GenPopulation(populationSize, rng)
 		validatePopulation(population)
 	})
 
@@ -41,7 +41,7 @@ func TestBitstringFactory(t *testing.T) {
 		seed1, _ := bitstring.MakeFromString("1111100000")
 		seed2, _ := bitstring.MakeFromString("1010101010")
 		seeds := []api.Candidate{seed1, seed2}
-		population := f.SeedInitialPopulation(populationSize, seeds, rng)
+		population := f.SeedPopulation(populationSize, seeds, rng)
 
 		// Check that the seed candidates appear in the generated population.
 		assert.Containsf(t, population, seed1, "Population does not contain seed candidate 1.")
@@ -56,7 +56,7 @@ func TestBitstringFactory(t *testing.T) {
 		// The following call should panic since the 3 seed candidates won't fit
 		// into a population of size 2.
 		assert.Panics(t, func() {
-			f.SeedInitialPopulation(2,
+			f.SeedPopulation(2,
 				[]api.Candidate{candidate, candidate, candidate},
 				rng)
 		})

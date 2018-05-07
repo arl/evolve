@@ -15,7 +15,7 @@ func TestBitstringCrossover(t *testing.T) {
 	xover := New(BitstringMater{})
 	f := factory.NewBitstring(50)
 
-	pop := f.GenerateInitialPopulation(2, rng)
+	pop := f.GenPopulation(2, rng)
 	// Test to make sure that crossover correctly preserves all genetic material
 	// originally present in the population and does not introduce anything new.
 	want := pop[0].(*bitstring.Bitstring).OnesCount() +

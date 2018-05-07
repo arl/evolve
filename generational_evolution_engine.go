@@ -44,7 +44,7 @@ type GenerationalEvolutionEngine struct {
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
 func NewGenerationalEvolutionEngine(
-	candidateFactory api.CandidateFactory,
+	candidateFactory api.Factory,
 	evolutionScheme api.EvolutionaryOperator,
 	fitnessEvaluator api.FitnessEvaluator,
 	selectionStrategy api.SelectionStrategy,

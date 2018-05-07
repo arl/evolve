@@ -39,7 +39,7 @@ func TestStringFactory(t *testing.T) {
 	t.Run("string population with ascii-only aplhabet", func(*testing.T) {
 		sf, err := NewStringFactory(alphabet, stringLength)
 		assert.NoError(t, err)
-		pop := sf.GenerateInitialPopulation(populationSize, rng)
+		pop := sf.GenPopulation(populationSize, rng)
 		validatePopulation(t, pop, alphabet)
 	})
 
@@ -67,7 +67,7 @@ func TestStringGenerator(t *testing.T) {
 
 	// create some random candidates
 	for i := 0; i < 10; i++ {
-		iface := gen.GenerateRandomCandidate(rng)
+		iface := gen.GenerateCandidate(rng)
 
 		// check candidate type is string
 		assert.IsType(t, "", iface)

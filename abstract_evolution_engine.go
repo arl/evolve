@@ -33,7 +33,7 @@ type AbstractEvolutionEngine struct {
 	pool                           *worker.Pool // shared concurrent worker
 	observers                      map[api.EvolutionObserver]struct{}
 	rng                            *rand.Rand
-	candidateFactory               api.CandidateFactory
+	candidateFactory               api.Factory
 	fitnessEvaluator               api.FitnessEvaluator
 	singleThreaded                 bool
 	satisfiedTerminationConditions []api.TerminationCondition
@@ -50,7 +50,7 @@ type AbstractEvolutionEngine struct {
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
 func NewAbstractEvolutionEngine(
-	candidateFactory api.CandidateFactory,
+	candidateFactory api.Factory,
 	fitnessEvaluator api.FitnessEvaluator,
 	rng *rand.Rand,
 	stepper Stepper) *AbstractEvolutionEngine {
@@ -195,7 +195,7 @@ func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(
 	var currentGenerationIndex int
 	startTime := time.Now()
 
-	population := e.candidateFactory.SeedInitialPopulation(populationSize,
+	population := e.candidateFactory.SeedPopulation(populationSize,
 		seedCandidates,
 		e.rng)
 

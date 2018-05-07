@@ -29,14 +29,14 @@ type StubIntegerFactory struct {
 func NewStubIntegerFactory() *StubIntegerFactory {
 	return &StubIntegerFactory{
 		factory.BaseFactory{
-			RandomCandidateGenerator: ZeroIntegerGenerator{},
+			CandidateGenerator: ZeroIntegerGenerator{},
 		},
 	}
 }
 
 type ZeroIntegerGenerator struct{}
 
-func (zig ZeroIntegerGenerator) GenerateRandomCandidate(rng *rand.Rand) api.Candidate {
+func (zig ZeroIntegerGenerator) GenerateCandidate(rng *rand.Rand) api.Candidate {
 	return 0
 }
 

@@ -6,29 +6,28 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-// BaseFactory is a base for implementations of
-// the CandidateFactory interface.
-type BaseFactory struct{ api.RandomCandidateGenerator }
+// BaseFactory serves as a base for implementing the api.Factory interface.
+type BaseFactory struct{ api.CandidateGenerator }
 
-// GenerateInitialPopulation randomly creates an initial population of
+// GenPopulation randomly creates an initial population of
 // candidates.
 //
 // If some control is required over the composition of the initial population,
 // consider the SeedInitialPopulation method.
 //
 // Returns a randomly generated initial population of candidate solutions.
-func (f *BaseFactory) GenerateInitialPopulation(
+func (f *BaseFactory) GenPopulation(
 	size int,
 	rng *rand.Rand) []api.Candidate {
 
 	pop := make([]api.Candidate, size)
 	for i := range pop {
-		pop[i] = f.GenerateRandomCandidate(rng)
+		pop[i] = f.GenerateCandidate(rng)
 	}
 	return pop
 }
 
-// SeedInitialPopulation seeds all or a part of an initial population
+// SeedPopulation seeds all or a part of an initial population
 // with some candidates.
 //
 // Sometimes it is desirable to seed the initial population with some known
@@ -48,7 +47,7 @@ func (f *BaseFactory) GenerateInitialPopulation(
 //
 // Returns an initial population of candidate solutions, including the
 // specified seed candidates.
-func (f *BaseFactory) SeedInitialPopulation(
+func (f *BaseFactory) SeedPopulation(
 	size int,
 	cands []api.Candidate,
 	rng *rand.Rand) []api.Candidate {
@@ -60,7 +59,7 @@ func (f *BaseFactory) SeedInitialPopulation(
 	copy(pop, cands)
 
 	for i := len(cands); i < size; i++ {
-		pop[i] = f.GenerateRandomCandidate(rng)
+		pop[i] = f.GenerateCandidate(rng)
 	}
 	return pop
 }

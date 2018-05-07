@@ -21,14 +21,14 @@ func newIntFactory() *intFactory {
 
 type intGenerator struct{}
 
-func (ig intGenerator) GenerateRandomCandidate(rng *rand.Rand) api.Candidate { return rng.Int() }
+func (ig intGenerator) GenerateCandidate(rng *rand.Rand) api.Candidate { return rng.Int() }
 
 func TestAbstractCandidateFactoryPopulationCreation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	t.Run("generate whole population", func(t *testing.T) {
 		cf := newIntFactory()
-		pop := cf.GenerateInitialPopulation(10, rng)
+		pop := cf.GenPopulation(10, rng)
 		assert.Len(t, pop, 10)
 	})
 
@@ -41,7 +41,7 @@ func TestAbstractCandidateFactoryPopulationCreation(t *testing.T) {
 			preseed[i] = i
 		}
 
-		pop := cf.SeedInitialPopulation(10, preseed, rng)
+		pop := cf.SeedPopulation(10, preseed, rng)
 		assert.Len(t, pop, 10)
 	})
 
@@ -56,7 +56,7 @@ func TestAbstractCandidateFactoryPopulationCreation(t *testing.T) {
 
 		// TODO: should return error instead of panicking
 		assert.Panics(t, func() {
-			cf.SeedInitialPopulation(5, preseed, rng)
+			cf.SeedPopulation(5, preseed, rng)
 		})
 	})
 }

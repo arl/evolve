@@ -52,12 +52,12 @@ type stringGenerator struct {
 	stringLength int
 }
 
-// GenerateRandomCandidate generates a random string of a pre-configured length.
+// GenerateCandidate generates a random string of a pre-configured length.
 //
 // Each character is randomly selected from the pre-configured alphabet. The
 // same character may appear multiple times and some characters may not appear
 // at all.
-func (g *stringGenerator) GenerateRandomCandidate(rng *rand.Rand) api.Candidate {
+func (g *stringGenerator) GenerateCandidate(rng *rand.Rand) api.Candidate {
 	var buffer bytes.Buffer
 	for i := 0; i < g.stringLength; i++ {
 		idx := rand.Int31n(int32(len(g.alphabet)))
