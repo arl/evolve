@@ -29,7 +29,7 @@ type elitismObserver api.PopulationData
 
 func (o *elitismObserver) PopulationUpdate(data *api.PopulationData) { *o = elitismObserver(*data) }
 
-func (o *elitismObserver) AverageFitness() float64 { return o.MeanFitness }
+func (o *elitismObserver) AverageFitness() float64 { return o.Mean }
 
 func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 	obs := new(elitismObserver)

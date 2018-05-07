@@ -13,14 +13,12 @@ type PopulationData struct {
 	// population.
 	BestFitness float64
 
-	// MeanFitness is the arithmetic mean of fitness scores for each member of
+	// Mean is the arithmetic mean of fitness scores for each member of
 	// the population.
-	// TODO: rename Mean
-	MeanFitness float64
+	Mean float64
 
-	// TODO rename StdDeviation
-	// FitnessStdDev is a measure of the variation in fitness scores.
-	FitnessStdDev float64
+	// StdDev is a measure of the variation in fitness scores.
+	StdDev float64
 
 	// Natural indicates, if true, that higher fitness is better.
 	Natural bool

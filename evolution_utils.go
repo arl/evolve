@@ -82,14 +82,14 @@ func ComputePopulationData(
 	}
 
 	return &api.PopulationData{
-		BestCand:      evaluatedPopulation[0].Candidate(),
-		BestFitness:   evaluatedPopulation[0].Fitness(),
-		MeanFitness:   stats.ArithmeticMean(),
-		FitnessStdDev: stats.StandardDeviation(),
-		Natural:       naturalFitness,
-		Size:          stats.Len(),
-		NumElites:     eliteCount,
-		GenNumber:     iterationNumber,
-		Elapsed:       time.Since(startTime),
+		BestCand:    evaluatedPopulation[0].Candidate(),
+		BestFitness: evaluatedPopulation[0].Fitness(),
+		Mean:        stats.ArithmeticMean(),
+		StdDev:      stats.StandardDeviation(),
+		Natural:     naturalFitness,
+		Size:        stats.Len(),
+		NumElites:   eliteCount,
+		GenNumber:   iterationNumber,
+		Elapsed:     time.Since(startTime),
 	}
 }
