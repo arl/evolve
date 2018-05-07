@@ -9,12 +9,12 @@ import (
 )
 
 type intFactory struct {
-	AbstractCandidateFactory
+	BaseFactory
 }
 
 func newIntFactory() *intFactory {
 	return &intFactory{
-		AbstractCandidateFactory{
+		BaseFactory{
 			intGenerator{}},
 	}
 }

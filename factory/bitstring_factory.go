@@ -7,31 +7,25 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
-// BitstringFactory is a general purpose candidate factory for generating bit
+// Bitstring is a general purpose candidate factory for generating bit
 // strings for genetic algorithms.
-type BitstringFactory struct {
-	AbstractCandidateFactory
+type Bitstring struct {
+	BaseFactory
 }
 
-// NewBitstringFactory creates a factory that generates bit strings of the
+// NewBitstring returns a factory that generates bitstrings of the
 // specified length
-func NewBitstringFactory(length int) *BitstringFactory {
-	return &BitstringFactory{
-		AbstractCandidateFactory{
-			&bitStringGenerator{
-				length: length,
-			},
-		},
+func NewBitstring(length int) *Bitstring {
+	return &Bitstring{
+		BaseFactory{bitstringGenerator(length)},
 	}
 }
 
-type bitStringGenerator struct {
-	length int
-}
+type bitstringGenerator int
 
 // GenerateRandomCandidate generates a random bit string, with a uniform
 // distribution of ones and zeroes.
-func (g *bitStringGenerator) GenerateRandomCandidate(rng *rand.Rand) api.Candidate {
-	bs, _ := bitstring.Random(g.length, rng)
+func (i bitstringGenerator) GenerateRandomCandidate(rng *rand.Rand) api.Candidate {
+	bs, _ := bitstring.Random(int(i), rng)
 	return bs
 }

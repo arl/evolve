@@ -6,12 +6,9 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-// AbstractCandidateFactory is a convenient base class for implementations of
+// BaseFactory is a base for implementations of
 // the CandidateFactory interface.
-// TODO: rename CandidateFactoryImpl
-type AbstractCandidateFactory struct {
-	api.RandomCandidateGenerator
-}
+type BaseFactory struct{ api.RandomCandidateGenerator }
 
 // GenerateInitialPopulation randomly creates an initial population of
 // candidates.
@@ -20,15 +17,15 @@ type AbstractCandidateFactory struct {
 // consider the SeedInitialPopulation method.
 //
 // Returns a randomly generated initial population of candidate solutions.
-func (f *AbstractCandidateFactory) GenerateInitialPopulation(
-	populationSize int,
+func (f *BaseFactory) GenerateInitialPopulation(
+	size int,
 	rng *rand.Rand) []api.Candidate {
 
-	population := make([]api.Candidate, populationSize)
-	for i := range population {
-		population[i] = f.GenerateRandomCandidate(rng)
+	pop := make([]api.Candidate, size)
+	for i := range pop {
+		pop[i] = f.GenerateRandomCandidate(rng)
 	}
-	return population
+	return pop
 }
 
 // SeedInitialPopulation seeds all or a part of an initial population
@@ -51,19 +48,19 @@ func (f *AbstractCandidateFactory) GenerateInitialPopulation(
 //
 // Returns an initial population of candidate solutions, including the
 // specified seed candidates.
-func (f *AbstractCandidateFactory) SeedInitialPopulation(
-	populationSize int,
-	seedCandidates []api.Candidate,
+func (f *BaseFactory) SeedInitialPopulation(
+	size int,
+	cands []api.Candidate,
 	rng *rand.Rand) []api.Candidate {
 
-	if len(seedCandidates) > populationSize {
+	if len(cands) > size {
 		panic("Too many seed candidates for specified population size.")
 	}
-	population := make([]api.Candidate, populationSize)
-	copy(population, seedCandidates)
+	pop := make([]api.Candidate, size)
+	copy(pop, cands)
 
-	for i := len(seedCandidates); i < populationSize; i++ {
-		population[i] = f.GenerateRandomCandidate(rng)
+	for i := len(cands); i < size; i++ {
+		pop[i] = f.GenerateRandomCandidate(rng)
 	}
-	return population
+	return pop
 }

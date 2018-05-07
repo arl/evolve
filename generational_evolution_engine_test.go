@@ -18,7 +18,7 @@ import (
 
 func prepareEngine() api.EvolutionEngine {
 	return NewGenerationalEvolutionEngine(
-		&factory.AbstractCandidateFactory{
+		&factory.BaseFactory{
 			RandomCandidateGenerator: test.NewStubIntegerFactory(),
 		},
 		integerZeroMaker{},

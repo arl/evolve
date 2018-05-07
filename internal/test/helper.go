@@ -23,12 +23,12 @@ func (e IntegerEvaluator) IsNatural() bool {
 
 // Stub candidate factory for tests. Always returns zero-valued integers.
 type StubIntegerFactory struct {
-	factory.AbstractCandidateFactory
+	factory.BaseFactory
 }
 
 func NewStubIntegerFactory() *StubIntegerFactory {
 	return &StubIntegerFactory{
-		factory.AbstractCandidateFactory{
+		factory.BaseFactory{
 			RandomCandidateGenerator: ZeroIntegerGenerator{},
 		},
 	}

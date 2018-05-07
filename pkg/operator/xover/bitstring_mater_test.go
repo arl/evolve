@@ -13,7 +13,7 @@ import (
 func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	xover := New(BitstringMater{})
-	f := factory.NewBitstringFactory(50)
+	f := factory.NewBitstring(50)
 
 	pop := f.GenerateInitialPopulation(2, rng)
 	// Test to make sure that crossover correctly preserves all genetic material

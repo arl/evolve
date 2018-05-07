@@ -1,8 +1,6 @@
 package api
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 // A CandidateFactory creates new populations of candidates.
 type CandidateFactory interface {

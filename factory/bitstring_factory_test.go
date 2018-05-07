@@ -30,14 +30,14 @@ func TestBitstringFactory(t *testing.T) {
 
 	t.Run("unseed population", func(t *testing.T) {
 
-		f := NewBitstringFactory(candidateLength)
+		f := NewBitstring(candidateLength)
 		population := f.GenerateInitialPopulation(populationSize, rng)
 		validatePopulation(population)
 	})
 
 	t.Run("seeded population", func(t *testing.T) {
 
-		f := NewBitstringFactory(candidateLength)
+		f := NewBitstring(candidateLength)
 		seed1, _ := bitstring.MakeFromString("1111100000")
 		seed2, _ := bitstring.MakeFromString("1010101010")
 		seeds := []api.Candidate{seed1, seed2}
@@ -51,7 +51,7 @@ func TestBitstringFactory(t *testing.T) {
 
 	t.Run("too many seed candidates", func(t *testing.T) {
 
-		f := NewBitstringFactory(candidateLength)
+		f := NewBitstring(candidateLength)
 		candidate, _ := bitstring.New(candidateLength)
 		// The following call should panic since the 3 seed candidates won't fit
 		// into a population of size 2.

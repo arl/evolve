@@ -14,7 +14,7 @@ import (
 // fixed-length string encoding.
 // Generates random strings of a fixed length from a given alphabet.
 type StringFactory struct {
-	AbstractCandidateFactory
+	BaseFactory
 }
 
 // NewStringFactory creates a StringFactory.
@@ -37,7 +37,7 @@ func NewStringFactory(alphabet string, stringLength int) (*StringFactory, error)
 	}
 	// unicode alphabet
 	sf := &StringFactory{
-		AbstractCandidateFactory{
+		BaseFactory{
 			&stringGenerator{
 				alphabet:     alphabet,
 				stringLength: stringLength,
