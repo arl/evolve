@@ -18,31 +18,23 @@ import (
 
 func prepareEngine() api.EvolutionEngine {
 	return NewGenerationalEvolutionEngine(
-		&factory.BaseFactory{
-			CandidateGenerator: test.NewStubIntegerFactory(),
-		},
+		&factory.BaseFactory{CandidateGenerator: test.NewStubIntegerFactory()},
 		integerZeroMaker{},
 		test.IntegerEvaluator{},
 		selection.RouletteWheelSelection,
 		rand.New(rand.NewSource(99)))
 }
 
-type elitismObserver struct {
-	data *api.PopulationData
-}
+type elitismObserver api.PopulationData
 
-func (o *elitismObserver) PopulationUpdate(data *api.PopulationData) {
-	o.data = data
-}
+func (o *elitismObserver) PopulationUpdate(data *api.PopulationData) { *o = elitismObserver(*data) }
 
-func (o *elitismObserver) AverageFitness() float64 {
-	return o.data.MeanFitness
-}
+func (o *elitismObserver) AverageFitness() float64 { return o.MeanFitness }
 
 func TestGenerationalEvolutionEngineElitism(t *testing.T) {
-	observer := new(elitismObserver)
+	obs := new(elitismObserver)
 	engine := prepareEngine()
-	engine.AddEvolutionObserver(observer)
+	engine.AddEvolutionObserver(obs)
 	elite := make([]api.Candidate, 3)
 	// Add the following seed candidates, all better than any others that can possibly
 	// get into the population (since every other candidate will always be zero).
@@ -58,22 +50,24 @@ func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 	// preserved they will lift the average fitness above zero. The exact value
 	// of the expected average fitness is easy to calculate, it is the aggregate
 	// fitness divided by the population size.
-	assert.Equalf(t, 24.0/10.0, observer.AverageFitness(),
-		"Elite candidates not preserved correctly: want %v, got %v",
-		24.0/10.0, observer.AverageFitness())
-	engine.RemoveEvolutionObserver(observer)
+	assert.Equalf(t, 24.0/10.0, obs.AverageFitness(),
+		"elite candidates not preserved correctly: want %v, got %v",
+		24.0/10.0, obs.AverageFitness())
+	engine.RemoveEvolutionObserver(obs)
 }
 
 func TestGenerationalEvolutionEngineEliteCountTooHigh(t *testing.T) {
 	engine := prepareEngine()
-	assert.Panics(t, func() { engine.Evolve(10, 10, termination.GenerationCount(10)) },
-		"Should panic because elite count must be less than the total population size")
+	assert.Panics(t, func() {
+		engine.Evolve(10, 10, termination.GenerationCount(10))
+	}, "elite count must be less than the total population size")
 }
 
 func TestGenerationalEvolutionEngineNoTerminationCondition(t *testing.T) {
 	engine := prepareEngine()
-	assert.Panics(t, func() { engine.Evolve(10, 0) },
-		"Should panic because there are no termination conditions")
+	assert.Panics(t, func() {
+		engine.Evolve(10, 0)
+	}, "some termination conditions must be set")
 }
 
 /*
@@ -103,20 +97,20 @@ func TestGenerationalEvolutionEngineInterrupt(t*testing.T) {
 func TestGenerationalEvolutionEngineSatisfiedTerminationConditions(t *testing.T) {
 	engine := prepareEngine()
 
-	generationsCondition := termination.GenerationCount(1)
-	engine.Evolve(10, 0, generationsCondition)
-	satisfiedConditions, err := engine.SatisfiedTerminationConditions()
+	cond := termination.GenerationCount(1)
+	engine.Evolve(10, 0, cond)
+	satisfied, err := engine.SatisfiedTerminationConditions()
 	assert.NoError(t, err)
-	assert.Len(t, satisfiedConditions, 1)
-	assert.Equal(t, generationsCondition, satisfiedConditions[0])
+	assert.Len(t, satisfied, 1)
+	assert.Equal(t, cond, satisfied[0])
 }
 
 func TestGenerationalEvolutionEngineSatisfiedTerminationConditionsBeforeStart(t *testing.T) {
 	engine := prepareEngine()
 
 	// Should return an error because evolution hasn't started, let alone terminated.
-	conditions, err := engine.SatisfiedTerminationConditions()
-	assert.Nil(t, conditions)
+	satisfied, err := engine.SatisfiedTerminationConditions()
+	assert.Nil(t, satisfied)
 	assert.Error(t, err)
 }
 
@@ -147,7 +141,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	}
 	alphabet[26] = ' '
 
-	stringFactory, err := factory.NewString(string(alphabet), len(targetString))
+	fac, err := factory.NewString(string(alphabet), len(targetString))
 	checkB(b, err)
 
 	// 1st operator: string mutation
@@ -160,57 +154,48 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	// Create a pipeline that applies mutation then crossover
 	pipe := operator.Pipeline{mut, xover}
 
-	fitnessEvaluator := newStringEvaluator(targetString)
-
-	var strategy = selection.RouletteWheelSelection
-	rng := rand.New(rand.NewSource(99))
-
-	engine := NewGenerationalEvolutionEngine(stringFactory,
+	engine := NewGenerationalEvolutionEngine(fac,
 		pipe,
-		fitnessEvaluator,
-		strategy,
-		rng)
+		evaluator(targetString),
+		selection.RouletteWheelSelection,
+		rand.New(rand.NewSource(99)))
 
 	//engine.SetSingleThreaded(true)
 
 	b.ResetTimer()
-	var result api.Candidate
+	var best api.Candidate
 	for n := 0; n < b.N; n++ {
-		result = engine.Evolve(100000, 5, termination.TargetFitness{Fitness: 0, Natural: false})
+		best = engine.Evolve(100000, 5, termination.TargetFitness{Fitness: 0, Natural: false})
 	}
-	fmt.Println(result)
+	fmt.Println(best)
 
-	var conditions []api.TerminationCondition
-	conditions, err = engine.SatisfiedTerminationConditions()
+	var satisfied []api.TerminationCondition
+	satisfied, err = engine.SatisfiedTerminationConditions()
 	checkB(b, err)
-	for i, condition := range conditions {
-		fmt.Printf("satified termination condition %v %T: %v\n",
-			i, condition, condition)
+	for i, cond := range satisfied {
+		fmt.Printf("satified termination condition %v: %v\n", i, cond)
 	}
 }
 
-type stringEvaluator struct{ targetString string }
+// This 'evaluator' assigns one "fitness point" for every character in the
+// candidate string that doesn't match the corresponding position in the target
+// string.
+type evaluator string
 
-func newStringEvaluator(targetString string) stringEvaluator {
-	return stringEvaluator{targetString: targetString}
-}
-
-// Assigns one "fitness point" for every character in the candidate string that
-// doesn't match the corresponding position in the target string.
-func (se stringEvaluator) Fitness(
-	candidate api.Candidate,
-	population []api.Candidate) float64 {
+func (s evaluator) Fitness(
+	cand api.Candidate,
+	pop []api.Candidate) float64 {
 
 	var errors float64
-	sc := candidate.(string)
+	sc := cand.(string)
 	for i := range sc {
-		if sc[i] != se.targetString[i] {
+		if sc[i] != string(s)[i] {
 			errors++
 		}
 	}
 	return errors
 }
 
-func (se stringEvaluator) IsNatural() bool {
-	return false
-}
+// Fitness is not natural, one fitness point represents an error, so the lower
+// is better
+func (evaluator) IsNatural() bool { return false }
