@@ -9,10 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func randomSeed() int64 {
-	return int64(time.Now().UnixNano())
-}
-
 const sleepTimeMs = 500
 
 type waiter struct{}

@@ -8,18 +8,6 @@ import (
 )
 
 // Provides methods used for testing the operation of RNG implementations.
-
-// Test to ensure that two distinct RNGs with the same seed return the same
-// sequence of numbers, at least for the given number of iterations.
-func testEquivalence(rng1, rng2 rand.Rand, iterations int) bool {
-	for i := 0; i < iterations; i++ {
-		if rng1.Int63() != rng2.Int63() {
-			return false
-		}
-	}
-	return true
-}
-
 // This is a rudimentary check to ensure that the output of a given RNG is
 // approximately uniformly distributed. If the RNG output is not uniformly
 // distributed, this method will return a poor estimate for the
