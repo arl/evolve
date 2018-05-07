@@ -176,7 +176,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	b.ResetTimer()
 	var result api.Candidate
 	for n := 0; n < b.N; n++ {
-		result = engine.Evolve(100000, 5, termination.NewTargetFitness(0, false))
+		result = engine.Evolve(100000, 5, termination.TargetFitness{Fitness: 0, Natural: false})
 	}
 	fmt.Println(result)
 

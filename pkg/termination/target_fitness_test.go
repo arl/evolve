@@ -11,7 +11,7 @@ import (
 func TestTargetFitness(t *testing.T) {
 
 	t.Run("natural fitness", func(t *testing.T) {
-		cond := NewTargetFitness(10.0, true)
+		cond := TargetFitness{Fitness: 10.0, Natural: true}
 
 		if cond.ShouldTerminate(
 			&api.PopulationData{struct{}{}, 5.0, 4.0, 0, true, 2, 0, 0, 100}) {
@@ -25,7 +25,7 @@ func TestTargetFitness(t *testing.T) {
 	})
 
 	t.Run("non-natural fitness", func(t *testing.T) {
-		cond := NewTargetFitness(1.0, false)
+		cond := TargetFitness{Fitness: 1.0, Natural: false}
 
 		if cond.ShouldTerminate(
 			&api.PopulationData{struct{}{}, 5.0, 4.0, 0, true, 2, 0, 0, 100}) {

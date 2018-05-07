@@ -91,7 +91,10 @@ func main() {
 
 	//engine.SetSingleThreaded(true)
 	engine.AddEvolutionObserver(observer{})
-	result := engine.Evolve(100, 5, termination.NewTargetFitness(0, false))
+
+	condition := termination.TargetFitness{Fitness: 0, Natural: false}
+
+	result := engine.Evolve(100, 5, condition)
 	fmt.Println(result)
 
 	var conditions []api.TerminationCondition
