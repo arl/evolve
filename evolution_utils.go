@@ -23,7 +23,7 @@ import (
 // should not continue if any of these is satisfied.
 func ShouldContinue(
 	data *api.PopulationData,
-	conditions ...api.TerminationCondition) []api.TerminationCondition {
+	conds ...api.TerminationCondition) []api.TerminationCondition {
 
 	// If the thread has been interrupted, we should abort and return whatever
 	// result we currently have.
@@ -32,64 +32,64 @@ func ShouldContinue(
 	//return Collections.emptyList();
 	//}
 	//// Otherwise check the termination conditions for the evolution.
-	satisfiedConditions := make([]api.TerminationCondition, 0)
-	for _, condition := range conditions {
-		if condition.ShouldTerminate(data) {
-			satisfiedConditions = append(satisfiedConditions, condition)
+	satisfied := make([]api.TerminationCondition, 0)
+	for _, cond := range conds {
+		if cond.ShouldTerminate(data) {
+			satisfied = append(satisfied, cond)
 		}
 	}
-	if len(satisfiedConditions) == 0 {
+	if len(satisfied) == 0 {
 		return nil
 
 	}
-	return satisfiedConditions
+	return satisfied
 }
 
 // SortEvaluatedPopulation sorts an evaluated population in descending order of
 // fitness (descending order of fitness score for natural scores, ascending
 // order of scores for non-natural scores).
-func SortEvaluatedPopulation(evaluatedPopulation api.EvaluatedPopulation, naturalFitness bool) {
+func SortEvaluatedPopulation(evpop api.EvaluatedPopulation, natural bool) {
 	// Sort candidates in descending order according to fitness.
-	if naturalFitness {
+	if natural {
 		// Descending values for natural fitness.
-		sort.Sort(sort.Reverse(evaluatedPopulation))
+		sort.Sort(sort.Reverse(evpop))
 	} else {
 		// Ascending values for non-natural fitness.
-		sort.Sort(evaluatedPopulation)
+		sort.Sort(evpop)
 	}
 }
 
 // ComputePopulationData computes statistics about the current generation of
 // evolved individuals, including the fittest candidate.
 //
-// evaluatedPopulation is the population of candidate solutions with their
-// associated fitness scores.
-// naturalFitness should be true if higher fitness scores mean fitter
-// individuals, false otherwise.
-// eliteCount is the number of candidates preserved via elitism.
-// iterationNumber is the zero-based index of the current generation/epoch.
-// startTime is the time at which the evolution began.
+// evpop is the population of candidate solutions with their associated fitness
+// scores.
+// natural should be true if higher fitness scores mean fitter individuals,
+// false otherwise.
+// nelites is the number of candidates preserved via elitism.
+// genidx is the zero-based index of the current generation/epoch.
+// start is the time at which the evolution began.
 func ComputePopulationData(
-	evaluatedPopulation api.EvaluatedPopulation,
-	naturalFitness bool,
-	eliteCount int,
-	iterationNumber int,
-	startTime time.Time) *api.PopulationData {
+	evpop api.EvaluatedPopulation,
+	natural bool,
+	nelites int,
+	genidx int,
+	start time.Time) *api.PopulationData {
 
-	stats := api.NewDataSet(api.WithInitialCapacity(len(evaluatedPopulation)))
-	for _, candidate := range evaluatedPopulation {
+	stats := api.NewDataSet(api.WithInitialCapacity(len(evpop)))
+	for _, candidate := range evpop {
 		stats.AddValue(candidate.Fitness())
 	}
 
 	return &api.PopulationData{
-		BestCand:    evaluatedPopulation[0].Candidate(),
-		BestFitness: evaluatedPopulation[0].Fitness(),
+		BestCand:    evpop[0].Candidate(),
+		BestFitness: evpop[0].Fitness(),
 		Mean:        stats.ArithmeticMean(),
 		StdDev:      stats.StandardDeviation(),
-		Natural:     naturalFitness,
+		Natural:     natural,
 		Size:        stats.Len(),
-		NumElites:   eliteCount,
-		GenNumber:   iterationNumber,
-		Elapsed:     time.Since(startTime),
+		NumElites:   nelites,
+		GenNumber:   genidx,
+		Elapsed:     time.Since(start),
 	}
 }
