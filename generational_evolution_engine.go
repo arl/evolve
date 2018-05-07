@@ -70,14 +70,14 @@ func NewGenerationalEvolutionEngine(
 	return impl
 }
 
-// NextEvolutionStep performs a single step/iteration of the evolutionary process.
+// Step performs a single step/iteration of the evolutionary process.
 //
 // evaluatedPopulation is the population at the beginning of the process.
 // eliteCount is the number of the fittest individuals that must be preserved.
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *GenerationalEvolutionEngine) NextEvolutionStep(
+func (e *GenerationalEvolutionEngine) Step(
 	epop api.EvaluatedPopulation,
 	nelites int,
 	rng *rand.Rand) api.EvaluatedPopulation {
