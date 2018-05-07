@@ -1,24 +1,33 @@
 language: go
 
 go: 
- - 1.10
+ - "1.10"
+ - master
 
 sudo: false
 
+install: true
+
+matrix:
+  allow_failures:
+    - go: master
+  # Don't wait for tip tests to finish.
+  fast_finish: true
+
 before_script:
-  - go vet ./...
-  - go get -u -v github.com/golang/lint/golint
-  - go get -u github.com/alecthomas/gometalinter
+  - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
+  #- go get -u github.com/alecthomas/gometalinter
   # use golint through gometalinter because it allows to easily ignore the
   # `vendor` and `internal` directories
+
+script:
+  - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
+  - go test -v -race ./...                   # Run all the tests with the race detector enabled
+  - go vet ./...
   - gometalinter --disable-all --enable=golint --skip=internal --vendor ./... -e 'unexported type.*GeneratorOption, which can be annoying to use'
 
 
-before_install:
-- go get -u -v github.com/mattn/goveralls
-- go get -u -v github.com/wadey/gocovmerge
-- if ! go get -u -v github.com/golang/tools/cmd/cover; then go get -u -v golang.org/x/tools/cmd/cover; fi
-
-script:
-- go test -v ./...
-- ./cover.sh
+#before_install:
+  #- go get -u -v github.com/mattn/goveralls
+  #- go get -u -v github.com/wadey/gocovmerge
+  #- if ! go get -u -v github.com/golang/tools/cmd/cover; then go get -u -v golang.org/x/tools/cmd/cover; fi
