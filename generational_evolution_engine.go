@@ -3,7 +3,7 @@ package evolve
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // GenerationalEvolutionEngine implements a general-purpose generational
@@ -24,83 +24,73 @@ import (
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
 type GenerationalEvolutionEngine struct {
-	evolutionScheme   framework.EvolutionaryOperator
-	fitnessEvaluator  framework.FitnessEvaluator
-	selectionStrategy framework.SelectionStrategy
-	engine            *AbstractEvolutionEngine
+	op   api.Operator
+	eval api.FitnessEvaluator
+	sel  api.SelectionStrategy
+	eng  *AbstractEvolutionEngine
 }
 
 // NewGenerationalEvolutionEngine creates a new evolution engine by specifying
 // the various components required by a generational evolutionary algorithm.
 //
-// candidateFactory is the factory used to create the initial population that is
-// iteratively evolved.
-// evolutionScheme is the combination of evolutionary operators used to evolve
-// the population at each generation.
-// fitnessEvaluator is a function for assigning fitness scores to candidate
-// solutions.
-// selectionStrategy is a strategy for selecting which candidates survive to be
+// f is the factory used to create the initial population that is iteratively
 // evolved.
+// op is the combination of evolutionary operators used to evolve the population
+// at each generation.
+// eval is a function for assigning fitness scores to candidate solutions.
+// sel is a strategy for selecting which candidates survive to be evolved.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
 func NewGenerationalEvolutionEngine(
-	candidateFactory framework.CandidateFactory,
-	evolutionScheme framework.EvolutionaryOperator,
-	fitnessEvaluator framework.FitnessEvaluator,
-	selectionStrategy framework.SelectionStrategy,
+	f api.Factory,
+	op api.Operator,
+	eval api.FitnessEvaluator,
+	sel api.SelectionStrategy,
 	rng *rand.Rand) *AbstractEvolutionEngine {
 
 	// create the Stepper implementation
 	stepper := &GenerationalEvolutionEngine{
-		evolutionScheme:   evolutionScheme,
-		fitnessEvaluator:  fitnessEvaluator,
-		selectionStrategy: selectionStrategy,
+		op:   op,
+		eval: eval,
+		sel:  sel,
 	}
 
 	// create the evolution engine implementation
-	engineImpl := NewAbstractEvolutionEngine(
-		candidateFactory,
-		fitnessEvaluator,
-		rng,
-		stepper,
-	)
+	impl := NewAbstractEvolutionEngine(f, eval, rng, stepper)
 
 	// provide the engine to the stepper for forwarding
-	stepper.engine = engineImpl
-	return engineImpl
+	stepper.eng = impl
+	return impl
 }
 
-// NextEvolutionStep performs a single step/iteration of the evolutionary process.
+// Step performs a single step/iteration of the evolutionary process.
 //
-// evaluatedPopulation is the population at the beginning of the process.
-// eliteCount is the number of the fittest individuals that must be preserved.
+// evpop is the population at the beginning of the process.
+// nelites is the number of the fittest individuals that must be preserved.
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *GenerationalEvolutionEngine) NextEvolutionStep(
-	evaluatedPopulation framework.EvaluatedPopulation,
-	eliteCount int,
-	rng *rand.Rand) framework.EvaluatedPopulation {
+func (e *GenerationalEvolutionEngine) Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation {
 
-	population := make([]framework.Candidate, 0, len(evaluatedPopulation))
+	pop := make([]api.Candidate, 0, len(evpop))
 
 	// First perform any elitist selection.
-	elite := make([]framework.Candidate, eliteCount)
-	for i := 0; i < eliteCount; i++ {
-		elite[i] = evaluatedPopulation[i].Candidate()
+	elite := make([]api.Candidate, nelites)
+	for i := 0; i < nelites; i++ {
+		elite[i] = evpop[i].Candidate()
 	}
 
 	// Then select candidates that will be operated on to create the evolved
 	// portion of the next generation.
-	population = append(population, e.selectionStrategy.Select(evaluatedPopulation,
-		e.fitnessEvaluator.IsNatural(),
-		len(evaluatedPopulation)-eliteCount,
+	pop = append(pop, e.sel.Select(evpop,
+		e.eval.IsNatural(),
+		len(evpop)-nelites,
 		rng)...)
 
 	// Then evolve the population.
-	population = e.evolutionScheme.Apply(population, rng)
+	pop = e.op.Apply(pop, rng)
 	// When the evolution is finished, add the elite to the population.
-	population = append(population, elite...)
+	pop = append(pop, elite...)
 
-	return e.engine.evaluatePopulation(population)
+	return e.eng.evaluatePopulation(pop)
 }

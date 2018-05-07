@@ -8,13 +8,38 @@ import (
 	"time"
 
 	"github.com/aurelien-rainone/evolve"
-	"github.com/aurelien-rainone/evolve/factory"
-	"github.com/aurelien-rainone/evolve/framework"
-	"github.com/aurelien-rainone/evolve/number"
-	"github.com/aurelien-rainone/evolve/operators"
-	"github.com/aurelien-rainone/evolve/selection"
-	"github.com/aurelien-rainone/evolve/termination"
+
+	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/aurelien-rainone/evolve/pkg/factory"
+	"github.com/aurelien-rainone/evolve/pkg/operator"
+	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
+	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
+	"github.com/aurelien-rainone/evolve/pkg/selection"
+	"github.com/aurelien-rainone/evolve/pkg/termination"
 )
+
+// This 'evaluator' assigns one "fitness point" for every character in the
+// candidate string that doesn't match the corresponding position in the target
+// string.
+type evaluator string
+
+func (s evaluator) Fitness(
+	cand api.Candidate,
+	pop []api.Candidate) float64 {
+
+	var errors float64
+	sc := cand.(string)
+	for i := range sc {
+		if sc[i] != string(s)[i] {
+			errors++
+		}
+	}
+	return errors
+}
+
+// Fitness is not natural, one fitness point represents an error, so the lower
+// is better
+func (evaluator) IsNatural() bool { return false }
 
 func main() {
 	var targetString = "HELLO WORLD"
@@ -37,58 +62,47 @@ func main() {
 	}
 
 	var (
-		stringFactory *factory.StringFactory
+		stringFactory *factory.String
 		err           error
 	)
-	stringFactory, err = factory.NewStringFactory(string(alphabet), len(targetString))
+	stringFactory, err = factory.NewString(string(alphabet), len(targetString))
 	check(err)
-
-	var (
-		mutationProb number.Probability
-		mutation     framework.EvolutionaryOperator
-		crossover    framework.EvolutionaryOperator
-		pipeline     *operators.EvolutionPipeline
-	)
 
 	// 1st operator: string mutation
-	mutationProb, err = number.NewProbability(0.02)
-	check(err)
-	mutation, err = operators.NewStringMutation(
-		string(alphabet),
-		operators.ConstantProbability(mutationProb),
-	)
-	check(err)
+	mutation := mutation.NewString(string(alphabet))
+	check(mutation.SetProb(0.02))
 
 	// 2nd operator: string crossover
-	crossover, err = operators.NewStringCrossover()
-	check(err)
+	xover := xover.New(xover.StringMater{})
 
-	// Create a pipeline that applies mutation then crossover
-	pipeline, err = operators.NewEvolutionPipeline(mutation, crossover)
-	check(err)
+	// Create a en operator pipeline applying first mutation, then crossover
+	pipeline := operator.Pipeline{mutation, xover}
 
-	fitnessEvaluator := newStringEvaluator(targetString)
+	eval := evaluator(targetString)
 
-	var selectionStrategy = &selection.RouletteWheelSelection{}
+	var selector = selection.RouletteWheelSelection
 	rng := rand.New(rand.NewSource(randomSeed()))
 
 	engine := evolve.NewGenerationalEvolutionEngine(stringFactory,
 		pipeline,
-		fitnessEvaluator,
-		selectionStrategy,
+		eval,
+		selector,
 		rng)
 
 	//engine.SetSingleThreaded(true)
-	engine.AddEvolutionObserver(observer{})
-	result := engine.Evolve(100, 5, termination.NewTargetFitness(0, false))
+	engine.AddObserver(observer{})
+
+	condition := termination.TargetFitness{Fitness: 0, Natural: false}
+
+	result := engine.Evolve(100, 5, condition)
 	fmt.Println(result)
 
-	var conditions []framework.TerminationCondition
+	var conditions []api.TerminationCondition
 	conditions, err = engine.SatisfiedTerminationConditions()
 	check(err)
 	for i, condition := range conditions {
-		fmt.Printf("satified termination condition %v %T: %v\n",
-			i, condition, condition)
+		fmt.Printf("satified termination condition %v: %v\n",
+			i, condition)
 	}
 }
 
@@ -105,7 +119,9 @@ func check(err error) {
 
 type observer struct{}
 
-func (o observer) PopulationUpdate(data *framework.PopulationData) {
-	fmt.Printf("Generation %d: %s (%v)\n", data.GenerationNumber(), data.BestCandidate(),
-		data.BestCandidateFitness())
+func (o observer) PopulationUpdate(data *api.PopulationData) {
+	fmt.Printf("Generation %d: %s (%v)\n",
+		data.GenNumber,
+		data.BestCand,
+		data.BestFitness)
 }

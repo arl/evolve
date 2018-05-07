@@ -4,7 +4,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // Utility methods used by different evolution implementations. This class
@@ -22,8 +22,8 @@ import (
 // conditions represents one or more termination conditions. The evolution
 // should not continue if any of these is satisfied.
 func ShouldContinue(
-	data *framework.PopulationData,
-	conditions ...framework.TerminationCondition) []framework.TerminationCondition {
+	data *api.PopulationData,
+	conditions ...api.TerminationCondition) []api.TerminationCondition {
 
 	// If the thread has been interrupted, we should abort and return whatever
 	// result we currently have.
@@ -32,7 +32,7 @@ func ShouldContinue(
 	//return Collections.emptyList();
 	//}
 	//// Otherwise check the termination conditions for the evolution.
-	satisfiedConditions := make([]framework.TerminationCondition, 0)
+	satisfiedConditions := make([]api.TerminationCondition, 0)
 	for _, condition := range conditions {
 		if condition.ShouldTerminate(data) {
 			satisfiedConditions = append(satisfiedConditions, condition)
@@ -48,7 +48,7 @@ func ShouldContinue(
 // SortEvaluatedPopulation sorts an evaluated population in descending order of
 // fitness (descending order of fitness score for natural scores, ascending
 // order of scores for non-natural scores).
-func SortEvaluatedPopulation(evaluatedPopulation framework.EvaluatedPopulation, naturalFitness bool) {
+func SortEvaluatedPopulation(evaluatedPopulation api.EvaluatedPopulation, naturalFitness bool) {
 	// Sort candidates in descending order according to fitness.
 	if naturalFitness {
 		// Descending values for natural fitness.
@@ -70,23 +70,26 @@ func SortEvaluatedPopulation(evaluatedPopulation framework.EvaluatedPopulation, 
 // iterationNumber is the zero-based index of the current generation/epoch.
 // startTime is the time at which the evolution began.
 func ComputePopulationData(
-	evaluatedPopulation framework.EvaluatedPopulation,
+	evaluatedPopulation api.EvaluatedPopulation,
 	naturalFitness bool,
 	eliteCount int,
 	iterationNumber int,
-	startTime time.Time) *framework.PopulationData {
+	startTime time.Time) *api.PopulationData {
 
-	stats := framework.NewDataSet(framework.WithInitialCapacity(len(evaluatedPopulation)))
+	stats := api.NewDataSet(api.WithInitialCapacity(len(evaluatedPopulation)))
 	for _, candidate := range evaluatedPopulation {
 		stats.AddValue(candidate.Fitness())
 	}
-	return framework.NewPopulationData(evaluatedPopulation[0].Candidate(),
-		evaluatedPopulation[0].Fitness(),
-		stats.ArithmeticMean(),
-		stats.StandardDeviation(),
-		naturalFitness,
-		stats.Len(),
-		eliteCount,
-		iterationNumber,
-		time.Since(startTime))
+
+	return &api.PopulationData{
+		BestCand:    evaluatedPopulation[0].Candidate(),
+		BestFitness: evaluatedPopulation[0].Fitness(),
+		Mean:        stats.ArithmeticMean(),
+		StdDev:      stats.StandardDeviation(),
+		Natural:     naturalFitness,
+		Size:        stats.Len(),
+		NumElites:   eliteCount,
+		GenNumber:   iterationNumber,
+		Elapsed:     time.Since(startTime),
+	}
 }

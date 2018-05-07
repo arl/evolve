@@ -5,15 +5,15 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/factory"
-	"github.com/aurelien-rainone/evolve/framework"
+	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/aurelien-rainone/evolve/pkg/factory"
 	"github.com/stretchr/testify/assert"
 )
 
 // Trivial fitness evaluator for integers. Used by unit tests.
 type IntegerEvaluator struct{}
 
-func (e IntegerEvaluator) Fitness(candidate framework.Candidate, population []framework.Candidate) float64 {
+func (e IntegerEvaluator) Fitness(candidate api.Candidate, population []api.Candidate) float64 {
 	return float64(candidate.(int))
 }
 
@@ -23,20 +23,20 @@ func (e IntegerEvaluator) IsNatural() bool {
 
 // Stub candidate factory for tests. Always returns zero-valued integers.
 type StubIntegerFactory struct {
-	factory.AbstractCandidateFactory
+	factory.BaseFactory
 }
 
 func NewStubIntegerFactory() *StubIntegerFactory {
 	return &StubIntegerFactory{
-		factory.AbstractCandidateFactory{
-			RandomCandidateGenerator: ZeroIntegerGenerator{},
+		factory.BaseFactory{
+			CandidateGenerator: ZeroIntegerGenerator{},
 		},
 	}
 }
 
 type ZeroIntegerGenerator struct{}
 
-func (zig ZeroIntegerGenerator) GenerateRandomCandidate(rng *rand.Rand) framework.Candidate {
+func (zig ZeroIntegerGenerator) GenerateCandidate(rng *rand.Rand) api.Candidate {
 	return 0
 }
 
@@ -44,8 +44,8 @@ func (zig ZeroIntegerGenerator) GenerateRandomCandidate(rng *rand.Rand) framewor
 // adding a fixed offset.
 type IntegerAdjuster int
 
-func (op IntegerAdjuster) Apply(selectedCandidates []framework.Candidate, rng *rand.Rand) []framework.Candidate {
-	result := make([]framework.Candidate, len(selectedCandidates))
+func (op IntegerAdjuster) Apply(selectedCandidates []api.Candidate, rng *rand.Rand) []api.Candidate {
+	result := make([]api.Candidate, len(selectedCandidates))
 	for i, c := range selectedCandidates {
 		result[i] = c.(int) + int(op)
 	}
@@ -56,11 +56,11 @@ func (op IntegerAdjuster) Apply(selectedCandidates []framework.Candidate, rng *r
 // Utility functions used by unit tests for migration strategies.
 //
 
-func CreateTestPopulation(members ...framework.Candidate) framework.EvaluatedPopulation {
+func CreateTestPopulation(members ...api.Candidate) api.EvaluatedPopulation {
 	var err error
-	population := make(framework.EvaluatedPopulation, len(members))
+	population := make(api.EvaluatedPopulation, len(members))
 	for i, member := range members {
-		population[i], err = framework.NewEvaluatedCandidate(member, 0)
+		population[i], err = api.NewEvaluatedCandidate(member, 0)
 		if err != nil {
 			panic(fmt.Sprintf("can't create test population: %v", err))
 		}
@@ -68,7 +68,7 @@ func CreateTestPopulation(members ...framework.Candidate) framework.EvaluatedPop
 	return population
 }
 
-func AssertPopulationContents(t *testing.T, actualPopulation framework.EvaluatedPopulation,
+func AssertPopulationContents(t *testing.T, actualPopulation api.EvaluatedPopulation,
 	expectedPopulation ...string) {
 	t.Helper() // mark current function as helper in case of error
 	assert.Len(t, actualPopulation, len(expectedPopulation), "wrong population size after migration")
