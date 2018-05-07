@@ -34,7 +34,7 @@ func (o *elitismObserver) AverageFitness() float64 { return o.MeanFitness }
 func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 	obs := new(elitismObserver)
 	engine := prepareEngine()
-	engine.AddEvolutionObserver(obs)
+	engine.AddObserver(obs)
 	elite := make([]api.Candidate, 3)
 	// Add the following seed candidates, all better than any others that can possibly
 	// get into the population (since every other candidate will always be zero).
@@ -53,7 +53,7 @@ func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 	assert.Equalf(t, 24.0/10.0, obs.AverageFitness(),
 		"elite candidates not preserved correctly: want %v, got %v",
 		24.0/10.0, obs.AverageFitness())
-	engine.RemoveEvolutionObserver(obs)
+	engine.RemoveObserver(obs)
 }
 
 func TestGenerationalEvolutionEngineEliteCountTooHigh(t *testing.T) {

@@ -291,18 +291,18 @@ func (e *AbstractEvolutionEngine) SatisfiedTerminationConditions() ([]api.Termin
 	return satisfiedTerminationConditions, nil
 }
 
-// AddEvolutionObserver adds a listener to receive status updates on the
+// AddObserver adds a listener to receive status updates on the
 // evolution progress.
 //
 // Updates are dispatched synchronously on the request thread. Observers should
 // complete their processing and return in a timely manner to avoid holding up
 // the evolution.
-func (e *AbstractEvolutionEngine) AddEvolutionObserver(observer api.EvolutionObserver) {
+func (e *AbstractEvolutionEngine) AddObserver(observer api.EvolutionObserver) {
 	e.observers[observer] = struct{}{}
 }
 
-// RemoveEvolutionObserver removes an evolution progress listener.
-func (e *AbstractEvolutionEngine) RemoveEvolutionObserver(observer api.EvolutionObserver) {
+// RemoveObserver removes an evolution progress listener.
+func (e *AbstractEvolutionEngine) RemoveObserver(observer api.EvolutionObserver) {
 	delete(e.observers, observer)
 }
 

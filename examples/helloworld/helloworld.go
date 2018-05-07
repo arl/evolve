@@ -90,7 +90,7 @@ func main() {
 		rng)
 
 	//engine.SetSingleThreaded(true)
-	engine.AddEvolutionObserver(observer{})
+	engine.AddObserver(observer{})
 
 	condition := termination.TargetFitness{Fitness: 0, Natural: false}
 

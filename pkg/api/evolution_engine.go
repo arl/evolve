@@ -1,7 +1,7 @@
 package api
 
-// EvolutionEngine is the interface implented by objects provide evolution
-// operations.
+// EvolutionEngine is the interface implemented by objects that provide
+// evolution operations.
 type EvolutionEngine interface {
 
 	// Evolve executes the evolutionary algorithm until one of the termination
@@ -11,21 +11,19 @@ type EvolutionEngine interface {
 	// To return the entire population rather than just the fittest candidate,
 	// use the EvolvePopulation method instead.
 	//
-	// populationSize is the number of candidate solutions present in the
-	// population at any point in time.
-	// eliteCount is the number of candidates preserved via elitism. In elitism,
-	// a sub-set of the population with the best fitness scores are preserved
+	// size is the number of candidate solutions present in the population at
+	// any point in time.
+	// nelites is the number of candidates preserved via elitism. In elitism, a
+	// sub-set of the population with the best fitness scores are preserved
 	// unchanged in the subsequent generation. Candidate solutions that are
 	// preserved unchanged through elitism remain eligible for selection for
 	// breeding the remainder of the next generation. This value must be
 	// non-negative and less than the population size. A value of zero means
 	// that no elitism will be applied.
-	// conditions is a slice of conditions that may cause the evolution to
-	// terminate.
+	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	Evolve(populationSize, eliteCount int,
-		conditions ...TerminationCondition) Candidate
+	Evolve(size, nelites int, conds ...TerminationCondition) Candidate
 
 	// EvolveWithSeedCandidates executes the evolutionary algorithm until one of
 	// the termination conditions is met, then return the fittest candidate from
@@ -34,25 +32,23 @@ type EvolutionEngine interface {
 	//
 	// To return the entire population rather than just the fittest candidate,
 	// use the EvolvePopulationWithSeedCandidates method instead.
-	// populationSize is the number of candidate solutions present in the
-	// population at any point in time.
-	// eliteCount is the number of candidates preserved via elitism. In elitism,
-	// a sub-set of the population with the best fitness scores are preserved
+	//
+	// size is the number of candidate solutions present in the population at
+	// any point in time.
+	// nelites is the number of candidates preserved via elitism. In elitism, a
+	// sub-set of the population with the best fitness scores are preserved
 	// unchanged in the subsequent generation. Candidate solutions that are
 	// preserved unchanged through elitism remain eligible for selection for
 	// breeding the remainder of the next generation.  This value must be
 	// non-negative and less than the population size. A value of zero means
 	// that no elitism will be applied.
-	// seedCandidates is a set of candidates to seed the population with. The
-	// size of this collection must be no greater than the specified population
-	// size.
-	// conditions is a slice of conditions that may cause the evolution to
-	// terminate.
+	// seedcands is a set of candidates to seed the population with. The size of
+	// this collection must be no greater than the specified population size.
+	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolveWithSeedCandidates(populationSize, eliteCount int,
-		seedCandidates []Candidate,
-		conditions ...TerminationCondition) Candidate
+	EvolveWithSeedCandidates(size, nelites int, seedcands []Candidate,
+		conds ...TerminationCondition) Candidate
 
 	// EvolvePopulation executes the evolutionary algorithm until one of the
 	// termination conditions is met, then return all of the candidates from the
@@ -60,21 +56,19 @@ type EvolutionEngine interface {
 	//
 	// To return just the fittest candidate rather than the entire population,
 	// use the Evolve method instead.
-	// populationSize is the number of candidate solutions present in the
-	// population at any point in time.
-	// eliteCount is the number of candidates preserved via elitism. In elitism,
-	// a sub-set of the population with the best fitness scores are preserved
+	// size is the number of candidate solutions present in the population at
+	// any point in time.
+	// nelites is the number of candidates preserved via elitism. In elitism, a
+	// sub-set of the population with the best fitness scores are preserved
 	// unchanged in the subsequent generation. Candidate solutions that are
 	// preserved unchanged through elitism remain eligible for selection for
 	// breeding the remainder of the next generation.  This value must be
 	// non-negative and less than the population size. A value of zero means
 	// that no elitism will be applied.
-	// conditions is a slice of conditions that may cause the evolution to
-	// terminate.
+	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolvePopulation(populationSize, eliteCount int,
-		conditions ...TerminationCondition) EvaluatedPopulation
+	EvolvePopulation(size, nelites int, conds ...TerminationCondition) EvaluatedPopulation
 
 	// EvolvePopulationWithSeedCandidates executes the evolutionary algorithm
 	// until one of the termination conditions is met, then return all of the
@@ -82,33 +76,32 @@ type EvolutionEngine interface {
 	//
 	// To return just the fittest candidate rather than the entire population,
 	// use the EvolveWithSeedCandidates method instead.
-	// populationSize is the number of candidate solutions present in the
-	// population at any point in time.
-	// eliteCount The number of candidates preserved via elitism.  In elitism, a
+	// size is the number of candidate solutions present in the population at
+	// any point in time.
+	// nelites The number of candidates preserved via elitism. In elitism, a
 	// sub-set of the population with the best fitness scores are preserved
-	// unchanged in the subsequent generation.  Candidate solutions that are
+	// unchanged in the subsequent generation. Candidate solutions that are
 	// preserved unchanged through elitism remain eligible for selection for
-	// breeding the remainder of the next generation.  This value must be
-	// non-negative and less than the population size.  A value of zero means
+	// breeding the remainder of the next generation. This value must be
+	// non-negative and less than the population size. A value of zero means
 	// that no elitism will be applied.
-	// seedCandidates A set of candidates to seed the population with.  The size
-	// of this collection must be no greater than the specified population size.
+	// seedcands is a set of candidates to seed the population with.The size of
+	// this collection must be no greater than the specified population size.
 	// conditions One or more conditions that may cause the evolution to
 	// terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolvePopulationWithSeedCandidates(populationSize, eliteCount int,
-		seedCandidates []Candidate,
-		conditions ...TerminationCondition) EvaluatedPopulation
+	EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []Candidate,
+		conds ...TerminationCondition) EvaluatedPopulation
 
-	// AddEvolutionObserver adds a listener to receive status updates on the
+	// AddObserver registers an observer to receive status updates on the
 	// evolution progress.
-	AddEvolutionObserver(observer EvolutionObserver)
+	AddObserver(o EvolutionObserver)
 
-	// RemoveEvolutionObserver removes an evolution progress listener.
-	RemoveEvolutionObserver(observer EvolutionObserver)
+	// RemoveObserver removes an evolution observer.
+	RemoveObserver(o EvolutionObserver)
 
-	// SatisfiedTerminationConditions returns a list of all
+	// SatisfiedTerminationConditions returns a slice of all
 	// TerminationCondition's that are satisfied by the current state of the
 	// evolution engine.
 	//
@@ -129,7 +122,7 @@ type EvolutionEngine interface {
 	// non-null. The list may be empty because it is possible for evolution to
 	// terminate without any conditions being matched. The only situation in
 	// which this occurs is when the request goroutine is interrupted.
-
+	//
 	// May return ErrIllegalState if this method is invoked on an evolution
 	// engine before evolution is started or while it is still in progress.
 	SatisfiedTerminationConditions() ([]TerminationCondition, error)
