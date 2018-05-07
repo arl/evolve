@@ -15,7 +15,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
 	"github.com/aurelien-rainone/evolve/pkg/selection"
-	"github.com/aurelien-rainone/evolve/termination"
+	"github.com/aurelien-rainone/evolve/pkg/termination"
 )
 
 func main() {
