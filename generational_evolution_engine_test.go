@@ -36,7 +36,7 @@ func (o *elitismObserver) PopulationUpdate(data *api.PopulationData) {
 }
 
 func (o *elitismObserver) AverageFitness() float64 {
-	return o.data.MeanFitness()
+	return o.data.MeanFitness
 }
 
 func TestGenerationalEvolutionEngineElitism(t *testing.T) {

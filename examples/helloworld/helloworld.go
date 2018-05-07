@@ -94,6 +94,8 @@ func check(err error) {
 type observer struct{}
 
 func (o observer) PopulationUpdate(data *api.PopulationData) {
-	fmt.Printf("Generation %d: %s (%v)\n", data.GenerationNumber(), data.BestCandidate(),
-		data.BestCandidateFitness())
+	fmt.Printf("Generation %d: %s (%v)\n",
+		data.GenNumber,
+		data.BestCand,
+		data.BestFitness)
 }

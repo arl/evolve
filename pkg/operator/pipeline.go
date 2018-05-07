@@ -8,7 +8,7 @@ import (
 
 // A Pipeline is a compound evolutionary operator that applies multiple
 // operators, in sequence, to a starting population.
-type Pipeline []api.EvolutionaryOperator
+type Pipeline []api.Operator
 
 // Apply applies each operation in the pipeline in turn to the selection.
 func (ops Pipeline) Apply(

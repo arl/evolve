@@ -38,10 +38,10 @@ func NewTargetFitness(targetFitness float64, natural bool) *TargetFitness {
 func (tc *TargetFitness) ShouldTerminate(populationData *api.PopulationData) bool {
 	if tc.natural {
 		// If we're using "natural" fitness scores, higher values are better.
-		return populationData.BestCandidateFitness() >= tc.targetFitness
+		return populationData.BestFitness >= tc.targetFitness
 	}
 	// If we're using "non-natural" fitness scores, lower values are better.
-	return populationData.BestCandidateFitness() <= tc.targetFitness
+	return populationData.BestFitness <= tc.targetFitness
 }
 
 // String returns the termination condition representation as a string

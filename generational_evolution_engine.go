@@ -24,7 +24,7 @@ import (
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
 type GenerationalEvolutionEngine struct {
-	evolutionScheme   api.EvolutionaryOperator
+	evolutionScheme   api.Operator
 	fitnessEvaluator  api.FitnessEvaluator
 	selectionStrategy api.SelectionStrategy
 	engine            *AbstractEvolutionEngine
@@ -45,7 +45,7 @@ type GenerationalEvolutionEngine struct {
 // evolutionary operators and selection strategies).
 func NewGenerationalEvolutionEngine(
 	candidateFactory api.Factory,
-	evolutionScheme api.EvolutionaryOperator,
+	evolutionScheme api.Operator,
 	fitnessEvaluator api.FitnessEvaluator,
 	selectionStrategy api.SelectionStrategy,
 	rng *rand.Rand) *AbstractEvolutionEngine {

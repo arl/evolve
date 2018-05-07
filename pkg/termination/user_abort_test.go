@@ -4,17 +4,28 @@ import (
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestUserAbort(t *testing.T) {
-	condition := NewUserAbort()
+	// population data is irrelevant
+	popdata := &api.PopulationData{}
+	cond := NewUserAbort()
 
-	// This population data should be irrelevant.
-	data := api.NewPopulationData(struct{}{}, 0, 0, 0, true, 2, 0, 0, 100)
-	assert.False(t, condition.ShouldTerminate(data), "Should not terminate without user abort.")
-	assert.False(t, condition.IsAborted(), "Should not be aborted without user intervention.")
-	condition.Abort()
-	assert.True(t, condition.ShouldTerminate(data), "Should terminate after user abort.")
-	assert.True(t, condition.IsAborted(), "Should be aborted after user intervention.")
+	if cond.ShouldTerminate(popdata) {
+		t.Errorf("should not terminate before user abort")
+	}
+
+	if cond.IsAborted() {
+		t.Errorf("should not have aborted without user intervention")
+	}
+
+	cond.Abort()
+
+	if !cond.ShouldTerminate(popdata) {
+		t.Errorf("should not terminate after user abort")
+	}
+
+	if !cond.IsAborted() {
+		t.Errorf("should have aborted after user intervention")
+	}
 }

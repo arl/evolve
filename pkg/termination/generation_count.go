@@ -16,7 +16,7 @@ type GenerationCount int
 // populationData is the information about the current state of evolution.
 // This may be used to determine whether evolution should continue or not.
 func (tc GenerationCount) ShouldTerminate(populationData *api.PopulationData) bool {
-	return populationData.GenerationNumber()+1 >= int(tc)
+	return populationData.GenNumber+1 >= int(tc)
 }
 
 // String returns the termination condition representation as a string

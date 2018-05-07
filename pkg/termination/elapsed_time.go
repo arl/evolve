@@ -14,7 +14,7 @@ type ElapsedTime time.Duration
 // ShouldTerminate returns true if the pre-configured maximum permitted time
 // has elapsed.
 func (tc ElapsedTime) ShouldTerminate(popdata *api.PopulationData) bool {
-	return popdata.ElapsedTime() >= time.Duration(tc)
+	return popdata.Elapsed >= time.Duration(tc)
 }
 
 // String returns the termination condition representation as a string
