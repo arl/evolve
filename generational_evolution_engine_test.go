@@ -154,7 +154,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	}
 	alphabet[26] = ' '
 
-	stringFactory, err := factory.NewStringFactory(string(alphabet), len(targetString))
+	stringFactory, err := factory.NewString(string(alphabet), len(targetString))
 	checkB(b, err)
 
 	// 1st operator: string mutation

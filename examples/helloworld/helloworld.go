@@ -39,10 +39,10 @@ func main() {
 	}
 
 	var (
-		stringFactory *factory.StringFactory
+		stringFactory *factory.String
 		err           error
 	)
-	stringFactory, err = factory.NewStringFactory(string(alphabet), len(targetString))
+	stringFactory, err = factory.NewString(string(alphabet), len(targetString))
 	check(err)
 
 	// 1st operator: string mutation

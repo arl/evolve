@@ -15,11 +15,10 @@ const (
 	alphabet       = "abcdefg"
 )
 
-// Make sure each candidate is valid (is the right length and contains only
+// Make sure each candidate is valid (has the right length and contains only
 // valid characters).
-// @param population The population to be validated.
-func validatePopulation(t *testing.T, population []api.Candidate, alphabet string) {
-	for _, candidate := range population {
+func validatePopulation(t *testing.T, pop []api.Candidate, alphabet string) {
+	for _, candidate := range pop {
 		assert.IsType(t, string(""), candidate)
 		s := candidate.(string)
 
@@ -37,24 +36,24 @@ func TestStringFactory(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	t.Run("string population with ascii-only aplhabet", func(*testing.T) {
-		sf, err := NewStringFactory(alphabet, stringLength)
+		sf, err := NewString(alphabet, stringLength)
 		assert.NoError(t, err)
 		pop := sf.GenPopulation(populationSize, rng)
 		validatePopulation(t, pop, alphabet)
 	})
 
 	t.Run("string population with non ascii-only aplhabet", func(*testing.T) {
-		_, err := NewStringFactory("日本語", stringLength)
+		_, err := NewString("日本語", stringLength)
 		assert.Error(t, err)
 	})
 
 	t.Run("StringFactory with empty aplhabet", func(*testing.T) {
-		_, err := NewStringFactory("", stringLength)
+		_, err := NewString("", stringLength)
 		assert.Error(t, err)
 	})
 
 	t.Run("StringFactory with zero string length", func(*testing.T) {
-		_, err := NewStringFactory(alphabet, 0)
+		_, err := NewString(alphabet, 0)
 		assert.Error(t, err)
 	})
 }
