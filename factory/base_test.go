@@ -8,20 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type intFactory struct {
-	BaseFactory
-}
+type intFactory struct{ BaseFactory }
 
-func newIntFactory() *intFactory {
-	return &intFactory{
-		BaseFactory{
-			intGenerator{}},
-	}
-}
+func newIntFactory() *intFactory { return &intFactory{BaseFactory{intGenerator{}}} }
 
 type intGenerator struct{}
 
-func (ig intGenerator) GenerateCandidate(rng *rand.Rand) api.Candidate { return rng.Int() }
+func (intGenerator) GenerateCandidate(rng *rand.Rand) api.Candidate { return rng.Int() }
 
 func TestAbstractCandidateFactoryPopulationCreation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
