@@ -11,7 +11,7 @@ import (
 // mutation probability
 var ErrInvalidMutationProb = errors.New("mutation probability must be in the [0.0,1.0] range")
 
-// Mutater is the interface implemented by objects defining the Mutate function.
+// Mutater is the interface that wraps the Mutate method.
 type Mutater interface {
 
 	// Mutate performs mutation on a candidate.
@@ -37,10 +37,10 @@ type Mutation struct {
 	probmin, probmax float64
 }
 
-// NewMutation creates a Mutation operator with rhe provided Mutater.
+// New creates a Mutation operator with rhe provided Mutater.
 //
 // The returned Mutation is preconfigured with a 0.01 mutation probability.
-func NewMutation(mut Mutater) *Mutation {
+func New(mut Mutater) *Mutation {
 	return &Mutation{
 		Mutater: mut,
 		prob:    0.01, varprob: false, probmin: 0.01, probmax: 0.01,

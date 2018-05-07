@@ -10,7 +10,7 @@ import (
 
 func TestByteSliceMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	crossover := NewCrossover(ByteSliceMater{})
+	crossover := New(ByteSliceMater{})
 	population := make([]api.Candidate, 4)
 	population[0] = []byte{1, 2, 3, 4, 5}
 	population[1] = []byte{6, 7, 8, 9, 10}
@@ -42,7 +42,7 @@ func TestByteSliceMater(t *testing.T) {
 func TestByteSliceMaterWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	crossover := NewCrossover(ByteSliceMater{})
+	crossover := New(ByteSliceMater{})
 	population := make([]api.Candidate, 2)
 	population[0] = []byte{1, 2, 3, 4, 5}
 	population[1] = []byte{2, 4, 8, 10, 12, 14, 16}

@@ -13,30 +13,30 @@ import (
 // mutation count
 var ErrInvalidMutationCount = errors.New("mutation count must be in the [0,MaxInt32] range")
 
-// TODO: document + rename (with pkg name it could be named mutation.Bitstring)
-type BitStringMutation struct {
+// Bitstring is a an evolutionary operator that mutates individual bits in
+// a bitstring.Bitstring according to some probability.
+type Bitstring struct {
 	*Mutation
 	nmut             int
 	varnmut          bool
 	nmutmin, nmutmax int
 }
 
-// NewBitstringMutation creates an evolutionary operator that mutates individual
-// bits in a bitstring.Bitstring according to some probability.
+// NewBitstring creates a new BitString mutation operator, pre-configured with a
+// probability of mutation of 1.0 and mutation count of 1.
 //
-// Possible options:
-// the mutation probability is the (possibly variable) probability of a
-// candidate bit string being mutated at all; set it with ConstantProbability or
-// VariableProbability. The default is a constant probability of 1.
+// The mutation probability is the (possibly variable) probability of a
+// candidate bit string being mutated at all. It can be modified with SetProb
+// and SetProbRange.
 // The mutation count is the (possibly variable) number of bits that will be
-// flipped on any candidate bit string that is selected for mutation; set it
-// with ConstantMutationCount or VariableMutationCount. The default is a
-// constant mutation count of exactly 1 bit flipped.
-func NewBitstringMutation() *BitStringMutation {
-	bsmut := &BitStringMutation{
+// flipped on any candidate bit string that is selected for mutation. It can be
+// modified with SetMutations and SetMutationsRange.
+func NewBitstring() *Bitstring {
+	bsmut := &Bitstring{
 		nmut: 1, varnmut: false, nmutmin: 1, nmutmax: 1,
 	}
-	bsmut.Mutation = NewMutation(bsmut)
+	bsmut.Mutation = New(bsmut)
+	bsmut.SetProb(1.0)
 	return bsmut
 }
 
@@ -45,7 +45,7 @@ func NewBitstringMutation() *BitStringMutation {
 //
 // If nmut is not in the [0,MaxInt32] range SetMutations will return
 // ErrInvalidMutationCount.
-func (op *BitStringMutation) SetMutations(nmut int) error {
+func (op *Bitstring) SetMutations(nmut int) error {
 	if nmut < 0 || nmut > math.MaxInt32 {
 		return ErrInvalidMutationCount
 	}
@@ -63,7 +63,7 @@ func (op *BitStringMutation) SetMutations(nmut int) error {
 // [0,MaxInt32) to [min,max).
 //
 // If min and max are not bounded by [0,MaxInt32] SetMutationsRange will return
-func (op *BitStringMutation) SetMutationsRange(min, max int) error {
+func (op *Bitstring) SetMutationsRange(min, max int) error {
 	if min > max || min < 0 || max > math.MaxInt32 {
 		return ErrInvalidMutationCount
 	}
@@ -77,7 +77,7 @@ func (op *BitStringMutation) SetMutationsRange(min, max int) error {
 //
 // The probability of any given bit being flipped is governed by the probability
 // generator configured for this mutation operator.
-func (op *BitStringMutation) Mutate(c api.Candidate, rng *rand.Rand) api.Candidate {
+func (op *Bitstring) Mutate(c api.Candidate, rng *rand.Rand) api.Candidate {
 	// get/decide a probability for this run
 	prob := op.prob
 	if op.varprob {

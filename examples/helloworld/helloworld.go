@@ -46,11 +46,11 @@ func main() {
 	check(err)
 
 	// 1st operator: string mutation
-	mutation := mutation.NewStringMutation(string(alphabet))
+	mutation := mutation.NewString(string(alphabet))
 	check(mutation.SetProb(0.02))
 
 	// 2nd operator: string crossover
-	xover := xover.NewCrossover(xover.StringMater{})
+	xover := xover.New(xover.StringMater{})
 
 	// Create a en operator pipeline applying first mutation, then crossover
 	pipeline := operator.Pipeline{mutation, xover}

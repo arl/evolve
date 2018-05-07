@@ -50,11 +50,11 @@ type Crossover struct {
 	probmin, probmax float64
 }
 
-// NewCrossover creates a Crossover operator based off the provided Mater.
+// New creates a Crossover operator based off the provided Mater.
 //
 // The returned Crossover performs a one point crossover with 1.0 (i.e always)
 // probabilty.
-func NewCrossover(mater Mater) *Crossover {
+func New(mater Mater) *Crossover {
 	return &Crossover{
 		npts: 1, varnpts: false, nptsmin: 1, nptsmax: 1,
 		prob: 1.0, varprob: false, probmin: 1.0, probmax: 1.0,

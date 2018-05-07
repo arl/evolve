@@ -24,7 +24,7 @@ func TestCrossover_SetPoints(t *testing.T) {
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			op := NewCrossover(nil)
+			op := New(nil)
 			if err := op.SetPoints(tt.npts); err != tt.wantErr {
 				t.Errorf("Crossover.SetPoints(%v) error = %v, wantErr '%v'", tt.npts, err, tt.wantErr)
 			}
@@ -45,7 +45,7 @@ func TestCrossover_SetPointsRange(t *testing.T) {
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			op := NewCrossover(nil)
+			op := New(nil)
 			if err := op.SetPointsRange(tt.min, tt.max); err != tt.wantErr {
 				t.Errorf("Crossover.SetPointsRange(%v, %v) error = %v, wantErr '%v'", tt.min, tt.max, err, tt.wantErr)
 			}
@@ -66,7 +66,7 @@ func TestCrossover_SetProb(t *testing.T) {
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			op := NewCrossover(nil)
+			op := New(nil)
 			if err := op.SetProb(tt.prob); err != tt.wantErr {
 				t.Errorf("Crossover.SetProb(%v) error = %v, wantErr %v", tt.prob, err, tt.wantErr)
 			}
@@ -87,7 +87,7 @@ func TestCrossover_SetProbRange(t *testing.T) {
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			op := NewCrossover(nil)
+			op := New(nil)
 			if err := op.SetProbRange(tt.min, tt.max); err != tt.wantErr {
 				t.Errorf("Crossover.SetProbRange(%v, %v) error = %v, wantErr '%v'", tt.min, tt.max, err, tt.wantErr)
 			}
@@ -116,14 +116,14 @@ func TestCrossover_Apply(t *testing.T) {
 	pop := []api.Candidate{"abcde", "fghij", "klmno", "pqrst", "uvwxy"}
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
-		xover := NewCrossover(StringMater{})
+		xover := New(StringMater{})
 		assert.NoError(t, xover.SetPoints(0))
 		got := xover.Apply(pop, rng)
 		sameStringPop(t, pop, got)
 	})
 
 	t.Run("zero_crossover_probability_is_noop", func(t *testing.T) {
-		xover := NewCrossover(StringMater{})
+		xover := New(StringMater{})
 		assert.NoError(t, xover.SetProb(0.0))
 		got := xover.Apply(pop, rng)
 		sameStringPop(t, pop, got)

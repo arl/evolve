@@ -23,7 +23,7 @@ func errcheck(t *testing.T, err error) {
 func TestBitstringMutationRandom(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	mut := NewBitstringMutation()
+	mut := NewBitstring()
 	errcheck(t, mut.SetProb(0.5))
 
 	org, err := bitstring.MakeFromString("111100101")
@@ -45,7 +45,7 @@ func TestBitstringMutationRandom(t *testing.T) {
 func TestBitstringMutationSingleBit(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	mut := NewBitstringMutation()
+	mut := NewBitstring()
 	errcheck(t, mut.SetProb(1.0))
 
 	org, err := bitstring.MakeFromString("111100101")

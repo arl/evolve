@@ -11,7 +11,7 @@ import (
 func TestStringMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := NewCrossover(StringMater{})
+	xover := New(StringMater{})
 	pop := make([]api.Candidate, 4)
 	pop[0] = "abcde"
 	pop[1] = "fghij"
@@ -41,7 +41,7 @@ func TestStringMater(t *testing.T) {
 func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := NewCrossover(StringMater{})
+	xover := New(StringMater{})
 	pop := []api.Candidate{"abcde", "fghijklm"}
 
 	// This should panic since the parents are different lengths.

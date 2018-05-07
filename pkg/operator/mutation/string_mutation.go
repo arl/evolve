@@ -6,14 +6,15 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-// NewStringMutation creates an operator that mutates individual characters in a
+// NewString creates an operator that mutates individual characters in a
 // string according to some probability.
 //
 // Zero or more characters may be modified. The probability of any given
 // character being modified is governed by the mutation probability.
-func NewStringMutation(alphabet string) *stringMutater {
+// nolint: golint
+func NewString(alphabet string) *stringMutater {
 	smut := &stringMutater{alphabet: alphabet}
-	smut.Mutation = NewMutation(smut)
+	smut.Mutation = New(smut)
 	return smut
 }
 

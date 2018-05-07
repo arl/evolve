@@ -12,7 +12,7 @@ func TestStringMutationTest(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	alphabet := []byte{'a', 'b', 'c', 'd'}
 
-	mutation := NewStringMutation(string(alphabet))
+	mutation := NewString(string(alphabet))
 	err := mutation.SetProb(0.5)
 	errcheck(t, err)
 	individual1 := "abcd"

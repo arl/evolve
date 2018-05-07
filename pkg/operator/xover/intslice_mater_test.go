@@ -11,7 +11,7 @@ import (
 func TestIntSliceMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := NewCrossover(IntSliceMater{})
+	xover := New(IntSliceMater{})
 	pop := make([]api.Candidate, 4)
 	pop[0] = []int{1, 2, 3, 4, 5}
 	pop[1] = []int{6, 7, 8, 9, 10}
@@ -43,7 +43,7 @@ func TestIntSliceMater(t *testing.T) {
 func TestIntArrayCrossoverWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := NewCrossover(IntSliceMater{})
+	xover := New(IntSliceMater{})
 	pop := make([]api.Candidate, 2)
 	pop[0] = []int{1, 2, 3, 4, 5}
 	pop[1] = []int{2}

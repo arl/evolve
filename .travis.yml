@@ -18,16 +18,11 @@ before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
   # use golint through gometalinter because it allows to easily ignore the
   # `vendor` and `internal` directories
-  - go get -u github.com/alecthomas/gometalinter
+  - go get -u gopkg.in/alecthomas/gometalinter.v2
 
 script:
   - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
   - go test -v -race ./...                   # Run all the tests with the race detector enabled
   - go vet ./...
-  - gometalinter --disable-all --enable=golint --skip=internal --vendor ./... -e 'unexported type.*GeneratorOption, which can be annoying to use'
-
-
-#before_install:
-  #- go get -u -v github.com/mattn/goveralls
-  #- go get -u -v github.com/wadey/gocovmerge
-  #- if ! go get -u -v github.com/golang/tools/cmd/cover; then go get -u -v golang.org/x/tools/cmd/cover; fi
+  - gometalinter.v2 --disable-all --enable=golint --skip=internal --vendor ./...
+  # XXX: re-add coverage
