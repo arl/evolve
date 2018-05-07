@@ -1,8 +1,6 @@
-package framework
+package api
 
-import (
-	"time"
-)
+import "time"
 
 // PopulationData is an immutable data object containing statistics about the
 // state of an evolved population and a reference to the fittest candidate

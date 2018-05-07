@@ -1,4 +1,4 @@
-package framework
+package api
 
 // EvolutionObserver is a call-back interface so that programs can monitor the
 // state of a long-running evolutionary algorithm.

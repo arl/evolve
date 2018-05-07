@@ -1,4 +1,4 @@
-package framework
+package api
 
 // FitnessEvaluator calculates the fitness score of a given candidate of the
 // appropriate type.
