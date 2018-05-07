@@ -10,14 +10,6 @@ import (
 // passed.
 type GenerationCount int
 
-// NewGenerationCount creates a GenerationCoun termination condition.
-func NewGenerationCount(generationCount int) GenerationCount {
-	if generationCount <= 0 {
-		panic("Generation count must be positive")
-	}
-	return GenerationCount(generationCount)
-}
-
 // ShouldTerminate reports whether or not evolution should finish at the
 // current point.
 //

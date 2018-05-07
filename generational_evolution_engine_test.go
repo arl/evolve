@@ -52,7 +52,7 @@ func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 	engine.EvolveWithSeedCandidates(10,
 		2, // at least 2 generations because the first is just the initial population.
 		elite,
-		termination.NewGenerationCount(2))
+		termination.GenerationCount(2))
 
 	// Then when we have run the evolution, if the elite canidates were
 	// preserved they will lift the average fitness above zero. The exact value
@@ -66,15 +66,8 @@ func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 
 func TestGenerationalEvolutionEngineEliteCountTooHigh(t *testing.T) {
 	engine := prepareEngine()
-	assert.Panics(t, func() { engine.Evolve(10, 10, termination.NewGenerationCount(10)) },
+	assert.Panics(t, func() { engine.Evolve(10, 10, termination.GenerationCount(10)) },
 		"Should panic because elite count must be less than the total population size")
-}
-
-func TestGenerationalEvolutionEngineEliteCountNegative(t *testing.T) {
-	engine := prepareEngine()
-	assert.Panics(t, func() { engine.EvolvePopulation(10, -1, termination.NewGenerationCount(10)) },
-		"Should panic because elite count must not be negative",
-	)
 }
 
 func TestGenerationalEvolutionEngineNoTerminationCondition(t *testing.T) {
@@ -110,7 +103,7 @@ func TestGenerationalEvolutionEngineInterrupt(t*testing.T) {
 func TestGenerationalEvolutionEngineSatisfiedTerminationConditions(t *testing.T) {
 	engine := prepareEngine()
 
-	generationsCondition := termination.NewGenerationCount(1)
+	generationsCondition := termination.GenerationCount(1)
 	engine.Evolve(10, 0, generationsCondition)
 	satisfiedConditions, err := engine.SatisfiedTerminationConditions()
 	assert.NoError(t, err)
