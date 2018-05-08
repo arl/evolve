@@ -96,10 +96,10 @@ type EvolutionEngine interface {
 
 	// AddObserver registers an observer to receive status updates on the
 	// evolution progress.
-	AddObserver(o EvolutionObserver)
+	AddObserver(o Observer)
 
 	// RemoveObserver removes an evolution observer.
-	RemoveObserver(o EvolutionObserver)
+	RemoveObserver(o Observer)
 
 	// SatisfiedTerminationConditions returns a slice of all
 	// TerminationCondition's that are satisfied by the current state of the

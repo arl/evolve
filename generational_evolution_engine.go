@@ -27,7 +27,7 @@ type GenerationalEvolutionEngine struct {
 	op   api.Operator
 	eval api.FitnessEvaluator
 	sel  api.SelectionStrategy
-	eng  *AbstractEvolutionEngine
+	eng  *BaseEngine
 }
 
 // NewGenerationalEvolutionEngine creates a new evolution engine by specifying
@@ -46,7 +46,7 @@ func NewGenerationalEvolutionEngine(
 	op api.Operator,
 	eval api.FitnessEvaluator,
 	sel api.SelectionStrategy,
-	rng *rand.Rand) *AbstractEvolutionEngine {
+	rng *rand.Rand) *BaseEngine {
 
 	// create the Stepper implementation
 	stepper := &GenerationalEvolutionEngine{
@@ -56,7 +56,7 @@ func NewGenerationalEvolutionEngine(
 	}
 
 	// create the evolution engine implementation
-	impl := NewAbstractEvolutionEngine(f, eval, rng, stepper)
+	impl := NewBaseEngine(f, eval, rng, stepper)
 
 	// provide the engine to the stepper for forwarding
 	stepper.eng = impl

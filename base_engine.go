@@ -24,10 +24,10 @@ type Stepper interface {
 	Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation
 }
 
-// AbstractEvolutionEngine is a base struct for EvolutionEngine implementations.
-type AbstractEvolutionEngine struct {
+// BaseEngine is a base struct for EvolutionEngine implementations.
+type BaseEngine struct {
 	pool           *worker.Pool // shared concurrent worker
-	observers      map[api.EvolutionObserver]struct{}
+	obs            map[api.Observer]struct{}
 	rng            *rand.Rand
 	f              api.Factory
 	eval           api.FitnessEvaluator
@@ -36,8 +36,8 @@ type AbstractEvolutionEngine struct {
 	Stepper
 }
 
-// NewAbstractEvolutionEngine creates a new evolution engine by specifying the
-// various components required by an evolutionary algorithm.
+// NewBaseEngine creates a new evolution engine by specifying the various
+// components required by an evolutionary algorithm.
 //
 // candidateFactory is the factory used to create the initial population that is
 // iteratively evolved.
@@ -45,14 +45,14 @@ type AbstractEvolutionEngine struct {
 // solutions.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewAbstractEvolutionEngine(f api.Factory, eval api.FitnessEvaluator, rng *rand.Rand, stepper Stepper) *AbstractEvolutionEngine {
+func NewBaseEngine(f api.Factory, eval api.FitnessEvaluator, rng *rand.Rand, stepper Stepper) *BaseEngine {
 
-	return &AbstractEvolutionEngine{
-		f:         f,
-		eval:      eval,
-		rng:       rng,
-		observers: make(map[api.EvolutionObserver]struct{}),
-		Stepper:   stepper,
+	return &BaseEngine{
+		f:       f,
+		eval:    eval,
+		rng:     rng,
+		obs:     make(map[api.Observer]struct{}),
+		Stepper: stepper,
 	}
 }
 
@@ -76,7 +76,7 @@ func NewAbstractEvolutionEngine(f api.Factory, eval api.FitnessEvaluator, rng *r
 // terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *AbstractEvolutionEngine) Evolve(size, nelites int, conds ...api.TerminationCondition) api.Candidate {
+func (e *BaseEngine) Evolve(size, nelites int, conds ...api.TerminationCondition) api.Candidate {
 	return e.EvolveWithSeedCandidates(size, nelites, []api.Candidate{}, conds...)
 }
 
@@ -102,7 +102,7 @@ func (e *AbstractEvolutionEngine) Evolve(size, nelites int, conds ...api.Termina
 // terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *AbstractEvolutionEngine) EvolveWithSeedCandidates(size, nelites int, seedcands []api.Candidate, conds ...api.TerminationCondition) api.Candidate {
+func (e *BaseEngine) EvolveWithSeedCandidates(size, nelites int, seedcands []api.Candidate, conds ...api.TerminationCondition) api.Candidate {
 	return e.EvolvePopulationWithSeedCandidates(size, nelites, seedcands, conds...)[0].Candidate()
 }
 
@@ -125,7 +125,7 @@ func (e *AbstractEvolutionEngine) EvolveWithSeedCandidates(size, nelites int, se
 // terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *AbstractEvolutionEngine) EvolvePopulation(size, nelites int, conds ...api.TerminationCondition) api.EvaluatedPopulation {
+func (e *BaseEngine) EvolvePopulation(size, nelites int, conds ...api.TerminationCondition) api.EvaluatedPopulation {
 	return e.EvolvePopulationWithSeedCandidates(size, nelites, []api.Candidate{}, conds...)
 }
 
@@ -149,7 +149,7 @@ func (e *AbstractEvolutionEngine) EvolvePopulation(size, nelites int, conds ...a
 // conditions One or more conditions that may cause the evolution to terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []api.Candidate, conds ...api.TerminationCondition) api.EvaluatedPopulation {
+func (e *BaseEngine) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []api.Candidate, conds ...api.TerminationCondition) api.EvaluatedPopulation {
 
 	if nelites < 0 || nelites >= size {
 		panic("Elite count must be non-negative and less than population size.")
@@ -198,7 +198,7 @@ func (e *AbstractEvolutionEngine) EvolvePopulationWithSeedCandidates(size, nelit
 //
 // Returns the evaluated population (a list of candidates with attached fitness
 // scores).
-func (e *AbstractEvolutionEngine) evaluatePopulation(
+func (e *BaseEngine) evaluatePopulation(
 	pop []api.Candidate) api.EvaluatedPopulation {
 
 	// Do fitness evaluations
@@ -282,7 +282,7 @@ func (w *fitnessEvaluationWorker) Work() (interface{}, error) {
 // possible for evolution to terminate without any conditions being matched.
 // The only situation in which this occurs is when the request thread is
 // interrupted.
-func (e *AbstractEvolutionEngine) SatisfiedTerminationConditions() ([]api.TerminationCondition, error) {
+func (e *BaseEngine) SatisfiedTerminationConditions() ([]api.TerminationCondition, error) {
 	if e.satisfied == nil {
 		return nil, api.ErrIllegalState("evolution engine has not terminated")
 	}
@@ -297,18 +297,18 @@ func (e *AbstractEvolutionEngine) SatisfiedTerminationConditions() ([]api.Termin
 // Updates are dispatched synchronously on the request thread. Observers should
 // complete their processing and return in a timely manner to avoid holding up
 // the evolution.
-func (e *AbstractEvolutionEngine) AddObserver(observer api.EvolutionObserver) {
-	e.observers[observer] = struct{}{}
+func (e *BaseEngine) AddObserver(observer api.Observer) {
+	e.obs[observer] = struct{}{}
 }
 
 // RemoveObserver removes an evolution progress listener.
-func (e *AbstractEvolutionEngine) RemoveObserver(observer api.EvolutionObserver) {
-	delete(e.observers, observer)
+func (e *BaseEngine) RemoveObserver(observer api.Observer) {
+	delete(e.obs, observer)
 }
 
 // notifyPopulationChange sends the population data to all registered observers.
-func (e *AbstractEvolutionEngine) notifyPopulationChange(data *api.PopulationData) {
-	for observer := range e.observers {
+func (e *BaseEngine) notifyPopulationChange(data *api.PopulationData) {
+	for observer := range e.obs {
 		observer.PopulationUpdate(data)
 	}
 }
@@ -321,12 +321,12 @@ func (e *AbstractEvolutionEngine) notifyPopulationChange(data *api.PopulationDat
 // environments where programs are not permitted to start or control threads. It
 // might also lead to better performance for programs that have extremely
 // lightweight/trivial fitness evaluations.
-func (e *AbstractEvolutionEngine) SetSingleThreaded(singleThreaded bool) {
+func (e *BaseEngine) SetSingleThreaded(singleThreaded bool) {
 	e.singleThreaded = singleThreaded
 }
 
 // workerPool lazily creates the fitness evaluations goroutine pool.
-func (e *AbstractEvolutionEngine) workerPool() *worker.Pool {
+func (e *BaseEngine) workerPool() *worker.Pool {
 	if e.pool == nil {
 		// create a worker pool and set the maximum number of concurrent
 		// goroutines to the number of logical CPUs usable by the current
