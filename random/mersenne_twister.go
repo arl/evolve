@@ -20,10 +20,10 @@ const (
 	n = 312
 	m = 156
 
-	hiMask uint64 = 0xffffffff80000000
-	loMask uint64 = 0x000000007fffffff
+	himask uint64 = 0xffffffff80000000
+	lomask uint64 = 0x000000007fffffff
 
-	matrixA uint64 = 0xB5026F5AA96619E9
+	matrixa uint64 = 0xB5026F5AA96619E9
 )
 
 // MT19937 is the structure to hold the state of one instance of the
@@ -107,15 +107,15 @@ func (mt *MT19937) Uint64() uint64 {
 	x := mt.state
 	if mt.index >= n {
 		for i := 0; i < n-m; i++ {
-			y := (x[i] & hiMask) | (x[i+1] & loMask)
-			x[i] = x[i+m] ^ (y >> 1) ^ ((y & 1) * matrixA)
+			y := (x[i] & himask) | (x[i+1] & lomask)
+			x[i] = x[i+m] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		}
 		for i := n - m; i < n-1; i++ {
-			y := (x[i] & hiMask) | (x[i+1] & loMask)
-			x[i] = x[i+(m-n)] ^ (y >> 1) ^ ((y & 1) * matrixA)
+			y := (x[i] & himask) | (x[i+1] & lomask)
+			x[i] = x[i+(m-n)] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		}
-		y := (x[n-1] & hiMask) | (x[0] & loMask)
-		x[n-1] = x[m-1] ^ (y >> 1) ^ ((y & 1) * matrixA)
+		y := (x[n-1] & himask) | (x[0] & lomask)
+		x[n-1] = x[m-1] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		mt.index = 0
 	}
 	y := x[mt.index]
@@ -135,15 +135,15 @@ func (mt *MT19937) Int63() int64 {
 	x := mt.state
 	if mt.index >= n {
 		for i := 0; i < n-m; i++ {
-			y := (x[i] & hiMask) | (x[i+1] & loMask)
-			x[i] = x[i+m] ^ (y >> 1) ^ ((y & 1) * matrixA)
+			y := (x[i] & himask) | (x[i+1] & lomask)
+			x[i] = x[i+m] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		}
 		for i := n - m; i < n-1; i++ {
-			y := (x[i] & hiMask) | (x[i+1] & loMask)
-			x[i] = x[i+(m-n)] ^ (y >> 1) ^ ((y & 1) * matrixA)
+			y := (x[i] & himask) | (x[i+1] & lomask)
+			x[i] = x[i+(m-n)] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		}
-		y := (x[n-1] & hiMask) | (x[0] & loMask)
-		x[n-1] = x[m-1] ^ (y >> 1) ^ ((y & 1) * matrixA)
+		y := (x[n-1] & himask) | (x[0] & lomask)
+		x[n-1] = x[m-1] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		mt.index = 0
 	}
 	y := x[mt.index]
@@ -160,22 +160,22 @@ func (mt *MT19937) Int63() int64 {
 // `len(p)` and `err` is always nil.
 func (mt *MT19937) Read(p []byte) (n int, err error) {
 	for n+8 <= len(p) {
-		val := mt.Uint64()
-		p[n] = byte(val)
-		p[n+1] = byte(val >> 8)
-		p[n+2] = byte(val >> 16)
-		p[n+3] = byte(val >> 24)
-		p[n+4] = byte(val >> 32)
-		p[n+5] = byte(val >> 40)
-		p[n+6] = byte(val >> 48)
-		p[n+7] = byte(val >> 56)
+		ui64 := mt.Uint64()
+		p[n] = byte(ui64)
+		p[n+1] = byte(ui64 >> 8)
+		p[n+2] = byte(ui64 >> 16)
+		p[n+3] = byte(ui64 >> 24)
+		p[n+4] = byte(ui64 >> 32)
+		p[n+5] = byte(ui64 >> 40)
+		p[n+6] = byte(ui64 >> 48)
+		p[n+7] = byte(ui64 >> 56)
 		n += 8
 	}
 	if n < len(p) {
-		val := mt.Uint64()
+		ui64 := mt.Uint64()
 		for n < len(p) {
-			p[n] = byte(val)
-			val >>= 8
+			p[n] = byte(ui64)
+			ui64 >>= 8
 			n++
 		}
 	}
