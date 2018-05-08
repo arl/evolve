@@ -72,7 +72,7 @@ func main() {
 
 	eval := evaluator(targetString)
 
-	var selector = selection.RouletteWheelSelection
+	var selector = selection.RouletteWheel
 	rng := rand.New(rand.NewSource(randomSeed()))
 
 	engine := engine.NewGenerational(fac,

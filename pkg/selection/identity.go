@@ -10,7 +10,7 @@ import (
 type Identity struct{}
 
 // Select selects the specified number of candidates from the population.
-func (ids Identity) Select(
+func (Identity) Select(
 	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,

@@ -45,7 +45,7 @@ func main() {
 	eng := engine.NewGenerational(factory.NewBitstring(nbits),
 		pipeline,
 		evaluator{},
-		selection.RouletteWheelSelection,
+		selection.RouletteWheel,
 		mt19937)
 
 	eng.AddObserver(observer{})

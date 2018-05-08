@@ -21,7 +21,7 @@ func prepareEngine() api.Engine {
 		&test.ZeroIntFactory,
 		zeroIntMaker{},
 		test.IntEvaluator{},
-		selection.RouletteWheelSelection,
+		selection.RouletteWheel,
 		rand.New(rand.NewSource(99)))
 }
 
@@ -157,7 +157,7 @@ func BenchmarkGenerationalEngine(b *testing.B) {
 	engine := NewGenerational(fac,
 		pipe,
 		evaluator(targetString),
-		selection.RouletteWheelSelection,
+		selection.RouletteWheel,
 		rand.New(rand.NewSource(99)))
 
 	//engine.SetSingleThreaded(true)
