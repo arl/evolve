@@ -42,6 +42,8 @@ type MT19937 struct {
 
 // NewMT19937 allocates a new instance of the 64bit Mersenne Twister with the
 // specified seed.
+// TODO: provide another version of the constructor that is safe for concurrent
+// use by multiple goroutines
 func NewMT19937(seed int64) *MT19937 {
 	res := &MT19937{
 		state: make([]uint64, n),
