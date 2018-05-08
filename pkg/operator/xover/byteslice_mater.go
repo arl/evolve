@@ -2,8 +2,6 @@ package xover
 
 import (
 	"math/rand"
-
-	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // ByteSliceMater mates two []byte and produces a new pair of []byte
@@ -12,8 +10,8 @@ type ByteSliceMater struct{}
 // Mate performs crossover on a pair of parents to generate a pair of
 // offspring.
 func (m ByteSliceMater) Mate(
-	parent1, parent2 api.Candidate, nxpts int64,
-	rng *rand.Rand) []api.Candidate {
+	parent1, parent2 interface{}, nxpts int64,
+	rng *rand.Rand) []interface{} {
 
 	p1, p2 := parent1.([]byte), parent2.([]byte)
 
@@ -36,5 +34,5 @@ func (m ByteSliceMater) Mate(
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return append([]api.Candidate{}, off1, off2)
+	return append([]interface{}{}, off1, off2)
 }

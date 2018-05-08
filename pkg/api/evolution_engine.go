@@ -1,8 +1,8 @@
 package api
 
-// EvolutionEngine is the interface implemented by objects that provide
-// evolution operations.
-type EvolutionEngine interface {
+// Engine is the interface implemented by objects that provide evolution
+// operations.
+type Engine interface {
 
 	// Evolve executes the evolutionary algorithm until one of the termination
 	// conditions is met, then return the fittest candidate from the final
@@ -23,7 +23,7 @@ type EvolutionEngine interface {
 	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	Evolve(size, nelites int, conds ...TerminationCondition) Candidate
+	Evolve(size, nelites int, conds ...TerminationCondition) interface{}
 
 	// EvolveWithSeedCandidates executes the evolutionary algorithm until one of
 	// the termination conditions is met, then return the fittest candidate from
@@ -47,8 +47,8 @@ type EvolutionEngine interface {
 	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolveWithSeedCandidates(size, nelites int, seedcands []Candidate,
-		conds ...TerminationCondition) Candidate
+	EvolveWithSeedCandidates(size, nelites int, seedcands []interface{},
+		conds ...TerminationCondition) interface{}
 
 	// EvolvePopulation executes the evolutionary algorithm until one of the
 	// termination conditions is met, then return all of the candidates from the
@@ -91,15 +91,15 @@ type EvolutionEngine interface {
 	// terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []Candidate,
+	EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []interface{},
 		conds ...TerminationCondition) EvaluatedPopulation
 
 	// AddObserver registers an observer to receive status updates on the
 	// evolution progress.
-	AddObserver(o EvolutionObserver)
+	AddObserver(o Observer)
 
 	// RemoveObserver removes an evolution observer.
-	RemoveObserver(o EvolutionObserver)
+	RemoveObserver(o Observer)
 
 	// SatisfiedTerminationConditions returns a slice of all
 	// TerminationCondition's that are satisfied by the current state of the

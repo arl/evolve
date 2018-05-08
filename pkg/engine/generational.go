@@ -1,4 +1,4 @@
-package evolve
+package engine
 
 import (
 	"math/rand"
@@ -6,7 +6,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-// GenerationalEvolutionEngine implements a general-purpose generational
+// Generational implements a general-purpose engine for generational
 // evolutionary algorithm.
 //
 // It supports optional concurrent fitness evaluations to take full advantage of
@@ -23,14 +23,14 @@ import (
 // where it is not permitted for applications to manage their own threads. If
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
-type GenerationalEvolutionEngine struct {
+type Generational struct {
 	op   api.Operator
-	eval api.FitnessEvaluator
-	sel  api.SelectionStrategy
-	eng  *AbstractEvolutionEngine
+	eval api.Evaluator
+	sel  api.Selection
+	eng  *Base
 }
 
-// NewGenerationalEvolutionEngine creates a new evolution engine by specifying
+// NewGenerational creates a new evolution engine by specifying
 // the various components required by a generational evolutionary algorithm.
 //
 // f is the factory used to create the initial population that is iteratively
@@ -41,22 +41,13 @@ type GenerationalEvolutionEngine struct {
 // sel is a strategy for selecting which candidates survive to be evolved.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewGenerationalEvolutionEngine(
-	f api.Factory,
-	op api.Operator,
-	eval api.FitnessEvaluator,
-	sel api.SelectionStrategy,
-	rng *rand.Rand) *AbstractEvolutionEngine {
+func NewGenerational(f api.Factory, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *Base {
 
 	// create the Stepper implementation
-	stepper := &GenerationalEvolutionEngine{
-		op:   op,
-		eval: eval,
-		sel:  sel,
-	}
+	stepper := &Generational{op: op, eval: eval, sel: sel}
 
 	// create the evolution engine implementation
-	impl := NewAbstractEvolutionEngine(f, eval, rng, stepper)
+	impl := NewBaseEngine(f, eval, rng, stepper)
 
 	// provide the engine to the stepper for forwarding
 	stepper.eng = impl
@@ -70,12 +61,12 @@ func NewGenerationalEvolutionEngine(
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *GenerationalEvolutionEngine) Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation {
+func (e *Generational) Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation {
 
-	pop := make([]api.Candidate, 0, len(evpop))
+	pop := make([]interface{}, 0, len(evpop))
 
 	// First perform any elitist selection.
-	elite := make([]api.Candidate, nelites)
+	elite := make([]interface{}, nelites)
 	for i := 0; i < nelites; i++ {
 		elite[i] = evpop[i].Candidate()
 	}

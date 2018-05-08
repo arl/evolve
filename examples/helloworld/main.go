@@ -7,9 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aurelien-rainone/evolve"
-
 	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/aurelien-rainone/evolve/pkg/engine"
 	"github.com/aurelien-rainone/evolve/pkg/factory"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
@@ -23,10 +22,7 @@ import (
 // string.
 type evaluator string
 
-func (s evaluator) Fitness(
-	cand api.Candidate,
-	pop []api.Candidate) float64 {
-
+func (s evaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 	var errors float64
 	sc := cand.(string)
 	for i := range sc {
@@ -61,11 +57,7 @@ func main() {
 		}
 	}
 
-	var (
-		stringFactory *factory.String
-		err           error
-	)
-	stringFactory, err = factory.NewString(string(alphabet), len(targetString))
+	fac, err := factory.NewString(string(alphabet), len(targetString))
 	check(err)
 
 	// 1st operator: string mutation
@@ -80,10 +72,10 @@ func main() {
 
 	eval := evaluator(targetString)
 
-	var selector = selection.RouletteWheelSelection
+	var selector = selection.RouletteWheel
 	rng := rand.New(rand.NewSource(randomSeed()))
 
-	engine := evolve.NewGenerationalEvolutionEngine(stringFactory,
+	engine := engine.NewGenerational(fac,
 		pipeline,
 		eval,
 		selector,

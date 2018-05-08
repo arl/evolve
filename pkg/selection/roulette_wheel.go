@@ -7,7 +7,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-// RouletteWheelSelection implements selection of N candidates from a population
+// RouletteWheel implements selection of N candidates from a population
 // by selecting N candidates at random where the probability of each candidate
 // getting selected is proportional to its fitness score.
 //
@@ -18,9 +18,9 @@ import (
 // excessively high occurrences of particular candidates. If this is a problem,
 // StochasticUniversalSampling provides an alternative fitness-proportionate
 // strategy for selection.
-var RouletteWheelSelection = rouletteWheelSelection{}
+var RouletteWheel = rouletteWheel{}
 
-type rouletteWheelSelection struct{}
+type rouletteWheel struct{}
 
 // Select selects the required number of candidates from the population with the
 // probability of selecting any particular candidate being proportional to that
@@ -30,11 +30,11 @@ type rouletteWheelSelection struct{}
 // naturalFitnessScores should be true if higher fitness scores indicate fitter
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
-func (rouletteWheelSelection) Select(
+func (rouletteWheel) Select(
 	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
 	// Record the cumulative fitness scores. It doesn't matter whether the
 	// population is sorted or not. We will use these cumulative scores to
@@ -50,7 +50,7 @@ func (rouletteWheelSelection) Select(
 		cumfitness[i] = cumfitness[i-1] + fitness
 	}
 
-	sel := make([]api.Candidate, size)
+	sel := make([]interface{}, size)
 	for i := 0; i < size; i++ {
 		rand := rng.Float64() * cumfitness[len(cumfitness)-1]
 		index := sort.SearchFloat64s(cumfitness, rand)
@@ -63,7 +63,7 @@ func (rouletteWheelSelection) Select(
 	return sel
 }
 
-func (rouletteWheelSelection) String() string { return "Roulette Wheel Selection" }
+func (rouletteWheel) String() string { return "Roulette Wheel Selection" }
 
 func abs(a int) int {
 	if a < 0 {

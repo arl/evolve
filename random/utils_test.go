@@ -18,7 +18,7 @@ import (
 // produce a reasonably accurate result (assuming the RNG is uniform).
 // Less than 10,000 is not particularly useful.  100,000 should be sufficient.
 //
-// Returns An approximation of pi generated using the provided RNG.
+// Returns an approximation of pi generated using the provided RNG.
 func calculateMonteCarloValueForPi(rng *rand.Rand, iterations int) float64 {
 	// Assumes a quadrant of a circle of radius 1, bounded by a box with
 	// sides of length 1.  The area of the square is therefore 1 square unit
@@ -44,7 +44,7 @@ func calculateMonteCarloValueForPi(rng *rand.Rand, iterations int) float64 {
 // the origin.
 // - x, y are the coordinates of the point (must be between 0 and 1).
 //
-// Returns True if the point is within the quadrant, false otherwise.
+// Returns true if the point is within the quadrant, false otherwise.
 func isInQuadrant(x, y float64) bool {
 	distance := math.Sqrt((x * x) + (y * y))
 	return distance <= 1

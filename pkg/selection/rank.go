@@ -7,7 +7,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-type rank struct{ selector api.SelectionStrategy }
+type rank struct{ selector api.Selection }
 
 // NewRank returns a rank selection stragy rank, that is similar to
 // fitness-proportionate selection except that is uses relative fitness rather
@@ -22,7 +22,7 @@ type rank struct{ selector api.SelectionStrategy }
 // mapRankToScore(int, int) and delegation to a fitness-proportionate selector.
 // The mapping function converts ranks into relative fitness scores that are
 // used to drive the delegate selector.
-func NewRank(selector api.SelectionStrategy) api.SelectionStrategy {
+func NewRank(selector api.Selection) api.Selection {
 	return rank{selector: selector}
 }
 
@@ -50,7 +50,7 @@ func (rs rank) Select(
 	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
 	ranked := make(api.EvaluatedPopulation, len(pop))
 	var err error

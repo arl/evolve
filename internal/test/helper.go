@@ -11,42 +11,28 @@ import (
 )
 
 // Trivial fitness evaluator for integers. Used by unit tests.
-type IntegerEvaluator struct{}
+type IntEvaluator struct{}
 
-func (e IntegerEvaluator) Fitness(candidate api.Candidate, population []api.Candidate) float64 {
-	return float64(candidate.(int))
+func (IntEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
+	return float64(cand.(int))
 }
 
-func (e IntegerEvaluator) IsNatural() bool {
-	return true
-}
+func (IntEvaluator) IsNatural() bool { return true }
 
 // Stub candidate factory for tests. Always returns zero-valued integers.
-type StubIntegerFactory struct {
-	factory.BaseFactory
-}
+var ZeroIntFactory = factory.BaseFactory{CandidateGenerator: ZeroIntGenerator{}}
 
-func NewStubIntegerFactory() *StubIntegerFactory {
-	return &StubIntegerFactory{
-		factory.BaseFactory{
-			CandidateGenerator: ZeroIntegerGenerator{},
-		},
-	}
-}
+type ZeroIntGenerator struct{}
 
-type ZeroIntegerGenerator struct{}
+func (ZeroIntGenerator) GenerateCandidate(rng *rand.Rand) interface{} { return 0 }
 
-func (zig ZeroIntegerGenerator) GenerateCandidate(rng *rand.Rand) api.Candidate {
-	return 0
-}
-
-// IntegerAdjuster is a trivial test operator that mutates all integers by
+// IntAdjuster is a trivial test operator that mutates all integers by
 // adding a fixed offset.
-type IntegerAdjuster int
+type IntAdjuster int
 
-func (op IntegerAdjuster) Apply(selectedCandidates []api.Candidate, rng *rand.Rand) []api.Candidate {
-	result := make([]api.Candidate, len(selectedCandidates))
-	for i, c := range selectedCandidates {
+func (op IntAdjuster) Apply(cands []interface{}, rng *rand.Rand) []interface{} {
+	result := make([]interface{}, len(cands))
+	for i, c := range cands {
 		result[i] = c.(int) + int(op)
 	}
 	return result
@@ -56,25 +42,24 @@ func (op IntegerAdjuster) Apply(selectedCandidates []api.Candidate, rng *rand.Ra
 // Utility functions used by unit tests for migration strategies.
 //
 
-func CreateTestPopulation(members ...api.Candidate) api.EvaluatedPopulation {
+func CreateTestPopulation(members ...interface{}) api.EvaluatedPopulation {
 	var err error
-	population := make(api.EvaluatedPopulation, len(members))
+	pop := make(api.EvaluatedPopulation, len(members))
 	for i, member := range members {
-		population[i], err = api.NewEvaluatedCandidate(member, 0)
+		pop[i], err = api.NewEvaluatedCandidate(member, 0)
 		if err != nil {
-			panic(fmt.Sprintf("can't create test population: %v", err))
+			panic(fmt.Sprintf("can't create test pop: %v", err))
 		}
 	}
-	return population
+	return pop
 }
 
-func AssertPopulationContents(t *testing.T, actualPopulation api.EvaluatedPopulation,
-	expectedPopulation ...string) {
+func AssertPopulationContents(t *testing.T, actualpop api.EvaluatedPopulation, expected ...string) {
 	t.Helper() // mark current function as helper in case of error
-	assert.Len(t, actualPopulation, len(expectedPopulation), "wrong population size after migration")
-	for i, evCand := range actualPopulation {
-		got := evCand.Candidate()
-		want := expectedPopulation[i]
+	assert.Len(t, actualpop, len(expected), "wrong population size after migration")
+	for i, cand := range actualpop {
+		got := cand.Candidate()
+		want := expected[i]
 		assert.Equalf(t, want, got, "wrong candidate at index %v, want %v, got %v", i, want, got)
 	}
 }

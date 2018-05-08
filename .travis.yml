@@ -19,10 +19,11 @@ before_script:
   # use golint through gometalinter because it allows to easily ignore the
   # `vendor` and `internal` directories
   - go get -u gopkg.in/alecthomas/gometalinter.v2
+  - gometalinter.v2 --install
 
 script:
   - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
   - go test -v -race ./...                   # Run all the tests with the race detector enabled
   - go vet ./...
-  - gometalinter.v2 --disable-all --skip=internal --vendor ./...
+  - gometalinter.v2 --skip=internal --vendor ./...
   # TODO: re-add coverage

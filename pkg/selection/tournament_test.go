@@ -3,15 +3,13 @@ package selection
 import (
 	"fmt"
 	"testing"
-
-	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 func TestTournamentSelectionNatural(t *testing.T) {
 	ts := NewTournament()
 	errcheck(t, ts.SetProb(0.7))
 	testRandomBasedSelection(t, ts, randomBasedPopNatural, true, 2,
-		func(selected []api.Candidate) error {
+		func(selected []interface{}) error {
 			if len(selected) != 2 {
 				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
 			}
@@ -23,7 +21,7 @@ func TestTournamentSelectionNonNatural(t *testing.T) {
 	ts := NewTournament()
 	errcheck(t, ts.SetProb(0.7))
 	testRandomBasedSelection(t, ts, randomBasedPopNonNatural, false, 2,
-		func(selected []api.Candidate) error {
+		func(selected []interface{}) error {
 			if len(selected) != 2 {
 				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
 			}

@@ -7,7 +7,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-type sigmaScaling struct{ selector api.SelectionStrategy }
+type sigmaScaling struct{ selector api.Selection }
 
 // NewSigmaScaling creates a sigma-scaled selection strategy. This is an
 // alternative to straightforward fitness-proportionate
@@ -23,7 +23,7 @@ type sigmaScaling struct{ selector api.SelectionStrategy }
 // in a population of mostly unfit individuals. It also helps to amplify minor
 // fitness differences in a more mature population where the rate of improvement
 // has slowed.
-func NewSigmaScaling(selector api.SelectionStrategy) api.SelectionStrategy {
+func NewSigmaScaling(selector api.Selection) api.Selection {
 	return &sigmaScaling{selector: selector}
 }
 
@@ -51,7 +51,7 @@ func (sel *sigmaScaling) Select(
 	population api.EvaluatedPopulation,
 	naturalFitnessScores bool,
 	selectionSize int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
 	statistics := api.NewDataSet(api.WithInitialCapacity(len(population)))
 	for _, candidate := range population {

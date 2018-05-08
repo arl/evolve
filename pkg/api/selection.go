@@ -5,10 +5,10 @@ import (
 	"math/rand"
 )
 
-// SelectionStrategy is the interface that wraps the Select method.
+// Selection is the interface that wraps the Select method.
 //
 // Select implements "natural" selection.
-type SelectionStrategy interface {
+type Selection interface {
 	fmt.Stringer
 
 	// Select selects the specified number of candidates from the population.
@@ -27,5 +27,5 @@ type SelectionStrategy interface {
 	//
 	// Returns a slice containing the selected candidates. Some individual
 	// candidates may potentially have been selected multiple times.
-	Select(pop EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []Candidate
+	Select(pop EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []interface{}
 }

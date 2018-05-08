@@ -12,8 +12,8 @@ type Pipeline []api.Operator
 
 // Apply applies each operation in the pipeline in turn to the selection.
 func (ops Pipeline) Apply(
-	sel []api.Candidate,
-	rng *rand.Rand) []api.Candidate {
+	sel []interface{},
+	rng *rand.Rand) []interface{} {
 
 	for _, op := range ops {
 		sel = op.Apply(sel, rng)

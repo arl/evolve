@@ -4,7 +4,6 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,7 +11,7 @@ func TestStringMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(StringMater{})
-	pop := make([]api.Candidate, 4)
+	pop := make([]interface{}, 4)
 	pop[0] = "abcde"
 	pop[1] = "fghij"
 	pop[2] = "klmno"
@@ -42,7 +41,7 @@ func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(StringMater{})
-	pop := []api.Candidate{"abcde", "fghijklm"}
+	pop := []interface{}{"abcde", "fghijklm"}
 
 	// This should panic since the parents are different lengths.
 	// TODO: why panicking and not returning an error?
