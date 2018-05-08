@@ -42,7 +42,7 @@ func main() {
 
 	mt19937 := rand.New(random.NewMT19937(0))
 
-	eng := engine.NewGenerationalEngine(factory.NewBitstring(nbits),
+	eng := engine.NewGenerational(factory.NewBitstring(nbits),
 		pipeline,
 		evaluator{},
 		selection.RouletteWheelSelection,

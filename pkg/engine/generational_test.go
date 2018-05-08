@@ -16,8 +16,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func prepareEngine() api.EvolutionEngine {
-	return NewGenerationalEngine(
+func prepareEngine() api.Engine {
+	return NewGenerational(
 		&factory.BaseFactory{CandidateGenerator: test.NewStubIntegerFactory()},
 		integerZeroMaker{},
 		test.IntegerEvaluator{},
@@ -154,7 +154,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	// Create a pipeline that applies mutation then crossover
 	pipe := operator.Pipeline{mut, xover}
 
-	engine := NewGenerationalEngine(fac,
+	engine := NewGenerational(fac,
 		pipe,
 		evaluator(targetString),
 		selection.RouletteWheelSelection,

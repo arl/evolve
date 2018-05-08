@@ -78,7 +78,7 @@ func main() {
 	var selector = selection.RouletteWheelSelection
 	rng := rand.New(rand.NewSource(randomSeed()))
 
-	engine := engine.NewGenerationalEngine(fac,
+	engine := engine.NewGenerational(fac,
 		pipeline,
 		eval,
 		selector,

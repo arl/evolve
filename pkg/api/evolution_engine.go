@@ -1,8 +1,8 @@
 package api
 
-// EvolutionEngine is the interface implemented by objects that provide
-// evolution operations.
-type EvolutionEngine interface {
+// Engine is the interface implemented by objects that provide evolution
+// operations.
+type Engine interface {
 
 	// Evolve executes the evolutionary algorithm until one of the termination
 	// conditions is met, then return the fittest candidate from the final
