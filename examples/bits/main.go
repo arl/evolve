@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
@@ -27,17 +28,26 @@ func (evaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 
 func (evaluator) IsNatural() bool { return true }
 
+func check(err error) {
+	if err != nil {
+		log.Fatalln("quitting with error:", err)
+	}
+}
+
 // An implementation of the first exercise (page 31) from the book An
 // Introduction to Genetic Algorithms, by Melanie Mitchell.  The algorithm
 // evolves bit strings and the fitness function simply counts the number of ones
 // in the bit string.  The evolution should therefore converge on strings that
 // consist only of ones.
 func main() {
+	// define the crossover
 	xover := xover.New(xover.BitstringMater{})
-	xover.SetPoints(1)
-	xover.SetProb(0.7)
+	check(xover.SetPoints(1))
+	check(xover.SetProb(0.7))
+
+	// define the mutation
 	mut := mutation.NewBitstring()
-	mut.SetProb(0.01)
+	check(mut.SetProb(0.01))
 	pipeline := operator.Pipeline{xover, mut}
 
 	mt19937 := rand.New(random.NewMT19937(0))
