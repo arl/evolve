@@ -58,7 +58,7 @@ var randomBasedPopNonNatural = testPopulation{
 	{name: "Steve", fitness: 10.0},
 }
 
-func testFitnessBasedSelection(t *testing.T, ss api.SelectionStrategy, tpop testPopulation, natural bool) {
+func testFitnessBasedSelection(t *testing.T, ss api.Selection, tpop testPopulation, natural bool) {
 	rng := rand.New(rand.NewSource(99))
 
 	// create the population
@@ -100,7 +100,7 @@ type popCheckFunc func(selected []api.Candidate) error
 
 // test a random based selection strategy ss by selecting the n best candidates
 // of tpop, running the result to f
-func testRandomBasedSelection(t *testing.T, ss api.SelectionStrategy, tpop testPopulation, natural bool, n int, f popCheckFunc) {
+func testRandomBasedSelection(t *testing.T, ss api.Selection, tpop testPopulation, natural bool, n int, f popCheckFunc) {
 	seed := time.Now().UnixNano()
 	rng := rand.New(rand.NewSource(seed))
 

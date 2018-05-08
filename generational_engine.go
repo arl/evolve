@@ -6,7 +6,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-// GenerationalEvolutionEngine implements a general-purpose generational
+// GenerationalEngine implements a general-purpose generational
 // evolutionary algorithm.
 //
 // It supports optional concurrent fitness evaluations to take full advantage of
@@ -23,14 +23,14 @@ import (
 // where it is not permitted for applications to manage their own threads. If
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
-type GenerationalEvolutionEngine struct {
+type GenerationalEngine struct {
 	op   api.Operator
-	eval api.FitnessEvaluator
-	sel  api.SelectionStrategy
+	eval api.Evaluator
+	sel  api.Selection
 	eng  *BaseEngine
 }
 
-// NewGenerationalEvolutionEngine creates a new evolution engine by specifying
+// NewGenerationalEngine creates a new evolution engine by specifying
 // the various components required by a generational evolutionary algorithm.
 //
 // f is the factory used to create the initial population that is iteratively
@@ -41,15 +41,15 @@ type GenerationalEvolutionEngine struct {
 // sel is a strategy for selecting which candidates survive to be evolved.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewGenerationalEvolutionEngine(
+func NewGenerationalEngine(
 	f api.Factory,
 	op api.Operator,
-	eval api.FitnessEvaluator,
-	sel api.SelectionStrategy,
+	eval api.Evaluator,
+	sel api.Selection,
 	rng *rand.Rand) *BaseEngine {
 
 	// create the Stepper implementation
-	stepper := &GenerationalEvolutionEngine{
+	stepper := &GenerationalEngine{
 		op:   op,
 		eval: eval,
 		sel:  sel,
@@ -70,7 +70,7 @@ func NewGenerationalEvolutionEngine(
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *GenerationalEvolutionEngine) Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation {
+func (e *GenerationalEngine) Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation {
 
 	pop := make([]api.Candidate, 0, len(evpop))
 

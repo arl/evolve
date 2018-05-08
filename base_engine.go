@@ -30,7 +30,7 @@ type BaseEngine struct {
 	obs            map[api.Observer]struct{}
 	rng            *rand.Rand
 	f              api.Factory
-	eval           api.FitnessEvaluator
+	eval           api.Evaluator
 	singleThreaded bool
 	satisfied      []api.TerminationCondition
 	Stepper
@@ -45,7 +45,7 @@ type BaseEngine struct {
 // solutions.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewBaseEngine(f api.Factory, eval api.FitnessEvaluator, rng *rand.Rand, stepper Stepper) *BaseEngine {
+func NewBaseEngine(f api.Factory, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *BaseEngine {
 
 	return &BaseEngine{
 		f:       f,
@@ -254,7 +254,7 @@ func (e *BaseEngine) evaluatePopulation(
 type fitnessEvaluationWorker struct {
 	idx       int             // index of candidate to evaluate
 	pop       []api.Candidate // full population
-	evaluator api.FitnessEvaluator
+	evaluator api.Evaluator
 }
 
 func (w *fitnessEvaluationWorker) Work() (interface{}, error) {

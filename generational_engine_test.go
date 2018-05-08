@@ -17,7 +17,7 @@ import (
 )
 
 func prepareEngine() api.EvolutionEngine {
-	return NewGenerationalEvolutionEngine(
+	return NewGenerationalEngine(
 		&factory.BaseFactory{CandidateGenerator: test.NewStubIntegerFactory()},
 		integerZeroMaker{},
 		test.IntegerEvaluator{},
@@ -154,7 +154,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	// Create a pipeline that applies mutation then crossover
 	pipe := operator.Pipeline{mut, xover}
 
-	engine := NewGenerationalEvolutionEngine(fac,
+	engine := NewGenerationalEngine(fac,
 		pipe,
 		evaluator(targetString),
 		selection.RouletteWheelSelection,

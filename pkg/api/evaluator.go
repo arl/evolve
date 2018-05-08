@@ -1,11 +1,11 @@
 package api
 
-// FitnessEvaluator calculates the fitness score of a given candidate of the
+// Evaluator calculates the fitness score of a given candidate of the
 // appropriate type.
 //
 // Fitness evaluations may be executed concurrently and therefore any access to
 // mutable shared state should be properly synchronised.
-type FitnessEvaluator interface {
+type Evaluator interface {
 
 	// Fitness calculates a fitness score for the given candidate.
 	//

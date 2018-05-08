@@ -23,7 +23,7 @@ import "sync"
 type FitnessCache struct {
 
 	// Wrapped is the fitness evaluator for which we want to provide caching
-	Wrapped FitnessEvaluator
+	Wrapped Evaluator
 	cache   sync.Map
 }
 

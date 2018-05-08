@@ -61,11 +61,7 @@ func main() {
 		}
 	}
 
-	var (
-		stringFactory *factory.String
-		err           error
-	)
-	stringFactory, err = factory.NewString(string(alphabet), len(targetString))
+	fac, err := factory.NewString(string(alphabet), len(targetString))
 	check(err)
 
 	// 1st operator: string mutation
@@ -83,7 +79,7 @@ func main() {
 	var selector = selection.RouletteWheelSelection
 	rng := rand.New(rand.NewSource(randomSeed()))
 
-	engine := evolve.NewGenerationalEvolutionEngine(stringFactory,
+	engine := evolve.NewGenerationalEngine(fac,
 		pipeline,
 		eval,
 		selector,
