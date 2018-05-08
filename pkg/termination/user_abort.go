@@ -32,7 +32,7 @@ func NewUserAbort() *UserAbort {
 //
 // populationData is the information about the current state of evolution.  This
 // may be used to determine whether evolution should continue or not.
-func (ua *UserAbort) ShouldTerminate(populationData *api.PopulationData) bool {
+func (ua *UserAbort) ShouldTerminate(popdata *api.PopulationData) bool {
 	return ua.IsAborted()
 }
 
@@ -59,6 +59,4 @@ func (ua *UserAbort) Reset() {
 }
 
 // String returns the termination condition representation as a string
-func (ua *UserAbort) String() string {
-	return "User aborted evolution"
-}
+func (*UserAbort) String() string { return "User aborted evolution" }
