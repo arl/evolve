@@ -19,6 +19,7 @@ before_script:
   # use golint through gometalinter because it allows to easily ignore the
   # `vendor` and `internal` directories
   - go get -u gopkg.in/alecthomas/gometalinter.v2
+  - gometalinter.v2 --install
 
 script:
   - test -z $(gofmt -s -l $GO_FILES)         # Fail if a .go file hasn't been formatted with gofmt
