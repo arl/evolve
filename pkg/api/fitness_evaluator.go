@@ -14,21 +14,21 @@ type FitnessEvaluator interface {
 	// value greater than or equal to zero. Framework behaviour is undefined for
 	// negative fitness scores.
 	//
-	// candidate is the candidate solution to calculate fitness for.
+	// cand is the candidate solution to calculate fitness for.
 	//
-	// population is the entire population. This will include the specified
-	// candidate. This is provided for fitness evaluators that evaluate
-	// individuals in the context of the population that they are part of (e.g.
-	// a program that evolves game-playing strategies may wish to play each
-	// strategy against each of the others). This parameter
-	// can be ignored by simple fitness evaluators. When iterating over the
-	// population, a simple interface equality check (==) can be used to
-	// identify which member of the population is the specified candidate.
+	// pop is the entire population. This will include the specified candidate.
+	// This is provided for fitness evaluators that evaluate individuals in the
+	// context of the population that they are part of (e.g.  a program that
+	// evolves game-playing strategies may wish to play each strategy against
+	// each of the others). This parameter can be ignored by simple fitness
+	// evaluators. When iterating over the population, a simple interface
+	// equality check (==) can be used to identify which member of the
+	// population is the specified candidate.
 	//
 	// Returns the fitness score for the specified candidate. Must always be a
 	// non-negative value regardless of natural or non-natural evaluation is
 	// being used.
-	Fitness(candidate Candidate, population []Candidate) float64
+	Fitness(cand Candidate, pop []Candidate) float64
 
 	// IsNatural specifies whether this evaluator generates 'natural' fitness
 	// scores or not.
