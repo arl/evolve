@@ -47,7 +47,7 @@ func NewGenerational(f api.Factory, op api.Operator, eval api.Evaluator, sel api
 	stepper := &Generational{op: op, eval: eval, sel: sel}
 
 	// create the evolution engine implementation
-	impl := NewBaseEngine(f, eval, rng, stepper)
+	impl := NewBase(f, eval, rng, stepper)
 
 	// provide the engine to the stepper for forwarding
 	stepper.eng = impl

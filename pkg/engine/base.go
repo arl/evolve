@@ -36,7 +36,7 @@ type Base struct {
 	Stepper
 }
 
-// NewBaseEngine creates a new evolution engine by specifying the various
+// NewBase creates a new evolution engine by specifying the various
 // components required by an evolutionary algorithm.
 //
 // candidateFactory is the factory used to create the initial population that is
@@ -45,8 +45,7 @@ type Base struct {
 // solutions.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewBaseEngine(f api.Factory, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
-
+func NewBase(f api.Factory, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
 	return &Base{
 		f:       f,
 		eval:    eval,
