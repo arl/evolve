@@ -265,7 +265,7 @@ func (w *fitnessEvaluationWorker) Work() (interface{}, error) {
 // that are satisfied by the current state of the evolution engine.
 //
 // Usually this slice will contain only one item, but it is possible that
-// mutliple termination conditions will become satisfied at the same time. In
+// multiple termination conditions will become satisfied at the same time. In
 // this case the condition objects in the slice will be in the same order that
 // they were specified when passed to the engine.
 //

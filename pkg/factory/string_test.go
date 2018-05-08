@@ -34,19 +34,19 @@ func validatePopulation(t *testing.T, pop []interface{}, alphabet string) {
 func TestStringFactory(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	t.Run("string population with ascii-only aplhabet", func(*testing.T) {
+	t.Run("string population with ascii-only alphabet", func(*testing.T) {
 		sf, err := NewString(alphabet, stringLength)
 		assert.NoError(t, err)
 		pop := sf.GenPopulation(populationSize, rng)
 		validatePopulation(t, pop, alphabet)
 	})
 
-	t.Run("string population with non ascii-only aplhabet", func(*testing.T) {
+	t.Run("string population with non ascii-only alphabet", func(*testing.T) {
 		_, err := NewString("日本語", stringLength)
 		assert.Error(t, err)
 	})
 
-	t.Run("StringFactory with empty aplhabet", func(*testing.T) {
+	t.Run("StringFactory with empty alphabet", func(*testing.T) {
 		_, err := NewString("", stringLength)
 		assert.Error(t, err)
 	})

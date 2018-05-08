@@ -2,6 +2,8 @@ package api
 
 // Engine is the interface implemented by objects that provide evolution
 // operations.
+// TODO: does the Engine interface really needs all this methods? wouldn't one
+// suffice and the others be derived from it (in engine.Base)?
 type Engine interface {
 
 	// Evolve executes the evolutionary algorithm until one of the termination
@@ -106,7 +108,7 @@ type Engine interface {
 	// evolution engine.
 	//
 	// Usually this list will contain only one item, but it is possible that
-	// mutliple termination conditions will become satisfied at the same time.
+	// multiple termination conditions will become satisfied at the same time.
 	// In this case the condition objects in the list will be in the same order
 	// that they were specified when passed to the engine.
 	//

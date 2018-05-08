@@ -48,7 +48,7 @@ type Crossover struct {
 // New creates a Crossover operator based off the provided Mater.
 //
 // The returned Crossover performs a one point crossover with 1.0 (i.e always)
-// probabilty.
+// probability.
 func New(mater Mater) *Crossover {
 	return &Crossover{
 		npts: 1, varnpts: false, nptsmin: 1, nptsmax: 1,

@@ -58,7 +58,7 @@ func (op *Bitstring) SetMutations(nmut int) error {
 }
 
 // SetMutationsRange sets the range of possible number of mutations (i.e the
-// numnber of bits that will be filpped if the bitstring candidate is selected
+// numnber of bits that will be flipped if the bitstring candidate is selected
 // for mutation).
 //
 // The specific number of mutations will be randomly chosen with the pseudo
