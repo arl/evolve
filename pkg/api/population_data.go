@@ -7,7 +7,9 @@ import "time"
 type PopulationData struct {
 
 	// BestCandidate is the fittest candidate present in the population.
-	BestCand Candidate
+	// TODO: rename into Best (or: why not having an evluated candidate here, so
+	// we would have the best candidate ANd their fitness)
+	BestCand interface{}
 
 	// BestFitness is the fitness score for the fittest candidate in the
 	// population.

@@ -85,7 +85,7 @@ func testFitnessBasedSelection(t *testing.T, ss api.Selection, tpop testPopulati
 	}
 }
 
-func frequency(slice []api.Candidate, val api.Candidate) int {
+func frequency(slice []interface{}, val interface{}) int {
 	var count int
 	for _, s := range slice {
 		if s.(string) == val {
@@ -96,7 +96,7 @@ func frequency(slice []api.Candidate, val api.Candidate) int {
 }
 
 // function to check the selected candidates (returns nil of test fail message)
-type popCheckFunc func(selected []api.Candidate) error
+type popCheckFunc func(selected []interface{}) error
 
 // test a random based selection strategy ss by selecting the n best candidates
 // of tpop, running the result to f

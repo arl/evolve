@@ -40,5 +40,5 @@ type Operator interface {
 	// should return a list that contains evolved copies of those candidates
 	// (umodified candidates can be included in the results without having to be
 	// copied).
-	Apply(cands []Candidate, rng *rand.Rand) []Candidate
+	Apply([]interface{}, *rand.Rand) []interface{}
 }

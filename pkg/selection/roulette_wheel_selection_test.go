@@ -3,8 +3,6 @@ package selection
 import (
 	"fmt"
 	"testing"
-
-	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // Unit test for roulette selection strategy. We cannot easily test
@@ -14,7 +12,7 @@ import (
 func testRouletteWheelSelection(t *testing.T, tpop testPopulation, natural bool) {
 	for i := 0; i < 20; i++ {
 		testRandomBasedSelection(t, RouletteWheelSelection, tpop, natural, 2,
-			func(selected []api.Candidate) error {
+			func(selected []interface{}) error {
 				if len(selected) != 2 {
 					return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
 				}

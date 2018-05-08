@@ -34,7 +34,7 @@ func (rouletteWheelSelection) Select(
 	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
 	// Record the cumulative fitness scores. It doesn't matter whether the
 	// population is sorted or not. We will use these cumulative scores to
@@ -50,7 +50,7 @@ func (rouletteWheelSelection) Select(
 		cumfitness[i] = cumfitness[i-1] + fitness
 	}
 
-	sel := make([]api.Candidate, size)
+	sel := make([]interface{}, size)
 	for i := 0; i < size; i++ {
 		rand := rng.Float64() * cumfitness[len(cumfitness)-1]
 		index := sort.SearchFloat64s(cumfitness, rand)

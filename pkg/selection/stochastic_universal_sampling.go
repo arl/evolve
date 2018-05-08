@@ -33,7 +33,7 @@ func (StochasticUniversalSampling) Select(
 	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
 	// Calculate the sum of all fitness values.
 	var sum float64
@@ -41,7 +41,7 @@ func (StochasticUniversalSampling) Select(
 		sum += adjustedFitness(cand.Fitness(), natural)
 	}
 
-	sel := make([]api.Candidate, 0, size)
+	sel := make([]interface{}, 0, size)
 
 	// Pick a random offset between 0 and 1 as the starting point for
 	// selection.

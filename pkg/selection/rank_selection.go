@@ -50,7 +50,7 @@ func (rs rank) Select(
 	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
 	ranked := make(api.EvaluatedPopulation, len(pop))
 	var err error

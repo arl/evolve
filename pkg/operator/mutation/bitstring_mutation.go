@@ -6,7 +6,6 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
@@ -81,7 +80,7 @@ func (op *Bitstring) SetMutationsRange(min, max int) error {
 //
 // The probability of any given bit being flipped is governed by the probability
 // generator configured for this mutation operator.
-func (op *Bitstring) Mutate(c api.Candidate, rng *rand.Rand) api.Candidate {
+func (op *Bitstring) Mutate(c interface{}, rng *rand.Rand) interface{} {
 	// get/decide a probability for this run
 	prob := op.prob
 	if op.varprob {

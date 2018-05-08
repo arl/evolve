@@ -22,10 +22,7 @@ import (
 // string.
 type evaluator string
 
-func (s evaluator) Fitness(
-	cand api.Candidate,
-	pop []api.Candidate) float64 {
-
+func (s evaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 	var errors float64
 	sc := cand.(string)
 	for i := range sc {

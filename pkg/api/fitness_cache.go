@@ -33,7 +33,7 @@ type FitnessCache struct {
 // the fitness evaluator has already calculated the fitness score for the
 // specified candidate that score is returned without delegating to the wrapped
 // evaluator.
-func (c *FitnessCache) Fitness(cand Candidate, pop []Candidate) float64 {
+func (c *FitnessCache) Fitness(cand interface{}, pop []interface{}) float64 {
 	var fitness float64
 	val, ok := c.cache.Load(cand)
 	if ok {

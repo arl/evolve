@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"math/rand"
 	"unicode/utf8"
-
-	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // String is a general-purpose candidate factory for evolutionary algorithms
@@ -47,7 +45,7 @@ type stringGenerator struct {
 // Each character is randomly selected from the pre-configured alphabet. The
 // same character may appear multiple times and some characters may not appear
 // at all.
-func (g *stringGenerator) GenerateCandidate(rng *rand.Rand) api.Candidate {
+func (g *stringGenerator) GenerateCandidate(rng *rand.Rand) interface{} {
 	var buffer bytes.Buffer
 	for i := 0; i < g.strlen; i++ {
 		idx := rand.Int31n(int32(len(g.alphabet)))

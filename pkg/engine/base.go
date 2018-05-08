@@ -76,8 +76,8 @@ func NewBaseEngine(f api.Factory, eval api.Evaluator, rng *rand.Rand, stepper St
 // terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *Base) Evolve(size, nelites int, conds ...api.TerminationCondition) api.Candidate {
-	return e.EvolveWithSeedCandidates(size, nelites, []api.Candidate{}, conds...)
+func (e *Base) Evolve(size, nelites int, conds ...api.TerminationCondition) interface{} {
+	return e.EvolveWithSeedCandidates(size, nelites, []interface{}{}, conds...)
 }
 
 // EvolveWithSeedCandidates executes the evolutionary algorithm until one of
@@ -102,7 +102,7 @@ func (e *Base) Evolve(size, nelites int, conds ...api.TerminationCondition) api.
 // terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *Base) EvolveWithSeedCandidates(size, nelites int, seedcands []api.Candidate, conds ...api.TerminationCondition) api.Candidate {
+func (e *Base) EvolveWithSeedCandidates(size, nelites int, seedcands []interface{}, conds ...api.TerminationCondition) interface{} {
 	return e.EvolvePopulationWithSeedCandidates(size, nelites, seedcands, conds...)[0].Candidate()
 }
 
@@ -126,7 +126,7 @@ func (e *Base) EvolveWithSeedCandidates(size, nelites int, seedcands []api.Candi
 //
 // Returns the fittest solution found by the evolutionary process.
 func (e *Base) EvolvePopulation(size, nelites int, conds ...api.TerminationCondition) api.EvaluatedPopulation {
-	return e.EvolvePopulationWithSeedCandidates(size, nelites, []api.Candidate{}, conds...)
+	return e.EvolvePopulationWithSeedCandidates(size, nelites, []interface{}{}, conds...)
 }
 
 // EvolvePopulationWithSeedCandidates executes the evolutionary algorithm
@@ -149,7 +149,7 @@ func (e *Base) EvolvePopulation(size, nelites int, conds ...api.TerminationCondi
 // conditions One or more conditions that may cause the evolution to terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []api.Candidate, conds ...api.TerminationCondition) api.EvaluatedPopulation {
+func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []interface{}, conds ...api.TerminationCondition) api.EvaluatedPopulation {
 
 	if nelites < 0 || nelites >= size {
 		panic("Elite count must be non-negative and less than population size.")
@@ -199,7 +199,7 @@ func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands [
 // Returns the evaluated population (a list of candidates with attached fitness
 // scores).
 func (e *Base) evaluatePopulation(
-	pop []api.Candidate) api.EvaluatedPopulation {
+	pop []interface{}) api.EvaluatedPopulation {
 
 	// Do fitness evaluations
 	evpop := make(api.EvaluatedPopulation, len(pop))
@@ -252,8 +252,8 @@ func (e *Base) evaluatePopulation(
 }
 
 type fitnessEvaluationWorker struct {
-	idx       int             // index of candidate to evaluate
-	pop       []api.Candidate // full population
+	idx       int           // index of candidate to evaluate
+	pop       []interface{} // full population
 	evaluator api.Evaluator
 }
 

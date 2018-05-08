@@ -2,8 +2,6 @@ package xover
 
 import (
 	"math/rand"
-
-	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // StringMater mates a pair of strings to produce a new pair of bit strings
@@ -12,8 +10,8 @@ type StringMater struct{}
 // Mate performs crossover on a pair of parents to generate a pair of
 // offspring.
 func (m StringMater) Mate(
-	parent1, parent2 api.Candidate, nxpts int64,
-	rng *rand.Rand) []api.Candidate {
+	parent1, parent2 interface{}, nxpts int64,
+	rng *rand.Rand) []interface{} {
 
 	p1, p2 := parent1.(string), parent2.(string)
 	if len(p1) != len(p2) {
@@ -33,5 +31,5 @@ func (m StringMater) Mate(
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return append([]api.Candidate{}, string(off1), string(off2))
+	return append([]interface{}{}, string(off1), string(off2))
 }

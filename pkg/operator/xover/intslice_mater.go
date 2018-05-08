@@ -2,8 +2,6 @@ package xover
 
 import (
 	"math/rand"
-
-	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // TODO: couldn't all slice crossover tests be shared, with interfaces and table
@@ -15,8 +13,8 @@ type IntSliceMater struct{}
 // Mate performs crossover on a pair of parents to generate a pair of
 // offspring.
 func (m IntSliceMater) Mate(
-	parent1, parent2 api.Candidate, npts int64,
-	rng *rand.Rand) []api.Candidate {
+	parent1, parent2 interface{}, npts int64,
+	rng *rand.Rand) []interface{} {
 
 	p1, p2 := parent1.([]int), parent2.([]int)
 
@@ -39,5 +37,5 @@ func (m IntSliceMater) Mate(
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return []api.Candidate{off1, off2}
+	return []interface{}{off1, off2}
 }

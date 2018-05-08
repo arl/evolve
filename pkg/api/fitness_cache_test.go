@@ -11,7 +11,7 @@ type incrEvaluator struct {
 	count   int
 }
 
-func (ie *incrEvaluator) Fitness(cand Candidate, pop []Candidate) float64 {
+func (ie *incrEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 	ie.count++
 	return float64(ie.count)
 }

@@ -11,7 +11,7 @@ type Factory interface {
 	// population, consider using SeedPopulation.
 	//
 	// Returns an initial population of candidate solutions.
-	GenPopulation(size int, rng *rand.Rand) []Candidate
+	GenPopulation(size int, rng *rand.Rand) []interface{}
 
 	// SeedPopulation seeds all or a part of an initial population
 	// with some candidates.
@@ -33,13 +33,14 @@ type Factory interface {
 	//
 	// Returns an initial population of candidate solutions, including the
 	// specified seed candidates.
-	SeedPopulation(size int, cands []Candidate, rng *rand.Rand) []Candidate
+	SeedPopulation(size int, cands []interface{}, rng *rand.Rand) []interface{}
 }
 
 // CandidateGenerator is the interface implemented by objects that
 // generate random candidates
+// TODO: can we come up with a better name?
 type CandidateGenerator interface {
 
 	// GenerateCandidate randomly create a single candidate solution.
-	GenerateCandidate(rng *rand.Rand) Candidate
+	GenerateCandidate(rng *rand.Rand) interface{}
 }

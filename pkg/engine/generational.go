@@ -63,10 +63,10 @@ func NewGenerational(f api.Factory, op api.Operator, eval api.Evaluator, sel api
 // by one step/iteration.
 func (e *Generational) Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation {
 
-	pop := make([]api.Candidate, 0, len(evpop))
+	pop := make([]interface{}, 0, len(evpop))
 
 	// First perform any elitist selection.
-	elite := make([]api.Candidate, nelites)
+	elite := make([]interface{}, nelites)
 	for i := 0; i < nelites; i++ {
 		elite[i] = evpop[i].Candidate()
 	}

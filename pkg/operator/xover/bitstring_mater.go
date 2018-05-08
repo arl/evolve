@@ -3,7 +3,6 @@ package xover
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 )
 
@@ -17,8 +16,8 @@ type BitstringMater struct{}
 // parent1 and parent2 are the two individuals that provides the source
 // material for generating offspring.
 func (BitstringMater) Mate(
-	parent1, parent2 api.Candidate, nxpts int64,
-	rng *rand.Rand) []api.Candidate {
+	parent1, parent2 interface{}, nxpts int64,
+	rng *rand.Rand) []interface{} {
 
 	p1, p2 := parent1.(*bitstring.Bitstring), parent2.(*bitstring.Bitstring)
 
@@ -36,5 +35,5 @@ func (BitstringMater) Mate(
 		crossoverIndex := (1 + rng.Intn(p1.Len()-1))
 		off1.SwapRange(off2, 0, crossoverIndex)
 	}
-	return []api.Candidate{off1, off2}
+	return []interface{}{off1, off2}
 }

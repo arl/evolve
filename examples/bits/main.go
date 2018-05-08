@@ -21,7 +21,7 @@ const nbits = 20
 // fitness evaluator that simply counts the number of ones in a string
 type evaluator struct{}
 
-func (evaluator) Fitness(cand api.Candidate, pop []api.Candidate) float64 {
+func (evaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 	return float64(cand.(*bitstring.Bitstring).OnesCount())
 }
 

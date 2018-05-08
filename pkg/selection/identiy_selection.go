@@ -14,9 +14,9 @@ func (ids Identity) Select(
 	pop api.EvaluatedPopulation,
 	natural bool,
 	size int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
-	sel := make([]api.Candidate, size)
+	sel := make([]interface{}, size)
 	for i := 0; i < size; i++ {
 		sel[i] = pop[i].Candidate()
 	}

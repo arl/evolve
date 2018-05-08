@@ -18,9 +18,9 @@ import (
 
 func prepareEngine() api.Engine {
 	return NewGenerational(
-		&factory.BaseFactory{CandidateGenerator: test.NewStubIntegerFactory()},
+		&test.ZeroIntFactory,
 		integerZeroMaker{},
-		test.IntegerEvaluator{},
+		test.IntEvaluator{},
 		selection.RouletteWheelSelection,
 		rand.New(rand.NewSource(99)))
 }
@@ -35,7 +35,7 @@ func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 	obs := new(elitismObserver)
 	engine := prepareEngine()
 	engine.AddObserver(obs)
-	elite := make([]api.Candidate, 3)
+	elite := make([]interface{}, 3)
 	// Add the following seed candidates, all better than any others that can possibly
 	// get into the population (since every other candidate will always be zero).
 	elite[0] = 7 // This candidate should be discarded by elitism.
@@ -117,8 +117,8 @@ func TestGenerationalEvolutionEngineSatisfiedTerminationConditionsBeforeStart(t 
 // Trivial test operator that mutates all integers into zeroes.
 type integerZeroMaker struct{}
 
-func (op integerZeroMaker) Apply(selectedCandidates []api.Candidate, rng *rand.Rand) []api.Candidate {
-	result := make([]api.Candidate, len(selectedCandidates))
+func (op integerZeroMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) []interface{} {
+	result := make([]interface{}, len(selectedCandidates))
 	for i := range selectedCandidates {
 		result[i] = 0
 	}
@@ -163,7 +163,7 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 	//engine.SetSingleThreaded(true)
 
 	b.ResetTimer()
-	var best api.Candidate
+	var best interface{}
 	for n := 0; n < b.N; n++ {
 		best = engine.Evolve(100000, 5, termination.TargetFitness{Fitness: 0, Natural: false})
 	}
@@ -183,8 +183,8 @@ func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
 type evaluator string
 
 func (s evaluator) Fitness(
-	cand api.Candidate,
-	pop []api.Candidate) float64 {
+	cand interface{},
+	pop []interface{}) float64 {
 
 	var errors float64
 	sc := cand.(string)

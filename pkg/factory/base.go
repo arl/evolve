@@ -18,9 +18,9 @@ type BaseFactory struct{ api.CandidateGenerator }
 // Returns a randomly generated initial population of candidate solutions.
 func (f *BaseFactory) GenPopulation(
 	size int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
-	pop := make([]api.Candidate, size)
+	pop := make([]interface{}, size)
 	for i := range pop {
 		pop[i] = f.GenerateCandidate(rng)
 	}
@@ -49,13 +49,13 @@ func (f *BaseFactory) GenPopulation(
 // specified seed candidates.
 func (f *BaseFactory) SeedPopulation(
 	size int,
-	cands []api.Candidate,
-	rng *rand.Rand) []api.Candidate {
+	cands []interface{},
+	rng *rand.Rand) []interface{} {
 
 	if len(cands) > size {
 		panic("Too many seed candidates for specified population size.")
 	}
-	pop := make([]api.Candidate, size)
+	pop := make([]interface{}, size)
 	copy(pop, cands)
 
 	for i := len(cands); i < size; i++ {

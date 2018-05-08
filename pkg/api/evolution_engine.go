@@ -23,7 +23,7 @@ type Engine interface {
 	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	Evolve(size, nelites int, conds ...TerminationCondition) Candidate
+	Evolve(size, nelites int, conds ...TerminationCondition) interface{}
 
 	// EvolveWithSeedCandidates executes the evolutionary algorithm until one of
 	// the termination conditions is met, then return the fittest candidate from
@@ -47,8 +47,8 @@ type Engine interface {
 	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolveWithSeedCandidates(size, nelites int, seedcands []Candidate,
-		conds ...TerminationCondition) Candidate
+	EvolveWithSeedCandidates(size, nelites int, seedcands []interface{},
+		conds ...TerminationCondition) interface{}
 
 	// EvolvePopulation executes the evolutionary algorithm until one of the
 	// termination conditions is met, then return all of the candidates from the
@@ -91,7 +91,7 @@ type Engine interface {
 	// terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []Candidate,
+	EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []interface{},
 		conds ...TerminationCondition) EvaluatedPopulation
 
 	// AddObserver registers an observer to receive status updates on the

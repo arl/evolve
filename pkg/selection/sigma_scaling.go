@@ -51,7 +51,7 @@ func (sel *sigmaScaling) Select(
 	population api.EvaluatedPopulation,
 	naturalFitnessScores bool,
 	selectionSize int,
-	rng *rand.Rand) []api.Candidate {
+	rng *rand.Rand) []interface{} {
 
 	statistics := api.NewDataSet(api.WithInitialCapacity(len(population)))
 	for _, candidate := range population {

@@ -28,7 +28,7 @@ type Evaluator interface {
 	// Returns the fitness score for the specified candidate. Must always be a
 	// non-negative value regardless of natural or non-natural evaluation is
 	// being used.
-	Fitness(cand Candidate, pop []Candidate) float64
+	Fitness(cand interface{}, pop []interface{}) float64
 
 	// IsNatural specifies whether this evaluator generates 'natural' fitness
 	// scores or not.
