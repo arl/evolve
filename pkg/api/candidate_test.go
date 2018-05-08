@@ -33,5 +33,4 @@ func TestShuffleCandidates(t *testing.T) {
 
 	// ensure values are ordered differently
 	assert.False(t, assert.ObjectsAreEqualValues(org, shuf))
-
 }
