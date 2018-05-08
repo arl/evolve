@@ -19,7 +19,7 @@ import (
 func prepareEngine() api.Engine {
 	return NewGenerational(
 		&test.ZeroIntFactory,
-		integerZeroMaker{},
+		zeroIntMaker{},
 		test.IntEvaluator{},
 		selection.RouletteWheelSelection,
 		rand.New(rand.NewSource(99)))
@@ -31,7 +31,7 @@ func (o *elitismObserver) PopulationUpdate(data *api.PopulationData) { *o = elit
 
 func (o *elitismObserver) AverageFitness() float64 { return o.Mean }
 
-func TestGenerationalEvolutionEngineElitism(t *testing.T) {
+func TestGenerationalEngineElitism(t *testing.T) {
 	obs := new(elitismObserver)
 	engine := prepareEngine()
 	engine.AddObserver(obs)
@@ -56,14 +56,14 @@ func TestGenerationalEvolutionEngineElitism(t *testing.T) {
 	engine.RemoveObserver(obs)
 }
 
-func TestGenerationalEvolutionEngineEliteCountTooHigh(t *testing.T) {
+func TestGenerationalEngineEliteCountTooHigh(t *testing.T) {
 	engine := prepareEngine()
 	assert.Panics(t, func() {
 		engine.Evolve(10, 10, termination.GenerationCount(10))
 	}, "elite count must be less than the total population size")
 }
 
-func TestGenerationalEvolutionEngineNoTerminationCondition(t *testing.T) {
+func TestGenerationalEngineNoTerminationCondition(t *testing.T) {
 	engine := prepareEngine()
 	assert.Panics(t, func() {
 		engine.Evolve(10, 0)
@@ -71,10 +71,10 @@ func TestGenerationalEvolutionEngineNoTerminationCondition(t *testing.T) {
 }
 
 /*
-func TestGenerationalEvolutionEngineInterrupt(t*testing.T) {
+func TestGenerationalEngineInterrupt(t*testing.T) {
         final long timeout = 1000L;
         final Thread requestThread = Thread.currentThread();
-        engine.addEvolutionObserver(new EvolutionObserver<Integer>()
+        engine.addObserver(new Observer<Integer>()
         {
             public void populationUpdate(PopulationData<? extends Integer> populationData)
             {
@@ -94,7 +94,7 @@ func TestGenerationalEvolutionEngineInterrupt(t*testing.T) {
     }
 */
 
-func TestGenerationalEvolutionEngineSatisfiedTerminationConditions(t *testing.T) {
+func TestGenerationalEngineSatisfiedTerminationConditions(t *testing.T) {
 	engine := prepareEngine()
 
 	cond := termination.GenerationCount(1)
@@ -105,7 +105,7 @@ func TestGenerationalEvolutionEngineSatisfiedTerminationConditions(t *testing.T)
 	assert.Equal(t, cond, satisfied[0])
 }
 
-func TestGenerationalEvolutionEngineSatisfiedTerminationConditionsBeforeStart(t *testing.T) {
+func TestGenerationalEngineSatisfiedTerminationConditionsBeforeStart(t *testing.T) {
 	engine := prepareEngine()
 
 	// Should return an error because evolution hasn't started, let alone terminated.
@@ -115,9 +115,9 @@ func TestGenerationalEvolutionEngineSatisfiedTerminationConditionsBeforeStart(t 
 }
 
 // Trivial test operator that mutates all integers into zeroes.
-type integerZeroMaker struct{}
+type zeroIntMaker struct{}
 
-func (op integerZeroMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) []interface{} {
+func (op zeroIntMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) []interface{} {
 	result := make([]interface{}, len(selectedCandidates))
 	for i := range selectedCandidates {
 		result[i] = 0
@@ -131,7 +131,7 @@ func checkB(b *testing.B, err error) {
 	}
 }
 
-func BenchmarkGenerationalEvolutionEngine(b *testing.B) {
+func BenchmarkGenerationalEngine(b *testing.B) {
 	const targetString = "HELLO WORLD"
 
 	// Create a factory to generate random 11-character Strings.

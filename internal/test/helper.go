@@ -20,11 +20,11 @@ func (IntEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 func (IntEvaluator) IsNatural() bool { return true }
 
 // Stub candidate factory for tests. Always returns zero-valued integers.
-var ZeroIntFactory = factory.BaseFactory{CandidateGenerator: ZeroIntegerGenerator{}}
+var ZeroIntFactory = factory.BaseFactory{CandidateGenerator: ZeroIntGenerator{}}
 
-type ZeroIntegerGenerator struct{}
+type ZeroIntGenerator struct{}
 
-func (ZeroIntegerGenerator) GenerateCandidate(rng *rand.Rand) interface{} { return 0 }
+func (ZeroIntGenerator) GenerateCandidate(rng *rand.Rand) interface{} { return 0 }
 
 // IntAdjuster is a trivial test operator that mutates all integers by
 // adding a fixed offset.
