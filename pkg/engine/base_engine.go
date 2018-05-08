@@ -1,4 +1,4 @@
-package evolve
+package engine
 
 import (
 	"fmt"
@@ -169,21 +169,21 @@ func (e *BaseEngine) EvolvePopulationWithSeedCandidates(size, nelites int, seedc
 	// Calculate the fitness scores for each member of the initial population.
 	evpop := e.evaluatePopulation(pop)
 
-	SortEvaluatedPopulation(evpop, e.eval.IsNatural())
-	data := ComputePopulationData(evpop, e.eval.IsNatural(), nelites, curgen, startTime)
+	api.SortEvaluatedPopulation(evpop, e.eval.IsNatural())
+	data := api.ComputePopulationData(evpop, e.eval.IsNatural(), nelites, curgen, startTime)
 
 	// Notify observers of the state of the population.
 	e.notifyPopulationChange(data)
 
-	satisfied := ShouldContinue(data, conds...)
+	satisfied := api.ShouldContinue(data, conds...)
 	for satisfied == nil {
 		curgen++
 		evpop = e.Step(evpop, nelites, e.rng)
-		SortEvaluatedPopulation(evpop, e.eval.IsNatural())
-		data = ComputePopulationData(evpop, e.eval.IsNatural(), nelites, curgen, startTime)
+		api.SortEvaluatedPopulation(evpop, e.eval.IsNatural())
+		data = api.ComputePopulationData(evpop, e.eval.IsNatural(), nelites, curgen, startTime)
 		// Notify observers of the state of the population.
 		e.notifyPopulationChange(data)
-		satisfied = ShouldContinue(data, conds...)
+		satisfied = api.ShouldContinue(data, conds...)
 	}
 	e.satisfied = satisfied
 	return evpop

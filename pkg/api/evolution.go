@@ -1,10 +1,8 @@
-package evolve
+package api
 
 import (
 	"sort"
 	"time"
-
-	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 // Utility methods used by different evolution implementations. This class
@@ -22,8 +20,8 @@ import (
 // conditions represents one or more termination conditions. The evolution
 // should not continue if any of these is satisfied.
 func ShouldContinue(
-	data *api.PopulationData,
-	conds ...api.TerminationCondition) []api.TerminationCondition {
+	data *PopulationData,
+	conds ...TerminationCondition) []TerminationCondition {
 
 	// If the thread has been interrupted, we should abort and return whatever
 	// result we currently have.
@@ -32,7 +30,7 @@ func ShouldContinue(
 	//return Collections.emptyList();
 	//}
 	//// Otherwise check the termination conditions for the evolution.
-	satisfied := make([]api.TerminationCondition, 0)
+	satisfied := make([]TerminationCondition, 0)
 	for _, cond := range conds {
 		if cond.ShouldTerminate(data) {
 			satisfied = append(satisfied, cond)
@@ -48,7 +46,7 @@ func ShouldContinue(
 // SortEvaluatedPopulation sorts an evaluated population in descending order of
 // fitness (descending order of fitness score for natural scores, ascending
 // order of scores for non-natural scores).
-func SortEvaluatedPopulation(evpop api.EvaluatedPopulation, natural bool) {
+func SortEvaluatedPopulation(evpop EvaluatedPopulation, natural bool) {
 	// Sort candidates in descending order according to fitness.
 	if natural {
 		// Descending values for natural fitness.
@@ -70,18 +68,18 @@ func SortEvaluatedPopulation(evpop api.EvaluatedPopulation, natural bool) {
 // genidx is the zero-based index of the current generation/epoch.
 // start is the time at which the evolution began.
 func ComputePopulationData(
-	evpop api.EvaluatedPopulation,
+	evpop EvaluatedPopulation,
 	natural bool,
 	nelites int,
 	genidx int,
-	start time.Time) *api.PopulationData {
+	start time.Time) *PopulationData {
 
-	stats := api.NewDataSet(api.WithInitialCapacity(len(evpop)))
+	stats := NewDataSet(WithInitialCapacity(len(evpop)))
 	for _, candidate := range evpop {
 		stats.AddValue(candidate.Fitness())
 	}
 
-	return &api.PopulationData{
+	return &PopulationData{
 		BestCand:    evpop[0].Candidate(),
 		BestFitness: evpop[0].Fitness(),
 		Mean:        stats.ArithmeticMean(),

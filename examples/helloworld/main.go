@@ -7,9 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aurelien-rainone/evolve"
-
 	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/aurelien-rainone/evolve/pkg/engine"
 	"github.com/aurelien-rainone/evolve/pkg/factory"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
@@ -79,7 +78,7 @@ func main() {
 	var selector = selection.RouletteWheelSelection
 	rng := rand.New(rand.NewSource(randomSeed()))
 
-	engine := evolve.NewGenerationalEngine(fac,
+	engine := engine.NewGenerationalEngine(fac,
 		pipeline,
 		eval,
 		selector,

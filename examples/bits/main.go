@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve"
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
+	"github.com/aurelien-rainone/evolve/pkg/engine"
 	"github.com/aurelien-rainone/evolve/pkg/factory"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
@@ -42,15 +42,15 @@ func main() {
 
 	mt19937 := rand.New(random.NewMT19937(0))
 
-	engine := evolve.NewGenerationalEngine(factory.NewBitstring(nbits),
+	eng := engine.NewGenerationalEngine(factory.NewBitstring(nbits),
 		pipeline,
 		evaluator{},
 		selection.RouletteWheelSelection,
 		mt19937)
 
-	engine.AddObserver(observer{})
+	eng.AddObserver(observer{})
 
-	best := engine.Evolve(
+	best := eng.Evolve(
 		100, // 100 candidates in the population
 		0,   // no elitism
 		termination.TargetFitness{Fitness: float64(nbits), Natural: true})
