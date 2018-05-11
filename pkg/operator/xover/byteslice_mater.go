@@ -15,6 +15,17 @@ func (m ByteSliceMater) Mate(
 
 	p1, p2 := parent1.([]byte), parent2.([]byte)
 
+	// TODO: we chose to panick here, making those assumptions:
+	// - always returning an error and checking its value in the caller would
+	// eat up some cpu cycle on the critical path.
+	// - in this specific case panics 'should' only happen for clear and
+	// irrecoverable logic errors, for example when trying to mate 2 slices of
+	// different lengths...
+	// But even if that's true, the cost should really be negligible compared to
+	// the individual fitness evaluation, that is what takes time in non-trivial
+	// GAs.
+	// So that let us, once again, with having to chose between error checking
+	// and/or panicking. IMO it should be refactored in favor of error checking!
 	if len(p1) != len(p2) {
 		panic("Cannot perform crossover with different length parents.")
 	}

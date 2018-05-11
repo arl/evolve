@@ -20,17 +20,24 @@ func TestStringMater(t *testing.T) {
 	for i := 0; i < 20; i++ {
 		values := make(map[rune]struct{}, 20) // used as a set of runes
 		pop = xover.Apply(pop, rng)
-		assert.Len(t, pop, 4, "Population size changed after crossover.")
+		if len(pop) != 4 {
+			t.Error("population size changed, want 4, got", len(pop))
+		}
+
 		for _, individual := range pop {
 			s := individual.(string)
-			assert.Lenf(t, s, 5, "Invalid candidate length: %v", len(s))
+			if len(s) != 5 {
+				t.Error("wrong candidate length, want 5, got", len(s))
+			}
 			for _, value := range s {
 				values[value] = struct{}{}
 			}
 		}
 		// All of the individual elements should still be present, just jumbled up
 		// between individuals.
-		assert.Len(t, values, 20, "Information lost during crossover.")
+		if len(values) != 20 {
+			t.Error("wrong number of candidates, want 20, got", len(values))
+		}
 	}
 }
 
@@ -43,9 +50,5 @@ func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 	xover := New(StringMater{})
 	pop := []interface{}{"abcde", "fghijklm"}
 
-	// This should panic since the parents are different lengths.
-	// TODO: why panicking and not returning an error?
-	assert.Panics(t, func() {
-		xover.Apply(pop, rng)
-	})
+	assert.Panics(t, func() { xover.Apply(pop, rng) })
 }
