@@ -8,6 +8,7 @@ import (
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/worker"
+	"github.com/pkg/errors"
 )
 
 // Stepper is the interface implemented by objects having a NextEvolutionStep
@@ -283,11 +284,11 @@ func (w *fitnessEvaluationWorker) Work() (interface{}, error) {
 // interrupted.
 func (e *Base) SatisfiedTerminationConditions() ([]api.TerminationCondition, error) {
 	if e.satisfied == nil {
-		return nil, api.ErrIllegalState("evolution engine has not terminated")
+		return nil, errors.Wrap(api.ErrIllegalState, "evolution engine has not terminated")
 	}
-	satisfiedTerminationConditions := make([]api.TerminationCondition, len(e.satisfied))
-	copy(satisfiedTerminationConditions, e.satisfied)
-	return satisfiedTerminationConditions, nil
+	conds := make([]api.TerminationCondition, len(e.satisfied))
+	copy(conds, e.satisfied)
+	return conds, nil
 }
 
 // AddObserver adds a listener to receive status updates on the
