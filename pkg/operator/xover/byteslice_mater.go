@@ -29,10 +29,8 @@ func (m ByteSliceMater) Mate(
 	if len(p1) != len(p2) {
 		panic("Cannot perform crossover with different length parents.")
 	}
-	off1 := make([]byte, len(p1))
-	copy(off1, p1)
-	off2 := make([]byte, len(p1))
-	copy(off2, p2)
+	off1 := append([]byte{}, p1...)
+	off2 := append([]byte{}, p2...)
 
 	// Apply as many crossovers as required.
 	for i := int64(0); i < nxpts; i++ {

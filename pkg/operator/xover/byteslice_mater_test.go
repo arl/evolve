@@ -1,6 +1,7 @@
 package xover
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 
@@ -54,4 +55,79 @@ func TestByteSliceMaterWithDifferentLengthParents(t *testing.T) {
 	pop[1] = []byte{2, 4, 8, 10, 12, 14, 16}
 
 	assert.Panics(t, func() { xover.Apply(pop, rng) })
+}
+
+var sink interface{}
+
+func createRandSlice(l int) ([]byte, error) {
+	s := make([]byte, l)
+	if _, err := rand.Read(s); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func BenchmarkByteSliceAppend(b *testing.B) {
+	type run struct {
+		slen  int
+		human string
+	}
+	runs := []run{
+		{1024, "1k"},
+		{100 * 1024, "100k"},
+		{10 * 1024 * 1024, "10M"},
+	}
+	for _, r := range runs {
+		name := fmt.Sprintf("BenchByteSliceAppend-%v", r.human)
+		b.Run(name, func(b *testing.B) {
+			var dst []byte
+
+			// allocate original slice
+			org, err := createRandSlice(r.slen)
+			if err != nil {
+				b.Error("can't create rand slice:", err)
+			}
+
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				// actual benchmark
+				dst = append([]byte{}, org...)
+			}
+			b.StopTimer()
+			sink = dst
+		})
+	}
+}
+
+func BenchmarkByteSliceCopy(b *testing.B) {
+	type run struct {
+		slen  int
+		human string
+	}
+	runs := []run{
+		{1024, "1k"},
+		{100 * 1024, "100k"},
+		{10 * 1024 * 1024, "10M"},
+	}
+	for _, r := range runs {
+		name := fmt.Sprintf("BenchByteSliceCopy-%v", r.human)
+		b.Run(name, func(b *testing.B) {
+			var dst []byte
+
+			// allocate original slice
+			org, err := createRandSlice(r.slen)
+			if err != nil {
+				b.Error("can't create rand slice:", err)
+			}
+
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				// actual benchmark
+				dst = make([]byte, len(org))
+				copy(dst, org)
+			}
+			b.StopTimer()
+			sink = dst
+		})
+	}
 }
