@@ -45,5 +45,5 @@ func (m ByteSliceMater) Mate(
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return append([]interface{}{}, off1, off2)
+	return []interface{}{off1, off2}
 }
