@@ -89,7 +89,7 @@ func (op *Bitstring) Mutate(c interface{}, rng *rand.Rand) interface{} {
 
 	if rng.Float64() < prob {
 		bs := c.(*bitstring.Bitstring)
-		mutated := bs.Copy()
+		mutated := bitstring.Copy(bs)
 		// there is a mutation to perform, get/decide how many bits to flip
 		var nmut int
 		if op.varnmut {
