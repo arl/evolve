@@ -254,12 +254,12 @@ func (bs *Bitstring) String() string {
 //
 // The new Bitstring is based off of a new backing array.
 func (bs *Bitstring) Copy() *Bitstring {
-	clone, err := New(bs.length)
-	if err != nil {
-		panic(fmt.Errorf("internal error, couldn't copy bitstring: %v", err))
+	cpy := &Bitstring{
+		length: bs.length,
+		data:   make([]uint32, len(bs.data)),
 	}
-	copy(clone.data, bs.data)
-	return clone
+	copy(cpy.data, bs.data)
+	return cpy
 }
 
 // Equals returns true if other is a Bitstring instance and both bit strings are
