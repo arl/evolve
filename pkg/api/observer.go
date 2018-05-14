@@ -15,3 +15,17 @@ type Observer interface {
 	// generation.
 	PopulationUpdate(data *PopulationData)
 }
+
+// TODO: try to come up with a better and short name for PopulationUpdate
+// and PopulationData maybe
+
+type observerFunc struct{ f func(*PopulationData) }
+
+// TODO: comment
+func ObserverFunc(f func(*PopulationData)) *observerFunc {
+	return &observerFunc{f: f}
+}
+
+func (obs *observerFunc) PopulationUpdate(data *PopulationData) {
+	obs.f(data)
+}
