@@ -93,7 +93,7 @@ func TestFactoryInvalidPatterns(t *testing.T) {
 				".........",
 				".........",
 			},
-			ErrPatternUnexpectedChar,
+			errPatternUnexpectedChar,
 		},
 		{
 			"wrong number of rows",
@@ -104,7 +104,7 @@ func TestFactoryInvalidPatterns(t *testing.T) {
 				".........",
 				".........",
 			},
-			ErrWrongNumberOfRows,
+			errWrongNumberOfRows,
 		},
 		{
 			"wrong number of columns",
@@ -119,7 +119,7 @@ func TestFactoryInvalidPatterns(t *testing.T) {
 				"..1.3....",
 				"........8",
 			},
-			ErrWrongNumberOfCols,
+			errWrongNumberOfCols,
 		},
 	}
 	for _, tt := range tests {

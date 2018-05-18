@@ -31,8 +31,8 @@ func (m mater) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) [
 	return []interface{}{&off1, &off2}
 }
 
-var ErrInvalidMutationCount = errors.New("mutation count must be greater than 0")
-var ErrInvalidMutationAmount = errors.New("mutation amount must be greater than 0")
+var errInvalidMutationCount = errors.New("mutation count must be greater than 0")
+var errInvalidMutationAmount = errors.New("mutation amount must be greater than 0")
 
 // rowMutation rows in a potential Sudoku solution by manipulating the order
 // of non-fixed cells in much the same way as the ListOrderMutation
@@ -71,7 +71,7 @@ func newRowMutation() *rowMutation {
 
 func (rm *rowMutation) SetMutations(nmut int) error {
 	if nmut < 1 || nmut > math.MaxInt32 {
-		return ErrInvalidMutationCount
+		return errInvalidMutationCount
 	}
 	rm.nmut = nmut
 	rm.varnmut = false
@@ -80,7 +80,7 @@ func (rm *rowMutation) SetMutations(nmut int) error {
 
 func (rm *rowMutation) SetMutationsRange(min, max int) error {
 	if min > max || min < 1 || max > math.MaxInt32 {
-		return ErrInvalidMutationCount
+		return errInvalidMutationCount
 	}
 	rm.nmutmin = min
 	rm.nmutmax = max
@@ -90,7 +90,7 @@ func (rm *rowMutation) SetMutationsRange(min, max int) error {
 
 func (rm *rowMutation) SetAmount(amnt int) error {
 	if amnt < 1 || amnt > math.MaxInt32 {
-		return ErrInvalidMutationAmount
+		return errInvalidMutationAmount
 	}
 	rm.amnt = amnt
 	rm.varamnt = false
@@ -99,7 +99,7 @@ func (rm *rowMutation) SetAmount(amnt int) error {
 
 func (rm *rowMutation) SetAmountRange(min, max int) error {
 	if min > max || min < 1 || max > math.MaxInt32 {
-		return ErrInvalidMutationAmount
+		return errInvalidMutationAmount
 	}
 	rm.amntmin = min
 	rm.amntmax = max

@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ErrWrongNumberOfRows     = fmt.Errorf("sudoku layout must have %v rows", size)
-	ErrWrongNumberOfCols     = fmt.Errorf("sudoku layout must have %v cells in each row", size)
-	ErrPatternUnexpectedChar = fmt.Errorf("unexpected char in pattern")
+	errWrongNumberOfRows     = fmt.Errorf("sudoku layout must have %v rows", size)
+	errWrongNumberOfCols     = fmt.Errorf("sudoku layout must have %v cells in each row", size)
+	errPatternUnexpectedChar = fmt.Errorf("unexpected char in pattern")
 	values                   = [size]int{1, 2, 3, 4, 5, 6, 7, 8, 9}
 )
 
@@ -27,7 +27,7 @@ type sudokuFactory struct{ factory.BaseFactory }
 
 func newSudokuFactory(pattern []string) (*sudokuFactory, error) {
 	if len(pattern) != size {
-		return nil, ErrWrongNumberOfRows
+		return nil, errWrongNumberOfRows
 	}
 
 	gen, err := newGenerator(pattern)
@@ -45,7 +45,7 @@ func newSudokuFactory(pattern []string) (*sudokuFactory, error) {
 // pattern is not made of 9 strings containig 1 to 9, or '.'
 func newGenerator(pattern []string) (*generator, error) {
 	if len(pattern) != size {
-		return nil, ErrWrongNumberOfRows
+		return nil, errWrongNumberOfRows
 	}
 
 	gen := &generator{}
@@ -60,7 +60,7 @@ func newGenerator(pattern []string) (*generator, error) {
 		prow := []byte(pattern[i])
 
 		if len(prow) != size {
-			return nil, ErrWrongNumberOfCols
+			return nil, errWrongNumberOfCols
 		}
 		for j := 0; j < len(prow); j++ {
 			c := prow[j]
@@ -76,7 +76,7 @@ func newGenerator(pattern []string) (*generator, error) {
 					}
 				}
 			} else if c != '.' {
-				return nil, ErrPatternUnexpectedChar
+				return nil, errPatternUnexpectedChar
 			}
 		}
 	}

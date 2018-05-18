@@ -142,10 +142,10 @@ func TestRowMutationFixedConstraints(t *testing.T) {
 }
 
 func TestRowMutationInvalid(t *testing.T) {
-	if err := newRowMutation().SetMutations(0); err != ErrInvalidMutationCount {
+	if err := newRowMutation().SetMutations(0); err != errInvalidMutationCount {
 		t.Errorf("SetMutations(0): want ErrInvalidMutationCount, got %v", err)
 	}
-	if err := newRowMutation().SetAmount(0); err != ErrInvalidMutationAmount {
+	if err := newRowMutation().SetAmount(0); err != errInvalidMutationAmount {
 		t.Errorf("SetAmount(0): want ErrInvalidMutationAmount, got %v", err)
 	}
 }
