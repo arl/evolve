@@ -27,5 +27,5 @@ type Selection interface {
 	//
 	// Returns a slice containing the selected candidates. Some individual
 	// candidates may potentially have been selected multiple times.
-	Select(pop EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []interface{}
+	Select(pop Population, natural bool, size int, rng *rand.Rand) []interface{}
 }

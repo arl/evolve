@@ -1,7 +1,6 @@
 package selection
 
 import (
-	"fmt"
 	"math/rand"
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
@@ -47,19 +46,15 @@ var Rank = NewRank(StochasticUniversalSampling{})
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
 func (rs rank) Select(
-	pop api.EvaluatedPopulation,
+	pop api.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {
 
-	ranked := make(api.EvaluatedPopulation, len(pop))
-	var err error
+	ranked := make(api.Population, len(pop))
 	for i, cand := range pop {
-		ranked[i], err = api.NewEvaluatedCandidate(cand.Candidate(),
-			mapRankToScore(i+1, len(pop)))
-		if err != nil {
-			panic(fmt.Sprintln("couldn't create evaluated candidate: ", err))
-		}
+		ranked[i] = &api.Individual{cand.Candidate,
+			mapRankToScore(i+1, len(pop))}
 	}
 	return rs.selector.Select(ranked, true, size, rng)
 }
@@ -67,17 +62,17 @@ func (rs rank) Select(
 func (rank) String() string { return "Rank Selection" }
 
 // mapRankToScore maps a population index to a relative pseudo-fitness score
-// that can be used for fitness-proportionate selection. The general
-// contract for the mapping function
-// is:
+// that can be used for fitness-proportionate selection. The general contract
+// for the mapping function is:
 //  f(rank) >= f(rank + 1)
-// for all legal values of rank, assuming natural scores.
-// The default mapping function is a simple linear transformation, but this
-// can be over-ridden by composition. Alternative implementations can be
-// linear or non-linear and either natural or non-natural.
-// rank is a zero-based index into the population (0 <= rank < populationSize)
+// For all legal values of rank, assuming natural scores.
 //
-// Returns populationSize - rank
-func mapRankToScore(rank, populationSize int) float64 {
-	return float64(populationSize - rank)
+// The default mapping function is a simple linear transformation, but this can
+// be overridden by composition. Alternative implementations can be linear or
+// non-linear and either natural or non-natural. rank is a zero-based index into
+// the population (0 <= rank < population size)
+//
+// Returns population size - rank
+func mapRankToScore(rank, size int) float64 {
+	return float64(size - rank)
 }

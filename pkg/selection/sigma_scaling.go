@@ -1,7 +1,6 @@
 package selection
 
 import (
-	"fmt"
 	"math/rand"
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
@@ -38,39 +37,38 @@ var SigmaScaling = NewSigmaScaling(StochasticUniversalSampling{})
 // in the list).
 // NOTE: It is an error to call this method with an empty or null population.
 //
-// population is the population from which to select.
-// naturalFitnessScores indicates whether higher fitness values represent fitter
-// individuals or not.
-// selectionSize is the number of individual selections to make (not necessarily
-// the number of distinct candidates to select, since the same individual may
+// pop is the population from which to select.
+// natural indicates whether higher fitness values represent fitter individuals
+// or not.
+// size is the number of individual selections to make (not necessarily the
+// number of distinct candidates to select, since the same individual may
 // potentially be selected more than once).
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
 func (sel *sigmaScaling) Select(
-	population api.EvaluatedPopulation,
-	naturalFitnessScores bool,
-	selectionSize int,
+	pop api.Population,
+	natural bool,
+	size int,
 	rng *rand.Rand) []interface{} {
 
-	statistics := api.NewDataSet(api.WithInitialCapacity(len(population)))
-	for _, candidate := range population {
-		statistics.AddValue(candidate.Fitness())
+	stats := api.NewDataSet(api.WithInitialCapacity(len(pop)))
+	for _, cand := range pop {
+		stats.AddValue(cand.Fitness)
 	}
 
-	scaledPopulation := make(api.EvaluatedPopulation, len(population))
-	var err error
-	for i, candidate := range population {
-		scaledFitness := sigmaScaledFitness(candidate.Fitness(),
-			statistics.ArithmeticMean(),
-			statistics.StandardDeviation())
-		scaledPopulation[i], err = api.NewEvaluatedCandidate(candidate.Candidate(),
-			scaledFitness)
-		if err != nil {
-			panic(fmt.Sprintln("couldn't create evaluated candidate: ", err))
+	scaledPop := make(api.Population, len(pop))
+	for i, cand := range pop {
+		scaledFitness := sigmaScaledFitness(cand.Fitness,
+			stats.ArithmeticMean(),
+			stats.StandardDeviation())
+
+		scaledPop[i] = &api.Individual{
+			Candidate: cand.Candidate,
+			Fitness:   scaledFitness,
 		}
 	}
-	return sel.selector.Select(scaledPopulation, naturalFitnessScores, selectionSize, rng)
+	return sel.selector.Select(scaledPop, natural, size, rng)
 }
 
 func (sigmaScaling) String() string { return "Sigma Scaling" }

@@ -62,11 +62,11 @@ func testFitnessBasedSelection(t *testing.T, ss api.Selection, tpop testPopulati
 	rng := rand.New(rand.NewSource(99))
 
 	// create the population
-	pop := api.EvaluatedPopulation{}
+	pop := api.Population{}
 	for i := range tpop {
-		cand, err := api.NewEvaluatedCandidate(tpop[i].name, tpop[i].fitness)
-		if err != nil {
-			t.Errorf("couldn't create evaluated candidate: %v", err)
+		cand := &api.Individual{
+			Candidate: tpop[i].name,
+			Fitness:   tpop[i].fitness,
 		}
 		pop = append(pop, cand)
 	}
@@ -105,11 +105,11 @@ func testRandomBasedSelection(t *testing.T, ss api.Selection, tpop testPopulatio
 	rng := rand.New(rand.NewSource(seed))
 
 	// create the population
-	pop := api.EvaluatedPopulation{}
+	pop := api.Population{}
 	for i := range tpop {
-		cand, err := api.NewEvaluatedCandidate(tpop[i].name, tpop[i].fitness)
-		if err != nil {
-			t.Errorf("couldn't create evaluated candidate: %v", err)
+		cand := &api.Individual{
+			Candidate: tpop[i].name,
+			Fitness:   tpop[i].fitness,
 		}
 		pop = append(pop, cand)
 	}

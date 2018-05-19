@@ -72,7 +72,7 @@ func (ts *Truncation) SetRatioRange(min, max float64) error {
 // size is the number of candidates to select from the evolved population.
 //
 // Returns the selected candidates.
-func (ts *Truncation) Select(pop api.EvaluatedPopulation, natural bool, size int, rng *rand.Rand) []interface{} {
+func (ts *Truncation) Select(pop api.Population, natural bool, size int, rng *rand.Rand) []interface{} {
 
 	sel := make([]interface{}, 0, size)
 
@@ -91,7 +91,7 @@ func (ts *Truncation) Select(pop api.EvaluatedPopulation, natural bool, size int
 	for {
 		count := minint(eligible, size-len(sel))
 		for i := 0; i < count; i++ {
-			sel = append(sel, pop[i].Candidate())
+			sel = append(sel, pop[i].Candidate)
 		}
 		if len(sel) >= size {
 			break

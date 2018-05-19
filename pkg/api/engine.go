@@ -72,7 +72,7 @@ type Engine interface {
 	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolvePopulation(size, nelites int, conds ...TerminationCondition) EvaluatedPopulation
+	EvolvePopulation(size, nelites int, conds ...TerminationCondition) Population
 
 	// EvolvePopulationWithSeedCandidates executes the evolutionary algorithm
 	// until one of the termination conditions is met, then return all of the
@@ -96,7 +96,7 @@ type Engine interface {
 	//
 	// Returns the fittest solution found by the evolutionary process.
 	EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []interface{},
-		conds ...TerminationCondition) EvaluatedPopulation
+		conds ...TerminationCondition) Population
 
 	// AddObserver registers an observer to receive status updates on the
 	// evolution progress.

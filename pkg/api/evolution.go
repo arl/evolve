@@ -46,7 +46,7 @@ func ShouldContinue(
 // SortEvaluatedPopulation sorts an evaluated population in descending order of
 // fitness (descending order of fitness score for natural scores, ascending
 // order of scores for non-natural scores).
-func SortEvaluatedPopulation(evpop EvaluatedPopulation, natural bool) {
+func SortEvaluatedPopulation(evpop Population, natural bool) {
 	// Sort candidates in descending order according to fitness.
 	if natural {
 		// Descending values for natural fitness.
@@ -68,20 +68,20 @@ func SortEvaluatedPopulation(evpop EvaluatedPopulation, natural bool) {
 // genidx is the zero-based index of the current generation/epoch.
 // start is the time at which the evolution began.
 func ComputePopulationData(
-	evpop EvaluatedPopulation,
+	pop Population,
 	natural bool,
 	nelites int,
 	genidx int,
 	start time.Time) *PopulationData {
 
-	stats := NewDataSet(WithInitialCapacity(len(evpop)))
-	for _, candidate := range evpop {
-		stats.AddValue(candidate.Fitness())
+	stats := NewDataSet(WithInitialCapacity(len(pop)))
+	for _, cand := range pop {
+		stats.AddValue(cand.Fitness)
 	}
 
 	return &PopulationData{
-		BestCand:    evpop[0].Candidate(),
-		BestFitness: evpop[0].Fitness(),
+		BestCand:    pop[0].Candidate,
+		BestFitness: pop[0].Fitness,
 		Mean:        stats.ArithmeticMean(),
 		StdDev:      stats.StandardDeviation(),
 		Natural:     natural,
