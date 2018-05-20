@@ -59,4 +59,4 @@ func (ua *UserAbort) Reset() {
 }
 
 // String returns the termination condition representation as a string
-func (*UserAbort) String() string { return "User aborted evolution" }
+func (UserAbort) String() string { return "User aborted evolution" }
