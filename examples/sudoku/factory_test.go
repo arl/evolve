@@ -6,6 +6,23 @@ import (
 	"time"
 )
 
+func checkCellVal(t *testing.T, s *sudoku, i, j, want int) {
+	t.Helper()
+
+	got := s[i][j].val
+	if got != want {
+		t.Errorf("Cell (%d, %d) value, want %v got %v", i, j, want, got)
+	}
+}
+
+func checkCellFixed(t *testing.T, s *sudoku, i, j int) {
+	t.Helper()
+
+	if !s[i][j].fixed {
+		t.Errorf("Cell (%d, %d) fixed, want true, got false", i, j)
+	}
+}
+
 // Checks to make sure that the givens are correctly placed and that each row
 // contains each value exactly once.
 func TestFactoryValidity(t *testing.T) {
@@ -24,41 +41,25 @@ func TestFactoryValidity(t *testing.T) {
 		t.Errorf("can't create factory: %v", err)
 	}
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	population := factory.GenPopulation(20, rng)
-	for _, iface := range population {
+	pop := factory.GenPopulation(20, rng)
+	for _, iface := range pop {
 		sudo := iface.(*sudoku)
 
 		// Check givens are correctly placed.
-		if !sudo[2][8].fixed {
-			t.Error("Cell (2, 8) should be fixed.")
-		}
-		if sudo[2][8].val != 5 {
-			t.Error("Cell (2, 8) should contain 5.")
-		}
-		if !sudo[7][3].fixed {
-			t.Error("Cell (7, 3) should be fixed.")
-		}
-		if sudo[7][3].val != 1 {
-			t.Error("Cell (7, 3) should contain 1.")
-		}
-		if !sudo[3][4].fixed {
-			t.Error("Cell (3, 4) should be fixed.")
-		}
-		if sudo[3][4].val != 2 {
-			t.Error("Cell (3, 4) should contain 2.")
-		}
-		if !sudo[0][1].fixed {
-			t.Error("Cell (0, 1) should be fixed.")
-		}
-		if sudo[0][1].val != 9 {
-			t.Error("Cell (0, 1) should contain 9.")
-		}
-		if !sudo[8][8].fixed {
-			t.Error("Cell (8, 8) should be fixed.")
-		}
-		if sudo[8][8].val != 9 {
-			t.Error("Cell (8, 8) should contain 9.")
-		}
+		checkCellFixed(t, sudo, 2, 8)
+		checkCellVal(t, sudo, 2, 8, 5)
+
+		checkCellFixed(t, sudo, 7, 3)
+		checkCellVal(t, sudo, 7, 3, 1)
+
+		checkCellFixed(t, sudo, 3, 4)
+		checkCellVal(t, sudo, 3, 4, 2)
+
+		checkCellFixed(t, sudo, 0, 1)
+		checkCellVal(t, sudo, 0, 1, 9)
+
+		checkCellFixed(t, sudo, 8, 8)
+		checkCellVal(t, sudo, 8, 8, 9)
 
 		// Check that each row has no duplicates.
 		set := make(map[int]struct{})

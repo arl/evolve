@@ -53,8 +53,10 @@ func (rs rank) Select(
 
 	ranked := make(api.Population, len(pop))
 	for i, cand := range pop {
-		ranked[i] = &api.Individual{cand.Candidate,
-			mapRankToScore(i+1, len(pop))}
+		ranked[i] = &api.Individual{
+			Candidate: cand.Candidate,
+			Fitness:   mapRankToScore(i+1, len(pop)),
+		}
 	}
 	return rs.selector.Select(ranked, true, size, rng)
 }

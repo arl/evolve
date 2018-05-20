@@ -34,7 +34,10 @@ func newSudokuFactory(pattern []string) (*sudokuFactory, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &sudokuFactory{factory.BaseFactory{gen}}, nil
+	sf := &sudokuFactory{
+		BaseFactory: factory.BaseFactory{CandidateGenerator: gen},
+	}
+	return sf, nil
 }
 
 // Creates a factory for generating random candidate solutions for a specified
@@ -43,7 +46,7 @@ func newSudokuFactory(pattern []string) (*sudokuFactory, error) {
 // digits '1' to '9' (each of which represents a fixed cell in the pattern) or
 // the '.' character, which represents an empty cell. Returns an error if the
 // pattern is not made of 9 strings containig 1 to 9, or '.'
-func newGenerator(pattern []string) (*generator, error) {
+func newGenerator(pattern []string) (*generator, error) { // nolint: gocyclo
 	if len(pattern) != size {
 		return nil, errWrongNumberOfRows
 	}
@@ -64,7 +67,9 @@ func newGenerator(pattern []string) (*generator, error) {
 		}
 		for j := 0; j < len(prow); j++ {
 			c := prow[j]
-			if c >= '1' && c <= '9' { // cell is a 'given'.
+			switch {
+			case c >= '1' && c <= '9':
+				// cell is a 'given'.
 				val := int(c - '0')
 				gen.templ[i][j].val = val
 				gen.templ[i][j].fixed = true
@@ -75,7 +80,8 @@ func newGenerator(pattern []string) (*generator, error) {
 						break
 					}
 				}
-			} else if c != '.' {
+			case c == '.':
+			default:
 				return nil, errPatternUnexpectedChar
 			}
 		}

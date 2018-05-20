@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"path"
@@ -19,12 +20,22 @@ import (
 	"github.com/aurelien-rainone/evolve/random"
 )
 
+func check(err error, v ...interface{}) {
+	if err != nil {
+		if len(v) == 0 {
+			log.Fatal(v, err)
+		}
+	}
+}
+
 func readSudokus(dir string) ([]string, error) {
 	f, err := os.Open(dir)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() {
+		f.Close() // nolint: errcheck
+	}()
 
 	names, err := f.Readdirnames(0)
 	switch {
@@ -41,7 +52,9 @@ func readPattern(fn string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() {
+		f.Close() // nolint: errcheck
+	}()
 
 	puzzle := []string{}
 
@@ -49,10 +62,7 @@ func readPattern(fn string) ([]string, error) {
 	for s.Scan() {
 		puzzle = append(puzzle, s.Text())
 	}
-	if s.Err() != nil {
-		return nil, s.Err()
-	}
-	return puzzle, nil
+	return puzzle, s.Err()
 }
 
 func solveSudoku(pattern []string) error {
@@ -61,26 +71,21 @@ func solveSudoku(pattern []string) error {
 	// Crossover rows between parents (so offspring is x rows from parent1 and y
 	// rows from parent2).
 	xover := xover.New(mater{})
-	xover.SetPoints(1)
+	check(xover.SetPoints(1))
 
 	mutation := newRowMutation()
 	// TODO: use a PoissonGenerator for mutation count and a
 	// DiscreteUniformGenerator for mutation amount
-	mutation.SetMutationsRange(1, 2)
-	mutation.SetAmountRange(1, 8)
+	check(mutation.SetMutationsRange(1, 2))
+	check(mutation.SetAmountRange(1, 8))
 
 	pipeline := operator.Pipeline{xover, mutation}
 
 	selector := selection.NewTournament()
-	err := selector.SetProb(0.85)
-	if err != nil {
-		return fmt.Errorf("can't create selection strategy: %v", err)
-	}
+	check(selector.SetProb(0.85))
 
 	factory, err := newSudokuFactory(pattern)
-	if err != nil {
-		return fmt.Errorf("can't create factory strategy: %v", err)
-	}
+	check(err)
 
 	eng := engine.NewGenerational(factory, pipeline, evaluator{}, selector, rng)
 
@@ -89,7 +94,7 @@ func solveSudoku(pattern []string) error {
 			return
 		}
 		// only shows multiple of 100 generations
-		fmt.Printf("gen:%d, fitness:%v:\n%v\n", data.GenNumber, data.BestFitness, data.BestCand.(*sudoku))
+		fmt.Printf("At generation %d the best solution has a fitness of %v\n%v\n", data.GenNumber, data.BestFitness, data.BestCand.(*sudoku))
 	}))
 
 	const (
@@ -98,7 +103,7 @@ func solveSudoku(pattern []string) error {
 	)
 	solution := eng.Evolve(
 		popsize, nelites,
-		termination.TargetFitness{0, false},
+		termination.TargetFitness{Fitness: 0, Natural: false},
 		termination.NewUserAbort(),
 	)
 
@@ -112,8 +117,7 @@ func main() {
 
 	puzzles, err := readSudokus(*puzdir)
 	if err != nil {
-		fmt.Printf("can't read puzzles directory: %v", err)
-		return
+		log.Fatalf("can't read puzzles directory: %v", err)
 	}
 
 	for i, p := range puzzles {
@@ -122,25 +126,21 @@ func main() {
 
 	fmt.Print("Choose the sudoku puzzle you want to solve? ")
 	var i int
-	if _, err := fmt.Scanf("%d", &i); err != nil {
-		fmt.Printf("can't read choice: %v", err)
+	if _, err = fmt.Scanf("%d", &i); err != nil {
+		log.Fatalf("can't read your choice: %v", err)
 		return
 	}
 	if i < 0 || i >= len(puzzles) {
-		fmt.Println("invalid entry")
-		return
+		log.Fatal("invalid entry")
 	}
-	fmt.Println("you chose ", i)
+
 	pattern, err := readPattern(path.Join(*puzdir, puzzles[i]))
 	if err != nil {
-		fmt.Printf("can't read pattern: %v", err)
-		return
+		log.Fatalf("can't read sudo pattern: %v", err)
 	}
-	fmt.Println("pattern ", pattern)
-	fmt.Println("sudoku:", (&sudoku{}).String())
 
 	err = solveSudoku(pattern)
 	if err != nil {
-		fmt.Printf("Couldn't solve: %v\n", err)
+		log.Fatalf("couldn't solve sudoku pattern: %v\n", err)
 	}
 }

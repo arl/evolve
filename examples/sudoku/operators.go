@@ -42,7 +42,7 @@ var errInvalidMutationAmount = errors.New("mutation amount must be greater than 
 // solution candidate
 // amnt (mutation amount) is the number of positions by which a list element
 // will be displaced as a result of mutation
-type rowMutation struct {
+type rowMutation struct { // nolint: maligned
 	nmut             int // number of mutations
 	varnmut          bool
 	nmutmin, nmutmax int

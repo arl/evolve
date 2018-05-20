@@ -2,15 +2,32 @@ package main
 
 import (
 	"math/rand"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/aurelien-rainone/evolve/random"
 )
 
+func sudokuFromStrings(strs []string) (*sudoku, error) {
+	s := &sudoku{}
+	for i, row := range strs {
+		vals := strings.Fields(row)
+		for j, sval := range vals {
+			val, err := strconv.ParseInt(sval, 10, 64)
+			if err != nil {
+				return nil, err
+			}
+			s[i][j].val = int(val)
+		}
+	}
+	return s, nil
+}
+
 func TestSudokuMater(t *testing.T) {
 
-	p1, err := newSudoku([]string{
+	p1, err := sudokuFromStrings([]string{
 		"1 1 1 1 1 1 1 1 1",
 		"2 2 2 2 2 2 2 2 2",
 		"3 3 3 3 3 3 3 3 3",
@@ -25,7 +42,7 @@ func TestSudokuMater(t *testing.T) {
 		t.Errorf("error creating sudoku from string: %v", err)
 	}
 
-	p2, err := newSudoku([]string{
+	p2, err := sudokuFromStrings([]string{
 		"9 9 9 9 9 9 9 9 9",
 		"8 8 8 8 8 8 8 8 8",
 		"7 7 7 7 7 7 7 7 7",
@@ -45,7 +62,7 @@ func TestSudokuMater(t *testing.T) {
 
 // Tests to ensure that rows are still valid after mutation.  Each row
 // should contain each value 1-9 exactly once.
-func TestRowMutationValidity(t *testing.T) {
+func TestRowMutationValidity(t *testing.T) { // nolint: gocyclo
 	rmut := newRowMutation()
 	err := rmut.SetMutations(8)
 	if err != nil {
@@ -55,7 +72,7 @@ func TestRowMutationValidity(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	sudo, err := newSudoku([]string{
+	sudo, err := sudokuFromStrings([]string{
 		"1 2 8 5 4 3 9 6 7",
 		"7 6 4 9 2 8 5 1 3",
 		"3 9 5 7 6 1 2 4 8",
@@ -66,6 +83,9 @@ func TestRowMutationValidity(t *testing.T) {
 		"9 4 6 8 5 7 3 2 1",
 		"2 3 7 1 9 4 6 8 5",
 	})
+	if err != nil {
+		t.Error(err)
+	}
 	pop := []interface{}{sudo}
 
 	counts := make(map[int]struct{})
@@ -98,7 +118,7 @@ func TestRowMutationValidity(t *testing.T) {
 }
 
 //Check that the mutation never modifies the value of fixed cells.
-func TestRowMutationFixedConstraints(t *testing.T) {
+func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 	rmut := newRowMutation()
 	err := rmut.SetMutations(8)
 	if err != nil {

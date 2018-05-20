@@ -55,7 +55,7 @@ func TestSudokuEvaluator(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		sud, err := newSudoku(tt.cand)
+		sud, err := sudokuFromStrings(tt.cand)
 		if err != nil {
 			t.Errorf("error creating sudoku from string: %v", err)
 		}
