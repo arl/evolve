@@ -74,7 +74,7 @@ func ComputePopulationData(
 	genidx int,
 	start time.Time) *PopulationData {
 
-	stats := NewDataSet(len(pop))
+	stats := NewDataset(len(pop))
 	for _, cand := range pop {
 		stats.AddValue(cand.Fitness)
 	}

@@ -60,7 +60,7 @@ func isInQuadrant(x, y float64) bool {
 //
 // Returns the standard deviation of the generated sample.
 func calculateSampleStandardDeviation(rng *rand.Rand, maxValue int64, iterations int) float64 {
-	dataset := api.NewDataSet(iterations)
+	dataset := api.NewDataset(iterations)
 	for i := 0; i < iterations; i++ {
 		dataset.AddValue(float64(rng.Int63n(maxValue)))
 	}
