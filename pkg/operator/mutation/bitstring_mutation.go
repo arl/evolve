@@ -58,7 +58,7 @@ func (op *Bitstring) SetMutations(nmut int) error {
 }
 
 // SetMutationsRange sets the range of possible number of mutations (i.e the
-// numnber of bits that will be filpped if the bitstring candidate is selected
+// numnber of bits that will be flipped if the bitstring candidate is selected
 // for mutation).
 //
 // The specific number of mutations will be randomly chosen with the pseudo
@@ -89,7 +89,7 @@ func (op *Bitstring) Mutate(c interface{}, rng *rand.Rand) interface{} {
 
 	if rng.Float64() < prob {
 		bs := c.(*bitstring.Bitstring)
-		mutated := bs.Copy()
+		mutated := bitstring.Copy(bs)
 		// there is a mutation to perform, get/decide how many bits to flip
 		var nmut int
 		if op.varnmut {

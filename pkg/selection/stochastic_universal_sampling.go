@@ -30,7 +30,7 @@ type StochasticUniversalSampling struct{}
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
 func (StochasticUniversalSampling) Select(
-	pop api.EvaluatedPopulation,
+	pop api.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {
@@ -38,7 +38,7 @@ func (StochasticUniversalSampling) Select(
 	// Calculate the sum of all fitness values.
 	var sum float64
 	for _, cand := range pop {
-		sum += adjustedFitness(cand.Fitness(), natural)
+		sum += adjustedFitness(cand.Fitness, natural)
 	}
 
 	sel := make([]interface{}, 0, size)
@@ -54,14 +54,13 @@ func (StochasticUniversalSampling) Select(
 		// Calculate the number of times this candidate is expected to
 		// be selected on average and add it to the cumulative total
 		// of expected frequencies.
-		expect += adjustedFitness(cand.Fitness(),
-			natural) / sum * float64(size)
+		expect += adjustedFitness(cand.Fitness, natural) / sum * float64(size)
 
 		// If f is the expected frequency, the candidate will be selected at
 		// least as often as floor(f) and at most as often as ceil(f). The
 		// actual count depends on the random starting offset.
 		for expect > off+float64(i) {
-			sel = append(sel, cand.Candidate())
+			sel = append(sel, cand.Candidate)
 			i++
 		}
 	}

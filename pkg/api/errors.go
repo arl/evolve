@@ -1,12 +1,7 @@
 package api
 
-import "fmt"
+import "errors"
 
-// ErrIllegalState is return by an function (or method) when it has been called
-// when the state of some argument (or the receiver) doesn't permit this
-// function (or method) to be called.
-type ErrIllegalState string
-
-func (err ErrIllegalState) Error() string {
-	return fmt.Sprintf("illegal state: %v", err)
-}
+// ErrIllegalState is the error returned when trying a method of an engine has
+// been called while its state doesn't allow that method call.
+var ErrIllegalState = errors.New("illegal state")

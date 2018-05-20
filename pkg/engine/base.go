@@ -8,6 +8,7 @@ import (
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/worker"
+	"github.com/pkg/errors"
 )
 
 // Stepper is the interface implemented by objects having a NextEvolutionStep
@@ -21,7 +22,7 @@ type Stepper interface {
 	//
 	// Returns the updated population after the evolutionary process has
 	// proceeded by one step/iteration.
-	Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation
+	Step(evpop api.Population, nelites int, rng *rand.Rand) api.Population
 }
 
 // Base is a base struct for EvolutionEngine implementations.
@@ -36,7 +37,7 @@ type Base struct {
 	Stepper
 }
 
-// NewBaseEngine creates a new evolution engine by specifying the various
+// NewBase creates a new evolution engine by specifying the various
 // components required by an evolutionary algorithm.
 //
 // candidateFactory is the factory used to create the initial population that is
@@ -45,8 +46,7 @@ type Base struct {
 // solutions.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewBaseEngine(f api.Factory, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
-
+func NewBase(f api.Factory, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
 	return &Base{
 		f:       f,
 		eval:    eval,
@@ -103,7 +103,7 @@ func (e *Base) Evolve(size, nelites int, conds ...api.TerminationCondition) inte
 //
 // Returns the fittest solution found by the evolutionary process.
 func (e *Base) EvolveWithSeedCandidates(size, nelites int, seedcands []interface{}, conds ...api.TerminationCondition) interface{} {
-	return e.EvolvePopulationWithSeedCandidates(size, nelites, seedcands, conds...)[0].Candidate()
+	return e.EvolvePopulationWithSeedCandidates(size, nelites, seedcands, conds...)[0].Candidate
 }
 
 // EvolvePopulation executes the evolutionary algorithm until one of the
@@ -125,7 +125,7 @@ func (e *Base) EvolveWithSeedCandidates(size, nelites int, seedcands []interface
 // terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *Base) EvolvePopulation(size, nelites int, conds ...api.TerminationCondition) api.EvaluatedPopulation {
+func (e *Base) EvolvePopulation(size, nelites int, conds ...api.TerminationCondition) api.Population {
 	return e.EvolvePopulationWithSeedCandidates(size, nelites, []interface{}{}, conds...)
 }
 
@@ -149,7 +149,7 @@ func (e *Base) EvolvePopulation(size, nelites int, conds ...api.TerminationCondi
 // conditions One or more conditions that may cause the evolution to terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []interface{}, conds ...api.TerminationCondition) api.EvaluatedPopulation {
+func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []interface{}, conds ...api.TerminationCondition) api.Population {
 
 	if nelites < 0 || nelites >= size {
 		panic("Elite count must be non-negative and less than population size.")
@@ -199,18 +199,17 @@ func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands [
 // Returns the evaluated population (a list of candidates with attached fitness
 // scores).
 func (e *Base) evaluatePopulation(
-	pop []interface{}) api.EvaluatedPopulation {
+	pop []interface{}) api.Population {
 
 	// Do fitness evaluations
-	evpop := make(api.EvaluatedPopulation, len(pop))
+	evpop := make(api.Population, len(pop))
 
 	if e.singleThreaded {
 
-		var err error
 		for i, candidate := range pop {
-			evpop[i], err = api.NewEvaluatedCandidate(candidate, e.eval.Fitness(candidate, pop))
-			if err != nil {
-				panic(fmt.Sprintf("Can't evaluate candidate %v: %v", candidate, err))
+			evpop[i] = &api.Individual{
+				Candidate: candidate,
+				Fitness:   e.eval.Fitness(candidate, pop),
 			}
 		}
 
@@ -235,7 +234,7 @@ func (e *Base) evaluatePopulation(
 		}
 
 		for i, result := range results {
-			evpop[i] = result.(*api.EvaluatedCandidate)
+			evpop[i] = result.(*api.Individual)
 		}
 		// TODO: handle goroutine termination
 		/*
@@ -258,15 +257,17 @@ type fitnessEvaluationWorker struct {
 }
 
 func (w *fitnessEvaluationWorker) Work() (interface{}, error) {
-	return api.NewEvaluatedCandidate(w.pop[w.idx],
-		w.evaluator.Fitness(w.pop[w.idx], w.pop))
+	return &api.Individual{
+		Candidate: w.pop[w.idx],
+		Fitness:   w.evaluator.Fitness(w.pop[w.idx], w.pop),
+	}, nil
 }
 
 // SatisfiedTerminationConditions returns a slice of all TerminationCondition's
 // that are satisfied by the current state of the evolution engine.
 //
 // Usually this slice will contain only one item, but it is possible that
-// mutliple termination conditions will become satisfied at the same time. In
+// multiple termination conditions will become satisfied at the same time. In
 // this case the condition objects in the slice will be in the same order that
 // they were specified when passed to the engine.
 //
@@ -284,11 +285,11 @@ func (w *fitnessEvaluationWorker) Work() (interface{}, error) {
 // interrupted.
 func (e *Base) SatisfiedTerminationConditions() ([]api.TerminationCondition, error) {
 	if e.satisfied == nil {
-		return nil, api.ErrIllegalState("evolution engine has not terminated")
+		return nil, errors.Wrap(api.ErrIllegalState, "evolution engine has not terminated")
 	}
-	satisfiedTerminationConditions := make([]api.TerminationCondition, len(e.satisfied))
-	copy(satisfiedTerminationConditions, e.satisfied)
-	return satisfiedTerminationConditions, nil
+	conds := make([]api.TerminationCondition, len(e.satisfied))
+	copy(conds, e.satisfied)
+	return conds, nil
 }
 
 // AddObserver adds a listener to receive status updates on the

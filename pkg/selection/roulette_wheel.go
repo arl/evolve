@@ -31,7 +31,7 @@ type rouletteWheel struct{}
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
 func (rouletteWheel) Select(
-	pop api.EvaluatedPopulation,
+	pop api.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {
@@ -44,9 +44,9 @@ func (rouletteWheel) Select(
 	// previous one is directly proportional to the probability of the
 	// corresponding candidate in the population being selected.
 	cumfitness := make([]float64, len(pop))
-	cumfitness[0] = adjustedFitness(pop[0].Fitness(), natural)
+	cumfitness[0] = adjustedFitness(pop[0].Fitness, natural)
 	for i := 1; i < len(pop); i++ {
-		fitness := adjustedFitness(pop[i].Fitness(), natural)
+		fitness := adjustedFitness(pop[i].Fitness, natural)
 		cumfitness[i] = cumfitness[i-1] + fitness
 	}
 
@@ -58,7 +58,7 @@ func (rouletteWheel) Select(
 			// Convert negative insertion point to array index.
 			index = abs(index + 1)
 		}
-		sel[i] = pop[index].Candidate()
+		sel[i] = pop[index].Candidate
 	}
 	return sel
 }

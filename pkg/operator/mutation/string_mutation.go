@@ -9,8 +9,7 @@ import (
 //
 // Zero or more characters may be modified. The probability of any given
 // character being modified is governed by the mutation probability.
-// nolint: golint
-func NewString(alphabet string) *stringMutater {
+func NewString(alphabet string) *stringMutater { // nolint: golint
 	smut := &stringMutater{alphabet: alphabet}
 	smut.Mutation = New(smut)
 	return smut

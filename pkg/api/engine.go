@@ -2,6 +2,10 @@ package api
 
 // Engine is the interface implemented by objects that provide evolution
 // operations.
+// TODO: does the Engine interface really needs all this methods? wouldn't one
+// suffice and the others be derived from it (in engine.Base)?
+// TODO: Could AddObserver/RemoveObserver be made an external interace, included
+// in Engine? How would that go with future island observers?
 type Engine interface {
 
 	// Evolve executes the evolutionary algorithm until one of the termination
@@ -68,7 +72,7 @@ type Engine interface {
 	// conds is a slice of conditions that may cause the evolution to terminate.
 	//
 	// Returns the fittest solution found by the evolutionary process.
-	EvolvePopulation(size, nelites int, conds ...TerminationCondition) EvaluatedPopulation
+	EvolvePopulation(size, nelites int, conds ...TerminationCondition) Population
 
 	// EvolvePopulationWithSeedCandidates executes the evolutionary algorithm
 	// until one of the termination conditions is met, then return all of the
@@ -92,7 +96,7 @@ type Engine interface {
 	//
 	// Returns the fittest solution found by the evolutionary process.
 	EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []interface{},
-		conds ...TerminationCondition) EvaluatedPopulation
+		conds ...TerminationCondition) Population
 
 	// AddObserver registers an observer to receive status updates on the
 	// evolution progress.
@@ -106,7 +110,7 @@ type Engine interface {
 	// evolution engine.
 	//
 	// Usually this list will contain only one item, but it is possible that
-	// mutliple termination conditions will become satisfied at the same time.
+	// multiple termination conditions will become satisfied at the same time.
 	// In this case the condition objects in the list will be in the same order
 	// that they were specified when passed to the engine.
 	//
@@ -125,5 +129,6 @@ type Engine interface {
 	//
 	// May return ErrIllegalState if this method is invoked on an evolution
 	// engine before evolution is started or while it is still in progress.
+	// TODO: find shorter name 'SatisfiedConditions' ?
 	SatisfiedTerminationConditions() ([]TerminationCondition, error)
 }

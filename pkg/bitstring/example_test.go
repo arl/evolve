@@ -74,11 +74,11 @@ func ExampleBitstring_BigInt() {
 	// Output: 4
 }
 
-func ExampleBitstring_SwapRange() {
+func ExampleSwapRange() {
 	bs1, _ := MakeFromString("111")
 	bs2, _ := MakeFromString("000")
 	// starting from bit 2 of bs1, swap 1 bit with bs2
-	bs1.SwapRange(bs2, 2, 1)
+	SwapRange(bs1, bs2, 2, 1)
 	fmt.Println(bs1)
 	// Output: 011
 }

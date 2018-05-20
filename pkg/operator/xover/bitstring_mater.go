@@ -24,16 +24,15 @@ func (BitstringMater) Mate(
 	if p1.Len() != p2.Len() {
 		panic("Cannot mate parents of different lengths")
 	}
-	off1 := p1.Copy()
-	off2 := p2.Copy()
+	off1 := bitstring.Copy(p1)
+	off2 := bitstring.Copy(p2)
 
 	// Apply as many crossovers as required.
 	for i := int64(0); i < nxpts; i++ {
 		// Cross-over index is always greater than zero and less than the
 		// length of the parent so that we always pick a point that will
 		// result in a meaningful crossover.
-		crossoverIndex := (1 + rng.Intn(p1.Len()-1))
-		off1.SwapRange(off2, 0, crossoverIndex)
+		bitstring.SwapRange(off1, off2, 0, (1 + rng.Intn(p1.Len()-1)))
 	}
 	return []interface{}{off1, off2}
 }

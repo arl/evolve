@@ -11,14 +11,14 @@ type Identity struct{}
 
 // Select selects the specified number of candidates from the population.
 func (Identity) Select(
-	pop api.EvaluatedPopulation,
+	pop api.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {
 
 	sel := make([]interface{}, size)
 	for i := 0; i < size; i++ {
-		sel[i] = pop[i].Candidate()
+		sel[i] = pop[i].Candidate
 	}
 	return sel
 }

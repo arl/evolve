@@ -5,109 +5,80 @@ import (
 	"sort"
 )
 
-const (
-	defaultCapacity = 50
-)
-
 // DataSet is a utility struct for calculating statistics for a finite data set.
 type DataSet struct {
-	dataSet          []float64
-	total            float64
-	product          float64
-	reciprocalSum    float64
-	minimum, maximum float64
+	values   []float64
+	total    float64
+	product  float64
+	recipsum float64 // reciprocal sum
+	min, max float64
 }
 
-// DataSetOption is the type of functions used to specify options during the
-// creation of DataSet objects.
-type DataSetOption func(*DataSet)
-
-// NewDataSet creates an empty data set with a default initial capacity.
-func NewDataSet(options ...DataSetOption) *DataSet {
-	ds := &DataSet{
-		minimum:       math.MaxFloat64,
-		maximum:       math.SmallestNonzeroFloat64,
-		product:       1,
-		total:         0,
-		reciprocalSum: 0,
-	}
-
-	// set dataset options
-	for _, option := range options {
-		option(ds)
-	}
-
-	if ds.dataSet == nil {
-		ds.dataSet = make([]float64, 0, defaultCapacity)
-	}
-	return ds
-}
-
-// WithInitialCapacity allows to specify the initial capacity of the
-// data set.
+// NewDataSet creates an empty data set with the provided initial capacity.
 //
-// The initial capacity for the data set corresponds to the number
-// of values that can be added without needing to resize the
-// internal data storage.
-func WithInitialCapacity(capacity int) DataSetOption {
-	return func(ds *DataSet) {
-		ds.dataSet = make([]float64, 0, capacity)
-	}
-}
-
-// WithPrePopulatedDataSet allows to prepopulates the data set with the
-// specified values.
-func WithPrePopulatedDataSet(dataSet []float64) DataSetOption {
-	return func(ds *DataSet) {
-		ds.dataSet = make([]float64, len(dataSet))
-		copy(ds.dataSet, dataSet)
-
-		for _, value := range ds.dataSet {
-			ds.updateStatsWithNewValue(value)
-		}
+// The initial capacity for the data set corresponds to the number of values
+// that can be added without needing to resize the internal data storage.
+func NewDataSet(capacity int) *DataSet {
+	return &DataSet{
+		min:      math.MaxFloat64,
+		max:      math.SmallestNonzeroFloat64,
+		product:  1,
+		total:    0,
+		recipsum: 0,
+		values:   make([]float64, 0, capacity),
 	}
 }
 
 // AddValue adds a single value to the data set and updates any statistics that
 // are calculated cumulatively.
 func (ds *DataSet) AddValue(value float64) {
-	ds.dataSet = append(ds.dataSet, value)
-	ds.updateStatsWithNewValue(value)
+	ds.values = append(ds.values, value)
+	ds.update(value)
 }
 
-func (ds *DataSet) updateStatsWithNewValue(value float64) {
+// AddValues adds multiple values to the data set and updates any statistics that
+// are calculated cumulatively.
+func (ds *DataSet) AddValues(values ...float64) {
+	ds.values = append(ds.values, values...)
+	for _, value := range ds.values {
+		ds.update(value)
+	}
+}
+
+// update the dataset by considering the new value that has been added
+func (ds *DataSet) update(value float64) {
 	ds.total += value
 	ds.product *= value
-	ds.reciprocalSum += 1 / value
-	ds.minimum = math.Min(ds.minimum, value)
-	ds.maximum = math.Max(ds.maximum, value)
+	ds.recipsum += 1 / value
+	ds.min = math.Min(ds.min, value)
+	ds.max = math.Max(ds.max, value)
 }
 
-func (ds *DataSet) assertNotEmpty() {
-	if len(ds.dataSet) == 0 {
+func (ds *DataSet) mustNotEmpty() {
+	if len(ds.values) == 0 {
 		panic("DataSet should not be empty")
 	}
 }
 
 // Len returns the number of values in this data set.
 func (ds *DataSet) Len() int {
-	return len(ds.dataSet)
+	return len(ds.values)
 }
 
-// Minimum returns the smallest value in the data set.
+// Min returns the smallest value in the data set.
 //
 // panics if the data set is empty.
-func (ds *DataSet) Minimum() float64 {
-	ds.assertNotEmpty()
-	return ds.minimum
+func (ds *DataSet) Min() float64 {
+	ds.mustNotEmpty()
+	return ds.min
 }
 
-// Maximum returns the biggest value in the data set.
+// Max returns the biggest value in the data set.
 //
 // panics if the data set is empty.
-func (ds *DataSet) Maximum() float64 {
-	ds.assertNotEmpty()
-	return ds.maximum
+func (ds *DataSet) Max() float64 {
+	ds.mustNotEmpty()
+	return ds.max
 }
 
 // Median determines the median value of the data set.
@@ -118,23 +89,24 @@ func (ds *DataSet) Maximum() float64 {
 //
 // panics if the data set is empty.
 func (ds *DataSet) Median() float64 {
-	ds.assertNotEmpty()
-	// Sort the data (take a copy to do this).
-	dataCopy := make([]float64, len(ds.dataSet))
-	copy(dataCopy, ds.dataSet)
-	sort.Float64s(dataCopy)
-	midPoint := len(dataCopy) / 2
-	if len(dataCopy)%2 != 0 {
-		return dataCopy[midPoint]
+	ds.mustNotEmpty()
+	// Sort the data (take a copy to do this)
+	// TODO: why exactly ??
+	cpy := make([]float64, len(ds.values))
+	copy(cpy, ds.values)
+	sort.Float64s(cpy)
+	middle := len(cpy) / 2
+	if len(cpy)%2 != 0 {
+		return cpy[middle]
 	}
-	return dataCopy[midPoint-1] + (dataCopy[midPoint]-dataCopy[midPoint-1])/2
+	return cpy[middle-1] + (cpy[middle]-cpy[middle-1])/2
 }
 
 // Aggregate returns the sum of all values.
 //
 // panics if the data set is empty.
 func (ds *DataSet) Aggregate() float64 {
-	ds.assertNotEmpty()
+	ds.mustNotEmpty()
 	return ds.total
 }
 
@@ -142,7 +114,7 @@ func (ds *DataSet) Aggregate() float64 {
 //
 // panics if the data set is empty.
 func (ds *DataSet) Product() float64 {
-	ds.assertNotEmpty()
+	ds.mustNotEmpty()
 	return ds.product
 }
 
@@ -157,8 +129,8 @@ func (ds *DataSet) Product() float64 {
 //
 // panics if the data set is empty.
 func (ds *DataSet) ArithmeticMean() float64 {
-	ds.assertNotEmpty()
-	return ds.total / float64(len(ds.dataSet))
+	ds.mustNotEmpty()
+	return ds.total / float64(len(ds.values))
 }
 
 // GeometricMean returns the geometric mean of all elements in the data set.
@@ -171,8 +143,8 @@ func (ds *DataSet) ArithmeticMean() float64 {
 //
 // panics if the data set is empty.
 func (ds *DataSet) GeometricMean() float64 {
-	ds.assertNotEmpty()
-	return math.Pow(ds.product, 1.0/float64(len(ds.dataSet)))
+	ds.mustNotEmpty()
+	return math.Pow(ds.product, 1.0/float64(len(ds.values)))
 }
 
 // HarmonicMean returns the harmonic mean of all the elements in the data set.
@@ -186,8 +158,8 @@ func (ds *DataSet) GeometricMean() float64 {
 //
 // panics if the data set is empty.
 func (ds *DataSet) HarmonicMean() float64 {
-	ds.assertNotEmpty()
-	return float64(len(ds.dataSet)) / ds.reciprocalSum
+	ds.mustNotEmpty()
+	return float64(len(ds.values)) / ds.recipsum
 }
 
 // MeanDeviation returns the mean absolute deviation of the data set.
@@ -201,10 +173,10 @@ func (ds *DataSet) HarmonicMean() float64 {
 func (ds *DataSet) MeanDeviation() float64 {
 	mean := ds.ArithmeticMean()
 	var diffs float64
-	for _, value := range ds.dataSet {
+	for _, value := range ds.values {
 		diffs += math.Abs(mean - value)
 	}
-	return diffs / float64(len(ds.dataSet))
+	return diffs / float64(len(ds.values))
 }
 
 // Variance returns the population variance of the data set.
@@ -220,7 +192,7 @@ func (ds *DataSet) MeanDeviation() float64 {
 //
 // panics if the data set is empty.
 func (ds *DataSet) Variance() float64 {
-	return ds.sumSquaredDiffs() / float64(len(ds.dataSet))
+	return ds.sumSquaredDiffs() / float64(len(ds.values))
 }
 
 // sumSquaredDiffs is an helper method for variance calculations.
@@ -231,12 +203,12 @@ func (ds *DataSet) Variance() float64 {
 // panics if the data set is empty.
 func (ds *DataSet) sumSquaredDiffs() float64 {
 	mean := ds.ArithmeticMean()
-	var squaredDiffs float64
-	for _, value := range ds.dataSet {
+	var sqdiffs float64
+	for _, value := range ds.values {
 		diff := mean - value
-		squaredDiffs += (diff * diff)
+		sqdiffs += (diff * diff)
 	}
-	return squaredDiffs
+	return sqdiffs
 }
 
 // StandardDeviation returns the standard deviation of the population.
@@ -264,7 +236,7 @@ func (ds *DataSet) StandardDeviation() float64 {
 //
 // panics if the data set is empty.
 func (ds *DataSet) SampleVariance() float64 {
-	return ds.sumSquaredDiffs() / float64(len(ds.dataSet)-1)
+	return ds.sumSquaredDiffs() / float64(len(ds.values)-1)
 }
 
 // SampleStandardDeviation returns the sample standard deviation of the data

@@ -31,5 +31,5 @@ func (m StringMater) Mate(
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return append([]interface{}{}, string(off1), string(off2))
+	return []interface{}{string(off1), string(off2)}
 }

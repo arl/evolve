@@ -47,7 +47,7 @@ func NewGenerational(f api.Factory, op api.Operator, eval api.Evaluator, sel api
 	stepper := &Generational{op: op, eval: eval, sel: sel}
 
 	// create the evolution engine implementation
-	impl := NewBaseEngine(f, eval, rng, stepper)
+	impl := NewBase(f, eval, rng, stepper)
 
 	// provide the engine to the stepper for forwarding
 	stepper.eng = impl
@@ -61,14 +61,14 @@ func NewGenerational(f api.Factory, op api.Operator, eval api.Evaluator, sel api
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *Generational) Step(evpop api.EvaluatedPopulation, nelites int, rng *rand.Rand) api.EvaluatedPopulation {
+func (e *Generational) Step(evpop api.Population, nelites int, rng *rand.Rand) api.Population {
 
 	pop := make([]interface{}, 0, len(evpop))
 
 	// First perform any elitist selection.
 	elite := make([]interface{}, nelites)
 	for i := 0; i < nelites; i++ {
-		elite[i] = evpop[i].Candidate()
+		elite[i] = evpop[i].Candidate
 	}
 
 	// Then select candidates that will be operated on to create the evolved

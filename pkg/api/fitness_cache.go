@@ -47,6 +47,4 @@ func (c *FitnessCache) Fitness(cand interface{}, pop []interface{}) float64 {
 
 // IsNatural specifies whether this evaluator generates 'natural' fitness
 // scores or not.
-func (c *FitnessCache) IsNatural() bool {
-	return c.Wrapped.IsNatural()
-}
+func (c *FitnessCache) IsNatural() bool { return c.Wrapped.IsNatural() }

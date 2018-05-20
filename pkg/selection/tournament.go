@@ -67,7 +67,7 @@ func (ts *Tournament) SetProbRange(min, max float64) error {
 
 // Select selects the specified number of candidates from the population.
 func (ts *Tournament) Select(
-	pop api.EvaluatedPopulation,
+	pop api.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {
@@ -86,16 +86,16 @@ func (ts *Tournament) Select(
 		}
 
 		if natural && rng.Float64() < prob { // Select the fitter candidate.
-			if cand2.Fitness() > cand1.Fitness() {
-				sel[i] = cand2.Candidate()
+			if cand2.Fitness > cand1.Fitness {
+				sel[i] = cand2.Candidate
 			} else {
-				sel[i] = cand1.Candidate()
+				sel[i] = cand1.Candidate
 			}
 		} else { // Select the less fit candidate.
-			if cand2.Fitness() > cand1.Fitness() {
-				sel[i] = cand1.Candidate()
+			if cand2.Fitness > cand1.Fitness {
+				sel[i] = cand1.Candidate
 			} else {
-				sel[i] = cand2.Candidate()
+				sel[i] = cand2.Candidate
 			}
 		}
 	}

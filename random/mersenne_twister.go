@@ -26,15 +26,15 @@ const (
 	matrixa uint64 = 0xB5026F5AA96619E9
 )
 
-// MT19937 is the structure to hold the state of one instance of the
-// Mersenne Twister PRNG. New instances can be allocated using the
-// mt19937.New() function. MT19937 implements the rand.Source
-// interface and rand.New() from the math/rand package can be used to
-// generate different distributions from a MT19937 PRNG.
+// MT19937 is the structure to hold the state of one instance of the Mersenne
+// Twister PRNG. New instances can be allocated using the mt19937.New()
+// function. MT19937 implements the rand.Source interface and rand.New() from
+// the math/rand package can be used to generate different distributions from a
+// MT19937 PRNG.
 //
-// This class is not safe for concurrent accesss by different
-// goroutines. If more than one goroutine accesses the PRNG, the
-// callers must synchronise access using sync.Mutex or similar.
+// This struct is not safe for concurrent access by different goroutines. If
+// more than one goroutine accesses the PRNG, the callers must synchronise
+// access using sync.Mutex or similar.
 type MT19937 struct {
 	state []uint64
 	index int

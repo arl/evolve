@@ -1,13 +1,11 @@
 package test
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/factory"
-	"github.com/stretchr/testify/assert"
 )
 
 // Trivial fitness evaluator for integers. Used by unit tests.
@@ -42,24 +40,25 @@ func (op IntAdjuster) Apply(cands []interface{}, rng *rand.Rand) []interface{} {
 // Utility functions used by unit tests for migration strategies.
 //
 
-func CreateTestPopulation(members ...interface{}) api.EvaluatedPopulation {
-	var err error
-	pop := make(api.EvaluatedPopulation, len(members))
+func CreateTestPopulation(members ...interface{}) api.Population {
+	pop := make(api.Population, len(members))
 	for i, member := range members {
-		pop[i], err = api.NewEvaluatedCandidate(member, 0)
-		if err != nil {
-			panic(fmt.Sprintf("can't create test pop: %v", err))
-		}
+		pop[i] = &api.Individual{Candidate: member, Fitness: 0}
 	}
 	return pop
 }
 
-func AssertPopulationContents(t *testing.T, actualpop api.EvaluatedPopulation, expected ...string) {
+func AssertPopulationContents(t *testing.T, actualpop api.Population, expected ...string) {
 	t.Helper() // mark current function as helper in case of error
-	assert.Len(t, actualpop, len(expected), "wrong population size after migration")
+	if len(actualpop) != len(expected) {
+		t.Errorf("wrong population size, want %v got %v", len(expected), len(actualpop))
+	}
+
 	for i, cand := range actualpop {
-		got := cand.Candidate()
+		got := cand.Candidate.(string)
 		want := expected[i]
-		assert.Equalf(t, want, got, "wrong candidate at index %v, want %v, got %v", i, want, got)
+		if want != got {
+			t.Errorf("wrong candidate at index %v, want %v, got %v", i, want, got)
+		}
 	}
 }

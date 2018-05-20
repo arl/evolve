@@ -62,11 +62,11 @@ func testFitnessBasedSelection(t *testing.T, ss api.Selection, tpop testPopulati
 	rng := rand.New(rand.NewSource(99))
 
 	// create the population
-	pop := api.EvaluatedPopulation{}
+	pop := api.Population{}
 	for i := range tpop {
-		cand, err := api.NewEvaluatedCandidate(tpop[i].name, tpop[i].fitness)
-		if err != nil {
-			t.Errorf("couldn't create evaluated candidate: %v", err)
+		cand := &api.Individual{
+			Candidate: tpop[i].name,
+			Fitness:   tpop[i].fitness,
 		}
 		pop = append(pop, cand)
 	}
@@ -95,28 +95,25 @@ func frequency(slice []interface{}, val interface{}) int {
 	return count
 }
 
-// function to check the selected candidates (returns nil of test fail message)
-type popCheckFunc func(selected []interface{}) error
-
 // test a random based selection strategy ss by selecting the n best candidates
-// of tpop, running the result to f
-func testRandomBasedSelection(t *testing.T, ss api.Selection, tpop testPopulation, natural bool, n int, f popCheckFunc) {
+// of tpop, running the result to checkfn (returns nil or test fail message)
+func testRandomBasedSelection(t *testing.T, ss api.Selection, tpop testPopulation, natural bool, n int, checkfn func([]interface{}) error) {
 	seed := time.Now().UnixNano()
 	rng := rand.New(rand.NewSource(seed))
 
 	// create the population
-	pop := api.EvaluatedPopulation{}
+	pop := api.Population{}
 	for i := range tpop {
-		cand, err := api.NewEvaluatedCandidate(tpop[i].name, tpop[i].fitness)
-		if err != nil {
-			t.Errorf("couldn't create evaluated candidate: %v", err)
+		cand := &api.Individual{
+			Candidate: tpop[i].name,
+			Fitness:   tpop[i].fitness,
 		}
 		pop = append(pop, cand)
 	}
 
 	// apply selection
 	selected := ss.Select(pop, natural, n, rng)
-	msg := f(selected)
+	msg := checkfn(selected)
 	if msg != nil {
 		t.Fatalf("%v with seed %v: %v", ss.String(), seed, msg)
 	}

@@ -10,179 +10,179 @@ import (
 func TestBitstringCreation(t *testing.T) {
 	// Check that a bit string is constructed correctly, with
 	// the correct length and all bits initially set to zero.
-	bitString, err := New(100)
+	bs, err := New(100)
 	assert.NoError(t, err)
-	assert.Equalf(t, bitString.Len(), 100, "want Bitstring length 100, got: %v", bitString.Len())
-	for i := 0; i < bitString.Len(); i++ {
-		assert.False(t, bitString.Bit(i), "Bit ", i, " should not be set.")
+	assert.Equalf(t, bs.Len(), 100, "want Bitstring length 100, got: %v", bs.Len())
+	for i := 0; i < bs.Len(); i++ {
+		assert.False(t, bs.Bit(i), "Bit ", i, " should not be set.")
 	}
 }
 
 func TestBitstringCreateRandomBitstring(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	// Check that a random bit string of the correct length is constructed.
-	bitString, err := Random(100, rng)
+	bs, err := Random(100, rng)
 	assert.NoError(t, err)
-	assert.Equalf(t, bitString.Len(), 100, "want Bitstring length 100, got: %v", bitString.Len())
+	assert.Equalf(t, bs.Len(), 100, "want Bitstring length 100, got: %v", bs.Len())
 }
 
 func TestBitstringSetBits(t *testing.T) {
 	// Make sure that bits are set correctly.
-	bitString, err := New(5)
+	bs, err := New(5)
 	assert.NoError(t, err)
 
-	bitString.SetBit(1, true)
-	bitString.SetBit(4, true)
+	bs.SetBit(1, true)
+	bs.SetBit(4, true)
 
 	// Testing with non-symmetrical string to ensure that there are no endian
-	// problems.
-	assert.False(t, bitString.Bit(0), "Bit 0 should not be set.")
-	assert.True(t, bitString.Bit(1), "Bit 1 should be set.")
-	assert.False(t, bitString.Bit(2), "Bit 2 should not be set.")
-	assert.False(t, bitString.Bit(3), "Bit 3 should not be set.")
-	assert.True(t, bitString.Bit(4), "Bit 4 should be set.")
+	// or index problems.
+	assert.False(t, bs.Bit(0), "Bit 0 should not be set.")
+	assert.True(t, bs.Bit(1), "Bit 1 should be set.")
+	assert.False(t, bs.Bit(2), "Bit 2 should not be set.")
+	assert.False(t, bs.Bit(3), "Bit 3 should not be set.")
+	assert.True(t, bs.Bit(4), "Bit 4 should be set.")
 
 	// Test unsetting a bit.
-	bitString.SetBit(4, false)
-	assert.False(t, bitString.Bit(4), "Bit 4 should be unset.")
+	bs.SetBit(4, false)
+	assert.False(t, bs.Bit(4), "Bit 4 should be unset.")
 }
 
 func TestBitstringFlipBits(t *testing.T) {
 	// Make sure bit-flipping works as expected.
-	bitString, err := New(5)
+	bs, err := New(5)
 	assert.NoError(t, err)
 
-	bitString.FlipBit(2)
-	assert.True(t, bitString.Bit(2), "Flipping unset bit failed.")
+	bs.FlipBit(2)
+	assert.True(t, bs.Bit(2), "Flipping unset bit failed.")
 
-	bitString.FlipBit(2)
-	assert.False(t, bitString.Bit(2), "Flipping set bit failed.")
+	bs.FlipBit(2)
+	assert.False(t, bs.Bit(2), "Flipping set bit failed.")
 }
 
 func TestBitstringToString(t *testing.T) {
 	// Checks that string representations are correctly generated.
-	bitString, err := New(10)
+	bs, err := New(10)
 	assert.NoError(t, err)
 
-	bitString.SetBit(3, true)
-	bitString.SetBit(7, true)
-	bitString.SetBit(8, true)
+	bs.SetBit(3, true)
+	bs.SetBit(7, true)
+	bs.SetBit(8, true)
 
 	// Testing with leading zero to make sure it isn't omitted.
-	exp := "0110001000"
-	got := bitString.String()
-	assert.Equalf(t, exp, got, "Incorrect string representation, want %s, got: %s", exp, got)
+	want := "0110001000"
+	got := bs.String()
+	assert.Equalf(t, want, got, "Incorrect string representation, want %s, got: %s", want, got)
 }
 
 func TestBitstringParsing(t *testing.T) {
 	// Checks that the String-parsing constructor works correctly.
 	// Use a 33-bit string to check that word boundaries are dealt with correctly.
-	fromString := "111010101110101100010100101000101"
-	bitString, err := MakeFromString(fromString)
+	want := "111010101110101100010100101000101"
+	bs, err := MakeFromString(want)
 	assert.NoError(t, err)
-	toString := bitString.String()
-	assert.Equal(t, toString, fromString, "Failed parsing: String representations do not match.")
+	got := bs.String()
+	assert.Equalf(t, want, got, "Failed parsing: want %v, got %v", want, got)
 }
 
 // Checks that integer conversion is correct.
 func TestBitstringToNumber(t *testing.T) {
-	bitString, err := New(10)
+	bs, err := New(10)
 	assert.NoError(t, err)
 
-	bitString.SetBit(0, true)
-	bitString.SetBit(9, true)
-	bint := bitString.BigInt()
+	bs.SetBit(0, true)
+	bs.SetBit(9, true)
+	bint := bs.BigInt()
 	assert.True(t, bint.IsInt64())
 	assert.EqualValuesf(t, 513, bint.Int64(), "Incorrect big.Int conversion, want %v, got: %v", 513, bint.Int64())
 }
 
 func TestBitstringCountSetBits(t *testing.T) {
 	// Checks that the bit string can correctly count its number of set bits.
-	bitString, err := New(64)
+	bs, err := New(64)
 	assert.NoError(t, err)
-	assert.Zerof(t, bitString.OnesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bitString.OnesCount(), bitString)
+	assert.Zerof(t, bs.OnesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bs.OnesCount(), bs)
 
 	// The bits to set have been chosen because they deal with boundary cases.
-	bitString.SetBit(0, true)
-	bitString.SetBit(31, true)
-	bitString.SetBit(32, true)
-	bitString.SetBit(33, true)
-	bitString.SetBit(63, true)
-	setBits := bitString.OnesCount()
+	bs.SetBit(0, true)
+	bs.SetBit(31, true)
+	bs.SetBit(32, true)
+	bs.SetBit(33, true)
+	bs.SetBit(63, true)
+	setBits := bs.OnesCount()
 	assert.Equalf(t, 5, setBits, "want set bits = 5, got: %v", setBits)
 }
 
 // Checks that the bit string can correctly count its number of unset bits.
 func TestBitstringCountUnsetBits(t *testing.T) {
-	bitString, err := New(12)
+	bs, err := New(12)
 	assert.NoError(t, err)
-	assert.Equalf(t, 12, bitString.ZeroesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bitString.ZeroesCount(), bitString)
+	assert.Equalf(t, 12, bs.ZeroesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bs.ZeroesCount(), bs)
 
-	bitString.SetBit(0, true)
-	bitString.SetBit(5, true)
-	bitString.SetBit(6, true)
-	bitString.SetBit(9, true)
-	bitString.SetBit(10, true)
-	setBits := bitString.ZeroesCount()
+	bs.SetBit(0, true)
+	bs.SetBit(5, true)
+	bs.SetBit(6, true)
+	bs.SetBit(9, true)
+	bs.SetBit(10, true)
+	setBits := bs.ZeroesCount()
 	assert.Equalf(t, 7, setBits, "want set bits = 7, got: %v", setBits)
 }
 
 func TestBitstringClone(t *testing.T) {
-	bitString, err := New(10)
+	bs, err := New(10)
 	assert.NoError(t, err)
-	bitString.SetBit(3, true)
-	bitString.SetBit(7, true)
-	bitString.SetBit(8, true)
-	clone := bitString.Copy()
+	bs.SetBit(3, true)
+	bs.SetBit(7, true)
+	bs.SetBit(8, true)
+	clone := Copy(bs)
 
 	// Check the clone is a bit-for-bit duplicate.
-	for i := 0; i < bitString.Len(); i++ {
-		assert.Equalf(t, bitString.Bit(i), clone.Bit(i), "Cloned bit string does not match in position %v", i)
+	for i := 0; i < bs.Len(); i++ {
+		assert.Equalf(t, bs.Bit(i), clone.Bit(i), "Cloned bit string does not match in position %v", i)
 	}
 
 	// Check that clone is distinct from original (i.e. it does not change
 	// if the original is modified).
-	assert.False(t, clone == bitString, "want clone and original different objects, got the same")
-	bitString.FlipBit(2)
+	assert.False(t, clone == bs, "want clone and original different objects, got the same")
+	bs.FlipBit(2)
 	assert.False(t, clone.Bit(2), "Clone is not independent from original.")
 }
 
 func TestBitstringEquality(t *testing.T) {
-	bitString, err := New(10)
+	bs, err := New(10)
 	assert.NoError(t, err)
-	bitString.SetBit(2, true)
-	bitString.SetBit(5, true)
-	bitString.SetBit(8, true)
+	bs.SetBit(2, true)
+	bs.SetBit(5, true)
+	bs.SetBit(8, true)
 
-	assert.True(t, bitString.Equals(bitString), "Bitstring should always equal itself.")
-	assert.False(t, bitString.Equals(nil), "Valid Bitstring should never equal nil.")
-	assert.False(t, bitString.Equals(&Bitstring{}), "Bitstring should not equal another instance")
+	assert.True(t, bs.Equals(bs), "Bitstring should always equal itself.")
+	assert.False(t, bs.Equals(nil), "Valid Bitstring should never equal nil.")
+	assert.False(t, bs.Equals(&Bitstring{}), "Bitstring should not equal another instance")
 
-	clone := bitString.Copy()
-	assert.True(t, clone.Equals(bitString), "Freshly cloned Bitstring should equal original")
+	clone := Copy(bs)
+	assert.True(t, clone.Equals(bs), "Freshly cloned Bitstring should equal original")
 
 	// Changing one of the objects should result in them no longer being
 	// considered equal.
 	clone.FlipBit(0)
-	assert.False(t, clone.Equals(bitString), "want different strings to cancel equality, \"%v\" and \"%s\"", clone, bitString)
+	assert.False(t, clone.Equals(bs), "want different strings to cancel equality, \"%v\" and \"%s\"", clone, bs)
 
 	// Bit strings of different lengths but with the same bits set should not
 	// be considered equal.
-	var shortBitstring *Bitstring
-	shortBitstring, err = New(9)
+	var bs2 *Bitstring
+	bs2, err = New(9)
 	assert.NoError(t, err)
-	shortBitstring.SetBit(2, true)
-	shortBitstring.SetBit(5, true)
-	shortBitstring.SetBit(8, true)
-	assert.False(t, shortBitstring.Equals(bitString), "want equal numbers but of different lengths to be considered not equal")
+	bs2.SetBit(2, true)
+	bs2.SetBit(5, true)
+	bs2.SetBit(8, true)
+	assert.False(t, bs2.Equals(bs), "want equal numbers but of different lengths to be considered not equal")
 }
 
 func TestBitstringInvalidLength(t *testing.T) {
 	// The length of a bit string must be non-negative. If an attempt is made to
 	// create a bit string with a negative length, an error and a nil Bitstring
 	// pointer should be returned.
-	bitString, err := New(-1)
-	assert.Nil(t, bitString)
+	bs, err := New(-1)
+	assert.Nil(t, bs)
 	assert.Error(t, err)
 }
 
@@ -215,26 +215,22 @@ func TestBitstringFromString(t *testing.T) {
 }
 
 func TestBitstringSetBit(t *testing.T) {
-	bitString, err := New(1)
+	bs, err := New(1)
 	assert.NoError(t, err)
 
 	t.Run("panics on negative index", func(t *testing.T) {
 		// The index of an individual bit must be non-negative.
-		assert.Panics(t, func() {
-			bitString.SetBit(-1, false)
-		})
+		assert.Panics(t, func() { bs.SetBit(-1, false) })
 	})
 
 	t.Run("panics on index too high", func(t *testing.T) {
 		// The index of an individual bit must be within the range 0 to
 		// length-1.
-		assert.Panics(t, func() {
-			bitString.SetBit(1, false)
-		})
+		assert.Panics(t, func() { bs.SetBit(1, false) })
 	})
 }
 
-func TestBitstringSwapSubstring(t *testing.T) {
+func TestBitstringSwapRange(t *testing.T) {
 	tests := []struct {
 		name              string
 		ones, zeros       string
@@ -336,7 +332,7 @@ func TestBitstringSwapSubstring(t *testing.T) {
 			assert.NoError(t, err1)
 			zeros, err2 := MakeFromString(tt.zeros)
 			assert.NoError(t, err2)
-			ones.SwapRange(zeros, tt.lo, tt.hi)
+			SwapRange(ones, zeros, tt.lo, tt.hi)
 
 			assert.Equalf(t, tt.expOnes, ones.String(),
 				"want %s, got %s", tt.expOnes, ones.String())

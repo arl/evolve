@@ -188,9 +188,11 @@ func (bs *Bitstring) BigInt() *big.Int {
 	if _, ok := bi.SetString(bs.String(), 2); !ok {
 		// XXX: by design, this panic should only happen when something very
 		// wrong happens. For bi.SetString to fail the string passed should
-		// contain other runes other than 0's and 1's, or be empty.
-		// bs.String() guarantees the string is made of 0's and 1's and all the
-		// ways to create Bitstring prevent construction them with 0-length.
+		// contain runes other than 0's and 1's, or be empty.
+		// bs.String() guarantees the string is made of 0's and 1's, plus, of
+		// all the ways to create a Bitstring none of them allows the bitstring
+		// to be empty though one could still have a zero value, by doing
+		// bitstring.Bitstring{}. If it panics in that case that's just fair...
 		panic(fmt.Sprintf("couldn't convert bit string \"%s\" to big.Int", bs.String()))
 	}
 	return bi
@@ -200,26 +202,26 @@ func (bs *Bitstring) BigInt() *big.Int {
 //
 // Both Bitstring should not necessarily have the same length but should contain
 // the range of bits specified by start and length.
-func (bs *Bitstring) SwapRange(other *Bitstring, start, length int) {
-	bs.mustExist(start)
-	other.mustExist(start)
+func SwapRange(bs1, bs2 *Bitstring, start, length int) {
+	bs1.mustExist(start)
+	bs2.mustExist(start)
 
 	word := start / wordLength
 	partialWordSize := (wordLength - start) % wordLength
 	if partialWordSize > 0 {
-		bs.swapBits(other, word, 0xffffffff<<uint32(wordLength-partialWordSize))
+		bs1.swapBits(bs2, word, 0xffffffff<<uint32(wordLength-partialWordSize))
 		word++
 	}
 
 	remainingBits := length - partialWordSize
 	stop := remainingBits / wordLength
 	for i := word; i < stop; i++ {
-		bs.data[i], other.data[i] = other.data[i], bs.data[i]
+		bs1.data[i], bs2.data[i] = bs2.data[i], bs1.data[i]
 	}
 
 	remainingBits %= wordLength
 	if remainingBits > 0 {
-		bs.swapBits(other, len(bs.data)-1, 0xffffffff>>uint32(wordLength-remainingBits))
+		bs1.swapBits(bs2, len(bs1.data)-1, 0xffffffff>>uint32(wordLength-remainingBits))
 	}
 }
 
@@ -250,16 +252,15 @@ func (bs *Bitstring) String() string {
 	return string(buf)
 }
 
-// Copy returns an identical copy of bs.
-//
-// The new Bitstring is based off of a new backing array.
-func (bs *Bitstring) Copy() *Bitstring {
-	clone, err := New(bs.length)
-	if err != nil {
-		panic(fmt.Errorf("internal error, couldn't copy bitstring: %v", err))
+// Copy creates and returns a new Bitstring that is the exact copy of a source
+// Bitstring.
+func Copy(src *Bitstring) *Bitstring {
+	dst := &Bitstring{
+		length: src.length,
+		data:   make([]uint32, len(src.data)),
 	}
-	copy(clone.data, bs.data)
-	return clone
+	copy(dst.data, src.data)
+	return dst
 }
 
 // Equals returns true if other is a Bitstring instance and both bit strings are

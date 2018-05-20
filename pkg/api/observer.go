@@ -15,3 +15,13 @@ type Observer interface {
 	// generation.
 	PopulationUpdate(data *PopulationData)
 }
+
+// TODO: try to come up with a better and short name for PopulationUpdate
+// and PopulationData maybe
+type observerFunc struct{ f func(*PopulationData) }
+
+// ObserverFunc returns a type satisfying the Observer interface, for which the
+// PopulationUpdate method forwards to f.
+func ObserverFunc(f func(*PopulationData)) Observer { return &observerFunc{f: f} }
+
+func (obs *observerFunc) PopulationUpdate(data *PopulationData) { obs.f(data) }
