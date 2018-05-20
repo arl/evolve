@@ -25,16 +25,16 @@ func prepareEngine() api.Engine {
 		rand.New(rand.NewSource(99)))
 }
 
-type elitismObserver api.PopulationData
-
-func (o *elitismObserver) PopulationUpdate(data *api.PopulationData) { *o = elitismObserver(*data) }
-
-func (o *elitismObserver) AverageFitness() float64 { return o.Mean }
-
 func TestGenerationalEngineElitism(t *testing.T) {
-	obs := new(elitismObserver)
 	engine := prepareEngine()
+
+	var avgfitness float64
+	// add an observer that record the mean fitness at each generation
+	obs := api.ObserverFunc(func(data *api.PopulationData) {
+		avgfitness = data.Mean
+	})
 	engine.AddObserver(obs)
+
 	elite := make([]interface{}, 3)
 	// Add the following seed candidates, all better than any others that can possibly
 	// get into the population (since every other candidate will always be zero).
@@ -50,9 +50,9 @@ func TestGenerationalEngineElitism(t *testing.T) {
 	// preserved they will lift the average fitness above zero. The exact value
 	// of the expected average fitness is easy to calculate, it is the aggregate
 	// fitness divided by the population size.
-	assert.Equalf(t, 24.0/10.0, obs.AverageFitness(),
+	assert.Equalf(t, 24.0/10.0, avgfitness,
 		"elite candidates not preserved correctly: want %v, got %v",
-		24.0/10.0, obs.AverageFitness())
+		24.0/10.0, avgfitness)
 	engine.RemoveObserver(obs)
 }
 
@@ -131,9 +131,11 @@ func checkB(b *testing.B, err error) {
 	}
 }
 
-func BenchmarkGenerationalEngine(b *testing.B) {
-	const targetString = "HELLO WORLD"
-
+// XXX: to prove useful in order to measure the difference between single and
+// multithreaded modes, the fitness evaluation must take a `long` time to
+// perform the job, otherwise the overhead of concurrent execution hides the
+// eventual performance gain.
+func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	// Create a factory to generate random 11-character Strings.
 	alphabet := make([]byte, 27)
 	for c := byte('A'); c <= 'Z'; c++ {
@@ -141,7 +143,13 @@ func BenchmarkGenerationalEngine(b *testing.B) {
 	}
 	alphabet[26] = ' '
 
-	fac, err := factory.NewString(string(alphabet), len(targetString))
+	// create the target string
+	var target string
+	for len(target) < strlen {
+		target = fmt.Sprintf("%s%c", target, 'A'+byte(rand.Intn(int('Z'-'A'))))
+	}
+
+	fac, err := factory.NewString(string(alphabet), len(target))
 	checkB(b, err)
 
 	// 1st operator: string mutation
@@ -156,25 +164,40 @@ func BenchmarkGenerationalEngine(b *testing.B) {
 
 	engine := NewGenerational(fac,
 		pipe,
-		evaluator(targetString),
+		evaluator(target),
 		selection.RouletteWheel,
 		rand.New(rand.NewSource(99)))
 
-	//engine.SetSingleThreaded(true)
+	engine.SetSingleThreaded(!multithread)
+	cond := termination.TargetFitness{Fitness: 0, Natural: false}
 
 	b.ResetTimer()
 	var best interface{}
 	for n := 0; n < b.N; n++ {
-		best = engine.Evolve(100000, 5, termination.TargetFitness{Fitness: 0, Natural: false})
+		best = engine.Evolve(100000, 5, cond)
 	}
-	fmt.Println(best)
+	if best.(string) != target {
+		b.Errorf("want target string \"%v\", got \"%v\"", target, best.(string))
+	}
+}
 
-	var satisfied []api.TerminationCondition
-	satisfied, err = engine.SatisfiedTerminationConditions()
-	checkB(b, err)
-	for i, cond := range satisfied {
-		fmt.Printf("satified termination condition %v: %v\n", i, cond)
-	}
+func BenchmarkGenerationalEngineSingleThread10(b *testing.B) {
+	benchmarkGenerationalEngine(b, false, 10)
+}
+func BenchmarkGenerationalEngineMultithread10(b *testing.B) {
+	benchmarkGenerationalEngine(b, true, 10)
+}
+func BenchmarkGenerationalEngineSingleThread100(b *testing.B) {
+	benchmarkGenerationalEngine(b, false, 100)
+}
+func BenchmarkGenerationalEngineMultithread100(b *testing.B) {
+	benchmarkGenerationalEngine(b, true, 100)
+}
+func BenchmarkGenerationalEngineSingleThread1000(b *testing.B) {
+	benchmarkGenerationalEngine(b, false, 1000)
+}
+func BenchmarkGenerationalEngineMultithread1000(b *testing.B) {
+	benchmarkGenerationalEngine(b, true, 1000)
 }
 
 // This 'evaluator' assigns one "fitness point" for every character in the
