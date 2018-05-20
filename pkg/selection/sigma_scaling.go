@@ -52,7 +52,7 @@ func (sel *sigmaScaling) Select(
 	size int,
 	rng *rand.Rand) []interface{} {
 
-	stats := api.NewDataSet(api.WithInitialCapacity(len(pop)))
+	stats := api.NewDataSet(len(pop))
 	for _, cand := range pop {
 		stats.AddValue(cand.Fitness)
 	}
