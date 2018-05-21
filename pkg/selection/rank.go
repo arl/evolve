@@ -6,46 +6,31 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
-type rank struct{ selector api.Selection }
-
-// NewRank returns a rank selection stragy rank, that is similar to
-// fitness-proportionate selection except that is uses relative fitness rather
-// than absolute fitness in order to determine the probability of selection for
-// a given individual (i.e. the actual numerical fitness values are ignored and
-// only the ordering of the sorted population is considered).
+// RankBased is selection strategy that is similar to fitness-proportionate
+// selection except that is uses relative fitness rather than absolute fitness
+// in order to determine the probability of selection for a given individual
+// (i.e. the actual numerical fitness values are ignored and only the ordering
+// of the sorted population is considered).
 //
-// selector is the proportionate selector that will be delegated to after
-// converting rankings into relative fitness scores.
-//
-// Rank selection is implemented in terms of a mapping function
-// mapRankToScore(int, int) and delegation to a fitness-proportionate selector.
-// The mapping function converts ranks into relative fitness scores that are
-// used to drive the delegate selector.
-func NewRank(selector api.Selection) api.Selection {
-	return rank{selector: selector}
+// RankBased is implemented in terms of a mapping function and delegation to a
+// fitness-proportionate selector. The mapping function converts ranks into
+// relative fitness scores that are used to drive the delegate selector.
+type RankBased struct {
+	Selector api.Selection
+	Map      MappingFunc
 }
-
-// Rank is the default rank based selection strategy. It uses
-// StochasticUniversalSampling as its selector.
-var Rank = NewRank(StochasticUniversalSampling{})
 
 // Select selects the specified number of candidates from the population.
 //
-// Implementations may assume that the population is sorted in descending
-// order according to fitness (so the fittest individual is the first item
-// in the list).
-// NOTE: It is an error to call this method with an empty or null population.
-//
-// population is the population from which to select.
-// naturalFitnessScores indicates whether higher fitness values represent fitter
-// individuals or not.
-// selectionSize is the number of individual selections to make (not necessarily
-// the number of distinct candidates to select, since the same individual may
+// - pop must be sorted by descending fitness, i.e the fittest individual of the
+// population should be pop[0].
+// - natural indicates fitter individuals have fitness scores.
+// - size is the number of individual selections to perform (not necessarily the
+// number of distinct candidates to select, since the same individual may
 // potentially be selected more than once).
 //
-// Returns a slice containing the selected candidates. Some individual
-// candidates may potentially have been selected multiple times.
-func (rs rank) Select(
+// Returns the selected candidates.
+func (rb RankBased) Select(
 	pop api.Population,
 	natural bool,
 	size int,
@@ -55,15 +40,16 @@ func (rs rank) Select(
 	for i, cand := range pop {
 		ranked[i] = &api.Individual{
 			Candidate: cand.Candidate,
-			Fitness:   mapRankToScore(i+1, len(pop)),
+			// use candidate 1-based index
+			Fitness: rb.Map(i+1, len(pop)),
 		}
 	}
-	return rs.selector.Select(ranked, true, size, rng)
+	return rb.Selector.Select(ranked, true, size, rng)
 }
 
-func (rank) String() string { return "Rank Selection" }
+func (RankBased) String() string { return "Rank-Based Selection" }
 
-// mapRankToScore maps a population index to a relative pseudo-fitness score
+// MapRankToScore maps a population index to a relative pseudo-fitness score
 // that can be used for fitness-proportionate selection. The general contract
 // for the mapping function is:
 //  f(rank) >= f(rank + 1)
@@ -74,7 +60,21 @@ func (rank) String() string { return "Rank Selection" }
 // non-linear and either natural or non-natural. rank is a zero-based index into
 // the population (0 <= rank < population size)
 //
-// Returns population size - rank
-func mapRankToScore(rank, size int) float64 {
-	return float64(size - rank)
+// Returns size - rank
+func MapRankToScore(rank, size int) float64 { return float64(size - rank) }
+
+// MappingFunc is the type of functions that maps a population index to a
+// relative pseudo-fitness score that can be used for fitness-proportionate
+// selection. The general contract for the mapping function is:
+//
+//  f(rank) >= f(rank + 1) for all legal values of rank and assuming natural
+//  scores.
+type MappingFunc func(rank, size int) float64
+
+// Rank is a preconfigured all-round rank-based selection strategy. It uses
+// StochasticUniversalSampling as selector and MapRankToScore as mapping
+// function.
+var Rank = RankBased{
+	Selector: StochasticUniversalSampling{},
+	Map:      MapRankToScore,
 }
