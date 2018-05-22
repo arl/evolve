@@ -9,7 +9,7 @@ import (
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/engine"
-	"github.com/aurelien-rainone/evolve/pkg/factory"
+	"github.com/aurelien-rainone/evolve/pkg/generator"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
@@ -37,19 +37,18 @@ func (s evaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 // is better
 func (evaluator) IsNatural() bool { return false }
 
-var alphabet = []byte{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '}
+var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
 
-// Create a factory that creates random string
-func createFactory(target string) *factory.String {
-
+// Create a generator that creates random string
+func createGenerator(target string) *generator.String {
 	for _, c := range target {
-		if !strings.ContainsRune(string(alphabet), c) {
+		if !strings.ContainsRune(alphabet, c) {
 			fmt.Printf("Rune %c is not contained in the alphabet\n", c)
 			os.Exit(1)
 		}
 	}
 
-	fac, err := factory.NewString(string(alphabet), len(target))
+	fac, err := generator.NewString(alphabet, len(target))
 	check(err)
 	return fac
 }
@@ -60,12 +59,12 @@ func main() {
 		target = strings.ToUpper(os.Args[1])
 	}
 
-	// create the factory that will generate random candidates
-	fac := createFactory(target)
+	// create the generator that will generate random candidates
+	fac := createGenerator(target)
 
 	// create an evolutionary operator pipeline that will apply to each
 	// candidate, first a string mutation and then a crossover
-	mutation := mutation.NewString(string(alphabet))
+	mutation := mutation.NewString(alphabet)
 	check(mutation.SetProb(0.02))
 	xover := xover.New(xover.StringMater{})
 	pipeline := operator.Pipeline{mutation, xover}

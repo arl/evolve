@@ -84,10 +84,10 @@ func solveSudoku(pattern []string) error {
 	selector := selection.NewTournament()
 	check(selector.SetProb(0.85))
 
-	factory, err := newSudokuFactory(pattern)
+	gen, err := newGenerator(pattern)
 	check(err)
 
-	eng := engine.NewGenerational(factory, pipeline, evaluator{}, selector, rng)
+	eng := engine.NewGenerational(gen, pipeline, evaluator{}, selector, rng)
 
 	eng.AddObserver(api.ObserverFunc(func(data *api.PopulationData) {
 		if data.GenNumber%100 == 0 {

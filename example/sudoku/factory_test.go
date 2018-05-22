@@ -4,14 +4,15 @@ import (
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/aurelien-rainone/evolve/pkg/api"
 )
 
 func checkCellVal(t *testing.T, s *sudoku, i, j, want int) {
 	t.Helper()
 
-	got := s[i][j].val
-	if got != want {
-		t.Errorf("Cell (%d, %d) value, want %v got %v", i, j, want, got)
+	if s[i][j].val != want {
+		t.Errorf("Cell (%d, %d) value, want %v got %v", i, j, want, s[i][j].val)
 	}
 }
 
@@ -26,7 +27,7 @@ func checkCellFixed(t *testing.T, s *sudoku, i, j int) {
 // Checks to make sure that the givens are correctly placed and that each row
 // contains each value exactly once.
 func TestFactoryValidity(t *testing.T) {
-	factory, err := newSudokuFactory([]string{
+	gen, err := newGenerator([]string{
 		".9.......",
 		".........",
 		"........5",
@@ -38,10 +39,10 @@ func TestFactoryValidity(t *testing.T) {
 		"........9",
 	})
 	if err != nil {
-		t.Errorf("can't create factory: %v", err)
+		t.Errorf("can't create generator: %v", err)
 	}
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	pop := factory.GenPopulation(20, rng)
+	pop := api.GeneratePopulation(gen, 20, rng)
 	for _, iface := range pop {
 		sudo := iface.(*sudoku)
 
@@ -125,9 +126,9 @@ func TestFactoryInvalidPatterns(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := newSudokuFactory(tt.pattern)
+			_, err := newGenerator(tt.pattern)
 			if err != tt.wantErr {
-				t.Fatalf("newFactory() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("newGenerator() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 		})

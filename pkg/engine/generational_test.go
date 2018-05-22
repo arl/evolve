@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
-	"github.com/aurelien-rainone/evolve/pkg/factory"
+	"github.com/aurelien-rainone/evolve/pkg/generator"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
@@ -34,20 +34,13 @@ func (intEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 
 func (intEvaluator) IsNatural() bool { return true }
 
-// TODO/ this is exactly because we must create the base factory, just to create
-// a zero generator, that we reckon there is a problem with the API.
-// As for api.Engine, we should use free functions, relying on a simùple
-// interface, in order to implement the functionality provided by a base factory
-// and an engine
-var zeroFactory = factory.BaseFactory{CandidateGenerator: zeroGenerator{}}
-
 type zeroGenerator struct{}
 
 func (zeroGenerator) GenerateCandidate(rng *rand.Rand) interface{} { return 0 }
 
 func prepareEngine() api.Engine {
 	return NewGenerational(
-		&zeroFactory,
+		zeroGenerator{},
 		zeroIntMaker{},
 		intEvaluator{},
 		selection.RouletteWheel,
@@ -155,11 +148,7 @@ func checkB(b *testing.B, err error) {
 // eventual performance gain.
 func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	// Create a factory to generate random 11-character Strings.
-	alphabet := make([]byte, 27)
-	for c := byte('A'); c <= 'Z'; c++ {
-		alphabet[c-'A'] = c
-	}
-	alphabet[26] = ' '
+	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 	// create the target string
 	var target string
@@ -167,11 +156,11 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 		target = fmt.Sprintf("%s%c", target, 'A'+byte(rand.Intn(int('Z'-'A'))))
 	}
 
-	fac, err := factory.NewString(string(alphabet), len(target))
+	fac, err := generator.NewString(alphabet, len(target))
 	checkB(b, err)
 
 	// 1st operator: string mutation
-	mut := mutation.NewString(string(alphabet))
+	mut := mutation.NewString(alphabet)
 	checkB(b, mut.SetProb(0.02))
 
 	// 2nd operator: string crossover

@@ -30,7 +30,7 @@ type Base struct {
 	pool           *worker.Pool // shared concurrent worker
 	obs            map[api.Observer]struct{}
 	rng            *rand.Rand
-	f              api.Factory
+	f              api.CandidateGenerator
 	eval           api.Evaluator
 	singleThreaded bool
 	satisfied      []api.TerminationCondition
@@ -46,7 +46,7 @@ type Base struct {
 // solutions.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewBase(f api.Factory, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
+func NewBase(f api.CandidateGenerator, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
 	return &Base{
 		f:       f,
 		eval:    eval,
@@ -162,9 +162,11 @@ func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands [
 	var curgen int
 	startTime := time.Now()
 
-	pop := e.f.SeedPopulation(size,
-		seedcands,
-		e.rng)
+	pop, err := api.SeedPopulation(e.f, size, seedcands, e.rng)
+	// TODO: this method should return an error
+	if err != nil {
+		panic(err)
+	}
 
 	// Calculate the fitness scores for each member of the initial population.
 	evpop := e.evaluatePopulation(pop)

@@ -4,17 +4,18 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
-	"github.com/aurelien-rainone/evolve/pkg/factory"
+	"github.com/aurelien-rainone/evolve/pkg/generator"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	xover := New(BitstringMater{})
-	f := factory.NewBitstring(50)
+	f := generator.Bitstring(50)
 
-	pop := f.GenPopulation(2, rng)
+	pop := api.GeneratePopulation(f, 2, rng)
 	// Test to make sure that crossover correctly preserves all genetic material
 	// originally present in the population and does not introduce anything new.
 	want := pop[0].(*bitstring.Bitstring).OnesCount() +

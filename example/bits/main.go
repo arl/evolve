@@ -8,7 +8,7 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/bitstring"
 	"github.com/aurelien-rainone/evolve/pkg/engine"
-	"github.com/aurelien-rainone/evolve/pkg/factory"
+	"github.com/aurelien-rainone/evolve/pkg/generator"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
 	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
 	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
@@ -52,7 +52,8 @@ func main() {
 
 	mt19937 := rand.New(random.NewMT19937(0))
 
-	eng := engine.NewGenerational(factory.NewBitstring(nbits),
+	eng := engine.NewGenerational(
+		generator.Bitstring(nbits),
 		pipeline,
 		evaluator{},
 		selection.RouletteWheel,

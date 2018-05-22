@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-
-	"github.com/aurelien-rainone/evolve/pkg/factory"
 )
 
 var (
@@ -21,23 +19,6 @@ var (
 type generator struct {
 	templ    sudoku
 	nonfixed [size][]int
-}
-
-type sudokuFactory struct{ factory.BaseFactory }
-
-func newSudokuFactory(pattern []string) (*sudokuFactory, error) {
-	if len(pattern) != size {
-		return nil, errWrongNumberOfRows
-	}
-
-	gen, err := newGenerator(pattern)
-	if err != nil {
-		return nil, err
-	}
-	sf := &sudokuFactory{
-		BaseFactory: factory.BaseFactory{CandidateGenerator: gen},
-	}
-	return sf, nil
 }
 
 // Creates a factory for generating random candidate solutions for a specified

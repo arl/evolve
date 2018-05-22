@@ -41,7 +41,7 @@ type Generational struct {
 // sel is a strategy for selecting which candidates survive to be evolved.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewGenerational(f api.Factory, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *Base {
+func NewGenerational(f api.CandidateGenerator, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *Base {
 
 	// create the Stepper implementation
 	stepper := &Generational{op: op, eval: eval, sel: sel}
