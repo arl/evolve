@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/internal/test"
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/factory"
 	"github.com/aurelien-rainone/evolve/pkg/operator"
@@ -16,11 +15,41 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Trivial test operator that mutates all integers into zeroes.
+type zeroIntMaker struct{}
+
+func (op zeroIntMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) []interface{} {
+	result := make([]interface{}, len(selectedCandidates))
+	for i := range selectedCandidates {
+		result[i] = 0
+	}
+	return result
+}
+
+type intEvaluator struct{}
+
+func (intEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
+	return float64(cand.(int))
+}
+
+func (intEvaluator) IsNatural() bool { return true }
+
+// TODO/ this is exactly because we must create the base factory, just to create
+// a zero generator, that we reckon there is a problem with the API.
+// As for api.Engine, we should use free functions, relying on a simùple
+// interface, in order to implement the functionality provided by a base factory
+// and an engine
+var zeroFactory = factory.BaseFactory{CandidateGenerator: zeroGenerator{}}
+
+type zeroGenerator struct{}
+
+func (zeroGenerator) GenerateCandidate(rng *rand.Rand) interface{} { return 0 }
+
 func prepareEngine() api.Engine {
 	return NewGenerational(
-		&test.ZeroIntFactory,
+		&zeroFactory,
 		zeroIntMaker{},
-		test.IntEvaluator{},
+		intEvaluator{},
 		selection.RouletteWheel,
 		rand.New(rand.NewSource(99)))
 }
@@ -112,17 +141,6 @@ func TestGenerationalEngineSatisfiedTerminationConditionsBeforeStart(t *testing.
 	satisfied, err := engine.SatisfiedTerminationConditions()
 	assert.Nil(t, satisfied)
 	assert.Error(t, err)
-}
-
-// Trivial test operator that mutates all integers into zeroes.
-type zeroIntMaker struct{}
-
-func (op zeroIntMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) []interface{} {
-	result := make([]interface{}, len(selectedCandidates))
-	for i := range selectedCandidates {
-		result[i] = 0
-	}
-	return result
 }
 
 func checkB(b *testing.B, err error) {
