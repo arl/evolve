@@ -9,7 +9,9 @@ type intGenerator struct{}
 
 func (intGenerator) Generate(rng *rand.Rand) interface{} { return rng.Int() }
 
-func TestGeneratePopulation(t *testing.T) {
+func generateInt(rng *rand.Rand) interface{} { return rng.Int() }
+
+func testGeneratePopulation(t *testing.T, g Generator) {
 	rng := rand.New(rand.NewSource(99))
 
 	pop := GeneratePopulation(intGenerator{}, 10, rng)
@@ -18,7 +20,7 @@ func TestGeneratePopulation(t *testing.T) {
 	}
 }
 
-func TestSeedPopulation(t *testing.T) {
+func testSeedPopulation(t *testing.T, g Generator) {
 	rng := rand.New(rand.NewSource(99))
 
 	// seed 5 candidates over 10
@@ -36,7 +38,7 @@ func TestSeedPopulation(t *testing.T) {
 	}
 }
 
-func TestSeedPopulationError(t *testing.T) {
+func testSeedPopulationError(t *testing.T, g Generator) {
 	rng := rand.New(rand.NewSource(99))
 
 	seeds := make([]interface{}, 10)
@@ -51,4 +53,24 @@ func TestSeedPopulationError(t *testing.T) {
 	if err != ErrTooManySeedCandidates {
 		t.Errorf("SeedPopulation: want err = %v, got %v", ErrTooManySeedCandidates, err)
 	}
+}
+
+func TestGeneratePopulation(t *testing.T) {
+	testGeneratePopulation(t, intGenerator{})
+}
+func TestSeedPopulation(t *testing.T) {
+	testSeedPopulation(t, intGenerator{})
+}
+func TestSeedPopulationError(t *testing.T) {
+	testSeedPopulationError(t, intGenerator{})
+}
+
+func TestGeneratePopulationFunc(t *testing.T) {
+	testGeneratePopulation(t, GeneratorFunc(generateInt))
+}
+func TestSeedPopulationFunc(t *testing.T) {
+	testSeedPopulation(t, GeneratorFunc(generateInt))
+}
+func TestSeedPopulationErrorFunc(t *testing.T) {
+	testSeedPopulationError(t, GeneratorFunc(generateInt))
 }
