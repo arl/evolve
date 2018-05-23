@@ -30,8 +30,8 @@ type Generational struct {
 	eng  *Base
 }
 
-// NewGenerational creates a new evolution engine by specifying
-// the various components required by a generational evolutionary algorithm.
+// NewGenerational creates a new generational evolution engine, injecting the
+// various components required by an evolutionary algorithm.
 //
 // gen is the generator used to create the initial population that is iteratively
 // evolved.
