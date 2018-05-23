@@ -43,7 +43,7 @@ var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
 func createGenerator(target string) *generator.String {
 	for _, c := range target {
 		if !strings.ContainsRune(alphabet, c) {
-			fmt.Printf("Rune %c is not contained in the alphabet\n", c)
+			fmt.Printf("All runes must be exist in the alphabet ('%v'), that's not the case of %c\n", alphabet, c)
 			os.Exit(1)
 		}
 	}
