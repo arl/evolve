@@ -9,19 +9,27 @@ import (
 // number of seed candidates is greater than the population size.
 var ErrTooManySeedCandidates = errors.New("Too many seed candidates for population size")
 
-// Generator is the interface implemented by objects that generate new
-// random candidates.
+// A Generator generates random candidates.
 //
 // It is used by evolution engine to increase genetic diversity and/or add new
 // candidates to a population.
 type Generator interface {
 
-	// Generate randomly create a single candidate solution.
-	Generate(rng *rand.Rand) interface{}
+	// Generate returns a new random candidate, using the provided pseudo-random
+	// number generator.
+	Generate(*rand.Rand) interface{}
 }
 
-// GeneratePopulation returns a slice of count candidates, randomly generated
-// with gen.
+// The GeneratorFunc type is an adapter to allow the use of ordinary
+// functions as candidate generators. If f is a function with the appropriate
+// signature, GeneratorFunc(f) is a Generator that calls f.
+type GeneratorFunc func(*rand.Rand) interface{}
+
+// Generate calls f(rng) and returns its return value.
+func (f GeneratorFunc) Generate(rng *rand.Rand) interface{} { return f(rng) }
+
+// GeneratePopulation returns a slice of count random candidates, generated
+// with the provided Generator.
 //
 // If some control is required over the composition of the initial population,
 // consider using SeedPopulation.
