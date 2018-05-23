@@ -30,7 +30,7 @@ type Base struct {
 	pool           *worker.Pool // shared concurrent worker
 	obs            map[api.Observer]struct{}
 	rng            *rand.Rand
-	f              api.CandidateGenerator
+	f              api.Generator
 	eval           api.Evaluator
 	singleThreaded bool
 	satisfied      []api.TerminationCondition
@@ -46,7 +46,7 @@ type Base struct {
 // solutions.
 // rng is the source of randomness used by all stochastic processes (including
 // evolutionary operators and selection strategies).
-func NewBase(f api.CandidateGenerator, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
+func NewBase(f api.Generator, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
 	return &Base{
 		f:       f,
 		eval:    eval,

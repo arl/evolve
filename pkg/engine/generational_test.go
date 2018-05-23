@@ -36,7 +36,7 @@ func (intEvaluator) IsNatural() bool { return true }
 
 type zeroGenerator struct{}
 
-func (zeroGenerator) GenerateCandidate(rng *rand.Rand) interface{} { return 0 }
+func (zeroGenerator) Generate(rng *rand.Rand) interface{} { return 0 }
 
 func prepareEngine() api.Engine {
 	return NewGenerational(

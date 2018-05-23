@@ -54,7 +54,7 @@ func TestStringGenerator(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	s := gen.GenerateCandidate(rand.New(rand.NewSource(99)))
+	s := gen.Generate(rand.New(rand.NewSource(99)))
 	if s, ok := s.(string); !ok {
 		t.Errorf("GenerateCandidate should generate string candidates, got %T", s)
 	}
@@ -76,7 +76,7 @@ func BenchmarkGenerateString(b *testing.B) {
 			gen, _ := NewString("A", slen)
 
 			for i := 0; i < b.N; i++ {
-				sink = gen.GenerateCandidate(rng)
+				sink = gen.Generate(rng)
 			}
 			b.StopTimer()
 		})

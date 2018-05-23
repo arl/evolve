@@ -73,7 +73,7 @@ func newGenerator(pattern []string) (*generator, error) { // nolint: gocyclo
 // The generated potential solution is guaranteed to have no
 // duplicates in any row but could have duplicates in a column or sub-grid.
 
-func (gen *generator) GenerateCandidate(rng *rand.Rand) interface{} {
+func (gen *generator) Generate(rng *rand.Rand) interface{} {
 	// Clone the template as the basis for this grid.
 	var rows sudoku
 	copy(rows[:], gen.templ[:])

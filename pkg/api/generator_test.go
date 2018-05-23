@@ -7,7 +7,7 @@ import (
 
 type intGenerator struct{}
 
-func (intGenerator) GenerateCandidate(rng *rand.Rand) interface{} { return rng.Int() }
+func (intGenerator) Generate(rng *rand.Rand) interface{} { return rng.Int() }
 
 func TestGeneratePopulation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
