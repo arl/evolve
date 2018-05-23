@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"bytes"
 	"errors"
 	"math/rand"
 	"unicode/utf8"
@@ -20,7 +19,7 @@ var (
 // String is a generator of ASCII string candidates of the specified length and
 // in which runes are randomly chosen from an alphabet
 type String struct {
-	alphabet string
+	alphabet []byte
 	length   int
 }
 
@@ -38,17 +37,16 @@ func NewString(alphabet string, length int) (*String, error) {
 	}
 
 	return &String{
-		alphabet: alphabet,
+		alphabet: []byte(alphabet),
 		length:   length,
 	}, nil
 }
 
 // GenerateCandidate generates a random string.
 func (gen *String) GenerateCandidate(rng *rand.Rand) interface{} {
-	var buffer bytes.Buffer
+	b := make([]byte, gen.length)
 	for i := 0; i < gen.length; i++ {
-		idx := rand.Int31n(int32(len(gen.alphabet)))
-		buffer.WriteByte(gen.alphabet[idx])
+		b[i] = gen.alphabet[rand.Int31n(int32(len(gen.alphabet)))]
 	}
-	return buffer.String()
+	return string(b)
 }

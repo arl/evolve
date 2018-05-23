@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 )
@@ -56,5 +57,28 @@ func TestStringGenerator(t *testing.T) {
 	s := gen.GenerateCandidate(rand.New(rand.NewSource(99)))
 	if s, ok := s.(string); !ok {
 		t.Errorf("GenerateCandidate should generate string candidates, got %T", s)
+	}
+}
+
+var sink interface{}
+
+func BenchmarkGenerateString(b *testing.B) {
+	rng := rand.New(rand.NewSource(99))
+
+	runs := []int{10, 100, 1000}
+
+	for _, slen := range runs {
+
+		b.Run(fmt.Sprintf("%d", slen), func(b *testing.B) {
+
+			b.ReportAllocs()
+
+			gen, _ := NewString("A", slen)
+
+			for i := 0; i < b.N; i++ {
+				sink = gen.GenerateCandidate(rng)
+			}
+			b.StopTimer()
+		})
 	}
 }
