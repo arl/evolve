@@ -17,26 +17,6 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/termination"
 )
 
-// This 'evaluator' assigns one "fitness point" for every character in the
-// candidate string that doesn't match the corresponding position in the target
-// string.
-type evaluator string
-
-func (s evaluator) Fitness(cand interface{}, pop []interface{}) float64 {
-	var errors float64
-	sc := cand.(string)
-	for i := range sc {
-		if sc[i] != string(s)[i] {
-			errors++
-		}
-	}
-	return errors
-}
-
-// Fitness is not natural, one fitness point represents an error, so the lower
-// is better
-func (evaluator) IsNatural() bool { return false }
-
 var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
 
 // Create a generator that creates random string
@@ -69,8 +49,21 @@ func main() {
 	xover := xover.New(xover.StringMater{})
 	pipeline := operator.Pipeline{mutation, xover}
 
-	// the evaluator will assign fitness to the candidates
-	eval := evaluator(target)
+	// This 'evaluator' assigns one "fitness point" for every character in the
+	// candidate string that doesn't match the corresponding position in the
+	// target string.
+	// Fitness is not-natural, one fitness point represents an error, so the lower
+	// is better
+	eval := api.NonNaturalEvaluatorFunc(func(cand interface{}, pop []interface{}) float64 {
+		var errors float64
+		sc := cand.(string)
+		for i := range sc {
+			if sc[i] != target[i] {
+				errors++
+			}
+		}
+		return errors
+	})
 
 	// choose a selection strategy
 	var selector = selection.RouletteWheel

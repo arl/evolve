@@ -59,3 +59,33 @@ type Evaluator interface {
 	// a low fitness score means a fitter candidate.
 	IsNatural() bool
 }
+
+// NaturalEvaluatorFunc is an adapter to allow the use of ordinary functions as
+// fitness evaluators. If f is a function with the appropriate signature,
+// NaturalEvaluatorFunc(f) is a fitness Evaluator that calls f, and fitness are
+// naturally ordered.
+type NaturalEvaluatorFunc func(interface{}, []interface{}) float64
+
+// NonNaturalEvaluatorFunc is an adapter to allow the use of ordinary functions
+// as fitness evaluators. If f is a function with the appropriate signature,
+// NonNaturalEvaluatorFunc(f) is a fitness Evaluator that calls f, and fitness
+// are non-naturally ordered.
+type NonNaturalEvaluatorFunc func(interface{}, []interface{}) float64
+
+// Fitness calculates a fitness score for the given candidate.
+func (f NaturalEvaluatorFunc) Fitness(cand interface{}, pop []interface{}) float64 {
+	return f(cand, pop)
+}
+
+// Fitness calculates a fitness score for the given candidate.
+func (f NonNaturalEvaluatorFunc) Fitness(cand interface{}, pop []interface{}) float64 {
+	return f(cand, pop)
+}
+
+// IsNatural specifies whether this evaluator generates 'natural' fitness
+// scores or not.
+func (f NaturalEvaluatorFunc) IsNatural() bool { return true }
+
+// IsNatural specifies whether this evaluator generates 'natural' fitness
+// scores or not.
+func (f NonNaturalEvaluatorFunc) IsNatural() bool { return false }
