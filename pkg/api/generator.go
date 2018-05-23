@@ -5,6 +5,8 @@ import (
 	"math/rand"
 )
 
+// ErrTooManySeedCandidates is the error returned by SeedPopulation when the
+// number of seed candidates is greater than the population size.
 var ErrTooManySeedCandidates = errors.New("Too many seed candidates for population size")
 
 // CandidateGenerator is the interface implemented by objects that

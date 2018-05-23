@@ -7,15 +7,22 @@ import (
 	"unicode/utf8"
 )
 
+var (
+	// ErrEmptyAlphabet is the error returned by NewString when providing an
+	// empty alphabet string.
+	ErrEmptyAlphabet = errors.New("alphabet should not be empty")
+
+	// ErrNotASCIIAlphabet is the error returned by NewString when the alphabet
+	// contains some non-ASCII runes.
+	ErrNotASCIIAlphabet = errors.New("alphabet should only contain ASCII runes")
+)
+
 // String is a generator of ASCII string candidates of the specified length and
 // in which runes are randomly chosen from an alphabet
 type String struct {
 	alphabet string
 	length   int
 }
-
-var ErrEmptyAlphabet = errors.New("alphabet should not be empty")
-var ErrNotASCIIAlphabet = errors.New("alphabet should only contain ASCII runes")
 
 // NewString returns a String that generates strings of the specified length
 // from the provided alphabet.
