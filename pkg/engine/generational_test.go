@@ -147,7 +147,6 @@ func checkB(b *testing.B, err error) {
 // perform the job, otherwise the overhead of concurrent execution hides the
 // eventual performance gain.
 func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
-	// Create a factory to generate random 11-character Strings.
 	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 	// create the target string
@@ -156,6 +155,7 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 		target = fmt.Sprintf("%s%c", target, 'A'+byte(rand.Intn(int('Z'-'A'))))
 	}
 
+	// Create a string generator
 	fac, err := generator.NewString(alphabet, len(target))
 	checkB(b, err)
 

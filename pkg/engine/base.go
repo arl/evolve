@@ -15,14 +15,15 @@ import (
 // method.
 type Stepper interface {
 
-	// Step performs a single step/iteration of the evolutionary process.
+	// Step performs an epoch/step/iteration of the evolutionary process.
 	//
-	// evpop is the population at the beginning of the process.
-	// nelites is the number of the fittest individuals that must be preserved.
+	// It takes as argument the population to evolve in that step, the elitism
+	// count -that is how many of the fittest candidates are preserved and
+	// directly inserted into the nexct generation, without selection- and a
+	// source of randomess.
 	//
-	// Returns the updated population after the evolutionary process has
-	// proceeded by one step/iteration.
-	Step(evpop api.Population, nelites int, rng *rand.Rand) api.Population
+	// It returns the next generation.
+	Step(api.Population, int, *rand.Rand) api.Population
 }
 
 // Base is a base struct for EvolutionEngine implementations.

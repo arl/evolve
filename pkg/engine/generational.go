@@ -33,21 +33,20 @@ type Generational struct {
 // NewGenerational creates a new evolution engine by specifying
 // the various components required by a generational evolutionary algorithm.
 //
-// f is the factory used to create the initial population that is iteratively
+// gen is the generator used to create the initial population that is iteratively
 // evolved.
-// op is the combination of evolutionary operators used to evolve the population
-// at each generation.
-// eval is a function for assigning fitness scores to candidate solutions.
-// sel is a strategy for selecting which candidates survive to be evolved.
-// rng is the source of randomness used by all stochastic processes (including
-// evolutionary operators and selection strategies).
-func NewGenerational(f api.Generator, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *Base {
+// op is the evolutionary operator applied at each generation to evolve the
+// population.
+// eval evaluates fitness scores of candidate solutions.
+// sel is a strategy for selecting which candidates survive an epoch.
+// rng is the source of randomness used by all stochastic processes.
+func NewGenerational(gen api.Generator, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *Base {
 
 	// create the Stepper implementation
 	stepper := &Generational{op: op, eval: eval, sel: sel}
 
 	// create the evolution engine implementation
-	impl := NewBase(f, eval, rng, stepper)
+	impl := NewBase(gen, eval, rng, stepper)
 
 	// provide the engine to the stepper for forwarding
 	stepper.eng = impl
