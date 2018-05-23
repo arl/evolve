@@ -5,12 +5,6 @@ import (
 	"testing"
 )
 
-const (
-	stringLength   = 8
-	populationSize = 10
-	alphabet       = "abcdefg"
-)
-
 func TestNewString(t *testing.T) {
 	tests := []struct {
 		name     string
