@@ -26,7 +26,7 @@ func checkCellFixed(t *testing.T, s *sudoku, i, j int) {
 
 // Checks to make sure that the givens are correctly placed and that each row
 // contains each value exactly once.
-func TestFactoryValidity(t *testing.T) {
+func TestGeneratorValidity(t *testing.T) {
 	gen, err := newGenerator([]string{
 		".9.......",
 		".........",
@@ -76,7 +76,7 @@ func TestFactoryValidity(t *testing.T) {
 	}
 }
 
-func TestFactoryInvalidPatterns(t *testing.T) {
+func TestGeneratorInvalidPatterns(t *testing.T) {
 	tests := []struct {
 		name    string
 		pattern []string

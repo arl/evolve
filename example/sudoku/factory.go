@@ -21,12 +21,12 @@ type generator struct {
 	nonfixed [size][]int
 }
 
-// Creates a factory for generating random candidate solutions for a specified
-// Sudoku puzzle. pattern is a slice of strings, each representing one row of
-// sudoku. Each character represents a single cell. Permitted characters are the
-// digits '1' to '9' (each of which represents a fixed cell in the pattern) or
-// the '.' character, which represents an empty cell. Returns an error if the
-// pattern is not made of 9 strings containig 1 to 9, or '.'
+// Creates a generator of random candidate solutions for a specified Sudoku
+// puzzle. pattern is a slice of strings, each representing one row of sudoku.
+// Each character represents a single cell. Permitted characters are the digits
+// '1' to '9' (each of which represents a fixed cell in the pattern) or the '.'
+// character, which represents an empty cell. Returns an error if the pattern is
+// not made of 9 strings containig 1 to 9, or '.'
 func newGenerator(pattern []string) (*generator, error) { // nolint: gocyclo
 	if len(pattern) != size {
 		return nil, errWrongNumberOfRows
