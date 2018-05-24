@@ -54,7 +54,7 @@ func main() {
 	// target string.
 	// Fitness is not-natural, one fitness point represents an error, so the lower
 	// is better
-	eval := api.NonNaturalEvaluatorFunc(func(cand interface{}, pop []interface{}) float64 {
+	eval := api.EvaluatorFunc(false, func(cand interface{}, pop []interface{}) float64 {
 		var errors float64
 		sc := cand.(string)
 		for i := range sc {

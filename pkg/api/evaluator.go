@@ -3,8 +3,8 @@ package api
 // Evaluator calculates the fitness score of a given candidate of the
 // appropriate type.
 //
-// Fitness evaluations may be executed concurrently and therefore any access to
-// mutable shared state should be properly synchronised.
+// Fitness evaluations may be executed concurrently and therefore any concurrent
+// access to a shared state should be properly synchronized.
 type Evaluator interface {
 
 	// Fitness calculates a fitness score for the given candidate.
@@ -60,32 +60,22 @@ type Evaluator interface {
 	IsNatural() bool
 }
 
-// NaturalEvaluatorFunc is an adapter to allow the use of ordinary functions as
-// fitness evaluators. If f is a function with the appropriate signature,
-// NaturalEvaluatorFunc(f) is a fitness Evaluator that calls f, and fitness are
-// naturally ordered.
-type NaturalEvaluatorFunc func(interface{}, []interface{}) float64
+// FitnessFunc is the type of function computing the fitness of a candidate
+// solution.
+type FitnessFunc func(interface{}, []interface{}) float64
 
-// NonNaturalEvaluatorFunc is an adapter to allow the use of ordinary functions
-// as fitness evaluators. If f is a function with the appropriate signature,
-// NonNaturalEvaluatorFunc(f) is a fitness Evaluator that calls f, and fitness
-// are non-naturally ordered.
-type NonNaturalEvaluatorFunc func(interface{}, []interface{}) float64
-
-// Fitness calculates a fitness score for the given candidate.
-func (f NaturalEvaluatorFunc) Fitness(cand interface{}, pop []interface{}) float64 {
-	return f(cand, pop)
+type evaluatorFunc struct {
+	f FitnessFunc
+	n bool
 }
 
-// Fitness calculates a fitness score for the given candidate.
-func (f NonNaturalEvaluatorFunc) Fitness(cand interface{}, pop []interface{}) float64 {
-	return f(cand, pop)
+func (e evaluatorFunc) Fitness(cand interface{}, pop []interface{}) float64 { return e.f(cand, pop) }
+func (e evaluatorFunc) IsNatural() bool                                     { return e.n }
+
+// EvaluatorFunc is an adapter to allow the use of ordinary functions as fitness
+// evaluators. If f is a function with the appropriate signature, EvaluatorFunc
+// returns an object satisfying the Evaluator interface, for which the Fitness
+// method calls f and IsNatural returns natural.
+func EvaluatorFunc(natural bool, f FitnessFunc) evaluatorFunc { // nolint: golint
+	return evaluatorFunc{f: f, n: natural}
 }
-
-// IsNatural specifies whether this evaluator generates 'natural' fitness
-// scores or not.
-func (f NaturalEvaluatorFunc) IsNatural() bool { return true }
-
-// IsNatural specifies whether this evaluator generates 'natural' fitness
-// scores or not.
-func (f NonNaturalEvaluatorFunc) IsNatural() bool { return false }
