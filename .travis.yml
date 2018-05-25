@@ -28,6 +28,6 @@ script:
   - go test -v -race ./...
   - |
     if [ "$COVER" == "yes" ]; then
-      go test -v -cover -covermode=count -coverprofile=profile.cov ./...
+      go test -v -cover -covermode=count -coverprofile=profile.cov ./... > /dev/null
       goveralls -coverprofile=profile.cov -service=travis-ci
     fi
