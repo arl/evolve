@@ -11,20 +11,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Epocher is the interface implemented by objects having an Epoch method.
-type Epocher interface {
-
-	// Epoch performs one epoch (i.e generation) of the evolutionary process.
-	//
-	// It takes as argument the population to evolve in that step, the elitism
-	// count -that is how many of the fittest candidates are preserved and
-	// directly inserted into the nexct generation, without selection- and a
-	// source of randomess.
-	//
-	// It returns the next generation.
-	Epoch(api.Population, int, *rand.Rand) api.Population
-}
-
 // Base is a base struct for EvolutionEngine implementations.
 type Base struct {
 	pool           *worker.Pool // shared concurrent worker
@@ -34,26 +20,24 @@ type Base struct {
 	eval           api.Evaluator
 	singleThreaded bool
 	satisfied      []api.TerminationCondition
-	Epocher
+	api.Epocher
 }
 
 // NewBase creates a new evolution engine, injecting the various components
 // required by an evolutionary algorithm.
-///
-// gen is the generator used to create the initial population that is iteratively
-// evolved.
-// op is the evolutionary operator applied at each generation to evolve the
-// population.
+//
+// gen is the generator used to create the initial population that is
+// iteratively evolved.
 // eval evaluates fitness scores of candidate solutions.
-// sel is a strategy for selecting which candidates survive an epoch.
 // rng is the source of randomness used by all stochastic processes.
-func NewBase(gen api.Generator, eval api.Evaluator, rng *rand.Rand, stepper Epocher) *Base {
+// ep is the Epocher
+func NewBase(gen api.Generator, eval api.Evaluator, rng *rand.Rand, ep api.Epocher) *Base {
 	return &Base{
 		gen:     gen,
 		eval:    eval,
 		rng:     rng,
 		obs:     make(map[api.Observer]struct{}),
-		Epocher: stepper,
+		Epocher: ep,
 	}
 }
 

@@ -42,14 +42,14 @@ type Generational struct {
 // rng is the source of randomness used by all stochastic processes.
 func NewGenerational(gen api.Generator, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *Base {
 
-	// create the Stepper implementation
-	stepper := &Generational{op: op, eval: eval, sel: sel}
+	// create the Epocher implementation
+	ep := &Generational{op: op, eval: eval, sel: sel}
 
 	// create the evolution engine implementation
-	impl := NewBase(gen, eval, rng, stepper)
+	impl := NewBase(gen, eval, rng, ep)
 
-	// provide the engine to the stepper for forwarding
-	stepper.eng = impl
+	// provide the engine to the epocher for forwarding
+	ep.eng = impl
 	return impl
 }
 
