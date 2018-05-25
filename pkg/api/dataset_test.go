@@ -16,7 +16,7 @@ func init() {
 // Make sure that the data set's capacity grows correctly as
 // more values are added.
 func TestDataSetCapacityIncrease(t *testing.T) {
-	data := NewDataSet(3)
+	data := NewDataset(3)
 	assert.Empty(t, data.Len(), "Initial size should be 0.")
 	data.AddValue(1)
 	data.AddValue(2)
@@ -28,20 +28,20 @@ func TestDataSetCapacityIncrease(t *testing.T) {
 }
 
 func TestDataSetAggregate(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
-	assert.Equal(t, round(data.Aggregate()), 15)
+	assert.Equal(t, round(data.Sum()), 15)
 }
 
 func TestDataSetProduct(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
 	product := int(factorial(5))
 	assert.Equal(t, round(data.Product()), product)
 }
 
 func TestDataSetMinimum(t *testing.T) {
-	data := NewDataSet(0)
+	data := NewDataset(0)
 	data.AddValue(4)
 	assert.Equal(t, data.Min(), 4.0)
 	data.AddValue(7)
@@ -53,7 +53,7 @@ func TestDataSetMinimum(t *testing.T) {
 }
 
 func TestDataSetMaximum(t *testing.T) {
-	data := NewDataSet(0)
+	data := NewDataset(0)
 	data.AddValue(9)
 	assert.Equal(t, data.Max(), 9.0)
 	data.AddValue(8)
@@ -65,7 +65,7 @@ func TestDataSetMaximum(t *testing.T) {
 }
 
 func TestDataSetMedian(t *testing.T) {
-	data := NewDataSet(0)
+	data := NewDataset(0)
 	data.AddValue(15)
 	assert.Equal(t, data.Median(), 15.0)
 	data.AddValue(17)
@@ -75,20 +75,20 @@ func TestDataSetMedian(t *testing.T) {
 }
 
 func TestDataSetArithmeticMean(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
 	assert.Equal(t, round(data.ArithmeticMean()), 3)
 }
 
 func TestDataSetGeometricMean(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
 	product := float64(factorial(5))
 	assert.Equal(t, data.GeometricMean(), math.Pow(product, 0.2))
 }
 
 func TestDataSetHarmonicMean(t *testing.T) {
-	data := NewDataSet(0)
+	data := NewDataset(0)
 	data.AddValues(1, 2, 4, 4)
 	// Reciprocals are 1, 1/2, 1/4 and 1/4.
 	// Sum of reciprocals is 2.  Therefore, harmonic mean is 4/2 = 2.
@@ -96,31 +96,31 @@ func TestDataSetHarmonicMean(t *testing.T) {
 }
 
 func TestDataSetMeanDeviation(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
 	assert.Equal(t, data.MeanDeviation(), 1.2)
 }
 
 func TestDataSetPopulationVariance(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
 	assert.Equal(t, round(data.Variance()), 2)
 }
 
 func TestDataSetSampleVariance(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
 	assert.Equal(t, data.SampleVariance(), 2.5)
 }
 
 func TestDataSetPopulationStandardDeviation(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
 	assert.Equal(t, data.StandardDeviation(), math.Sqrt(2))
 }
 
 func TestDataSetSampleStandardDeviation(t *testing.T) {
-	data := NewDataSet(len(testDataSet))
+	data := NewDataset(len(testDataSet))
 	data.AddValues(testDataSet...)
 	assert.Equal(t, data.SampleStandardDeviation(), math.Sqrt(2.5))
 }
@@ -128,7 +128,7 @@ func TestDataSetSampleStandardDeviation(t *testing.T) {
 // Check that an appropriate exception is thrown when attempting to
 // calculate stats without any data.
 func TestDataSetEmptyDataSet(t *testing.T) {
-	data := NewDataSet(10)
+	data := NewDataset(10)
 	assert.Panics(t, func() { data.ArithmeticMean() })
 }
 

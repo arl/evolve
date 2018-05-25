@@ -3,31 +3,41 @@ package operator
 import (
 	"math/rand"
 	"testing"
-
-	"github.com/aurelien-rainone/evolve/internal/test"
 )
+
+// adjustInt mutates integers candidates by adding a fixed offset.
+type adjustInt int
+
+func (op adjustInt) Apply(cand []interface{}, rng *rand.Rand) []interface{} {
+	result := make([]interface{}, len(cand))
+	for i, c := range cand {
+		result[i] = c.(int) + int(op)
+	}
+	return result
+}
 
 func TestEvolutionPipeline(t *testing.T) {
 	// Make sure that multiple operators in a pipeline are applied correctly
 	// to the population and validate the cumulative effects.
 	rng := rand.New(rand.NewSource(99))
-	pop := make([]interface{}, 0, 10)
+	pop := make([]interface{}, 0)
 	for i := 10; i <= 100; i += 10 {
 		pop = append(pop, i)
 	}
-	// Increment 30% of the numbers and decrement the other 70%.
-	pipe := Pipeline{test.IntAdjuster(1), test.IntAdjuster(3)}
+
+	pipe := Pipeline{adjustInt(1), adjustInt(3)}
 	pop = pipe.Apply(pop, rng)
+
 	// Net result should be each candidate increased by 4.
-	var aggregate int
+	var sum int
 	for _, c := range pop {
 		ic := c.(int)
-		aggregate += ic
+		sum += ic
 		if ic%10 != 4 {
 			t.Error("candidate value should have increased by 4, got", ic)
 		}
 	}
-	if aggregate != 590 {
-		t.Error("want aggregate to be 590, got", aggregate)
+	if sum != 590 {
+		t.Error("want sum = 90, got", sum)
 	}
 }

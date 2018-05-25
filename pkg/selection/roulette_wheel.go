@@ -53,12 +53,12 @@ func (rouletteWheel) Select(
 	sel := make([]interface{}, size)
 	for i := 0; i < size; i++ {
 		rand := rng.Float64() * cumfitness[len(cumfitness)-1]
-		index := sort.SearchFloat64s(cumfitness, rand)
-		if index < 0 {
+		j := sort.SearchFloat64s(cumfitness, rand)
+		if j < 0 {
 			// Convert negative insertion point to array index.
-			index = abs(index + 1)
+			j = abs(j + 1)
 		}
-		sel[i] = pop[index].Candidate
+		sel[i] = pop[j].Candidate
 	}
 	return sel
 }

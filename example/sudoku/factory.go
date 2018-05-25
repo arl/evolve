@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"math/rand"
-
-	"github.com/aurelien-rainone/evolve/pkg/factory"
 )
 
 var (
@@ -23,29 +21,12 @@ type generator struct {
 	nonfixed [size][]int
 }
 
-type sudokuFactory struct{ factory.BaseFactory }
-
-func newSudokuFactory(pattern []string) (*sudokuFactory, error) {
-	if len(pattern) != size {
-		return nil, errWrongNumberOfRows
-	}
-
-	gen, err := newGenerator(pattern)
-	if err != nil {
-		return nil, err
-	}
-	sf := &sudokuFactory{
-		BaseFactory: factory.BaseFactory{CandidateGenerator: gen},
-	}
-	return sf, nil
-}
-
-// Creates a factory for generating random candidate solutions for a specified
-// Sudoku puzzle. pattern is a slice of strings, each representing one row of
-// sudoku. Each character represents a single cell. Permitted characters are the
-// digits '1' to '9' (each of which represents a fixed cell in the pattern) or
-// the '.' character, which represents an empty cell. Returns an error if the
-// pattern is not made of 9 strings containig 1 to 9, or '.'
+// Creates a generator of random candidate solutions for a specified Sudoku
+// puzzle. pattern is a slice of strings, each representing one row of sudoku.
+// Each character represents a single cell. Permitted characters are the digits
+// '1' to '9' (each of which represents a fixed cell in the pattern) or the '.'
+// character, which represents an empty cell. Returns an error if the pattern is
+// not made of 9 strings containig 1 to 9, or '.'
 func newGenerator(pattern []string) (*generator, error) { // nolint: gocyclo
 	if len(pattern) != size {
 		return nil, errWrongNumberOfRows
@@ -92,7 +73,7 @@ func newGenerator(pattern []string) (*generator, error) { // nolint: gocyclo
 // The generated potential solution is guaranteed to have no
 // duplicates in any row but could have duplicates in a column or sub-grid.
 
-func (gen *generator) GenerateCandidate(rng *rand.Rand) interface{} {
+func (gen *generator) Generate(rng *rand.Rand) interface{} {
 	// Clone the template as the basis for this grid.
 	var rows sudoku
 	copy(rows[:], gen.templ[:])

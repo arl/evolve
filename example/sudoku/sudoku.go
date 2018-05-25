@@ -38,8 +38,8 @@ type evaluator struct{}
 
 func (evaluator) Fitness(cand interface{}, pop []interface{}) float64 { // nolint: golint
 	// We can assume that there are no duplicates in any rows because the
-	// candidate factory and evolutionary operators that we use do not permit
-	// rows to contain duplicates.
+	// candidate generator and evolutionary operators we use do not permit rows
+	// to contain duplicates.
 	var fitness int
 	sudo := cand.(*sudoku)
 

@@ -11,18 +11,18 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Stepper is the interface implemented by objects having a NextEvolutionStep
-// method.
-type Stepper interface {
+// Epocher is the interface implemented by objects having an Epoch method.
+type Epocher interface {
 
-	// Step performs a single step/iteration of the evolutionary process.
+	// Epoch performs one epoch (i.e generation) of the evolutionary process.
 	//
-	// evpop is the population at the beginning of the process.
-	// nelites is the number of the fittest individuals that must be preserved.
+	// It takes as argument the population to evolve in that step, the elitism
+	// count -that is how many of the fittest candidates are preserved and
+	// directly inserted into the nexct generation, without selection- and a
+	// source of randomess.
 	//
-	// Returns the updated population after the evolutionary process has
-	// proceeded by one step/iteration.
-	Step(evpop api.Population, nelites int, rng *rand.Rand) api.Population
+	// It returns the next generation.
+	Epoch(api.Population, int, *rand.Rand) api.Population
 }
 
 // Base is a base struct for EvolutionEngine implementations.
@@ -30,126 +30,123 @@ type Base struct {
 	pool           *worker.Pool // shared concurrent worker
 	obs            map[api.Observer]struct{}
 	rng            *rand.Rand
-	f              api.Factory
+	gen            api.Generator
 	eval           api.Evaluator
 	singleThreaded bool
 	satisfied      []api.TerminationCondition
-	Stepper
+	Epocher
 }
 
-// NewBase creates a new evolution engine by specifying the various
-// components required by an evolutionary algorithm.
-//
-// candidateFactory is the factory used to create the initial population that is
-// iteratively evolved.
-// fitnessEvaluator is a function for assigning fitness scores to candidate
-// solutions.
-// rng is the source of randomness used by all stochastic processes (including
-// evolutionary operators and selection strategies).
-func NewBase(f api.Factory, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
+// NewBase creates a new evolution engine, injecting the various components
+// required by an evolutionary algorithm.
+///
+// gen is the generator used to create the initial population that is iteratively
+// evolved.
+// op is the evolutionary operator applied at each generation to evolve the
+// population.
+// eval evaluates fitness scores of candidate solutions.
+// sel is a strategy for selecting which candidates survive an epoch.
+// rng is the source of randomness used by all stochastic processes.
+func NewBase(gen api.Generator, eval api.Evaluator, rng *rand.Rand, stepper Epocher) *Base {
 	return &Base{
-		f:       f,
+		gen:     gen,
 		eval:    eval,
 		rng:     rng,
 		obs:     make(map[api.Observer]struct{}),
-		Stepper: stepper,
+		Epocher: stepper,
 	}
 }
 
-// Evolve executes the evolutionary algorithm until one of the termination
+// Evolve runs the evolutionary algorithm until one of the termination
 // conditions is met, then return the fittest candidate from the final
 // generation.
 //
 // To return the entire population rather than just the fittest candidate,
 // use the EvolvePopulation method instead.
 //
-// populationSize is the number of candidate solutions present in the population
-// at any point in time.
-// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// size is the number of candidate solutions present in the population at any
+// point in time.
+// nelites is the number of candidates preserved via elitism. In elitism, a
 // sub-set of the population with the best fitness scores are preserved
 // unchanged in the subsequent generation. Candidate solutions that are
 // preserved unchanged through elitism remain eligible for selection for
 // breeding the remainder of the next generation. This value must be
 // non-negative and less than the population size. A value of zero means that no
 // elitism will be applied.
-// conditions is a slice of conditions that may cause the evolution to
-// terminate.
+// conds is a slice of conditions that may cause the evolution to terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
 func (e *Base) Evolve(size, nelites int, conds ...api.TerminationCondition) interface{} {
 	return e.EvolveWithSeedCandidates(size, nelites, []interface{}{}, conds...)
 }
 
-// EvolveWithSeedCandidates executes the evolutionary algorithm until one of
-// the termination conditions is met, then return the fittest candidate from
-// the final generation. Provide a set of candidates to seed the starting
-// population with.
+// EvolveWithSeedCandidates runs the evolutionary algorithm until one of the
+// termination conditions is met, then return the fittest candidate from the
+// final generation. Provide a set of candidates to seed the starting population
+// with.
 //
 // To return the entire population rather than just the fittest candidate,
 // use the EvolvePopulationWithSeedCandidates method instead.
-// populationSize is the number of candidate solutions present in the
-// population at any point in time.
-// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// size is the number of candidate solutions present in the population at any
+// point in time.
+// nelites is the number of candidates preserved via elitism. In elitism, a
 // sub-set of the population with the best fitness scores are preserved
 // unchanged in the subsequent generation. Candidate solutions that are
 // preserved unchanged through elitism remain eligible for selection for
-// breeding the remainder of the next generation.  This value must be
+// breeding the remainder of the next generation. This value must be
 // non-negative and less than the population size. A value of zero means that no
 // elitism will be applied.
-// seedCandidates is a set of candidates to seed the population with. The size
-// of this collection must be no greater than the specified population size.
-// conditions is a slice of conditions that may cause the evolution to
-// terminate.
+// seeds is a set of candidates to seed the population with. The size of this
+// collection must be no greater than the specified population size.
+// conds is a slice of conditions that may cause the evolution to terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *Base) EvolveWithSeedCandidates(size, nelites int, seedcands []interface{}, conds ...api.TerminationCondition) interface{} {
-	return e.EvolvePopulationWithSeedCandidates(size, nelites, seedcands, conds...)[0].Candidate
+func (e *Base) EvolveWithSeedCandidates(size, nelites int, seeds []interface{}, conds ...api.TerminationCondition) interface{} {
+	return e.EvolvePopulationWithSeedCandidates(size, nelites, seeds, conds...)[0].Candidate
 }
 
-// EvolvePopulation executes the evolutionary algorithm until one of the
-// termination conditions is met, then return all of the candidates from the
-// final generation.
+// EvolvePopulation runs the evolutionary algorithm until one of the termination
+// conditions is met, then return all of the candidates from the final
+// generation.
 //
 // To return just the fittest candidate rather than the entire population,
 // use the Evolve method instead.
-// populationSize is the number of candidate solutions present in the population
-// at any point in time.
-// eliteCount is the number of candidates preserved via elitism. In elitism, a
+// size is the number of candidate solutions present in the population at any
+// point in time.
+// nelites is the number of candidates preserved via elitism. In elitism, a
 // sub-set of the population with the best fitness scores are preserved
 // unchanged in the subsequent generation. Candidate solutions that are
 // preserved unchanged through elitism remain eligible for selection for
-// breeding the remainder of the next generation.  This value must be
+// breeding the remainder of the next generation. This value must be
 // non-negative and less than the population size. A value of zero means that no
 // elitism will be applied.
-// conditions is a slice of conditions that may cause the evolution to
-// terminate.
+// conds is a slice of conditions that may cause the evolution to terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
 func (e *Base) EvolvePopulation(size, nelites int, conds ...api.TerminationCondition) api.Population {
 	return e.EvolvePopulationWithSeedCandidates(size, nelites, []interface{}{}, conds...)
 }
 
-// EvolvePopulationWithSeedCandidates executes the evolutionary algorithm
-// until one of the termination conditions is met, then return all of the
-// candidates from the final generation.
+// EvolvePopulationWithSeedCandidates runs the evolutionary algorithm until one
+// of the termination conditions is met, then return all of the candidates from
+// the final generation.
 //
-// To return just the fittest candidate rather than the entire population,
-// use the EvolveWithSeedCandidates method instead.
-// populationSize is the number of candidate solutions present in the population
-// at any point in time.
-// eliteCount The number of candidates preserved via elitism.  In elitism, a
-// sub-set of the population with the best fitness scores are preserved
-// unchanged in the subsequent generation.  Candidate solutions that are
-// preserved unchanged through elitism remain eligible for selection for
-// breeding the remainder of the next generation.  This value must be
-// non-negative and less than the population size.  A value of zero means that
-// no elitism will be applied.
-// seedCandidates A set of candidates to seed the population with. The size of
-// this collection must be no greater than the specified population size.
-// conditions One or more conditions that may cause the evolution to terminate.
+// To return just the fittest candidate rather than the entire population, use
+// the EvolveWithSeedCandidates method instead.
+// size is the number of candidate solutions present in the population at any
+// point in time.
+// nelites The number of candidates preserved via elitism. In elitism, a sub-set
+// of the population with the best fitness scores are preserved unchanged in the
+// subsequent generation. Candidate solutions that are preserved unchanged
+// through elitism remain eligible for selection for breeding the remainder of
+// the next generation. This value must be non-negative and less than the
+// population size. A value of zero means that no elitism will be applied.
+// seeds is a set of candidates to seed the population with. The size of this
+// collection must be no greater than the specified population size.
+// conds is a slice of conditions that may cause the evolution to terminate.
 //
 // Returns the fittest solution found by the evolutionary process.
-func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands []interface{}, conds ...api.TerminationCondition) api.Population {
+func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seeds []interface{}, conds ...api.TerminationCondition) api.Population {
 
 	if nelites < 0 || nelites >= size {
 		panic("Elite count must be non-negative and less than population size.")
@@ -162,9 +159,11 @@ func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands [
 	var curgen int
 	startTime := time.Now()
 
-	pop := e.f.SeedPopulation(size,
-		seedcands,
-		e.rng)
+	pop, err := api.SeedPopulation(e.gen, size, seeds, e.rng)
+	// TODO: this method should return an error
+	if err != nil {
+		panic(err)
+	}
 
 	// Calculate the fitness scores for each member of the initial population.
 	evpop := e.evaluatePopulation(pop)
@@ -178,7 +177,7 @@ func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seedcands [
 	satisfied := api.ShouldContinue(data, conds...)
 	for satisfied == nil {
 		curgen++
-		evpop = e.Step(evpop, nelites, e.rng)
+		evpop = e.Epoch(evpop, nelites, e.rng)
 		api.SortEvaluatedPopulation(evpop, e.eval.IsNatural())
 		data = api.ComputePopulationData(evpop, e.eval.IsNatural(), nelites, curgen, startTime)
 		// Notify observers of the state of the population.
@@ -221,7 +220,7 @@ func (e *Base) evaluatePopulation(
 		// processing.
 		workers := make([]worker.Worker, len(pop))
 		for i := range pop {
-			workers[i] = &fitnessEvaluationWorker{
+			workers[i] = &fitnessWorker{
 				idx:       i,
 				pop:       pop,
 				evaluator: e.eval,
@@ -250,13 +249,13 @@ func (e *Base) evaluatePopulation(
 	return evpop
 }
 
-type fitnessEvaluationWorker struct {
+type fitnessWorker struct {
 	idx       int           // index of candidate to evaluate
 	pop       []interface{} // full population
 	evaluator api.Evaluator
 }
 
-func (w *fitnessEvaluationWorker) Work() (interface{}, error) {
+func (w *fitnessWorker) Work() (interface{}, error) {
 	return &api.Individual{
 		Candidate: w.pop[w.idx],
 		Fitness:   w.evaluator.Fitness(w.pop[w.idx], w.pop),

@@ -3,8 +3,8 @@ package api
 // Evaluator calculates the fitness score of a given candidate of the
 // appropriate type.
 //
-// Fitness evaluations may be executed concurrently and therefore any access to
-// mutable shared state should be properly synchronised.
+// Fitness evaluations may be executed concurrently and therefore any concurrent
+// access to a shared state should be properly synchronized.
 type Evaluator interface {
 
 	// Fitness calculates a fitness score for the given candidate.
@@ -58,4 +58,24 @@ type Evaluator interface {
 	// Returns true if a high fitness score means a fitter candidate or false if
 	// a low fitness score means a fitter candidate.
 	IsNatural() bool
+}
+
+// FitnessFunc is the type of function computing the fitness of a candidate
+// solution.
+type FitnessFunc func(interface{}, []interface{}) float64
+
+type evaluatorFunc struct {
+	f FitnessFunc
+	n bool
+}
+
+func (e evaluatorFunc) Fitness(cand interface{}, pop []interface{}) float64 { return e.f(cand, pop) }
+func (e evaluatorFunc) IsNatural() bool                                     { return e.n }
+
+// EvaluatorFunc is an adapter to allow the use of ordinary functions as fitness
+// evaluators. If f is a function with the appropriate signature, EvaluatorFunc
+// returns an object satisfying the Evaluator interface, for which the Fitness
+// method calls f and IsNatural returns natural.
+func EvaluatorFunc(natural bool, f FitnessFunc) evaluatorFunc { // nolint: golint
+	return evaluatorFunc{f: f, n: natural}
 }

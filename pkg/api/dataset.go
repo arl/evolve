@@ -5,8 +5,9 @@ import (
 	"sort"
 )
 
-// DataSet is a utility struct for calculating statistics for a finite data set.
-type DataSet struct {
+// A Dataset stores some floating point values and compute some statistics
+// about the finite dataset composed of all the values it stores.
+type Dataset struct {
 	values   []float64
 	total    float64
 	product  float64
@@ -14,12 +15,12 @@ type DataSet struct {
 	min, max float64
 }
 
-// NewDataSet creates an empty data set with the provided initial capacity.
+// NewDataset creates an empty data set with the provided initial capacity.
 //
 // The initial capacity for the data set corresponds to the number of values
 // that can be added without needing to resize the internal data storage.
-func NewDataSet(capacity int) *DataSet {
-	return &DataSet{
+func NewDataset(capacity int) *Dataset {
+	return &Dataset{
 		min:      math.MaxFloat64,
 		max:      math.SmallestNonzeroFloat64,
 		product:  1,
@@ -31,14 +32,14 @@ func NewDataSet(capacity int) *DataSet {
 
 // AddValue adds a single value to the data set and updates any statistics that
 // are calculated cumulatively.
-func (ds *DataSet) AddValue(value float64) {
+func (ds *Dataset) AddValue(value float64) {
 	ds.values = append(ds.values, value)
 	ds.update(value)
 }
 
 // AddValues adds multiple values to the data set and updates any statistics that
 // are calculated cumulatively.
-func (ds *DataSet) AddValues(values ...float64) {
+func (ds *Dataset) AddValues(values ...float64) {
 	ds.values = append(ds.values, values...)
 	for _, value := range ds.values {
 		ds.update(value)
@@ -46,7 +47,7 @@ func (ds *DataSet) AddValues(values ...float64) {
 }
 
 // update the dataset by considering the new value that has been added
-func (ds *DataSet) update(value float64) {
+func (ds *Dataset) update(value float64) {
 	ds.total += value
 	ds.product *= value
 	ds.recipsum += 1 / value
@@ -54,21 +55,21 @@ func (ds *DataSet) update(value float64) {
 	ds.max = math.Max(ds.max, value)
 }
 
-func (ds *DataSet) mustNotEmpty() {
+func (ds *Dataset) mustNotEmpty() {
 	if len(ds.values) == 0 {
 		panic("DataSet should not be empty")
 	}
 }
 
 // Len returns the number of values in this data set.
-func (ds *DataSet) Len() int {
+func (ds *Dataset) Len() int {
 	return len(ds.values)
 }
 
 // Min returns the smallest value in the data set.
 //
 // panics if the data set is empty.
-func (ds *DataSet) Min() float64 {
+func (ds *Dataset) Min() float64 {
 	ds.mustNotEmpty()
 	return ds.min
 }
@@ -76,7 +77,7 @@ func (ds *DataSet) Min() float64 {
 // Max returns the biggest value in the data set.
 //
 // panics if the data set is empty.
-func (ds *DataSet) Max() float64 {
+func (ds *Dataset) Max() float64 {
 	ds.mustNotEmpty()
 	return ds.max
 }
@@ -88,7 +89,7 @@ func (ds *DataSet) Max() float64 {
 // middle elements.
 //
 // panics if the data set is empty.
-func (ds *DataSet) Median() float64 {
+func (ds *Dataset) Median() float64 {
 	ds.mustNotEmpty()
 	// Sort the data (take a copy to do this)
 	// TODO: why exactly ??
@@ -102,10 +103,10 @@ func (ds *DataSet) Median() float64 {
 	return cpy[middle-1] + (cpy[middle]-cpy[middle-1])/2
 }
 
-// Aggregate returns the sum of all values.
+// Sum returns the sum of all values.
 //
 // panics if the data set is empty.
-func (ds *DataSet) Aggregate() float64 {
+func (ds *Dataset) Sum() float64 {
 	ds.mustNotEmpty()
 	return ds.total
 }
@@ -113,7 +114,7 @@ func (ds *DataSet) Aggregate() float64 {
 // Product returns the product of all values.
 //
 // panics if the data set is empty.
-func (ds *DataSet) Product() float64 {
+func (ds *Dataset) Product() float64 {
 	ds.mustNotEmpty()
 	return ds.product
 }
@@ -128,7 +129,7 @@ func (ds *DataSet) Product() float64 {
 // See GeometricMean()
 //
 // panics if the data set is empty.
-func (ds *DataSet) ArithmeticMean() float64 {
+func (ds *Dataset) ArithmeticMean() float64 {
 	ds.mustNotEmpty()
 	return ds.total / float64(len(ds.values))
 }
@@ -142,7 +143,7 @@ func (ds *DataSet) ArithmeticMean() float64 {
 // See ArithmeticMean() and HarmonicMean()
 //
 // panics if the data set is empty.
-func (ds *DataSet) GeometricMean() float64 {
+func (ds *Dataset) GeometricMean() float64 {
 	ds.mustNotEmpty()
 	return math.Pow(ds.product, 1.0/float64(len(ds.values)))
 }
@@ -157,7 +158,7 @@ func (ds *DataSet) GeometricMean() float64 {
 // See ArithmeticMean() and GeometricMean()
 //
 // panics if the data set is empty.
-func (ds *DataSet) HarmonicMean() float64 {
+func (ds *Dataset) HarmonicMean() float64 {
 	ds.mustNotEmpty()
 	return float64(len(ds.values)) / ds.recipsum
 }
@@ -170,7 +171,7 @@ func (ds *DataSet) HarmonicMean() float64 {
 // See ArithmeticMean(), Variance() and StandardDeviation()
 //
 // panics if the data set is empty.
-func (ds *DataSet) MeanDeviation() float64 {
+func (ds *Dataset) MeanDeviation() float64 {
 	mean := ds.ArithmeticMean()
 	var diffs float64
 	for _, value := range ds.values {
@@ -191,7 +192,7 @@ func (ds *DataSet) MeanDeviation() float64 {
 // See SampleVariance(), StandardDeviation() and MeanDeviation()
 //
 // panics if the data set is empty.
-func (ds *DataSet) Variance() float64 {
+func (ds *Dataset) Variance() float64 {
 	return ds.sumSquaredDiffs() / float64(len(ds.values))
 }
 
@@ -201,7 +202,7 @@ func (ds *DataSet) Variance() float64 {
 // each value and the arithmetic mean.
 //
 // panics if the data set is empty.
-func (ds *DataSet) sumSquaredDiffs() float64 {
+func (ds *Dataset) sumSquaredDiffs() float64 {
 	mean := ds.ArithmeticMean()
 	var sqdiffs float64
 	for _, value := range ds.values {
@@ -220,7 +221,7 @@ func (ds *DataSet) sumSquaredDiffs() float64 {
 // See SampleStandardDeviation(), Variance() and MeanDeviation()
 //
 // panics if the data set is empty.
-func (ds *DataSet) StandardDeviation() float64 {
+func (ds *Dataset) StandardDeviation() float64 {
 	return math.Sqrt(ds.Variance())
 }
 
@@ -235,7 +236,7 @@ func (ds *DataSet) StandardDeviation() float64 {
 // See Variance(), SampleStandardDeviation() and MeanDeviation()
 //
 // panics if the data set is empty.
-func (ds *DataSet) SampleVariance() float64 {
+func (ds *Dataset) SampleVariance() float64 {
 	return ds.sumSquaredDiffs() / float64(len(ds.values)-1)
 }
 
@@ -249,6 +250,6 @@ func (ds *DataSet) SampleVariance() float64 {
 // See StandardDeviation(), SampleVariance() and MeanDeviation()
 //
 // panics if the data set is empty.
-func (ds *DataSet) SampleStandardDeviation() float64 {
+func (ds *Dataset) SampleStandardDeviation() float64 {
 	return math.Sqrt(ds.SampleVariance())
 }
