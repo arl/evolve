@@ -2,10 +2,8 @@ package api
 
 import (
 	"math/rand"
-	"runtime"
 	"time"
 
-	"github.com/aurelien-rainone/evolve/worker"
 	"github.com/pkg/errors"
 )
 
@@ -160,7 +158,6 @@ type Engine interface {
 // Engine bla
 // TODO: documentation
 type Engine struct {
-	pool           *worker.Pool // shared concurrent worker
 	obs            map[Observer]struct{}
 	rng            *rand.Rand
 	gen            Generator
@@ -380,15 +377,4 @@ func (e *Engine) notifyPopulationChange(data *PopulationData) {
 // lightweight/trivial fitness evaluations.
 func (e *Engine) SetSingleThreaded(singleThreaded bool) {
 	e.singleThreaded = singleThreaded
-}
-
-// workerPool lazily creates the fitness evaluations goroutine pool.
-func (e *Engine) workerPool() *worker.Pool {
-	if e.pool == nil {
-		// create a worker pool and set the maximum number of concurrent
-		// goroutines to the number of logical CPUs usable by the current
-		// process.
-		e.pool = worker.NewPool(runtime.NumCPU())
-	}
-	return e.pool
 }
