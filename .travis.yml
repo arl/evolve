@@ -6,9 +6,10 @@ install: true
 
 matrix:
   include:
-    - go: "1.10"
-    - go: master
-      env: COVER=no
+   - go: "1.10"
+     env: COVER=yes
+   - go: master
+     env: COVER=no
 
   allow_failures:
     - go: master
@@ -25,6 +26,8 @@ script:
   - go vet ./...
   - gometalinter.v2 --skip=internal --vendor ./...
   - go test -v -race ./...
-  # do not report coverage for go tip
-  - [ "$COVER" != 'no' ] && go test -v -cover -covermode=count -coverprofile=profile.cov ./...
-  - [ "$COVER" != 'no' ] && goveralls -coverprofile=profile.cov -service=travis-ci
+  - |
+    if [ "$COVER" == "yes" ]; then
+      go test -v -cover -covermode=count -coverprofile=profile.cov ./...
+      goveralls -coverprofile=profile.cov -service=travis-ci
+    fi
