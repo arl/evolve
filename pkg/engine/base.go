@@ -220,7 +220,7 @@ func (e *Base) evaluatePopulation(
 		// processing.
 		workers := make([]worker.Worker, len(pop))
 		for i := range pop {
-			workers[i] = &fitnessEvaluationWorker{
+			workers[i] = &fitnessWorker{
 				idx:       i,
 				pop:       pop,
 				evaluator: e.eval,
@@ -249,13 +249,13 @@ func (e *Base) evaluatePopulation(
 	return evpop
 }
 
-type fitnessEvaluationWorker struct {
+type fitnessWorker struct {
 	idx       int           // index of candidate to evaluate
 	pop       []interface{} // full population
 	evaluator api.Evaluator
 }
 
-func (w *fitnessEvaluationWorker) Work() (interface{}, error) {
+func (w *fitnessWorker) Work() (interface{}, error) {
 	return &api.Individual{
 		Candidate: w.pop[w.idx],
 		Fitness:   w.evaluator.Fitness(w.pop[w.idx], w.pop),

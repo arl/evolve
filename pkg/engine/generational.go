@@ -53,14 +53,14 @@ func NewGenerational(gen api.Generator, op api.Operator, eval api.Evaluator, sel
 	return impl
 }
 
-// Step performs a single step/iteration of the evolutionary process.
+// Epoch performs a single step/iteration of the evolutionary process.
 //
 // evpop is the population at the beginning of the process.
 // nelites is the number of the fittest individuals that must be preserved.
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *Generational) Step(evpop api.Population, nelites int, rng *rand.Rand) api.Population {
+func (e *Generational) Epoch(evpop api.Population, nelites int, rng *rand.Rand) api.Population {
 
 	pop := make([]interface{}, 0, len(evpop))
 

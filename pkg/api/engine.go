@@ -4,8 +4,8 @@ package api
 // operations.
 // TODO: does the Engine interface really needs all this methods? wouldn't one
 // suffice and the others be derived from it (in engine.Base)?
-// TODO: Could AddObserver/RemoveObserver be made an external interace, included
-// in Engine? How would that go with future island observers?
+// TODO: Could AddObserver/RemoveObserver be made an external interface,
+// embedded in Engine? How would that go with future island observers?
 type Engine interface {
 
 	// Evolve executes the evolutionary algorithm until one of the termination
