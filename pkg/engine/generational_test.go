@@ -38,7 +38,7 @@ type zeroGenerator struct{}
 
 func (zeroGenerator) Generate(rng *rand.Rand) interface{} { return 0 }
 
-func prepareEngine() api.Engine {
+func prepareEngine() *api.Engine {
 	return NewGenerational(
 		zeroGenerator{},
 		zeroIntMaker{},
