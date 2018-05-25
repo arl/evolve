@@ -27,7 +27,7 @@ type Generational struct {
 	op   api.Operator
 	eval api.Evaluator
 	sel  api.Selection
-	eng  *Base
+	eng  *api.Engine
 }
 
 // NewGenerational creates a new generational evolution engine, injecting the
@@ -40,47 +40,44 @@ type Generational struct {
 // eval evaluates fitness scores of candidate solutions.
 // sel is a strategy for selecting which candidates survive an epoch.
 // rng is the source of randomness used by all stochastic processes.
-func NewGenerational(gen api.Generator, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *Base {
+func NewGenerational(gen api.Generator, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *api.Engine {
 
-	// create the Stepper implementation
-	stepper := &Generational{op: op, eval: eval, sel: sel}
+	// create the Epocher implementation
+	ep := &Generational{op: op, eval: eval, sel: sel}
 
 	// create the evolution engine implementation
-	impl := NewBase(gen, eval, rng, stepper)
+	impl := api.NewEngine(gen, eval, rng, ep)
 
-	// provide the engine to the stepper for forwarding
-	stepper.eng = impl
+	// provide the engine to the epocher for forwarding
+	ep.eng = impl
 	return impl
 }
 
 // Epoch performs a single step/iteration of the evolutionary process.
 //
-// evpop is the population at the beginning of the process.
+// pop is the population at the beginning of the process.
 // nelites is the number of the fittest individuals that must be preserved.
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *Generational) Epoch(evpop api.Population, nelites int, rng *rand.Rand) api.Population {
+func (e *Generational) Epoch(pop api.Population, nelites int, rng *rand.Rand) api.Population {
+	nextpop := make([]interface{}, 0, len(pop))
 
-	pop := make([]interface{}, 0, len(evpop))
-
-	// First perform any elitist selection.
+	// Perform elitism: straightforward copy the n fittest candidates into the
+	// next generation, without any kind of selection.
 	elite := make([]interface{}, nelites)
 	for i := 0; i < nelites; i++ {
-		elite[i] = evpop[i].Candidate
+		elite[i] = pop[i].Candidate
 	}
 
-	// Then select candidates that will be operated on to create the evolved
-	// portion of the next generation.
-	pop = append(pop, e.sel.Select(evpop,
-		e.eval.IsNatural(),
-		len(evpop)-nelites,
-		rng)...)
+	// Select the rest of population through natural selection
+	selected := e.sel.Select(pop, e.eval.IsNatural(), len(pop)-nelites, rng)
 
-	// Then evolve the population.
-	pop = e.op.Apply(pop, rng)
-	// When the evolution is finished, add the elite to the population.
-	pop = append(pop, elite...)
+	// Apply genetic operators on the selected candidates
+	nextpop = e.op.Apply(append(nextpop, selected...), rng)
 
-	return e.eng.evaluatePopulation(pop)
+	// While the elite is added, untouched, to the next population
+	nextpop = append(nextpop, elite...)
+	api.EvaluatePopulation(nextpop, e.eval, true)
+	return api.EvaluatePopulation(nextpop, e.eval, true)
 }
