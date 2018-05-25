@@ -11,11 +11,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Stepper is the interface implemented by objects having a NextEvolutionStep
-// method.
-type Stepper interface {
+// Epocher is the interface implemented by objects having an Epoch method.
+type Epocher interface {
 
-	// Step performs an epoch/step/iteration of the evolutionary process.
+	// Epoch performs one epoch (i.e generation) of the evolutionary process.
 	//
 	// It takes as argument the population to evolve in that step, the elitism
 	// count -that is how many of the fittest candidates are preserved and
@@ -23,7 +22,7 @@ type Stepper interface {
 	// source of randomess.
 	//
 	// It returns the next generation.
-	Step(api.Population, int, *rand.Rand) api.Population
+	Epoch(api.Population, int, *rand.Rand) api.Population
 }
 
 // Base is a base struct for EvolutionEngine implementations.
@@ -35,7 +34,7 @@ type Base struct {
 	eval           api.Evaluator
 	singleThreaded bool
 	satisfied      []api.TerminationCondition
-	Stepper
+	Epocher
 }
 
 // NewBase creates a new evolution engine, injecting the various components
@@ -48,13 +47,13 @@ type Base struct {
 // eval evaluates fitness scores of candidate solutions.
 // sel is a strategy for selecting which candidates survive an epoch.
 // rng is the source of randomness used by all stochastic processes.
-func NewBase(gen api.Generator, eval api.Evaluator, rng *rand.Rand, stepper Stepper) *Base {
+func NewBase(gen api.Generator, eval api.Evaluator, rng *rand.Rand, stepper Epocher) *Base {
 	return &Base{
 		gen:     gen,
 		eval:    eval,
 		rng:     rng,
 		obs:     make(map[api.Observer]struct{}),
-		Stepper: stepper,
+		Epocher: stepper,
 	}
 }
 
@@ -178,7 +177,7 @@ func (e *Base) EvolvePopulationWithSeedCandidates(size, nelites int, seeds []int
 	satisfied := api.ShouldContinue(data, conds...)
 	for satisfied == nil {
 		curgen++
-		evpop = e.Step(evpop, nelites, e.rng)
+		evpop = e.Epoch(evpop, nelites, e.rng)
 		api.SortEvaluatedPopulation(evpop, e.eval.IsNatural())
 		data = api.ComputePopulationData(evpop, e.eval.IsNatural(), nelites, curgen, startTime)
 		// Notify observers of the state of the population.
