@@ -78,6 +78,5 @@ func (e *Generational) Epoch(pop api.Population, nelites int, rng *rand.Rand) ap
 
 	// While the elite is added, untouched, to the next population
 	nextpop = append(nextpop, elite...)
-	api.EvaluatePopulation(nextpop, e.eval, true)
 	return api.EvaluatePopulation(nextpop, e.eval, true)
 }

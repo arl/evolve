@@ -205,7 +205,7 @@ func NewEngine(gen Generator, eval Evaluator, rng *rand.Rand, ep Epocher) *Engin
 //
 // Returns the fittest solution found by the evolutionary process.
 func (e *Engine) Evolve(size, nelites int, conds ...TerminationCondition) interface{} {
-	return e.EvolveWithSeedCandidates(size, nelites, []interface{}{}, conds...)
+	return e.EvolvePopulationWithSeedCandidates(size, nelites, []interface{}{}, conds...)[0].Candidate
 }
 
 // EvolveWithSeedCandidates runs the evolutionary algorithm until one of the
