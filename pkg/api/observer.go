@@ -8,6 +8,10 @@ package api
 // size is small as this leads to shorter generations. The processing performed by an
 // evolution observer should be reasonably short-lived so as to avoid slowing down
 // the evolution.
+//
+// XXX:  just thinking out loud, but why is this in api package, observer are
+// only used in the context of the engine, called engine.Observer would also
+// make for a clearer name
 type Observer interface {
 
 	// PopulationUpdate is called when the state of the population has changed
