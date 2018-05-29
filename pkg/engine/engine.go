@@ -17,14 +17,12 @@ var (
 )
 
 type Engine struct {
-	obs            map[api.Observer]struct{}
-	rng            *rand.Rand
-	gen            api.Generator
-	eval           api.Evaluator
-	ep             api.Epocher
-	stats          *api.Dataset
-	singleThreaded bool
-
+	obs     map[api.Observer]struct{}
+	rng     *rand.Rand
+	gen     api.Generator
+	eval    api.Evaluator
+	ep      api.Epocher
+	stats   *api.Dataset
 	nelites int
 	seeds   []interface{}
 	conds   []api.TerminationCondition
@@ -154,13 +152,10 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Popula
 
 	var satisfied []api.TerminationCondition
 
-	// Evaluate fitness of the whole initial population
+	// Evaluate initial population fitness
 	evpop := api.EvaluatePopulation(pop, e.eval, true)
 
 	for {
-
-		ngen++
-
 		// Sort population according to fitness.
 		if e.eval.IsNatural() {
 			sort.Sort(sort.Reverse(evpop))
@@ -168,38 +163,47 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Popula
 			sort.Sort(evpop)
 		}
 
-		e.stats.Clear()
-		for _, cand := range evpop {
-			e.stats.AddValue(cand.Fitness)
-		}
+		// compute population stats
+		data := e.updateStats(evpop, ngen, time.Since(start))
 
-		// Notify observers with the population state
-		data := api.PopulationData{
-			BestCand:    evpop[0].Candidate,
-			BestFitness: evpop[0].Fitness,
-			Mean:        e.stats.ArithmeticMean(),
-			StdDev:      e.stats.StandardDeviation(),
-			Natural:     e.eval.IsNatural(),
-			Size:        e.stats.Len(),
-			NumElites:   e.nelites,
-			GenNumber:   ngen,
-			Elapsed:     time.Since(start),
-		}
-		for o := range e.obs {
-			o.PopulationUpdate(&data)
-		}
-
-		// TODO: all the functions in api like ShouldContinue,
-		// SortEvaluatedPopulation, etc. really are useful there?
-		// Why aren't they in engine package, unexported?
-		satisfied = shouldContinue(&data, e.conds...)
+		// check for termination conditions
+		satisfied = shouldContinue(data, e.conds...)
 		if satisfied != nil {
 			break
 		}
 
+		// perform evolution
 		evpop = e.ep.Epoch(evpop, e.nelites, e.rng)
+
+		ngen++
 	}
 	return evpop, satisfied, nil
+}
+
+func (e *Engine) updateStats(pop api.Population, ngen int, elapsed time.Duration) *api.PopulationData {
+
+	e.stats.Clear()
+	for _, cand := range pop {
+		e.stats.AddValue(cand.Fitness)
+	}
+
+	// Notify observers with the population state
+	data := api.PopulationData{
+		BestCand:    pop[0].Candidate,
+		BestFitness: pop[0].Fitness,
+		Mean:        e.stats.ArithmeticMean(),
+		StdDev:      e.stats.StandardDeviation(),
+		Natural:     e.eval.IsNatural(),
+		Size:        e.stats.Len(),
+		NumElites:   e.nelites,
+		GenNumber:   ngen,
+		Elapsed:     elapsed,
+	}
+
+	for o := range e.obs {
+		o.PopulationUpdate(&data)
+	}
+	return &data
 }
 
 // shouldContinue determines whether or not the evolution should continue.
