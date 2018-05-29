@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/aurelien-rainone/evolve/pkg/api"
 	"github.com/aurelien-rainone/evolve/pkg/engine"
@@ -17,81 +16,88 @@ import (
 	"github.com/aurelien-rainone/evolve/pkg/termination"
 )
 
-var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
 
-// Create a generator that creates random string
-func createGenerator(target string) *generator.String {
-	for _, c := range target {
-		if !strings.ContainsRune(alphabet, c) {
-			fmt.Printf("All runes must be exist in the alphabet ('%v'), that's not the case of %c\n", alphabet, c)
-			os.Exit(1)
-		}
-	}
-
-	fac, err := generator.NewString(alphabet, len(target))
-	check(err)
-	return fac
-}
-
-func main() {
-	var target = "HELLO WORLD"
-	if len(os.Args) == 2 {
-		target = strings.ToUpper(os.Args[1])
-	}
-
-	// create the generator that will generate random candidates
-	fac := createGenerator(target)
-
-	// create an evolutionary operator pipeline that will apply to each
-	// candidate, first a string mutation and then a crossover
-	mutation := mutation.NewString(alphabet)
-	check(mutation.SetProb(0.02))
-	xover := xover.New(xover.StringMater{})
-	pipeline := operator.Pipeline{mutation, xover}
-
-	// This 'evaluator' assigns one "fitness point" for every character in the
-	// candidate string that doesn't match the corresponding position in the
-	// target string.
-	// Fitness is not-natural, one fitness point represents an error, so the lower
-	// is better
-	eval := api.EvaluatorFunc(false, func(cand interface{}, pop []interface{}) float64 {
-		var errors float64
-		sc := cand.(string)
-		for i := range sc {
-			if sc[i] != target[i] {
-				errors++
-			}
-		}
-		return errors
-	})
-
-	// choose a selection strategy
-	var selector = selection.RouletteWheel
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	// we can now define our evolutionary engine
-	engine := engine.NewGenerational(fac, pipeline, eval, selector, rng)
-
-	// define an observer
-	engine.AddObserver(
-		api.ObserverFunc(func(data *api.PopulationData) {
-			fmt.Printf("Generation %d: %s (%v)\n",
-				data.GenNumber,
-				data.BestCand,
-				data.BestFitness)
-		}))
-
-	// we want evolution to end when a fitness of 0 has been reached (0
-	// differences between candidate and target string)
-	condition := termination.TargetFitness{Fitness: 0, Natural: false}
-
-	// start evolution engine and print the best result
-	fmt.Println(engine.Evolve(100, 5, condition))
-}
+var target = "EVOLVE WORLD"
 
 func check(err error) {
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(1)
 	}
+}
+
+// This evaluator assigns one "fitness point" for every character in the
+// candidate string that doesn't match the corresponding position in the
+// target string.
+type evaluator struct{}
+
+func (evaluator) Fitness(cand interface{}, pop []interface{}) float64 {
+	// count differences between candidate and target strings
+	var nerrors int
+	sc := cand.(string)
+	for i := range sc {
+		if sc[i] != target[i] {
+			nerrors++
+		}
+	}
+	return float64(nerrors)
+}
+
+// Non natural fitness, lower is better
+func (evaluator) IsNatural() bool { return false }
+
+func main() {
+	if len(os.Args) == 2 {
+		target = strings.ToUpper(os.Args[1])
+	}
+
+	// Setup a generator of random strings
+	for _, c := range target {
+		if !strings.ContainsRune(alphabet, c) {
+			log.Fatalf("Target string must be solely made of \"%v\"", alphabet)
+		}
+	}
+	gen, err := generator.NewString(alphabet, len(target))
+	check(err)
+
+	// Define our evolutionary operators, a string mutation where each rune has
+	// a probability of mutation of 0.02, plus a default string crossover.
+	mutation := mutation.NewString(alphabet)
+	check(mutation.SetProb(0.02))
+	xover := xover.New(xover.StringMater{})
+
+	// Define a composite evolutionary operator, that is a pipeline that applies
+	// to each candidate a string mutation followed by a crossover
+	pipeline := operator.Pipeline{mutation, xover}
+
+	// This evaluator assigns one "fitness point" for every character in the
+	// The epocher is generational evolutionary engine.
+	epocher := engine.Generational{
+		Op:   pipeline,
+		Eval: evaluator{},
+		Sel:  selection.RouletteWheel,
+	}
+
+	// Define the components of our engine
+	eng, err := engine.New(gen, evaluator{}, &epocher)
+	check(err)
+
+	// Define an observer
+	eng.AddObserver(
+		api.ObserverFunc(func(data *api.PopulationData) {
+			log.Printf("Generation %d: %s (%v)\n",
+				data.GenNumber,
+				data.BestCand,
+				data.BestFitness)
+		}))
+
+	// Evolution should end when a candidate with a fitness of 0 has been
+	// reached (0 different chars between candidate and target string)
+	cond := termination.TargetFitness{Fitness: 0, Natural: false}
+
+	// Start evolution engine and print the best result
+	bests, _, err := eng.Evolve(100, engine.Elites(5), engine.EndOn(cond))
+	check(err)
+	log.Println(bests[0])
 }
