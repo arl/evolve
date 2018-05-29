@@ -11,7 +11,7 @@ func TestUserAbort(t *testing.T) {
 	popdata := &api.PopulationData{}
 	cond := NewUserAbort()
 
-	if cond.ShouldTerminate(popdata) {
+	if cond.IsSatisfied(popdata) {
 		t.Errorf("should not terminate before user abort")
 	}
 
@@ -21,7 +21,7 @@ func TestUserAbort(t *testing.T) {
 
 	cond.Abort()
 
-	if !cond.ShouldTerminate(popdata) {
+	if !cond.IsSatisfied(popdata) {
 		t.Errorf("should not terminate after user abort")
 	}
 

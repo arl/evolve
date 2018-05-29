@@ -15,12 +15,12 @@ func TestTargetFitness(t *testing.T) {
 		popdata := &api.PopulationData{Natural: true}
 
 		popdata.BestFitness = 5.0
-		if cond.ShouldTerminate(popdata) {
+		if cond.IsSatisfied(popdata) {
 			t.Errorf("should not terminate before target fitness has been reached")
 		}
 
 		popdata.BestFitness = 10.0
-		if !cond.ShouldTerminate(popdata) {
+		if !cond.IsSatisfied(popdata) {
 			t.Errorf("should terminate once target fitness has been reached")
 		}
 	})
@@ -30,12 +30,12 @@ func TestTargetFitness(t *testing.T) {
 		popdata := &api.PopulationData{Natural: true}
 
 		popdata.BestFitness = 5.0
-		if cond.ShouldTerminate(popdata) {
+		if cond.IsSatisfied(popdata) {
 			t.Errorf("should not terminate before target fitness has been reached")
 		}
 
 		popdata.BestFitness = 1.0
-		if !cond.ShouldTerminate(popdata) {
+		if !cond.IsSatisfied(popdata) {
 			t.Errorf("should terminate once target fitness has been reached")
 		}
 	})

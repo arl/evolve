@@ -206,7 +206,7 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Popula
 func shouldContinue(data *api.PopulationData, conds ...api.TerminationCondition) []api.TerminationCondition {
 	satisfied := make([]api.TerminationCondition, 0)
 	for _, cond := range conds {
-		if cond.ShouldTerminate(data) {
+		if cond.IsSatisfied(data) {
 			satisfied = append(satisfied, cond)
 		}
 	}

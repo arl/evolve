@@ -10,12 +10,12 @@ import (
 // passed.
 type GenerationCount int
 
-// ShouldTerminate reports whether or not evolution should finish at the
+// IsSatisfied reports whether or not evolution should finish at the
 // current point.
 //
 // populationData is the information about the current state of evolution.
 // This may be used to determine whether evolution should continue or not.
-func (tc GenerationCount) ShouldTerminate(populationData *api.PopulationData) bool {
+func (tc GenerationCount) IsSatisfied(populationData *api.PopulationData) bool {
 	return populationData.GenNumber+1 >= int(tc)
 }
 

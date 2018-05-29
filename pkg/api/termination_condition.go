@@ -15,10 +15,10 @@ import "fmt"
 type TerminationCondition interface {
 	fmt.Stringer
 
-	// ShouldTerminate reports whether or not evolution should finish at the
+	// IsSatisfied reports whether or not evolution should finish at the
 	// current point.
 	//
 	// pdata is the information about the current state of evolution.  This may
 	// be used to determine whether evolution should continue or not.
-	ShouldTerminate(pdata *PopulationData) bool
+	IsSatisfied(pdata *PopulationData) bool
 }

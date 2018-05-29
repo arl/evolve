@@ -13,9 +13,9 @@ type TargetFitness struct {
 	Natural bool
 }
 
-// ShouldTerminate reports whether or not evolution should finish at the
+// IsSatisfied reports whether or not evolution should finish at the
 // current point.
-func (tc TargetFitness) ShouldTerminate(data *api.PopulationData) bool {
+func (tc TargetFitness) IsSatisfied(data *api.PopulationData) bool {
 	if tc.Natural {
 		return data.BestFitness >= tc.Fitness
 	}
