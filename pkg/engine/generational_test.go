@@ -52,7 +52,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 		Sel:  selection.RouletteWheel,
 	}
 
-	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher, Seed(99))
+	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher)
 
 	var avgfitness float64
 	// add an observer that record the mean fitness at each generation
@@ -67,7 +67,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 	seeds[0] = 7 // This candidate should be discarded by elitism.
 	seeds[1] = 11
 	seeds[2] = 13
-	eng.Evolve(10, Elites(2), Seeds(seeds), EndOn(termination.GenerationCount(2)))
+	eng.Evolve(10, Elites(2), Seeds(seeds), EndOn(termination.GenerationCount(3)))
 
 	// Then when we have run the evolution, if the elite canidates were
 	// preserved they will lift the average fitness above zero. The exact value
@@ -86,7 +86,7 @@ func TestGenerationalEngineSatisfiedTerminationConditions(t *testing.T) {
 		Sel:  selection.RouletteWheel,
 	}
 
-	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher, Seed(99))
+	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher)
 
 	cond := termination.GenerationCount(1)
 	_, satisfied, err := eng.Evolve(10, EndOn(cond))
@@ -137,7 +137,7 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 		Eval: evaluator(target),
 		Sel:  selection.RouletteWheel,
 	}
-	eng, err := New(fac, evaluator(target), &epocher, Seed(99))
+	eng, err := New(fac, evaluator(target), &epocher)
 	checkB(b, err)
 
 	// TODO: add option function for singlethread
