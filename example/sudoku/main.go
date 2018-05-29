@@ -66,8 +66,6 @@ func readPattern(fn string) ([]string, error) {
 }
 
 func solveSudoku(pattern []string) error {
-	rng := rand.New(random.NewMT19937(time.Now().UnixNano()))
-
 	// Crossover rows between parents (so offspring is x rows from parent1 and y
 	// rows from parent2).
 	xover := xover.New(mater{})
@@ -84,30 +82,42 @@ func solveSudoku(pattern []string) error {
 	selector := selection.NewTournament()
 	check(selector.SetProb(0.85))
 
-	gen, err := newGenerator(pattern)
-	check(err)
-
-	eng := engine.NewGenerational(gen, pipeline, evaluator{}, selector, rng)
-
-	eng.AddObserver(api.ObserverFunc(func(data *api.PopulationData) {
+	obs := api.ObserverFunc(func(data *api.PopulationData) {
+		// only shows multiple of 100 generations
 		if data.GenNumber%100 == 0 {
 			return
 		}
-		// only shows multiple of 100 generations
-		fmt.Printf("At generation %d the best solution has a fitness of %v\n%v\n", data.GenNumber, data.BestFitness, data.BestCand.(*sudoku))
-	}))
+		log.Printf("Gen %d, best solution has %v fitness\n%v\n",
+			data.GenNumber, data.BestFitness, data.BestCand.(*sudoku))
+	})
+
+	gen, err := newGenerator(pattern)
+	check(err)
+
+	epocher := engine.Generational{Op: pipeline, Eval: evaluator{}, Sel: selector}
+
+	eng, err := engine.New(
+		gen,
+		evaluator{},
+		&epocher,
+		engine.Observer(obs),
+		engine.Rand(rand.New(random.NewMT19937(time.Now().UnixNano()))),
+	)
+	check(err)
 
 	const (
 		popsize = 500
 		nelites = 500 * 0.05
 	)
-	solution := eng.Evolve(
-		popsize, nelites,
-		termination.TargetFitness{Fitness: 0, Natural: false},
-		termination.NewUserAbort(),
+	bests, _, err := eng.Evolve(
+		popsize,
+		engine.Elites(nelites),
+		engine.EndOn(termination.TargetFitness{Fitness: 0, Natural: false}),
+		engine.EndOn(termination.NewUserAbort()),
 	)
+	check(err)
 
-	fmt.Printf("solution:\n%v\n", solution.(*sudoku))
+	log.Printf("solution:\n%v\n", bests[0])
 	return nil
 }
 
