@@ -38,35 +38,36 @@ type zeroGenerator struct{}
 
 func (zeroGenerator) Generate(rng *rand.Rand) interface{} { return 0 }
 
-func prepareEngine() *api.Engine {
-	return NewGenerational(
-		zeroGenerator{},
-		zeroIntMaker{},
-		intEvaluator{},
-		selection.RouletteWheel,
-		rand.New(rand.NewSource(99)))
+func check(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestGenerationalEngineElitism(t *testing.T) {
-	engine := prepareEngine()
+	epocher := Generational{
+		Op:   zeroIntMaker{},
+		Eval: intEvaluator{},
+		Sel:  selection.RouletteWheel,
+	}
+
+	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher, Seed(99))
 
 	var avgfitness float64
 	// add an observer that record the mean fitness at each generation
 	obs := api.ObserverFunc(func(data *api.PopulationData) {
 		avgfitness = data.Mean
 	})
-	engine.AddObserver(obs)
+	eng.AddObserver(obs)
 
-	elite := make([]interface{}, 3)
+	seeds := make([]interface{}, 3)
 	// Add the following seed candidates, all better than any others that can possibly
 	// get into the population (since every other candidate will always be zero).
-	elite[0] = 7 // This candidate should be discarded by elitism.
-	elite[1] = 11
-	elite[2] = 13
-	engine.EvolveWithSeedCandidates(10,
-		2, // at least 2 generations because the first is just the initial population.
-		elite,
-		termination.GenerationCount(2))
+	seeds[0] = 7 // This candidate should be discarded by elitism.
+	seeds[1] = 11
+	seeds[2] = 13
+	eng.Evolve(10, Elites(2), Seeds(seeds), EndOn(termination.GenerationCount(2)))
 
 	// Then when we have run the evolution, if the elite canidates were
 	// preserved they will lift the average fitness above zero. The exact value
@@ -75,65 +76,27 @@ func TestGenerationalEngineElitism(t *testing.T) {
 	assert.Equalf(t, 24.0/10.0, avgfitness,
 		"elite candidates not preserved correctly: want %v, got %v",
 		24.0/10.0, avgfitness)
-	engine.RemoveObserver(obs)
+	eng.RemoveObserver(obs)
 }
-
-func TestGenerationalEngineEliteCountTooHigh(t *testing.T) {
-	engine := prepareEngine()
-	assert.Panics(t, func() {
-		engine.Evolve(10, 10, termination.GenerationCount(10))
-	}, "elite count must be less than the total population size")
-}
-
-func TestGenerationalEngineNoTerminationCondition(t *testing.T) {
-	engine := prepareEngine()
-	assert.Panics(t, func() {
-		engine.Evolve(10, 0)
-	}, "some termination conditions must be set")
-}
-
-/*
-func TestGenerationalEngineInterrupt(t*testing.T) {
-        final long timeout = 1000L;
-        final Thread requestThread = Thread.currentThread();
-        engine.addObserver(new Observer<Integer>()
-        {
-            public void populationUpdate(PopulationData<? extends Integer> populationData)
-            {
-                if (populationData.getElapsedTime() > timeout / 2)
-                {
-                    requestThread.interrupt();
-                }
-            }
-        });
-        long startTime = System.currentTimeMillis();
-        engine.evolve(10, 0, new ElapsedTime(timeout));
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        assert Thread.interrupted() : "Thread was not interrupted before timeout.";
-        assert elapsedTime < timeout : "Engine did not respond to interrupt before timeout.";
-        assert engine.getSatisfiedTerminationConditions().isEmpty()
-            : "Interrupted engine should have no satisfied termination conditions.";
-    }
-*/
 
 func TestGenerationalEngineSatisfiedTerminationConditions(t *testing.T) {
-	engine := prepareEngine()
+	epocher := Generational{
+		Op:   zeroIntMaker{},
+		Eval: intEvaluator{},
+		Sel:  selection.RouletteWheel,
+	}
+
+	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher, Seed(99))
 
 	cond := termination.GenerationCount(1)
-	engine.Evolve(10, 0, cond)
-	satisfied, err := engine.SatisfiedTerminationConditions()
-	assert.NoError(t, err)
-	assert.Len(t, satisfied, 1)
-	assert.Equal(t, cond, satisfied[0])
-}
-
-func TestGenerationalEngineSatisfiedTerminationConditionsBeforeStart(t *testing.T) {
-	engine := prepareEngine()
-
-	// Should return an error because evolution hasn't started, let alone terminated.
-	satisfied, err := engine.SatisfiedTerminationConditions()
-	assert.Nil(t, satisfied)
-	assert.Error(t, err)
+	_, satisfied, err := eng.Evolve(10, EndOn(cond))
+	check(t, err)
+	if len(satisfied) != 1 {
+		t.Errorf("want len(satisfied) = 1, got %v", len(satisfied))
+	}
+	if satisfied[0] != cond {
+		t.Errorf("want satisfied[0] == cond, got != (cond[0]: %v)", satisfied[0])
+	}
 }
 
 func checkB(b *testing.B, err error) {
@@ -169,19 +132,23 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	// Create a pipeline that applies mutation then crossover
 	pipe := operator.Pipeline{mut, xover}
 
-	engine := NewGenerational(fac,
-		pipe,
-		evaluator(target),
-		selection.RouletteWheel,
-		rand.New(rand.NewSource(99)))
+	epocher := Generational{
+		Op:   pipe,
+		Eval: evaluator(target),
+		Sel:  selection.RouletteWheel,
+	}
+	eng, err := New(fac, evaluator(target), &epocher, Seed(99))
+	checkB(b, err)
 
-	engine.SetSingleThreaded(!multithread)
+	// TODO: add option function for singlethread
+	//engine.SetSingleThreaded(!multithread)
 	cond := termination.TargetFitness{Fitness: 0, Natural: false}
 
 	b.ResetTimer()
 	var best interface{}
 	for n := 0; n < b.N; n++ {
-		best = engine.Evolve(100000, 5, cond)
+		best, _, err = eng.Evolve(100000, Elites(5), EndOn(cond))
+		checkB(b, err)
 	}
 	if best.(string) != target {
 		b.Errorf("want target string \"%v\", got \"%v\"", target, best.(string))

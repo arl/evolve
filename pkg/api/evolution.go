@@ -23,13 +23,7 @@ func ShouldContinue(
 	data *PopulationData,
 	conds ...TerminationCondition) []TerminationCondition {
 
-	// If the thread has been interrupted, we should abort and return whatever
-	// result we currently have.
-	// TODO: ? what is this????
-	//if (Thread.currentThread().isInterrupted()) {
-	//return Collections.emptyList();
-	//}
-	//// Otherwise check the termination conditions for the evolution.
+	// Otherwise check the termination conditions for the evolution.
 	satisfied := make([]TerminationCondition, 0)
 	for _, cond := range conds {
 		if cond.ShouldTerminate(data) {
@@ -38,7 +32,6 @@ func ShouldContinue(
 	}
 	if len(satisfied) == 0 {
 		return nil
-
 	}
 	return satisfied
 }
