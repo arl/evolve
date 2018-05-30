@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 	"github.com/stretchr/testify/assert"
 )
 

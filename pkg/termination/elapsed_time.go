@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // ElapsedTime terminates evolution after a pre-determined period of time has

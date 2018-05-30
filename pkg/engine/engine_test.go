@@ -3,7 +3,7 @@ package engine
 import (
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/pkg/termination"
+	"github.com/arl/evolve/pkg/termination"
 )
 
 func TestEngineArgumentErrors(t *testing.T) {

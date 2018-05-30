@@ -11,13 +11,13 @@ import (
 	"path"
 	"time"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
-	"github.com/aurelien-rainone/evolve/pkg/engine"
-	"github.com/aurelien-rainone/evolve/pkg/operator"
-	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
-	"github.com/aurelien-rainone/evolve/pkg/selection"
-	"github.com/aurelien-rainone/evolve/pkg/termination"
-	"github.com/aurelien-rainone/evolve/random"
+	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/engine"
+	"github.com/arl/evolve/pkg/operator"
+	"github.com/arl/evolve/pkg/operator/xover"
+	"github.com/arl/evolve/pkg/selection"
+	"github.com/arl/evolve/pkg/termination"
+	"github.com/arl/evolve/random"
 )
 
 func check(err error, v ...interface{}) {

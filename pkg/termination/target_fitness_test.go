@@ -3,7 +3,7 @@ package termination
 import (
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // Unit test for termination condition that checks the best fitness attained so far

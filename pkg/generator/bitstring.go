@@ -3,7 +3,7 @@ package generator
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/bitstring"
+	"github.com/arl/evolve/pkg/bitstring"
 )
 
 // Bitstring generates random Bitstring of a specified length.

@@ -5,13 +5,13 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
-	"github.com/aurelien-rainone/evolve/pkg/generator"
-	"github.com/aurelien-rainone/evolve/pkg/operator"
-	"github.com/aurelien-rainone/evolve/pkg/operator/mutation"
-	"github.com/aurelien-rainone/evolve/pkg/operator/xover"
-	"github.com/aurelien-rainone/evolve/pkg/selection"
-	"github.com/aurelien-rainone/evolve/pkg/termination"
+	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/generator"
+	"github.com/arl/evolve/pkg/operator"
+	"github.com/arl/evolve/pkg/operator/mutation"
+	"github.com/arl/evolve/pkg/operator/xover"
+	"github.com/arl/evolve/pkg/selection"
+	"github.com/arl/evolve/pkg/termination"
 	"github.com/stretchr/testify/assert"
 )
 

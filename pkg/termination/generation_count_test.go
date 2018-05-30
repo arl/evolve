@@ -3,7 +3,7 @@ package termination
 import (
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 func TestGenerationCount(t *testing.T) {
