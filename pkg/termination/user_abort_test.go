@@ -3,7 +3,7 @@ package termination
 import (
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 func TestUserAbort(t *testing.T) {
@@ -11,7 +11,7 @@ func TestUserAbort(t *testing.T) {
 	popdata := &api.PopulationData{}
 	cond := NewUserAbort()
 
-	if cond.ShouldTerminate(popdata) {
+	if cond.IsSatisfied(popdata) {
 		t.Errorf("should not terminate before user abort")
 	}
 
@@ -21,7 +21,7 @@ func TestUserAbort(t *testing.T) {
 
 	cond.Abort()
 
-	if !cond.ShouldTerminate(popdata) {
+	if !cond.IsSatisfied(popdata) {
 		t.Errorf("should not terminate after user abort")
 	}
 

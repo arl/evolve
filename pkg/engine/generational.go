@@ -3,7 +3,7 @@ package engine
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // Generational implements a general-purpose engine for generational
@@ -24,33 +24,9 @@ import (
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
 type Generational struct {
-	op   api.Operator
-	eval api.Evaluator
-	sel  api.Selection
-	eng  *api.Engine
-}
-
-// NewGenerational creates a new generational evolution engine, injecting the
-// various components required by an evolutionary algorithm.
-//
-// gen is the generator used to create the initial population that is iteratively
-// evolved.
-// op is the evolutionary operator applied at each generation to evolve the
-// population.
-// eval evaluates fitness scores of candidate solutions.
-// sel is a strategy for selecting which candidates survive an epoch.
-// rng is the source of randomness used by all stochastic processes.
-func NewGenerational(gen api.Generator, op api.Operator, eval api.Evaluator, sel api.Selection, rng *rand.Rand) *api.Engine {
-
-	// create the Epocher implementation
-	ep := &Generational{op: op, eval: eval, sel: sel}
-
-	// create the evolution engine implementation
-	impl := api.NewEngine(gen, eval, rng, ep)
-
-	// provide the engine to the epocher for forwarding
-	ep.eng = impl
-	return impl
+	Op   api.Operator
+	Eval api.Evaluator
+	Sel  api.Selection
 }
 
 // Epoch performs a single step/iteration of the evolutionary process.
@@ -71,13 +47,12 @@ func (e *Generational) Epoch(pop api.Population, nelites int, rng *rand.Rand) ap
 	}
 
 	// Select the rest of population through natural selection
-	selected := e.sel.Select(pop, e.eval.IsNatural(), len(pop)-nelites, rng)
+	selected := e.Sel.Select(pop, e.Eval.IsNatural(), len(pop)-nelites, rng)
 
 	// Apply genetic operators on the selected candidates
-	nextpop = e.op.Apply(append(nextpop, selected...), rng)
+	nextpop = e.Op.Apply(append(nextpop, selected...), rng)
 
 	// While the elite is added, untouched, to the next population
 	nextpop = append(nextpop, elite...)
-	api.EvaluatePopulation(nextpop, e.eval, true)
-	return api.EvaluatePopulation(nextpop, e.eval, true)
+	return api.EvaluatePopulation(nextpop, e.Eval, true)
 }

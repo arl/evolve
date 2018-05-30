@@ -3,7 +3,7 @@ package selection
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // RankBased is selection strategy that is similar to fitness-proportionate

@@ -46,6 +46,17 @@ func (ds *Dataset) AddValues(values ...float64) {
 	}
 }
 
+// Clear clears all the values previously added and resets the statistics. The
+// dataset capacity remains unchanged.
+func (ds *Dataset) Clear() {
+	ds.min = math.MaxFloat64
+	ds.max = math.SmallestNonzeroFloat64
+	ds.product = 1
+	ds.total = 0
+	ds.recipsum = 0
+	ds.values = ds.values[:0]
+}
+
 // update the dataset by considering the new value that has been added
 func (ds *Dataset) update(value float64) {
 	ds.total += value

@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
-	"github.com/aurelien-rainone/evolve/pkg/bitstring"
-	"github.com/aurelien-rainone/evolve/pkg/generator"
+	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/bitstring"
+	"github.com/arl/evolve/pkg/generator"
 	"github.com/stretchr/testify/assert"
 )
 

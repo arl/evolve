@@ -3,7 +3,7 @@ package termination
 import (
 	"sync"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // UserAbort is an implementation of the TerminationCondition interface that
@@ -27,12 +27,12 @@ func NewUserAbort() *UserAbort {
 	}
 }
 
-// ShouldTerminate reports whether or not evolution should finish at the current
+// IsSatisfied reports whether or not evolution should finish at the current
 // point.
 //
 // populationData is the information about the current state of evolution.  This
 // may be used to determine whether evolution should continue or not.
-func (ua *UserAbort) ShouldTerminate(popdata *api.PopulationData) bool {
+func (ua *UserAbort) IsSatisfied(popdata *api.PopulationData) bool {
 	return ua.IsAborted()
 }
 

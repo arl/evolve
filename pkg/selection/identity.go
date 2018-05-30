@@ -3,7 +3,7 @@ package selection
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // Identity is a selection strategy that returns identical candidates

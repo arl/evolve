@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/aurelien-rainone/evolve/worker"
+	"github.com/arl/evolve/worker"
 )
 
 // EvaluatePopulation takes a population, assigns a fitness score to each member

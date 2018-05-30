@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aurelien-rainone/evolve/random"
+	"github.com/arl/evolve/random"
 )
 
 func sudokuFromStrings(strs []string) (*sudoku, error) {
