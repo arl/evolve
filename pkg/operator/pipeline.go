@@ -3,7 +3,7 @@ package operator
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // A Pipeline is a compound evolutionary operator that applies multiple

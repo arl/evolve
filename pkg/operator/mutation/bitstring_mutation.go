@@ -6,7 +6,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/bitstring"
+	"github.com/arl/evolve/pkg/bitstring"
 )
 
 // ErrInvalidMutationCount is the error returned when trying to set an invalid

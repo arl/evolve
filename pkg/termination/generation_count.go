@@ -3,7 +3,7 @@ package termination
 import (
 	"fmt"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // GenerationCount terminates evolution after a set number of generations have
