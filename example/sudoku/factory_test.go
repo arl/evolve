@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 func checkCellVal(t *testing.T, s *sudoku, i, j, want int) {

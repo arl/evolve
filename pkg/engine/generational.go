@@ -3,7 +3,7 @@ package engine
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // Generational implements a general-purpose engine for generational

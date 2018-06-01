@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // StochasticUniversalSampling is an alternative to RouletteWheelSelection as a

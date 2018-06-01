@@ -3,7 +3,7 @@ package xover
 import (
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/bitstring"
+	"github.com/arl/evolve/pkg/bitstring"
 )
 
 // BitstringMater mates a pair of bit-strings to produce a new pair of

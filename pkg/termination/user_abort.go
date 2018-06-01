@@ -3,7 +3,7 @@ package termination
 import (
 	"sync"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // UserAbort is an implementation of the TerminationCondition interface that

@@ -6,7 +6,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/api"
 )
 
 // ErrInvalidTruncRatio is the error returned when trying to set an invalid
