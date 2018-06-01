@@ -5,8 +5,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/aurelien-rainone/evolve/pkg/api"
-	"github.com/aurelien-rainone/evolve/random"
+	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve/random"
 	"github.com/pkg/errors"
 )
 
