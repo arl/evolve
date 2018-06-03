@@ -10,12 +10,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Engine runs an evolutionary algorithm, following all the steps of evolution,
+// from the creation of the initial population to the end of evolution.
 type Engine struct {
 	obs     map[api.Observer]struct{}
 	rng     *rand.Rand
 	gen     api.Generator
 	eval    api.Evaluator
-	ep      api.Epocher
+	epoch   api.Epocher
 	stats   *api.Dataset
 	nelites int
 	seeds   []interface{}
@@ -23,14 +25,19 @@ type Engine struct {
 	size    int
 }
 
-func New(g api.Generator, ev api.Evaluator, ep api.Epocher, options ...func(*Engine) error) (*Engine, error) {
+// New returns a new evolution Engine.
+//
+// gen generates new random candidates solutions.
+// eval evaluates fitness scores of candidates.
+// epoch transforms a whole population into the next generation.
+// rng is the source of randomness.
+func New(gen api.Generator, eval api.Evaluator, epoch api.Epocher, options ...func(*Engine) error) (*Engine, error) {
 	eng := Engine{
-		obs:  make(map[api.Observer]struct{}),
-		gen:  g,
-		eval: ev,
-		ep:   ep,
+		obs:   make(map[api.Observer]struct{}),
+		gen:   gen,
+		eval:  eval,
+		epoch: epoch,
 	}
-
 	for _, opt := range options {
 		if err := opt(&eng); err != nil {
 			return nil, err
