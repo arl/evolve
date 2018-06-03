@@ -17,8 +17,8 @@ func TestEngineArgumentErrors(t *testing.T) {
 			eng, err = New(zeroGenerator{}, intEvaluator{}, nil)
 			check(t, err)
 			_, _, err = eng.Evolve(10, Elites(nelites), EndOn(termination.GenerationCount(10)))
-			if err != ErrEngineElite {
-				t.Errorf("Evolve(Elites(%v)), wantErr %v, got %v", nelites, ErrEngineElite, err)
+			if err == nil {
+				t.Errorf("Evolve(Elites(%v)), want error, got nil", nelites)
 			}
 		}
 	})
@@ -27,8 +27,8 @@ func TestEngineArgumentErrors(t *testing.T) {
 		eng, err = New(zeroGenerator{}, intEvaluator{}, nil)
 		check(t, err)
 		_, _, err = eng.Evolve(10)
-		if err != ErrEngineTermination {
-			t.Errorf("Evolve(), wantErr %v, got %v", ErrEngineTermination, err)
+		if err == nil {
+			t.Error("Evolve(), want error, got nil")
 		}
 	})
 
@@ -36,8 +36,8 @@ func TestEngineArgumentErrors(t *testing.T) {
 		eng, err = New(zeroGenerator{}, intEvaluator{}, nil)
 		check(t, err)
 		_, _, err = eng.Evolve(0, EndOn(termination.GenerationCount(1)))
-		if err != ErrEnginePopSize {
-			t.Errorf("Evolve(), wantErr %v, got %v", ErrEnginePopSize, err)
+		if err == nil {
+			t.Error("Evolve(), want error, got nil")
 		}
 	})
 }

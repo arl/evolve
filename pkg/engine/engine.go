@@ -10,12 +10,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	ErrEnginePopSize     = errors.New("population size must be at least 1")
-	ErrEngineElite       = errors.New("elite count must be positive and less than population size")
-	ErrEngineTermination = errors.New("at least one termination condition must be specified")
-)
-
 type Engine struct {
 	obs     map[api.Observer]struct{}
 	rng     *rand.Rand
@@ -83,12 +77,12 @@ func Observer(o api.Observer) func(*Engine) error {
 // preserved, unchanged, and placed into the successive generation. Candidate
 // solutions that are preserved unchanged through elitism remain eligible for
 // selection for breeding the remainder of the next generation. This value must
-// be non-negative and less than the population size or Evolve will return
-// ErrEngineElite
+// be non-negative and less than the population size or Evolve will return en
+// error
 func Elites(n int) func(*Engine) error {
 	return func(eng *Engine) error {
 		if n < 0 || n >= eng.size {
-			return ErrEngineElite
+			return errors.New("invalid number of elites")
 		}
 		eng.nelites = n
 		return nil
@@ -120,10 +114,10 @@ func EndOn(cond api.TerminationCondition) func(*Engine) error {
 //
 // size is the number of candidate in the population. They whole population is
 // generated for the first generation, unless some seed candidates are provided
-// with Seeds. size must be at least 1 or Evolve will return ErrEnginePopSize.
+// with Seeds. size must be at least 1 or Evolve will return en error.
 //
 // At least one termination condition must be defined with EndOn, or Evolve will
-// return ErrEngineTermination.
+// return an error.
 func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Population, []api.TerminationCondition, error) {
 	e.size = popsize
 	for _, opt := range options {
@@ -133,10 +127,10 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Popula
 	}
 
 	if popsize <= 0 {
-		return nil, nil, ErrEnginePopSize
+		return nil, nil, errors.New("invalid population size")
 	}
 	if len(e.conds) == 0 {
-		return nil, nil, ErrEngineTermination
+		return nil, nil, errors.New("no termination condition specified")
 	}
 
 	// create the dataset
@@ -173,7 +167,7 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Popula
 		}
 
 		// perform evolution
-		evpop = e.ep.Epoch(evpop, e.nelites, e.rng)
+		evpop = e.epoch.Epoch(evpop, e.nelites, e.rng)
 
 		ngen++
 	}
