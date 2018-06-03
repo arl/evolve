@@ -34,7 +34,7 @@ func readSudokus(dir string) ([]string, error) {
 		return nil, err
 	}
 	defer func() {
-		f.Close() // nolint: errcheck
+		f.Close() // nolint
 	}()
 
 	names, err := f.Readdirnames(0)
@@ -53,7 +53,7 @@ func readPattern(fn string) ([]string, error) {
 		return nil, err
 	}
 	defer func() {
-		f.Close() // nolint: errcheck
+		f.Close() // nolint
 	}()
 
 	puzzle := []string{}
