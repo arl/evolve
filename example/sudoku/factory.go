@@ -26,7 +26,7 @@ type generator struct {
 // Each character represents a single cell. Permitted characters are the digits
 // '1' to '9' (each of which represents a fixed cell in the pattern) or the '.'
 // character, which represents an empty cell. Returns an error if the pattern is
-// not made of 9 strings containig 1 to 9, or '.'
+// not made of 9 strings containing 1 to 9, or '.'
 func newGenerator(pattern []string) (*generator, error) { // nolint: gocyclo
 	if len(pattern) != size {
 		return nil, errWrongNumberOfRows

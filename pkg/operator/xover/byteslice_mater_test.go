@@ -34,19 +34,17 @@ func TestByteSliceMater(t *testing.T) {
 				values[value] = struct{}{}
 			}
 		}
-		// All of the individual elements should still be present, just jumbled up
-		// between individuals.
+		// All of the individual elements should still be present, just jumbled
+		// up between individuals.
 		if len(values) != 20 {
 			t.Error("wrong number of candidates, want 20, got", len(values))
 		}
 	}
 }
 
-// ByteSliceMater is only defined for populations of []byte of equal length. Any
-// attempt to apply the operation to populations containing slices of different
-// length should panic. Not panicking should be considered a bug since it could
-// lead to hard to trace bugs elsewhere.
-func TestByteSliceMaterWithDifferentLengthParents(t *testing.T) {
+// ByteSliceMater must operate on []byte of equal length. It should panic if
+// different length slices are used.
+func TestByteSliceMaterDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(ByteSliceMater{})
