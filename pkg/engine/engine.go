@@ -77,8 +77,8 @@ func Observer(o api.Observer) func(*Engine) error {
 	}
 }
 
-// Elites defines the number of candidates preserved via elitism. By default it
-// is set to 0, no elitism is applied.
+// Elites defines the number of candidates preserved via elitism for the
+// engine. By default it is set to 0, no elitism is applied.
 //
 // In elitism, a subset of the population with the best fitness scores is
 // preserved, unchanged, and placed into the successive generation. Candidate
@@ -96,9 +96,9 @@ func Elites(n int) func(*Engine) error {
 	}
 }
 
-// Seeds provides a set of candidates to seed the starting population with.
-// A second (and successive) call to Seeds will replace the set of seed
-// candidates defined by the previous call.
+// Seeds provides the engine with a set of candidates to seed the starting
+// population with. Successive calls to Seeds will replace the set of seed
+// candidates set in the previous call.
 func Seeds(seeds []interface{}) func(*Engine) error {
 	return func(eng *Engine) error {
 		eng.seeds = seeds
