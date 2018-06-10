@@ -82,7 +82,7 @@ func solveSudoku(pattern []string) error {
 	selector := selection.NewTournament()
 	check(selector.SetProb(0.85))
 
-	obs := api.ObserverFunc(func(data *api.PopulationData) {
+	obs := engine.ObserverFunc(func(data *api.PopulationData) {
 		// only shows multiple of 100 generations
 		if data.GenNumber%100 == 0 {
 			return
@@ -100,7 +100,7 @@ func solveSudoku(pattern []string) error {
 		gen,
 		evaluator{},
 		&epocher,
-		engine.Observer(obs),
+		engine.Observe(obs),
 		engine.Rand(rand.New(random.NewMT19937(time.Now().UnixNano()))),
 	)
 	check(err)

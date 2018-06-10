@@ -85,7 +85,7 @@ func main() {
 
 	// Define an observer
 	eng.AddObserver(
-		api.ObserverFunc(func(data *api.PopulationData) {
+		engine.ObserverFunc(func(data *api.PopulationData) {
 			log.Printf("Generation %d: %s (%v)\n",
 				data.GenNumber,
 				data.BestCand,

@@ -13,7 +13,7 @@ import (
 // Engine runs an evolutionary algorithm, following all the steps of evolution,
 // from the creation of the initial population to the end of evolution.
 type Engine struct {
-	obs     map[api.Observer]struct{}
+	obs     map[Observer]struct{}
 	rng     *rand.Rand
 	gen     api.Generator
 	eval    api.Evaluator
@@ -32,7 +32,7 @@ type Engine struct {
 // epoch transforms a whole population into the next generation.
 func New(gen api.Generator, eval api.Evaluator, epoch api.Epocher, options ...func(*Engine) error) (*Engine, error) {
 	eng := Engine{
-		obs:   make(map[api.Observer]struct{}),
+		obs:   make(map[Observer]struct{}),
 		gen:   gen,
 		eval:  eval,
 		epoch: epoch,
@@ -51,12 +51,12 @@ func New(gen api.Generator, eval api.Evaluator, epoch api.Epocher, options ...fu
 }
 
 // AddObserver adds an observer of the evolution process.
-func (e *Engine) AddObserver(o api.Observer) {
+func (e *Engine) AddObserver(o Observer) {
 	e.obs[o] = struct{}{}
 }
 
 // RemoveObserver removes an observer of the evolution process.
-func (e *Engine) RemoveObserver(o api.Observer) {
+func (e *Engine) RemoveObserver(o Observer) {
 	delete(e.obs, o)
 }
 
@@ -68,8 +68,8 @@ func Rand(rng *rand.Rand) func(*Engine) error {
 	}
 }
 
-// Observer adds an observer of the evolution process for the engine.
-func Observer(o api.Observer) func(*Engine) error {
+// Observe adds an observer of the evolution process.
+func Observe(o Observer) func(*Engine) error {
 	return func(eng *Engine) error {
 		eng.obs[o] = struct{}{}
 		return nil
