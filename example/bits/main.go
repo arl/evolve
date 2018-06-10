@@ -38,9 +38,10 @@ func main() {
 	mut := mutation.NewBitstring()
 	check(mut.SetProb(0.01))
 
-	eval := api.EvaluatorFunc(true, // natural fitness (higher is better)
-		// our evaluator counts the ones in the bitstring
+	eval := api.EvaluatorFunc(
+		true, // natural fitness (higher is better)
 		func(cand interface{}, pop []interface{}) float64 {
+			// our evaluator counts the ones in the bitstring
 			return float64(cand.(*bitstring.Bitstring).OnesCount())
 		})
 

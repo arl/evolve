@@ -25,12 +25,11 @@ type Engine struct {
 	size    int
 }
 
-// New returns a new evolution Engine.
+// New creates an evolution engine.
 //
 // gen generates new random candidates solutions.
 // eval evaluates fitness scores of candidates.
 // epoch transforms a whole population into the next generation.
-// rng is the source of randomness.
 func New(gen api.Generator, eval api.Evaluator, epoch api.Epocher, options ...func(*Engine) error) (*Engine, error) {
 	eng := Engine{
 		obs:   make(map[api.Observer]struct{}),
@@ -61,7 +60,7 @@ func (e *Engine) RemoveObserver(o api.Observer) {
 	delete(e.obs, o)
 }
 
-// Rand sets the global random number generator for the engine.
+// Rand sets rng as the source of randomness of the engine.
 func Rand(rng *rand.Rand) func(*Engine) error {
 	return func(eng *Engine) error {
 		eng.rng = rng
