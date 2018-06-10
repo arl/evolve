@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/condition"
 	"github.com/arl/evolve/pkg/engine"
 	"github.com/arl/evolve/pkg/operator"
 	"github.com/arl/evolve/pkg/operator/xover"
 	"github.com/arl/evolve/pkg/selection"
-	"github.com/arl/evolve/pkg/termination"
 	"github.com/arl/evolve/random"
 )
 
@@ -112,8 +112,8 @@ func solveSudoku(pattern []string) error {
 	bests, _, err := eng.Evolve(
 		popsize,
 		engine.Elites(nelites),
-		engine.EndOn(termination.TargetFitness{Fitness: 0, Natural: false}),
-		engine.EndOn(termination.NewUserAbort()),
+		engine.EndOn(condition.TargetFitness{Fitness: 0, Natural: false}),
+		engine.EndOn(condition.NewUserAbort()),
 	)
 	check(err)
 

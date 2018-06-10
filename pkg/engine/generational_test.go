@@ -6,12 +6,12 @@ import (
 	"testing"
 
 	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/condition"
 	"github.com/arl/evolve/pkg/generator"
 	"github.com/arl/evolve/pkg/operator"
 	"github.com/arl/evolve/pkg/operator/mutation"
 	"github.com/arl/evolve/pkg/operator/xover"
 	"github.com/arl/evolve/pkg/selection"
-	"github.com/arl/evolve/pkg/termination"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -67,7 +67,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 	seeds[0] = 7 // This candidate should be discarded by elitism.
 	seeds[1] = 11
 	seeds[2] = 13
-	eng.Evolve(10, Elites(2), Seeds(seeds), EndOn(termination.GenerationCount(3)))
+	eng.Evolve(10, Elites(2), Seeds(seeds), EndOn(condition.GenerationCount(3)))
 
 	// Then when we have run the evolution, if the elite canidates were
 	// preserved they will lift the average fitness above zero. The exact value
@@ -79,7 +79,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 	eng.RemoveObserver(obs)
 }
 
-func TestGenerationalEngineSatisfiedTerminationConditions(t *testing.T) {
+func TestGenerationalEngineSatisfiedConditions(t *testing.T) {
 	epocher := Generational{
 		Op:   zeroIntMaker{},
 		Eval: intEvaluator{},
@@ -88,7 +88,7 @@ func TestGenerationalEngineSatisfiedTerminationConditions(t *testing.T) {
 
 	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher)
 
-	cond := termination.GenerationCount(1)
+	cond := condition.GenerationCount(1)
 	_, satisfied, err := eng.Evolve(10, EndOn(cond))
 	check(t, err)
 	if len(satisfied) != 1 {
@@ -142,7 +142,7 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 
 	// TODO: add option function for singlethread
 	//engine.SetSingleThreaded(!multithread)
-	cond := termination.TargetFitness{Fitness: 0, Natural: false}
+	cond := condition.TargetFitness{Fitness: 0, Natural: false}
 
 	b.ResetTimer()
 	var best interface{}

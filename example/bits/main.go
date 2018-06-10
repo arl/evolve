@@ -6,13 +6,13 @@ import (
 
 	"github.com/arl/evolve/pkg/api"
 	"github.com/arl/evolve/pkg/bitstring"
+	"github.com/arl/evolve/pkg/condition"
 	"github.com/arl/evolve/pkg/engine"
 	"github.com/arl/evolve/pkg/generator"
 	"github.com/arl/evolve/pkg/operator"
 	"github.com/arl/evolve/pkg/operator/mutation"
 	"github.com/arl/evolve/pkg/operator/xover"
 	"github.com/arl/evolve/pkg/selection"
-	"github.com/arl/evolve/pkg/termination"
 )
 
 const nbits = 20
@@ -65,7 +65,7 @@ func main() {
 	bests, _, err := eng.Evolve(
 		100,              // 100 candidates in the population
 		engine.Elites(2), // best 2 are put into next population
-		engine.EndOn(termination.TargetFitness{
+		engine.EndOn(condition.TargetFitness{
 			Fitness: float64(nbits),
 			Natural: true,
 		}),

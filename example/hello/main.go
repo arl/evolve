@@ -7,13 +7,13 @@ import (
 	"strings"
 
 	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve/pkg/condition"
 	"github.com/arl/evolve/pkg/engine"
 	"github.com/arl/evolve/pkg/generator"
 	"github.com/arl/evolve/pkg/operator"
 	"github.com/arl/evolve/pkg/operator/mutation"
 	"github.com/arl/evolve/pkg/operator/xover"
 	"github.com/arl/evolve/pkg/selection"
-	"github.com/arl/evolve/pkg/termination"
 )
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
@@ -94,7 +94,7 @@ func main() {
 
 	// Evolution should end when a candidate with a fitness of 0 has been
 	// reached (0 different chars between candidate and target string)
-	cond := termination.TargetFitness{Fitness: 0, Natural: false}
+	cond := condition.TargetFitness{Fitness: 0, Natural: false}
 
 	// Start evolution engine and print the best result
 	bests, _, err := eng.Evolve(100, engine.Elites(5), engine.EndOn(cond))

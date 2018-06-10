@@ -21,7 +21,7 @@ type Engine struct {
 	stats   *api.Dataset
 	nelites int
 	seeds   []interface{}
-	conds   []api.TerminationCondition
+	conds   []api.Condition
 	size    int
 }
 
@@ -106,8 +106,8 @@ func Seeds(seeds []interface{}) func(*Engine) error {
 }
 
 // EndOn adds a termination condition to the engine. The engine stops
-// after one or more termination conditions are met.
-func EndOn(cond api.TerminationCondition) func(*Engine) error {
+// after one or more condition is met.
+func EndOn(cond api.Condition) func(*Engine) error {
 	return func(eng *Engine) error {
 		eng.conds = append(eng.conds, cond)
 		return nil
@@ -124,7 +124,7 @@ func EndOn(cond api.TerminationCondition) func(*Engine) error {
 //
 // At least one termination condition must be defined with EndOn, or Evolve will
 // return an error.
-func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Population, []api.TerminationCondition, error) {
+func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Population, []api.Condition, error) {
 	e.size = popsize
 	for _, opt := range options {
 		if err := opt(e); err != nil {
@@ -150,7 +150,7 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Popula
 		return nil, nil, errors.Wrap(err, "can't seed population")
 	}
 
-	var satisfied []api.TerminationCondition
+	var satisfied []api.Condition
 
 	// Evaluate initial population fitness
 	evpop := api.EvaluatePopulation(pop, e.eval, true)
@@ -207,8 +207,8 @@ func (e *Engine) updateStats(pop api.Population, ngen int, elapsed time.Duration
 }
 
 // shouldContinue determines whether or not the evolution should continue.
-func shouldContinue(data *api.PopulationData, conds ...api.TerminationCondition) []api.TerminationCondition {
-	satisfied := make([]api.TerminationCondition, 0)
+func shouldContinue(data *api.PopulationData, conds ...api.Condition) []api.Condition {
+	satisfied := make([]api.Condition, 0)
 	for _, cond := range conds {
 		if cond.IsSatisfied(data) {
 			satisfied = append(satisfied, cond)

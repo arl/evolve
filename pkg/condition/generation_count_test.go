@@ -1,4 +1,4 @@
-package termination
+package condition
 
 import (
 	"testing"
