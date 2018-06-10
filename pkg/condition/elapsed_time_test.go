@@ -1,4 +1,4 @@
-package termination
+package condition
 
 import (
 	"testing"
@@ -12,12 +12,12 @@ func TestElapsedTime(t *testing.T) {
 	popdata := &api.PopulationData{}
 
 	popdata.Elapsed = 100 * time.Millisecond
-	if cond.ShouldTerminate(popdata) {
+	if cond.IsSatisfied(popdata) {
 		t.Errorf("should not terminate before elapsed time")
 	}
 
 	popdata.Elapsed = time.Second
-	if !cond.ShouldTerminate(popdata) {
+	if !cond.IsSatisfied(popdata) {
 		t.Errorf("should terminate after elapsed time")
 	}
 }

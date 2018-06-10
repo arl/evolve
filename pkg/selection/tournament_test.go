@@ -5,28 +5,28 @@ import (
 	"testing"
 )
 
-func TestTournamentSelectionNatural(t *testing.T) {
-	ts := NewTournament()
-	errcheck(t, ts.SetProb(0.7))
-	testRandomBasedSelection(t, ts, randomBasedPopNatural, true, 2,
-		func(selected []interface{}) error {
-			if len(selected) != 2 {
-				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
-			}
-			return nil
-		})
-}
+func TestTournamentSelection(t *testing.T) {
 
-func TestTournamentSelectionNonNatural(t *testing.T) {
-	ts := NewTournament()
-	errcheck(t, ts.SetProb(0.7))
-	testRandomBasedSelection(t, ts, randomBasedPopNonNatural, false, 2,
-		func(selected []interface{}) error {
-			if len(selected) != 2 {
-				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
-			}
-			return nil
+	var tests = []struct {
+		name    string
+		natural bool
+	}{
+		{name: "natural", natural: true},
+		{name: "non-natural", natural: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ts := NewTournament()
+			errcheck(t, ts.SetProb(0.7))
+			testRandomBasedSelection(t, ts, randomBasedPopNonNatural, tt.natural, 2,
+				func(selected []interface{}) error {
+					if len(selected) != 2 {
+						return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
+					}
+					return nil
+				})
 		})
+	}
 }
 
 func TestTournamentSelectionSetProb(t *testing.T) {

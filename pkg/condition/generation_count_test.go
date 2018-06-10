@@ -1,4 +1,4 @@
-package termination
+package condition
 
 import (
 	"testing"
@@ -11,12 +11,12 @@ func TestGenerationCount(t *testing.T) {
 	popdata := &api.PopulationData{}
 
 	popdata.GenNumber = 3
-	if cond.ShouldTerminate(popdata) {
+	if cond.IsSatisfied(popdata) {
 		t.Errorf("should not terminate after 4th generation")
 	}
 
 	popdata.GenNumber = 4
-	if !cond.ShouldTerminate(popdata) {
+	if !cond.IsSatisfied(popdata) {
 		t.Errorf("should terminate after 5th generation")
 	}
 }

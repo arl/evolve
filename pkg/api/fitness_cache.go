@@ -2,7 +2,7 @@ package api
 
 import "sync"
 
-// FitnessCache provides caching for any FitnessEvaluator implementation.  The
+// FitnessCache provides caching for any Evaluator implementation. The
 // results of fitness evaluations are stored in a cache so that if the same
 // candidate is evaluated twice, the expense of the fitness calculation can be
 // avoided the second time.
@@ -19,7 +19,7 @@ import "sync"
 // depends only upon the candidate being evaluated.  This is not the case when
 // candidates are evaluated against the other members of the population.  So
 // unless the fitness evaluator ignores the second parameter to the
-// FitnessEvaluator.Fitness method, caching must not be used.
+// Evaluator.Fitness method, caching must not be used.
 type FitnessCache struct {
 
 	// Wrapped is the fitness evaluator for which we want to provide caching

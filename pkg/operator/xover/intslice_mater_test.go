@@ -33,20 +33,17 @@ func TestIntSliceMater(t *testing.T) {
 				values[value] = struct{}{}
 			}
 		}
-		// All of the individual elements should still be present, just jumbled up
-		// between individuals.
+		// All of the individual elements should still be present, just jumbled
+		// up between individuals.
 		if len(values) != 20 {
 			t.Error("wrong number of candidates, want 20, got", len(values))
 		}
 	}
 }
 
-// The IntArrayCrossover operator is only defined to work on populations
-// containing arrays of equal lengths. Any attempt to apply the operation to
-// populations that contain different length arrays should panic. Not panicking
-// should be considered a bug since it could lead to hard to trace bugs
-// elsewhere.
-func TestIntArrayCrossoverWithDifferentLengthParents(t *testing.T) {
+// IntSliceMater must operate on []int of equal length. It should panic if
+// different length slices are used.
+func TestIntSliceMaterDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(IntSliceMater{})
