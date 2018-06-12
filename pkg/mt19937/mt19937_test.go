@@ -1,4 +1,4 @@
-package random
+package mt19937
 
 import (
 	"math"
@@ -17,10 +17,10 @@ func TestMT19937Repeatability(t *testing.T) {
 	seed := int64(time.Now().UnixNano())
 
 	// create first mersenne twister rng
-	rng := rand.New(NewMT19937(seed))
+	rng := rand.New(New(seed))
 
 	// create second one using same seed.
-	other := rand.New(NewMT19937(seed))
+	other := rand.New(New(seed))
 
 	// read sequences of 100 bytes on both generators
 	data1 := make([]byte, 100)
@@ -36,7 +36,7 @@ func TestMT19937Repeatability(t *testing.T) {
 // Diehard, but it provides a simple check for major problems with the output.
 func TestMT19937Distribution(t *testing.T) {
 	seed := int64(time.Now().UnixNano())
-	rng := rand.New(NewMT19937(seed))
+	rng := rand.New(New(seed))
 
 	pi := monteCarloValueForPi(rng, 1000000)
 	assert.InDeltaf(t, pi, math.Pi, 0.01, "Monte Carlo value for Pi is outside acceptable range")
@@ -47,7 +47,7 @@ func TestMT19937Distribution(t *testing.T) {
 // Diehard, but it provides a simple check for major problems with the output.
 func TestMT19937StdDev(t *testing.T) {
 	seed := int64(time.Now().UnixNano())
-	rng := rand.New(NewMT19937(seed))
+	rng := rand.New(New(seed))
 
 	// Expected standard deviation for a uniformly distributed
 	// population of values in the range 0..n approaches n/sqrt(12).

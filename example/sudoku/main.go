@@ -16,8 +16,9 @@ import (
 	"github.com/arl/evolve/pkg/engine"
 	"github.com/arl/evolve/pkg/operator"
 	"github.com/arl/evolve/pkg/operator/xover"
+
+	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/arl/evolve/pkg/selection"
-	"github.com/arl/evolve/random"
 )
 
 func check(err error, v ...interface{}) {
@@ -101,7 +102,7 @@ func solveSudoku(pattern []string) error {
 		evaluator{},
 		&epocher,
 		engine.Observe(obs),
-		engine.Rand(rand.New(random.NewMT19937(time.Now().UnixNano()))),
+		engine.Rand(rand.New(mt19937.New(time.Now().UnixNano()))),
 	)
 	check(err)
 

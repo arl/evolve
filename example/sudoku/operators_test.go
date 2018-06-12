@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arl/evolve/random"
+	"github.com/arl/evolve/pkg/mt19937"
 )
 
 func sudokuFromStrings(strs []string) (*sudoku, error) {
@@ -57,7 +57,7 @@ func TestSudokuMater(t *testing.T) {
 		t.Errorf("error creating sudoku from string: %v", err)
 	}
 
-	mater{}.Mate(p1, p2, 1, rand.New(random.NewMT19937(2)))
+	mater{}.Mate(p1, p2, 1, rand.New(mt19937.New(2)))
 }
 
 // Tests to ensure that rows are still valid after mutation.  Each row
@@ -89,7 +89,7 @@ func TestRowMutationValidity(t *testing.T) { // nolint: gocyclo
 	pop := []interface{}{sudo}
 
 	counts := make(map[int]struct{})
-	rng := rand.New(random.NewMT19937(time.Now().UnixNano()))
+	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 
 	for i := 0; i < 20; i++ {
 		pop = rmut.Apply(pop, rng)
@@ -137,7 +137,7 @@ func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 			sudo[row][col].fixed = col == row
 		}
 	}
-	rng := rand.New(random.NewMT19937(time.Now().UnixNano()))
+	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 	pop := []interface{}{&sudo}
 	for i := 0; i < 100; i++ { // 100 generations of mutation.
 		pop = rmut.Apply(pop, rng)

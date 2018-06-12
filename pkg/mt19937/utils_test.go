@@ -1,4 +1,4 @@
-package random
+package mt19937
 
 import (
 	"math"

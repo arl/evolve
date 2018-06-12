@@ -14,7 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package random
+// Package mt19937 implements a Mersenne Twister source of random numbers
+// satisfying the rand.Source64 interface.
+//
+// Structs in mt19937 package are not safe for concurrent access by different
+// goroutines. If more than one goroutine accesses the PRNG, the callers must
+// synchronise access using sync.Mutex or similar.
+//
+// For random numbers suitable for security-sensitive work, see the crypto/rand
+// package.
+package mt19937
 
 const (
 	n = 312
@@ -26,11 +35,10 @@ const (
 	matrixa uint64 = 0xB5026F5AA96619E9
 )
 
-// MT19937 is the structure to hold the state of one instance of the Mersenne
-// Twister PRNG. New instances can be allocated using the mt19937.New()
-// function. MT19937 implements the rand.Source interface and rand.New() from
-// the math/rand package can be used to generate different distributions from a
-// MT19937 PRNG.
+// MT19937 holds the state of one instance of the Mersenne Twister PRNG.
+// New instances can be allocated using the mt19937.New() function. MT19937
+// implements the rand.Source64 interface and rand.New() from the math/rand
+// package can be used to generate different distributions from a MT19937 PRNG.
 //
 // This struct is not safe for concurrent access by different goroutines. If
 // more than one goroutine accesses the PRNG, the callers must synchronise
@@ -43,9 +51,9 @@ type MT19937 struct {
 // TODO: provide another version of the constructor that is safe for concurrent
 // use by multiple goroutines
 
-// NewMT19937 allocates a new instance of the 64bit Mersenne Twister with the
-// specified seed.
-func NewMT19937(seed int64) *MT19937 {
+// New returns a new instance of the 64bit Mersenne Twister with the specified
+// seed.
+func New(seed int64) *MT19937 {
 	res := MT19937{state: make([]uint64, n)}
 	res.Seed(seed)
 	return &res

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/arl/evolve/pkg/api"
-	"github.com/arl/evolve/random"
+	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/pkg/errors"
 )
 
@@ -45,7 +45,7 @@ func New(gen api.Generator, eval api.Evaluator, epoch api.Epocher, options ...fu
 
 	if eng.rng == nil {
 		seed := time.Now().UnixNano()
-		eng.rng = rand.New(random.NewMT19937(seed))
+		eng.rng = rand.New(mt19937.New(seed))
 	}
 	return &eng, nil
 }
