@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/arl/evolve"
+	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/pkg/bitstring"
-	"github.com/arl/evolve/pkg/generator"
+
 	"github.com/stretchr/testify/assert"
 )
 

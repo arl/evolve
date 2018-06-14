@@ -12,13 +12,13 @@ import (
 	"time"
 
 	"github.com/arl/evolve"
-	"github.com/arl/evolve/pkg/condition"
-	"github.com/arl/evolve/pkg/engine"
-	"github.com/arl/evolve/pkg/operator"
-	"github.com/arl/evolve/pkg/operator/xover"
+	"github.com/arl/evolve/condition"
+	"github.com/arl/evolve/engine"
+	"github.com/arl/evolve/operator"
+	"github.com/arl/evolve/operator/xover"
+	"github.com/arl/evolve/selection"
 
 	"github.com/arl/evolve/pkg/mt19937"
-	"github.com/arl/evolve/pkg/selection"
 )
 
 func check(err error, v ...interface{}) {

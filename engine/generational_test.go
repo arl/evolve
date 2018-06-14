@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/arl/evolve"
-	"github.com/arl/evolve/pkg/condition"
-	"github.com/arl/evolve/pkg/generator"
-	"github.com/arl/evolve/pkg/operator"
-	"github.com/arl/evolve/pkg/operator/mutation"
-	"github.com/arl/evolve/pkg/operator/xover"
-	"github.com/arl/evolve/pkg/selection"
+	"github.com/arl/evolve/condition"
+	"github.com/arl/evolve/generator"
+	"github.com/arl/evolve/operator"
+	"github.com/arl/evolve/operator/mutation"
+	"github.com/arl/evolve/operator/xover"
+	"github.com/arl/evolve/selection"
+
 	"github.com/stretchr/testify/assert"
 )
 

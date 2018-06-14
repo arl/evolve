@@ -3,7 +3,7 @@ package engine
 import (
 	"testing"
 
-	"github.com/arl/evolve/pkg/condition"
+	"github.com/arl/evolve/condition"
 )
 
 func TestEngineArgumentErrors(t *testing.T) {
