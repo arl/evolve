@@ -3,7 +3,7 @@ package condition
 import (
 	"fmt"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // TargetFitness is a condition that is met when at least one candidate in the
@@ -14,7 +14,7 @@ type TargetFitness struct {
 }
 
 // IsSatisfied returns true if the time duration has elapsed.
-func (tc TargetFitness) IsSatisfied(data *api.PopulationData) bool {
+func (tc TargetFitness) IsSatisfied(data *evolve.PopulationData) bool {
 	if tc.Natural {
 		return data.BestFitness >= tc.Fitness
 	}

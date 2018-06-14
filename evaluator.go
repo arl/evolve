@@ -1,4 +1,4 @@
-package api
+package evolve
 
 // Evaluator calculates the fitness score of a given candidate of the
 // appropriate type.

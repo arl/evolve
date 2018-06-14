@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"sort"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // RouletteWheel implements selection of N candidates from a population
@@ -31,7 +31,7 @@ type rouletteWheel struct{}
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
 func (rouletteWheel) Select(
-	pop api.Population,
+	pop evolve.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {

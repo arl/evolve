@@ -11,7 +11,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/condition"
 	"github.com/arl/evolve/pkg/engine"
 	"github.com/arl/evolve/pkg/operator"
@@ -83,7 +83,7 @@ func solveSudoku(pattern []string) error {
 	selector := selection.NewTournament()
 	check(selector.SetProb(0.85))
 
-	obs := engine.ObserverFunc(func(data *api.PopulationData) {
+	obs := engine.ObserverFunc(func(data *evolve.PopulationData) {
 		// only shows multiple of 100 generations
 		if data.GenNumber%100 == 0 {
 			return

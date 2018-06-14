@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/bitstring"
 	"github.com/arl/evolve/pkg/generator"
 )
@@ -14,7 +14,7 @@ func ExampleNew() {
 
 	gen := generator.Bitstring(2)
 
-	eval := api.EvaluatorFunc(
+	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)
 		func(cand interface{}, pop []interface{}) float64 {
 			// our evaluator counts the ones in the bitstring

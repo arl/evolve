@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/pkg/errors"
 )
@@ -15,13 +15,13 @@ import (
 type Engine struct {
 	obs     map[Observer]struct{}
 	rng     *rand.Rand
-	gen     api.Generator
-	eval    api.Evaluator
-	epoch   api.Epocher
-	stats   *api.Dataset
+	gen     evolve.Generator
+	eval    evolve.Evaluator
+	epoch   evolve.Epocher
+	stats   *evolve.Dataset
 	nelites int
 	seeds   []interface{}
-	conds   []api.Condition
+	conds   []evolve.Condition
 	size    int
 }
 
@@ -30,7 +30,7 @@ type Engine struct {
 // gen generates new random candidates solutions.
 // eval evaluates fitness scores of candidates.
 // epoch transforms a whole population into the next generation.
-func New(gen api.Generator, eval api.Evaluator, epoch api.Epocher, options ...func(*Engine) error) (*Engine, error) {
+func New(gen evolve.Generator, eval evolve.Evaluator, epoch evolve.Epocher, options ...func(*Engine) error) (*Engine, error) {
 	eng := Engine{
 		obs:   make(map[Observer]struct{}),
 		gen:   gen,
@@ -107,7 +107,7 @@ func Seeds(seeds []interface{}) func(*Engine) error {
 
 // EndOn adds a termination condition to the engine. The engine stops
 // after one or more condition is met.
-func EndOn(cond api.Condition) func(*Engine) error {
+func EndOn(cond evolve.Condition) func(*Engine) error {
 	return func(eng *Engine) error {
 		eng.conds = append(eng.conds, cond)
 		return nil
@@ -124,7 +124,7 @@ func EndOn(cond api.Condition) func(*Engine) error {
 //
 // At least one termination condition must be defined with EndOn, or Evolve will
 // return an error.
-func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Population, []api.Condition, error) {
+func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Population, []evolve.Condition, error) {
 	e.size = popsize
 	for _, opt := range options {
 		if err := opt(e); err != nil {
@@ -140,20 +140,20 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Popula
 	}
 
 	// create the dataset
-	e.stats = api.NewDataset(popsize)
+	e.stats = evolve.NewDataset(popsize)
 
 	var ngen int
 	start := time.Now()
 
-	pop, err := api.SeedPopulation(e.gen, popsize, e.seeds, e.rng)
+	pop, err := evolve.SeedPopulation(e.gen, popsize, e.seeds, e.rng)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "can't seed population")
 	}
 
-	var satisfied []api.Condition
+	var satisfied []evolve.Condition
 
 	// Evaluate initial population fitness
-	evpop := api.EvaluatePopulation(pop, e.eval, true)
+	evpop := evolve.EvaluatePopulation(pop, e.eval, true)
 
 	for {
 		// Sort population according to fitness.
@@ -180,7 +180,7 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (api.Popula
 	return evpop, satisfied, nil
 }
 
-func (e *Engine) updateStats(pop api.Population, ngen int, elapsed time.Duration) *api.PopulationData {
+func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Duration) *evolve.PopulationData {
 
 	e.stats.Clear()
 	for _, cand := range pop {
@@ -188,7 +188,7 @@ func (e *Engine) updateStats(pop api.Population, ngen int, elapsed time.Duration
 	}
 
 	// Notify observers with the population state
-	data := api.PopulationData{
+	data := evolve.PopulationData{
 		BestCand:    pop[0].Candidate,
 		BestFitness: pop[0].Fitness,
 		Mean:        e.stats.ArithmeticMean(),
@@ -207,8 +207,8 @@ func (e *Engine) updateStats(pop api.Population, ngen int, elapsed time.Duration
 }
 
 // shouldContinue determines whether or not the evolution should continue.
-func shouldContinue(data *api.PopulationData, conds ...api.Condition) []api.Condition {
-	satisfied := make([]api.Condition, 0)
+func shouldContinue(data *evolve.PopulationData, conds ...evolve.Condition) []evolve.Condition {
+	satisfied := make([]evolve.Condition, 0)
 	for _, cond := range conds {
 		if cond.IsSatisfied(data) {
 			satisfied = append(satisfied, cond)

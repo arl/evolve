@@ -3,7 +3,7 @@ package condition
 import (
 	"testing"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // Unit test for termination condition that checks the best fitness attained so far
@@ -12,7 +12,7 @@ func TestTargetFitness(t *testing.T) {
 
 	t.Run("natural fitness", func(t *testing.T) {
 		cond := TargetFitness{Fitness: 10.0, Natural: true}
-		popdata := &api.PopulationData{Natural: true}
+		popdata := &evolve.PopulationData{Natural: true}
 
 		popdata.BestFitness = 5.0
 		if cond.IsSatisfied(popdata) {
@@ -27,7 +27,7 @@ func TestTargetFitness(t *testing.T) {
 
 	t.Run("non-natural fitness", func(t *testing.T) {
 		cond := TargetFitness{Fitness: 1.0, Natural: false}
-		popdata := &api.PopulationData{Natural: true}
+		popdata := &evolve.PopulationData{Natural: false}
 
 		popdata.BestFitness = 5.0
 		if cond.IsSatisfied(popdata) {

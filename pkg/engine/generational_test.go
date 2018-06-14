@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/condition"
 	"github.com/arl/evolve/pkg/generator"
 	"github.com/arl/evolve/pkg/operator"
@@ -56,7 +56,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 
 	var avgfitness float64
 	// add an observer that record the mean fitness at each generation
-	obs := ObserverFunc(func(data *api.PopulationData) {
+	obs := ObserverFunc(func(data *evolve.PopulationData) {
 		avgfitness = data.Mean
 	})
 	eng.AddObserver(obs)

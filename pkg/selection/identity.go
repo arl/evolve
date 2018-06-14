@@ -3,7 +3,7 @@ package selection
 import (
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // Identity is a selection strategy that returns identical candidates
@@ -11,7 +11,7 @@ type Identity struct{}
 
 // Select selects the specified number of candidates from the population.
 func (Identity) Select(
-	pop api.Population,
+	pop evolve.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {

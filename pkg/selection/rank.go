@@ -3,7 +3,7 @@ package selection
 import (
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // RankBased is selection strategy that is similar to fitness-proportionate
@@ -16,7 +16,7 @@ import (
 // fitness-proportionate selector. The mapping function converts ranks into
 // relative fitness scores that are used to drive the delegate selector.
 type RankBased struct {
-	Selector api.Selection
+	Selector evolve.Selection
 	Map      MappingFunc
 }
 
@@ -31,14 +31,14 @@ type RankBased struct {
 //
 // Returns the selected candidates.
 func (rb RankBased) Select(
-	pop api.Population,
+	pop evolve.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {
 
-	ranked := make(api.Population, len(pop))
+	ranked := make(evolve.Population, len(pop))
 	for i, cand := range pop {
-		ranked[i] = &api.Individual{
+		ranked[i] = &evolve.Individual{
 			Candidate: cand.Candidate,
 			// use candidate 1-based index
 			Fitness: rb.Map(i+1, len(pop)),

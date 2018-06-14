@@ -3,12 +3,12 @@ package operator
 import (
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // A Pipeline is a compound evolutionary operator that applies multiple
 // operators, in sequence, to a starting population.
-type Pipeline []api.Operator
+type Pipeline []evolve.Operator
 
 // Apply applies each operation in the pipeline in turn to the selection.
 func (ops Pipeline) Apply(

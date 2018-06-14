@@ -3,7 +3,7 @@ package condition
 import (
 	"sync"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // UserAbort is a condition satisfied when Abort has been called. It allows for
@@ -22,7 +22,7 @@ func NewUserAbort() *UserAbort {
 }
 
 // IsSatisfied reports whether or not Abort has been called.
-func (ua *UserAbort) IsSatisfied(*api.PopulationData) bool {
+func (ua *UserAbort) IsSatisfied(*evolve.PopulationData) bool {
 	ua.mutex.RLock()
 	defer ua.mutex.RUnlock()
 	return ua.aborted

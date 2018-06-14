@@ -1,4 +1,4 @@
-package api
+package evolve
 
 // ZeroEvaluator is a fitness evaluator always giving a score of 0.
 type ZeroEvaluator struct{}

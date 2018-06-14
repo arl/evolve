@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 func TestElapsedTime(t *testing.T) {
 	cond := 1 * ElapsedTime(time.Second)
-	popdata := &api.PopulationData{}
+	popdata := &evolve.PopulationData{}
 
 	popdata.Elapsed = 100 * time.Millisecond
 	if cond.IsSatisfied(popdata) {

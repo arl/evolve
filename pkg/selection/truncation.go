@@ -6,7 +6,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // ErrInvalidTruncRatio is the error returned when trying to set an invalid
@@ -72,7 +72,7 @@ func (ts *Truncation) SetRatioRange(min, max float64) error {
 // size is the number of candidates to select from the evolved population.
 //
 // Returns the selected candidates.
-func (ts *Truncation) Select(pop api.Population, natural bool, size int, rng *rand.Rand) []interface{} {
+func (ts *Truncation) Select(pop evolve.Population, natural bool, size int, rng *rand.Rand) []interface{} {
 
 	sel := make([]interface{}, 0, size)
 

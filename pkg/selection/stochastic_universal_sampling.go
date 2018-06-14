@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // StochasticUniversalSampling is an alternative to RouletteWheelSelection as a
@@ -30,7 +30,7 @@ type StochasticUniversalSampling struct{}
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
 func (StochasticUniversalSampling) Select(
-	pop api.Population,
+	pop evolve.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {

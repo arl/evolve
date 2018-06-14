@@ -3,12 +3,12 @@ package condition
 import (
 	"testing"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 func TestGenerationCount(t *testing.T) {
 	cond := GenerationCount(5)
-	popdata := &api.PopulationData{}
+	popdata := &evolve.PopulationData{}
 
 	popdata.GenNumber = 3
 	if cond.IsSatisfied(popdata) {

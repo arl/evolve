@@ -3,11 +3,11 @@ package condition
 import (
 	"testing"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 func TestUserAbort(t *testing.T) {
-	popdata := &api.PopulationData{}
+	popdata := &evolve.PopulationData{}
 	cond := NewUserAbort()
 
 	if cond.IsSatisfied(popdata) {

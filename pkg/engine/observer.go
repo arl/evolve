@@ -1,6 +1,6 @@
 package engine
 
-import "github.com/arl/evolve/pkg/api"
+import "github.com/arl/evolve"
 
 // An Observer monitors the evolution of a population.
 //
@@ -11,15 +11,15 @@ type Observer interface {
 	// PopulationUpdate is called at every population update -once an epoch is
 	// has been completed- with information and statistics about the current
 	// population.
-	PopulationUpdate(data *api.PopulationData)
+	PopulationUpdate(data *evolve.PopulationData)
 }
 
 // TODO: try to come up with a better and short name for PopulationUpdate
 // and PopulationData maybe
-type observerFunc struct{ f func(*api.PopulationData) }
+type observerFunc struct{ f func(*evolve.PopulationData) }
 
 // ObserverFunc returns a type satisfying the Observer interface, for which the
 // PopulationUpdate method forwards to f.
-func ObserverFunc(f func(*api.PopulationData)) Observer { return &observerFunc{f: f} }
+func ObserverFunc(f func(*evolve.PopulationData)) Observer { return &observerFunc{f: f} }
 
-func (obs *observerFunc) PopulationUpdate(data *api.PopulationData) { obs.f(data) }
+func (obs *observerFunc) PopulationUpdate(data *evolve.PopulationData) { obs.f(data) }

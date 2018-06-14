@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 func checkCellVal(t *testing.T, s *sudoku, i, j, want int) {
@@ -42,7 +42,7 @@ func TestGeneratorValidity(t *testing.T) {
 		t.Errorf("can't create generator: %v", err)
 	}
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	pop := api.GeneratePopulation(gen, 20, rng)
+	pop := evolve.GeneratePopulation(gen, 20, rng)
 	for _, iface := range pop {
 		sudo := iface.(*sudoku)
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // ErrInvalidTournamentProb is the error returned when trying to set an invalid
@@ -67,7 +67,7 @@ func (ts *Tournament) SetProbRange(min, max float64) error {
 
 // Select selects the specified number of candidates from the population.
 func (ts *Tournament) Select(
-	pop api.Population,
+	pop evolve.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {

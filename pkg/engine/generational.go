@@ -3,7 +3,7 @@ package engine
 import (
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // Generational implements a general-purpose engine for generational
@@ -24,9 +24,9 @@ import (
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
 type Generational struct {
-	Op   api.Operator
-	Eval api.Evaluator
-	Sel  api.Selection
+	Op   evolve.Operator
+	Eval evolve.Evaluator
+	Sel  evolve.Selection
 }
 
 // Epoch performs a single step/iteration of the evolutionary process.
@@ -36,7 +36,7 @@ type Generational struct {
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *Generational) Epoch(pop api.Population, nelites int, rng *rand.Rand) api.Population {
+func (e *Generational) Epoch(pop evolve.Population, nelites int, rng *rand.Rand) evolve.Population {
 	nextpop := make([]interface{}, 0, len(pop))
 
 	// Perform elitism: straightforward copy the n fittest candidates into the
@@ -54,5 +54,5 @@ func (e *Generational) Epoch(pop api.Population, nelites int, rng *rand.Rand) ap
 
 	// While the elite is added, untouched, to the next population
 	nextpop = append(nextpop, elite...)
-	return api.EvaluatePopulation(nextpop, e.Eval, true)
+	return evolve.EvaluatePopulation(nextpop, e.Eval, true)
 }

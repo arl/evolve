@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
 // Provides methods used for testing the operation of RNG implementations.
@@ -60,7 +60,7 @@ func isInQuadrant(x, y float64) bool {
 //
 // Returns the standard deviation of the generated sample.
 func calculareSampleStdDev(rng *rand.Rand, max int64, niter int) float64 {
-	dataset := api.NewDataset(niter)
+	dataset := evolve.NewDataset(niter)
 	for i := 0; i < niter; i++ {
 		dataset.AddValue(float64(rng.Int63n(max)))
 	}

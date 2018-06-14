@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/bitstring"
 	"github.com/arl/evolve/pkg/condition"
 	"github.com/arl/evolve/pkg/engine"
@@ -38,7 +38,7 @@ func main() {
 	mut := mutation.NewBitstring()
 	check(mut.SetProb(0.01))
 
-	eval := api.EvaluatorFunc(
+	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)
 		func(cand interface{}, pop []interface{}) float64 {
 			// our evaluator counts the ones in the bitstring
@@ -55,7 +55,7 @@ func main() {
 	check(err)
 
 	eng.AddObserver(
-		engine.ObserverFunc(func(data *api.PopulationData) {
+		engine.ObserverFunc(func(data *evolve.PopulationData) {
 			log.Printf("Generation %d: %s (%v)\n",
 				data.GenNumber,
 				data.BestCand,

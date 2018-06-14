@@ -3,10 +3,10 @@ package selection
 import (
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 )
 
-type sigmaScaling struct{ selector api.Selection }
+type sigmaScaling struct{ selector evolve.Selection }
 
 // NewSigmaScaling creates a sigma-scaled selection strategy. This is an
 // alternative to straightforward fitness-proportionate
@@ -22,7 +22,7 @@ type sigmaScaling struct{ selector api.Selection }
 // in a population of mostly unfit individuals. It also helps to amplify minor
 // fitness differences in a more mature population where the rate of improvement
 // has slowed.
-func NewSigmaScaling(selector api.Selection) api.Selection {
+func NewSigmaScaling(selector evolve.Selection) evolve.Selection {
 	return &sigmaScaling{selector: selector}
 }
 
@@ -47,23 +47,23 @@ var SigmaScaling = NewSigmaScaling(StochasticUniversalSampling{})
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
 func (sel *sigmaScaling) Select(
-	pop api.Population,
+	pop evolve.Population,
 	natural bool,
 	size int,
 	rng *rand.Rand) []interface{} {
 
-	stats := api.NewDataset(len(pop))
+	stats := evolve.NewDataset(len(pop))
 	for _, cand := range pop {
 		stats.AddValue(cand.Fitness)
 	}
 
-	scaledPop := make(api.Population, len(pop))
+	scaledPop := make(evolve.Population, len(pop))
 	for i, cand := range pop {
 		scaledFitness := sigmaScaledFitness(cand.Fitness,
 			stats.ArithmeticMean(),
 			stats.StandardDeviation())
 
-		scaledPop[i] = &api.Individual{
+		scaledPop[i] = &evolve.Individual{
 			Candidate: cand.Candidate,
 			Fitness:   scaledFitness,
 		}

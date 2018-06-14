@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,13 +58,13 @@ var randomBasedPopNonNatural = testPopulation{
 	{name: "Steve", fitness: 10.0},
 }
 
-func testFitnessBasedSelection(t *testing.T, ss api.Selection, tpop testPopulation, natural bool) {
+func testFitnessBasedSelection(t *testing.T, ss evolve.Selection, tpop testPopulation, natural bool) {
 	rng := rand.New(rand.NewSource(99))
 
 	// create the population
-	pop := api.Population{}
+	pop := evolve.Population{}
 	for i := range tpop {
-		cand := &api.Individual{
+		cand := &evolve.Individual{
 			Candidate: tpop[i].name,
 			Fitness:   tpop[i].fitness,
 		}
@@ -97,14 +97,14 @@ func frequency(slice []interface{}, val interface{}) int {
 
 // test a random based selection strategy ss by selecting the n best candidates
 // of tpop, running the result to checkfn (returns nil or test fail message)
-func testRandomBasedSelection(t *testing.T, ss api.Selection, tpop testPopulation, natural bool, n int, checkfn func([]interface{}) error) {
+func testRandomBasedSelection(t *testing.T, ss evolve.Selection, tpop testPopulation, natural bool, n int, checkfn func([]interface{}) error) {
 	seed := time.Now().UnixNano()
 	rng := rand.New(rand.NewSource(seed))
 
 	// create the population
-	pop := api.Population{}
+	pop := evolve.Population{}
 	for i := range tpop {
-		cand := &api.Individual{
+		cand := &evolve.Individual{
 			Candidate: tpop[i].name,
 			Fitness:   tpop[i].fitness,
 		}

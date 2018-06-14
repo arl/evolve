@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/bitstring"
 	"github.com/stretchr/testify/assert"
 )
@@ -31,7 +31,7 @@ func TestBitstring(t *testing.T) {
 	t.Run("unseed population", func(t *testing.T) {
 
 		f := Bitstring(length)
-		pop := api.GeneratePopulation(f, popsize, rng)
+		pop := evolve.GeneratePopulation(f, popsize, rng)
 		checkPop(pop)
 	})
 
@@ -41,7 +41,7 @@ func TestBitstring(t *testing.T) {
 		seed1, _ := bitstring.MakeFromString("1111100000")
 		seed2, _ := bitstring.MakeFromString("1010101010")
 		seeds := []interface{}{seed1, seed2}
-		pop, err := api.SeedPopulation(f, popsize, seeds, rng)
+		pop, err := evolve.SeedPopulation(f, popsize, seeds, rng)
 		if err != nil {
 			t.Error(err)
 		}
@@ -59,9 +59,9 @@ func TestBitstring(t *testing.T) {
 		// The following call should panic since the 3 seed candidates won't fit
 		// into a population of size 2.
 		seeds := []interface{}{cand, cand, cand}
-		_, err := api.SeedPopulation(f, 2, seeds, rng)
-		if err != api.ErrTooManySeedCandidates {
-			t.Errorf("wantErr = %v, got %v", api.ErrTooManySeedCandidates, err)
+		_, err := evolve.SeedPopulation(f, 2, seeds, rng)
+		if err != evolve.ErrTooManySeedCandidates {
+			t.Errorf("wantErr = %v, got %v", evolve.ErrTooManySeedCandidates, err)
 		}
 	})
 }

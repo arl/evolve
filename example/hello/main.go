@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arl/evolve/pkg/api"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/condition"
 	"github.com/arl/evolve/pkg/engine"
 	"github.com/arl/evolve/pkg/generator"
@@ -85,7 +85,7 @@ func main() {
 
 	// Define an observer
 	eng.AddObserver(
-		engine.ObserverFunc(func(data *api.PopulationData) {
+		engine.ObserverFunc(func(data *evolve.PopulationData) {
 			log.Printf("Generation %d: %s (%v)\n",
 				data.GenNumber,
 				data.BestCand,
