@@ -2,15 +2,14 @@ package evolve
 
 import "sync"
 
-// EvaluatePopulation takes a population, assigns a fitness score to each member
-// and returns the members with their scores attached, sorted in descending
-// order of fitness (descending order of fitness score for natural scores,
-// ascending order of scores for non-natural scores).
-// population is the population to evaluate (each candidate is assigned a
-// fitness score).
+// EvaluatePopulation evaluates individuals and returns a sorted population.
 //
-// Returns the evaluated population (a slice of candidates with attached fitness
-// scores).
+// Every individual is assigned a fitness score with the provided evaluator,
+// after that individuals is inserted into a population. The population is then
+// sorted, either in descending order of fitness for natural scores, or ascending
+// for non natural scores.
+//
+// Returns the evaluated population (a slice of individuals, each of which associated with its fitness).
 func EvaluatePopulation(pop []interface{}, e Evaluator, concurrent bool) Population {
 	var evpop Population
 

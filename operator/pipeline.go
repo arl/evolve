@@ -7,14 +7,11 @@ import (
 )
 
 // A Pipeline is a compound evolutionary operator that applies multiple
-// operators, in sequence, to a starting population.
+// operators in sequence to a population.
 type Pipeline []evolve.Operator
 
-// Apply applies each operation in the pipeline in turn to the selection.
-func (ops Pipeline) Apply(
-	sel []interface{},
-	rng *rand.Rand) []interface{} {
-
+// Apply applies each operator in the pipeline in sequence to the selection.
+func (ops Pipeline) Apply(sel []interface{}, rng *rand.Rand) []interface{} {
 	for _, op := range ops {
 		sel = op.Apply(sel, rng)
 	}
