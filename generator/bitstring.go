@@ -6,7 +6,7 @@ import (
 	"github.com/arl/evolve/pkg/bitstring"
 )
 
-// Bitstring generates random Bitstring of a specified length.
+// Bitstring generates random bit strings of a specified length.
 type Bitstring int
 
 // Generate generates a random bit string in which the distribution of ones and
