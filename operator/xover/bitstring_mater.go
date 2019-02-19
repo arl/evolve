@@ -32,7 +32,7 @@ func (BitstringMater) Mate(
 		// Cross-over index is always greater than zero and less than the
 		// length of the parent so that we always pick a point that will
 		// result in a meaningful crossover.
-		bitstring.SwapRange(off1, off2, 0, (1 + rng.Intn(p1.Len()-1)))
+		bitstring.SwapRange(off1, off2, 0, uint(1+rng.Intn(p1.Len()-1)))
 	}
 	return []interface{}{off1, off2}
 }
