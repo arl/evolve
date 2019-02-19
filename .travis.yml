@@ -14,13 +14,10 @@ matrix:
 
 before_script:
   - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
-  - go get -u gopkg.in/alecthomas/gometalinter.v2
-  - gometalinter.v2 --install
 
 script:
   - test -z $(gofmt -s -l $GO_FILES)
   - go vet ./...
-  - gometalinter.v2 --skip=internal --vendor ./...
   - go test -v -race ./...
   - go test -v -cover -covermode=count -coverprofile=coverage.txt ./... > /dev/null
 
