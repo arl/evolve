@@ -211,9 +211,9 @@ func SwapRange(bs1, bs2 *Bitstring, start, length uint) {
 		word++
 	}
 
-	remain := int(length) - int(partial) // can be negative
+	remain := int(length) - partial // can be negative
 	stop := remain / wordlen
-	for i := int(word); i < int(stop); i++ {
+	for i := int(word); i < stop; i++ {
 		bs1.data[i], bs2.data[i] = bs2.data[i], bs1.data[i]
 	}
 

@@ -50,9 +50,10 @@ func TestBitstringUintn(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			bs, _ := MakeFromString(tt.input)
 			got := bs.Uintn(tt.nbits, tt.i)
-			require.Equalf(t, tt.want, got,
-				"Uintn(nbits=%v, %v) got %s, want %s", tt.nbits, tt.i,
-				sprintubits(got, tt.nbits), sprintubits(tt.want, tt.nbits))
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Uintn(%d, %d) got %s, want %s", tt.input, tt.nbits, tt.i,
+					sprintubits(got, tt.nbits), sprintubits(tt.want, tt.nbits))
+			}
 		})
 	}
 }
@@ -90,9 +91,10 @@ func TestBitstringUint32(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			bs, _ := MakeFromString(tt.input)
 			got := bs.Uint32(tt.i)
-			require.Equalf(t, tt.want, got,
-				"Bitstring(%s).Uint32(%v) got %s, want %s", tt.i,
-				sprintubits(uint32(got), 32), sprintubits(uint32(tt.want), 32))
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Uint32(%d) got %s, want %s", tt.input, tt.i,
+					sprintubits(uint32(got), 32), sprintubits(uint32(tt.want), 32))
+			}
 		})
 	}
 }
@@ -101,38 +103,39 @@ func TestBitstringUint16(t *testing.T) {
 	tests := []struct {
 		input string
 		i     uint
-		uwant uint16
+		want  uint16
 	}{
 		// LSB and MSB 8 are both on the same word
 		{input: "00000000000000000000000000000001",
-			i: 0, uwant: 1},
+			i: 0, want: 1},
 		{input: "00000000000000000000000000000010",
-			i: 0, uwant: 2},
+			i: 0, want: 2},
 		{input: "00000000000000000100000000000010",
-			i: 0, uwant: 1<<14 + 2},
+			i: 0, want: 1<<14 + 2},
 		{input: "11111111111111110100000000000010",
-			i: 0, uwant: 1<<14 + 2},
+			i: 0, want: 1<<14 + 2},
 		{input: "0000000000000000000000000000000111111111111111111111111111111111",
-			i: 32, uwant: 1},
+			i: 32, want: 1},
 		{input: "0000000000000000100000000000000111111111111111111111111111111111",
-			i: 32, uwant: 1<<15 + 1},
+			i: 32, want: 1<<15 + 1},
 		{input: "10000000000000000",
-			i: 1, uwant: 1 << 15},
+			i: 1, want: 1 << 15},
 
 		// LSB and MSB 8 are on 2 separate words
 		{input: "111111111111111111111110100000000000010111111111111111111111111",
-			i: 24, uwant: 1<<14 + 2},
+			i: 24, want: 1<<14 + 2},
 		{input: "000000000000000000000001111111111111110000000000000000000000000",
-			i: 24, uwant: math.MaxUint16 - 1},
+			i: 24, want: math.MaxUint16 - 1},
 	}
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			bs, _ := MakeFromString(tt.input)
 			got := bs.Uint16(tt.i)
-			require.Equalf(t, tt.uwant, got,
-				"Bitstring(%s).Uint16(%v) got %s, want %s", tt.input, tt.i,
-				sprintubits(uint32(got), 16), sprintubits(uint32(tt.uwant), 16))
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Uint16(%d) got %s, want %s", tt.input, tt.i,
+					sprintubits(uint32(got), 16), sprintubits(uint32(tt.want), 16))
+			}
 		})
 	}
 }
@@ -170,9 +173,10 @@ func TestBitstringUint8(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			bs, _ := MakeFromString(tt.input)
 			got := bs.Uint8(tt.i)
-			require.Equalf(t, tt.want, got,
-				"Uint8(%v) got %s, want %s", tt.i,
-				sprintubits(uint32(got), 8), sprintubits(uint32(tt.want), 8))
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Uint8(%d) got %s, want %s", tt.input, tt.i,
+					sprintubits(uint32(got), 8), sprintubits(uint32(tt.want), 8))
+			}
 		})
 	}
 }
@@ -206,9 +210,10 @@ func TestBitstringInt32(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			bs, _ := MakeFromString(tt.input)
 			got := bs.Int32(tt.i)
-			require.Equalf(t, tt.want, got,
-				"Bitstring(%s).Int32(%v) got %s, want %s", tt.input, tt.i,
-				sprintsbits(int32(got), 32), sprintsbits(int32(tt.want), 32))
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Int32(%d) got %s, want %s", tt.input, tt.i,
+					sprintsbits(int32(got), 32), sprintsbits(int32(tt.want), 32))
+			}
 		})
 	}
 }
@@ -239,9 +244,10 @@ func TestBitstringInt16(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			bs, _ := MakeFromString(tt.input)
 			got := bs.Int16(tt.i)
-			require.Equalf(t, tt.want, got,
-				"Bitstring(%s).Int16(%v) got %s, want %s", tt.input, tt.i,
-				sprintsbits(int32(got), 16), sprintsbits(int32(tt.want), 16))
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Int16(%d) got %s, want %s", tt.input, tt.i,
+					sprintsbits(int32(got), 16), sprintsbits(int32(tt.want), 16))
+			}
 		})
 	}
 }
@@ -274,9 +280,10 @@ func TestBitstringInt8(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			bs, _ := MakeFromString(tt.input)
 			got := bs.Int8(tt.i)
-			require.Equalf(t, tt.want, got,
-				"Bitstring(%s).Int8(%v) got %s, want %s", tt.input, tt.i,
-				sprintsbits(int32(got), 8), sprintsbits(int32(tt.want), 8))
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Int8(%d) got %s, want %s", tt.input, tt.i,
+					sprintsbits(int32(got), 8), sprintsbits(int32(tt.want), 8))
+			}
 		})
 	}
 }

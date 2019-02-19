@@ -99,7 +99,7 @@ func (op *Bitstring) Mutate(c interface{}, rng *rand.Rand) interface{} {
 		}
 
 		for i := 0; i < nmut; i++ {
-			mutated.FlipBit(rng.Intn(mutated.Len()))
+			mutated.FlipBit(uint(rng.Intn(mutated.Len())))
 		}
 		return mutated
 	}

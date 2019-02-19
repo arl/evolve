@@ -1,7 +1,6 @@
 package bitstring
 
 import (
-	"fmt"
 	"strconv"
 	"testing"
 )
@@ -26,7 +25,6 @@ func Test_genlomask(t *testing.T) {
 		{n: wordlen, want: bintoa("11111111111111111111111111111111")},
 	}
 	for _, tt := range tests {
-		fmt.Printf("genlomask(%d) = %s\n", tt.n, sprintubits(genlomask(tt.n), 32))
 		if got := genlomask(tt.n); got != tt.want {
 			t.Errorf("genlomask(%d) got %s, want %s", tt.n,
 				sprintubits(got, 32), sprintubits(tt.want, 32))
