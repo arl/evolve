@@ -40,8 +40,8 @@ func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	xover := New(BitstringMater{})
 
-	bs1, _ := bitstring.Random(32, rng)
-	bs2, _ := bitstring.Random(33, rng)
+	bs1 := bitstring.Random(32, rng)
+	bs2 := bitstring.Random(33, rng)
 	pop := []interface{}{bs1, bs2}
 
 	assert.Panics(t, func() {

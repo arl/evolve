@@ -13,7 +13,7 @@ func TestBitstringUintn(t *testing.T) {
 	tests := []struct {
 		input    string
 		nbits, i uint
-		want     uint32
+		want     word
 	}{
 		// LSB and MSB 8 are both on the same word
 		{input: "10",
@@ -91,7 +91,7 @@ func TestBitstringUint32(t *testing.T) {
 			got := bs.Uint32(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Uint32(%d) got %s, want %s", tt.input, tt.i,
-					sprintubits(uint32(got), 32), sprintubits(uint32(tt.want), 32))
+					sprintubits(word(got), 32), sprintubits(word(tt.want), 32))
 			}
 		})
 	}
@@ -132,7 +132,7 @@ func TestBitstringUint16(t *testing.T) {
 			got := bs.Uint16(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Uint16(%d) got %s, want %s", tt.input, tt.i,
-					sprintubits(uint32(got), 16), sprintubits(uint32(tt.want), 16))
+					sprintubits(word(got), 16), sprintubits(word(tt.want), 16))
 			}
 		})
 	}
@@ -173,7 +173,7 @@ func TestBitstringUint8(t *testing.T) {
 			got := bs.Uint8(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Uint8(%d) got %s, want %s", tt.input, tt.i,
-					sprintubits(uint32(got), 8), sprintubits(uint32(tt.want), 8))
+					sprintubits(word(got), 8), sprintubits(word(tt.want), 8))
 			}
 		})
 	}
@@ -210,7 +210,7 @@ func TestBitstringInt32(t *testing.T) {
 			got := bs.Int32(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Int32(%d) got %s, want %s", tt.input, tt.i,
-					sprintsbits(int32(got), 32), sprintsbits(int32(tt.want), 32))
+					sprintsbits(sword(got), 32), sprintsbits(sword(tt.want), 32))
 			}
 		})
 	}
@@ -244,7 +244,7 @@ func TestBitstringInt16(t *testing.T) {
 			got := bs.Int16(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Int16(%d) got %s, want %s", tt.input, tt.i,
-					sprintsbits(int32(got), 16), sprintsbits(int32(tt.want), 16))
+					sprintsbits(sword(got), 16), sprintsbits(sword(tt.want), 16))
 			}
 		})
 	}
@@ -280,7 +280,7 @@ func TestBitstringInt8(t *testing.T) {
 			got := bs.Int8(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Int8(%d) got %s, want %s", tt.input, tt.i,
-					sprintsbits(int32(got), 8), sprintsbits(int32(tt.want), 8))
+					sprintsbits(sword(got), 8), sprintsbits(sword(tt.want), 8))
 			}
 		})
 	}

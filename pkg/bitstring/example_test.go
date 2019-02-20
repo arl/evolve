@@ -4,7 +4,7 @@ import "fmt"
 
 func ExampleNew() {
 	// create a 8 bits Bitstring
-	bitstring, _ := New(8)
+	bitstring := New(8)
 	// upon creation all bits are unset
 	fmt.Println(bitstring)
 	// Output: 00000000
@@ -19,24 +19,24 @@ func ExampleMakeFromString() {
 
 func ExampleBitstring_Len() {
 	// create a 8 bits Bitstring
-	bitstring, _ := New(8)
+	bitstring := New(8)
 	fmt.Println(bitstring.Len())
 	// Output: 8
 }
 
 func ExampleBitstring_Bit() {
 	// create a 8 bits Bitstring
-	bitstring, _ := New(8)
+	bitstring := New(8)
 	fmt.Println(bitstring.Bit(7))
 	// Output: false
 }
 
 func ExampleBitstring_SetBit() {
 	// create a 8 bits Bitstring
-	bitstring, _ := New(8)
-	bitstring.SetBit(2, true)
+	bitstring := New(8)
+	bitstring.SetBit(2)
 	fmt.Println(bitstring)
-	bitstring.SetBit(2, false)
+	bitstring.ClearBit(2)
 	fmt.Println(bitstring)
 	// Output: 00000100
 	// 00000000
@@ -44,7 +44,7 @@ func ExampleBitstring_SetBit() {
 
 func ExampleBitstring_FlipBit() {
 	// create a 8 bits Bitstring
-	bitstring, _ := New(8)
+	bitstring := New(8)
 	bitstring.FlipBit(2)
 	fmt.Println(bitstring)
 	// Output: 00000100
@@ -52,7 +52,7 @@ func ExampleBitstring_FlipBit() {
 
 func ExampleBitstring_ZeroesCount() {
 	// create a 8 bits Bitstring
-	bitstring, _ := New(8)
+	bitstring := New(8)
 	// upon creation all bits are unset
 	fmt.Println(bitstring.ZeroesCount())
 	// Output: 8
@@ -60,7 +60,7 @@ func ExampleBitstring_ZeroesCount() {
 
 func ExampleBitstring_OnesCount() {
 	// create a 8 bits Bitstring
-	bitstring, _ := New(8)
+	bitstring := New(8)
 	// upon creation all bits are unset
 	fmt.Println(bitstring.OnesCount())
 	// Output: 0
