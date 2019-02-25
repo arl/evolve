@@ -8,6 +8,10 @@ import "math"
 type (
 	word  = uint32
 	sword = int32
+
+	// export aliases
+	Word       = word
+	SignedWord = sword
 )
 
 const (
@@ -16,4 +20,6 @@ const (
 	minsword   = math.MinInt32
 	maxsword   = math.MaxInt32
 	maxuword   = math.MaxUint32
+
+	WordLength = wordlen
 )
