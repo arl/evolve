@@ -10,8 +10,7 @@ import (
 func TestBitstringCreation(t *testing.T) {
 	// Check that a bit string is constructed correctly, with
 	// the correct length and all bits initially set to zero.
-	bs, err := New(100)
-	assert.NoError(t, err)
+	bs := New(100)
 	assert.Equalf(t, bs.Len(), 100, "want Bitstring length 100, got: %v", bs.Len())
 	for i := 0; i < bs.Len(); i++ {
 		assert.False(t, bs.Bit(uint(i)), "Bit ", i, " should not be set.")
@@ -21,18 +20,16 @@ func TestBitstringCreation(t *testing.T) {
 func TestBitstringCreateRandomBitstring(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	// Check that a random bit string of the correct length is constructed.
-	bs, err := Random(100, rng)
-	assert.NoError(t, err)
+	bs := Random(100, rng)
 	assert.Equalf(t, bs.Len(), 100, "want Bitstring length 100, got: %v", bs.Len())
 }
 
 func TestBitstringSetBits(t *testing.T) {
 	// Make sure that bits are set correctly.
-	bs, err := New(5)
-	assert.NoError(t, err)
+	bs := New(5)
 
-	bs.SetBit(1, true)
-	bs.SetBit(4, true)
+	bs.SetBit(1)
+	bs.SetBit(4)
 
 	// Testing with non-symmetrical string to ensure that there are no endian
 	// or index problems.
@@ -43,14 +40,13 @@ func TestBitstringSetBits(t *testing.T) {
 	assert.True(t, bs.Bit(4), "Bit 4 should be set.")
 
 	// Test unsetting a bit.
-	bs.SetBit(4, false)
+	bs.ClearBit(4)
 	assert.False(t, bs.Bit(4), "Bit 4 should be unset.")
 }
 
 func TestBitstringFlipBits(t *testing.T) {
 	// Make sure bit-flipping works as expected.
-	bs, err := New(5)
-	assert.NoError(t, err)
+	bs := New(5)
 
 	bs.FlipBit(2)
 	assert.True(t, bs.Bit(2), "Flipping unset bit failed.")
@@ -61,12 +57,11 @@ func TestBitstringFlipBits(t *testing.T) {
 
 func TestBitstringToString(t *testing.T) {
 	// Checks that string representations are correctly generated.
-	bs, err := New(10)
-	assert.NoError(t, err)
+	bs := New(10)
 
-	bs.SetBit(3, true)
-	bs.SetBit(7, true)
-	bs.SetBit(8, true)
+	bs.SetBit(3)
+	bs.SetBit(7)
+	bs.SetBit(8)
 
 	// Testing with leading zero to make sure it isn't omitted.
 	want := "0110001000"
@@ -86,11 +81,10 @@ func TestBitstringParsing(t *testing.T) {
 
 // Checks that integer conversion is correct.
 func TestBitstringToNumber(t *testing.T) {
-	bs, err := New(10)
-	assert.NoError(t, err)
+	bs := New(10)
 
-	bs.SetBit(0, true)
-	bs.SetBit(9, true)
+	bs.SetBit(0)
+	bs.SetBit(9)
 	bint := bs.BigInt()
 	assert.True(t, bint.IsInt64())
 	assert.EqualValuesf(t, 513, bint.Int64(), "Incorrect big.Int conversion, want %v, got: %v", 513, bint.Int64())
@@ -98,83 +92,76 @@ func TestBitstringToNumber(t *testing.T) {
 
 func TestBitstringCountSetBits(t *testing.T) {
 	// Checks that the bit string can correctly count its number of set bits.
-	bs, err := New(64)
-	assert.NoError(t, err)
+	bs := New(64)
 	assert.Zerof(t, bs.OnesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bs.OnesCount(), bs)
 
 	// The bits to set have been chosen because they deal with boundary cases.
-	bs.SetBit(0, true)
-	bs.SetBit(31, true)
-	bs.SetBit(32, true)
-	bs.SetBit(33, true)
-	bs.SetBit(63, true)
+	bs.SetBit(0)
+	bs.SetBit(31)
+	bs.SetBit(32)
+	bs.SetBit(33)
+	bs.SetBit(63)
 	setBits := bs.OnesCount()
 	assert.EqualValuesf(t, 5, setBits, "want set bits = 5, got: %v", setBits)
 }
 
 // Checks that the bit string can correctly count its number of unset bits.
 func TestBitstringCountUnsetBits(t *testing.T) {
-	bs, err := New(12)
-	assert.NoError(t, err)
+	bs := New(12)
 	assert.EqualValuesf(t, 12, bs.ZeroesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bs.ZeroesCount(), bs)
 
-	bs.SetBit(0, true)
-	bs.SetBit(5, true)
-	bs.SetBit(6, true)
-	bs.SetBit(9, true)
-	bs.SetBit(10, true)
+	bs.SetBit(0)
+	bs.SetBit(5)
+	bs.SetBit(6)
+	bs.SetBit(9)
+	bs.SetBit(10)
 	setBits := bs.ZeroesCount()
 	assert.EqualValuesf(t, 7, setBits, "want set bits = 7, got: %v", setBits)
 }
 
-func TestBitstringClone(t *testing.T) {
-	bs, err := New(10)
-	assert.NoError(t, err)
-	bs.SetBit(3, true)
-	bs.SetBit(7, true)
-	bs.SetBit(8, true)
-	clone := Copy(bs)
+func TestBitstringCopy(t *testing.T) {
+	rng := rand.New(rand.NewSource(99))
+	bs := Random(2000, rng)
+	bs.SetBit(3)
+	bs.SetBit(7)
+	bs.SetBit(8)
+	cpy := Copy(bs)
 
-	// Check the clone is a bit-for-bit duplicate.
+	// Check the copy is a bit-for-bit duplicate.
 	for i := uint(0); i < uint(bs.Len()); i++ {
-		assert.Equalf(t, bs.Bit(i), clone.Bit(i), "Cloned bit string does not match in position %v", i)
+		assert.Equalf(t, bs.Bit(i), cpy.Bit(i), "copy differs original at bit %d", i)
 	}
 
-	// Check that clone is distinct from original (i.e. it does not change
-	// if the original is modified).
-	assert.False(t, clone == bs, "want clone and original different objects, got the same")
+	assert.False(t, cpy == bs, "copy and original should be different bitstring instances")
 	bs.FlipBit(2)
-	assert.False(t, clone.Bit(2), "Clone is not independent from original.")
+	assert.False(t, cpy.Bit(2) == bs.Bit(2), "copy and original are not independent from each other")
 }
 
 func TestBitstringEquality(t *testing.T) {
-	bs, err := New(10)
-	assert.NoError(t, err)
-	bs.SetBit(2, true)
-	bs.SetBit(5, true)
-	bs.SetBit(8, true)
+	bs := New(10)
+	bs.SetBit(2)
+	bs.SetBit(5)
+	bs.SetBit(8)
 
-	assert.True(t, bs.Equals(bs), "Bitstring should always equal itself.")
-	assert.False(t, bs.Equals(nil), "Valid Bitstring should never equal nil.")
-	assert.False(t, bs.Equals(&Bitstring{}), "Bitstring should not equal another instance")
+	assert.True(t, bs.Equals(bs), "Bitstring should always equals itself.")
+	assert.False(t, bs.Equals(nil), "Valid Bitstring should never equals nil.")
+	assert.False(t, bs.Equals(&Bitstring{}), "Bitstring should not equals another instance")
 
-	clone := Copy(bs)
-	assert.True(t, clone.Equals(bs), "Freshly cloned Bitstring should equal original")
+	cpy := Copy(bs)
+	assert.Truef(t, cpy.Equals(bs), "Freshly copied Bitstring should equals original, bs=%s copy=%s", bs, cpy)
 
 	// Changing one of the objects should result in them no longer being
 	// considered equal.
-	clone.FlipBit(0)
-	assert.False(t, clone.Equals(bs), "want different strings to cancel equality, \"%v\" and \"%s\"", clone, bs)
+	cpy.FlipBit(0)
+	assert.Falsef(t, cpy.Equals(bs), "bs=%s copy=%s", bs, cpy)
 
 	// Bit strings of different lengths but with the same bits set should not
 	// be considered equal.
-	var bs2 *Bitstring
-	bs2, err = New(9)
-	assert.NoError(t, err)
-	bs2.SetBit(2, true)
-	bs2.SetBit(5, true)
-	bs2.SetBit(8, true)
-	assert.False(t, bs2.Equals(bs), "want equal numbers but of different lengths to be considered not equal")
+	bs2 := New(9)
+	bs2.SetBit(2)
+	bs2.SetBit(5)
+	bs2.SetBit(8)
+	assert.False(t, bs2.Equals(bs))
 }
 
 func TestBitstringFromString(t *testing.T) {
@@ -188,7 +175,7 @@ func TestBitstringFromString(t *testing.T) {
 		{"only 0s", "0000", true},
 		{"only 1s", "1111111", true},
 		{"mixed 0s and 1s", "1000111011", true},
-		{"empty string", "", false},
+		{"empty string", "", true},
 		{"with spaces", "11 ", false},
 	}
 	for _, tt := range tests {
@@ -206,124 +193,138 @@ func TestBitstringFromString(t *testing.T) {
 }
 
 func TestBitstringSetBit(t *testing.T) {
-	bs, err := New(1)
-	assert.NoError(t, err)
-
+	bs := New(1)
 	t.Run("panics on index too high", func(t *testing.T) {
 		// The index of an individual bit must be within the range 0 to
 		// length-1.
-		assert.Panics(t, func() { bs.SetBit(1, false) })
+		assert.Panics(t, func() { bs.ClearBit(1) })
 	})
 }
 
 func TestBitstringSwapRange(t *testing.T) {
 	tests := []struct {
-		name              string
-		ones, zeros       string
-		lo, hi            uint // Bit indices are little-endian, so position 0 is the rightmost bit.
-		expOnes, expZeros string
+		x, y          string
+		start, length uint
+		wantx, wanty  string
 	}{
 		{
-			"word-aligned",
-			"1111111111111111111111111111111111111111111111111111111111111111",
-			"0000000000000000000000000000000000000000000000000000000000000000",
-			0, 32,
-			"1111111111111111111111111111111100000000000000000000000000000000",
-			"0000000000000000000000000000000011111111111111111111111111111111",
+			x:     "1",
+			y:     "0",
+			start: 0, length: 1,
+			wantx: "0",
+			wanty: "1",
 		},
 		{
-			"non-aligned start",
-			"1111111111111111111111111111111111111111",
-			"0000000000000000000000000000000000000000",
-			2, 30,
-			"1111111100000000000000000000000000000011",
-			"0000000011111111111111111111111111111100",
+			x:     "1111111111111111111111111111111111111111111111111111111111111111",
+			y:     "0000000000000000000000000000000000000000000000000000000000000000",
+			start: 0, length: 32,
+			wantx: "1111111111111111111111111111111100000000000000000000000000000000",
+			wanty: "0000000000000000000000000000000011111111111111111111111111111111",
 		},
 		{
-			"non-aligned end",
-			"1111111111",
-			"0000000000",
-			0, 3,
-			"1111111000",
-			"0000000111",
+			x:     "1111111111111111111111111111111111111111",
+			y:     "0000000000000000000000000000000000000000",
+			start: 2, length: 30,
+			wantx: "1111111100000000000000000000000000000011",
+			wanty: "0000000011111111111111111111111111111100",
 		},
 		{
-			"smaller than word length",
-			"111",
-			"000",
-			1, 2,
-			"001",
-			"110",
+			x:     "1111111111",
+			y:     "0000000000",
+			start: 0, length: 3,
+			wantx: "1111111000",
+			wanty: "0000000111",
 		},
 		{
-			"smaller than word length, full swap",
-			"111",
-			"000",
-			0, 3,
-			"000",
-			"111",
+			x:     "111",
+			y:     "000",
+			start: 1, length: 2,
+			wantx: "001",
+			wanty: "110",
 		},
 		{
-			"word length full swap",
-			"11111111111111111111111111111111",
-			"00000000000000000000000000000000",
-			0, 32,
-			"00000000000000000000000000000000",
-			"11111111111111111111111111111111",
+			x:     "111",
+			y:     "000",
+			start: 0, length: 3,
+			wantx: "000",
+			wanty: "111",
 		},
 		{
-			"greater than word length full swap",
-			"111111111111111111111111111111111",
-			"000000000000000000000000000000000",
-			0, 33,
-			"000000000000000000000000000000000",
-			"111111111111111111111111111111111",
+			x:     "11111111111111111111111111111111",
+			y:     "00000000000000000000000000000000",
+			start: 0, length: 32,
+			wantx: "00000000000000000000000000000000",
+			wanty: "11111111111111111111111111111111",
 		},
 		{
-			"smaller than 2 times word length full swap",
-			"111111111111111111111111111111111111111111111111111111111111111",
-			"000000000000000000000000000000000000000000000000000000000000000",
-			0, 63,
-			"000000000000000000000000000000000000000000000000000000000000000",
-			"111111111111111111111111111111111111111111111111111111111111111",
+			x:     "111111111111111111111111111111111",
+			y:     "000000000000000000000000000000000",
+			start: 0, length: 33,
+			wantx: "000000000000000000000000000000000",
+			wanty: "111111111111111111111111111111111",
 		},
 		{
-			"2 times word length full swap",
-			"1111111111111111111111111111111111111111111111111111111111111111",
-			"0000000000000000000000000000000000000000000000000000000000000000",
-			0, 64,
-			"0000000000000000000000000000000000000000000000000000000000000000",
-			"1111111111111111111111111111111111111111111111111111111111111111",
+			x:     "111111111111111111111111111111111111111111111111111111111111111",
+			y:     "000000000000000000000000000000000000000000000000000000000000000",
+			start: 0, length: 63,
+			wantx: "000000000000000000000000000000000000000000000000000000000000000",
+			wanty: "111111111111111111111111111111111111111111111111111111111111111",
 		},
 		{
-			"greater than 2 times word length full swap",
-			"11111111111111111111111111111111111111111111111111111111111111111",
-			"00000000000000000000000000000000000000000000000000000000000000000",
-			0, 65,
-			"00000000000000000000000000000000000000000000000000000000000000000",
-			"11111111111111111111111111111111111111111111111111111111111111111",
+			x:     "1111111111111111111111111111111111111111111111111111111111111111",
+			y:     "0000000000000000000000000000000000000000000000000000000000000000",
+			start: 0, length: 64,
+			wantx: "0000000000000000000000000000000000000000000000000000000000000000",
+			wanty: "1111111111111111111111111111111111111111111111111111111111111111",
 		},
 		{
-			"greater than 3 times word length",
-			"1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-			"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-			94, 1,
-			"0111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-			"1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+			x:     "11111111111111111111111111111111111111111111111111111111111111111",
+			y:     "00000000000000000000000000000000000000000000000000000000000000000",
+			start: 0, length: 65,
+			wantx: "00000000000000000000000000000000000000000000000000000000000000000",
+			wanty: "11111111111111111111111111111111111111111111111111111111111111111",
+		},
+		{
+			x:     "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+			y:     "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+			start: 94, length: 1,
+			wantx: "1101111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+			wanty: "0010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+		},
+		{
+			x:     "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+			y:     "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+			start: 1, length: 256,
+			wantx: "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+			wanty: "011111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110",
+		},
+		{
+			x:     "1111111111111111111111111111111111111111111111111111111111111111111",
+			y:     "0000000000000000000000000000000000000000000000000000000000000000000",
+			start: 64, length: 2,
+			wantx: "1001111111111111111111111111111111111111111111111111111111111111111",
+			wanty: "0110000000000000000000000000000000000000000000000000000000000000000",
+		},
+		{
+			x:     "1111111111111111111111111111111111111111111111111111111111111111111",
+			y:     "0000000000000000000000000000000000000000000000000000000000000000000",
+			start: 65, length: 1,
+			wantx: "1011111111111111111111111111111111111111111111111111111111111111111",
+			wanty: "0100000000000000000000000000000000000000000000000000000000000000000",
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ones, err1 := MakeFromString(tt.ones)
+		t.Run("", func(t *testing.T) {
+			x, err1 := MakeFromString(tt.x)
 			assert.NoError(t, err1)
-			zeros, err2 := MakeFromString(tt.zeros)
+			y, err2 := MakeFromString(tt.y)
 			assert.NoError(t, err2)
-			SwapRange(ones, zeros, tt.lo, tt.hi)
+			SwapRange(x, y, tt.start, tt.length)
 
-			assert.Equalf(t, tt.expOnes, ones.String(),
-				"want %s, got %s", tt.expOnes, ones.String())
-			assert.Equalf(t, tt.expZeros, zeros.String(),
-				"want %s, got %s", tt.expZeros, zeros.String())
+			assert.Equalf(t, tt.wantx, x.String(),
+				"want %s, got %s", tt.wantx, x.String())
+			assert.Equalf(t, tt.wanty, y.String(),
+				"want %s, got %s", tt.wanty, y.String())
 		})
 	}
 }

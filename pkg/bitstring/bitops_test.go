@@ -1,28 +1,30 @@
 package bitstring
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 )
 
-func bintoa(s string) uint32 {
-	i, err := strconv.ParseInt(s, 2, 64)
+func atobin(s string) word {
+	i, err := strconv.ParseUint(s, 2, wordlen)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Can't convert %s to base 2: %s", s, err))
 	}
-	return uint32(i)
+	return word(i)
 }
 
 func Test_genlomask(t *testing.T) {
 	tests := []struct {
 		n    uint
-		want uint32
+		want word
 	}{
-		{n: 0, want: bintoa("00000000000000000000000000000001")},
-		{n: 1, want: bintoa("00000000000000000000000000000011")},
-		{n: wordlen - 2, want: bintoa("01111111111111111111111111111111")},
-		{n: wordlen - 1, want: bintoa("11111111111111111111111111111111")},
-		{n: wordlen, want: bintoa("11111111111111111111111111111111")},
+		{n: 0, want: atobin("00000000000000000000000000000000")},
+		{n: 1, want: atobin("00000000000000000000000000000001")},
+		{n: 2, want: atobin("00000000000000000000000000000011")},
+		{n: wordlen - 2, want: maxuword >> 2},
+		{n: wordlen - 1, want: maxuword >> 1},
+		{n: wordlen, want: maxuword},
 	}
 	for _, tt := range tests {
 		if got := genlomask(tt.n); got != tt.want {
@@ -35,13 +37,12 @@ func Test_genlomask(t *testing.T) {
 func Test_genhimask(t *testing.T) {
 	tests := []struct {
 		n    uint
-		want uint32
+		want word
 	}{
-		{n: 0, want: bintoa("11111111111111111111111111111111")},
-		{n: 1, want: bintoa("11111111111111111111111111111110")},
-		{n: wordlen - 2, want: bintoa("11000000000000000000000000000000")},
-		{n: wordlen - 1, want: bintoa("10000000000000000000000000000000")},
-		{n: wordlen, want: bintoa("00000000000000000000000000000000")},
+		{n: 0, want: maxuword},
+		{n: 1, want: maxuword - 1},
+		{n: wordlen - 2, want: 1<<(wordlen-1) + 1<<(wordlen-2)},
+		{n: wordlen - 1, want: 1 << (wordlen - 1)},
 	}
 	for _, tt := range tests {
 		if got := genhimask(tt.n); got != tt.want {
@@ -54,16 +55,16 @@ func Test_genhimask(t *testing.T) {
 func Test_genmask(t *testing.T) {
 	tests := []struct {
 		l, h uint
-		want uint32
+		want word
 	}{
-		{l: 0, h: 0, want: bintoa("00000000000000000000000000000001")},
-		{l: 0, h: 1, want: bintoa("00000000000000000000000000000011")},
-		{l: 0, h: 2, want: bintoa("00000000000000000000000000000111")},
-		{l: 1, h: 1, want: bintoa("00000000000000000000000000000010")},
-		{l: 1, h: 2, want: bintoa("00000000000000000000000000000110")},
-		{l: 0, h: 31, want: bintoa("11111111111111111111111111111111")},
-		{l: 1, h: 31, want: bintoa("11111111111111111111111111111110")},
-		{l: 0, h: 30, want: bintoa("01111111111111111111111111111111")},
+		{l: 0, h: 0, want: atobin("00000000000000000000000000000000")},
+		{l: 0, h: 1, want: atobin("00000000000000000000000000000001")},
+		{l: 0, h: 2, want: atobin("00000000000000000000000000000011")},
+		{l: 1, h: 1, want: atobin("00000000000000000000000000000000")},
+		{l: 1, h: 2, want: atobin("00000000000000000000000000000010")},
+		{l: 0, h: 31, want: atobin("01111111111111111111111111111111")},
+		{l: 1, h: 31, want: atobin("01111111111111111111111111111110")},
+		{l: 0, h: 30, want: atobin("00111111111111111111111111111111")},
 	}
 	for _, tt := range tests {
 		if got := genmask(tt.l, tt.h); got != tt.want {
@@ -75,17 +76,17 @@ func Test_genmask(t *testing.T) {
 
 func Test_findFirstSetBit(t *testing.T) {
 	tests := []struct {
-		w    uint32
+		w    word
 		want uint
 	}{
-		{w: uint32(bintoa("00000000000000000000000000000001")), want: 0},
-		{w: uint32(bintoa("00000000000000000000000000000010")), want: 1},
-		{w: uint32(bintoa("10000000000000000000000000000001")), want: 0},
-		{w: uint32(bintoa("00000000000001111111000000000100")), want: 2},
-		{w: uint32(bintoa("00000000000001111111000000000000")), want: 12},
-		{w: uint32(bintoa("10000000000000000000000000000000")), want: 31},
-		{w: uint32(bintoa("00000000000000000000000000000000")), want: 31},
-		{w: uint32(bintoa("11111111111111111111111111111111")), want: 0},
+		{w: atobin("00000000000000000000000000000001"), want: 0},
+		{w: atobin("00000000000000000000000000000010"), want: 1},
+		{w: atobin("10000000000000000000000000000001"), want: 0},
+		{w: atobin("00000000000001111111000000000100"), want: 2},
+		{w: atobin("00000000000001111111000000000000"), want: 12},
+		{w: atobin("10000000000000000000000000000000"), want: 31},
+		{w: atobin("00000000000000000000000000000000"), want: wordlen - 1},
+		{w: atobin("11111111111111111111111111111111"), want: 0},
 	}
 	for _, tt := range tests {
 		if got := findFirstSetBit(tt.w); got != tt.want {

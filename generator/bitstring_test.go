@@ -55,7 +55,7 @@ func TestBitstring(t *testing.T) {
 	t.Run("too many seed candidates", func(t *testing.T) {
 
 		f := Bitstring(length)
-		cand, _ := bitstring.New(length)
+		cand := bitstring.New(length)
 		// The following call should panic since the 3 seed candidates won't fit
 		// into a population of size 2.
 		seeds := []interface{}{cand, cand, cand}
