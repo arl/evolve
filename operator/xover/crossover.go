@@ -12,7 +12,7 @@ var (
 	ErrInvalidXOverNumPoints = errors.New("crossover points must be in the [0,MaxInt32] range")
 	// ErrInvalidXOverProb is the error returned when trying to set an invalid
 	// probability of crossover
-	ErrInvalidXOverProb = errors.New("crossover probability must be in the [0.0,1.0] range")
+	ErrInvalidXOverProb = errors.New("crossover probability must be in the [0,1] range")
 )
 
 // Mater is the interface implemented by objects defining the Mate function.
@@ -72,7 +72,7 @@ func (op *Crossover) SetPoints(npts int) error {
 
 // SetProb sets the crossover probability,
 //
-// If prob is not in the [0.1,1.0] range SetProb will return
+// If prob is not in the [0,1] range SetProb will return
 // ErrInvalidXOverProb.
 func (op *Crossover) SetProb(prob float64) error {
 	if prob < 0.0 || prob > 1.0 {
@@ -105,9 +105,9 @@ func (op *Crossover) SetPointsRange(min, max int) error {
 //
 // The specific crossover probability will be randomly chosen with the pseudo
 // random number generator argument of Apply, by linearly converting from
-// [0.0,1.0) to [min,max).
+// [0,1) to [min,max).
 //
-// If min and max are not bounded by [0.0,1.0] SetProbRange will return
+// If min and max are not bounded by [0,1] SetProbRange will return
 // ErrInvalidXOverProb.
 func (op *Crossover) SetProbRange(min, max float64) error {
 	if min > max || min < 0.0 || max > 1.0 {

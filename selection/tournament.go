@@ -10,7 +10,7 @@ import (
 
 // ErrInvalidTournamentProb is the error returned when trying to set an invalid
 // tournament selection probability
-var ErrInvalidTournamentProb = errors.New("crossover probability must be in the [0.0,1.0] range")
+var ErrInvalidTournamentProb = errors.New("crossover probability must be in the [0,1] range")
 
 // Tournament is a selection strategy that picks a pair of candidates at random
 // and then selects the fitter of the two candidates with probability p, where p

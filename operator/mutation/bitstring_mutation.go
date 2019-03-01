@@ -23,7 +23,7 @@ type Bitstring struct {
 }
 
 // NewBitstring creates a new BitString mutation operator, pre-configured with a
-// probability of mutation of 1.0 and mutation count of 1.
+// probability of mutation of 0.01 (1%) and mutation count of 1 bit.
 //
 // The mutation probability is the (possibly variable) probability of a
 // candidate bit string being mutated at all. It can be modified with SetProb
@@ -36,7 +36,7 @@ func NewBitstring() *Bitstring {
 		nmut: 1, varnmut: false, nmutmin: 1, nmutmax: 1,
 	}
 	bsmut.Mutation = New(bsmut)
-	err := bsmut.SetProb(1.0)
+	err := bsmut.SetProb(0.01)
 	if err != nil {
 		panic(fmt.Errorf("cannot set mutation probability: %v", err))
 	}
@@ -66,6 +66,7 @@ func (op *Bitstring) SetMutations(nmut int) error {
 // [0,MaxInt32) to [min,max).
 //
 // If min and max are not bounded by [0,MaxInt32] SetMutationsRange will return
+// ErrInvalidMutationCount.
 func (op *Bitstring) SetMutationsRange(min, max int) error {
 	if min > max || min < 0 || max > math.MaxInt32 {
 		return ErrInvalidMutationCount

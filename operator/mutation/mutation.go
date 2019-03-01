@@ -7,7 +7,7 @@ import (
 
 // ErrInvalidMutationProb is the error returned when trying to set an invalid
 // mutation probability
-var ErrInvalidMutationProb = errors.New("mutation probability must be in the [0.0,1.0] range")
+var ErrInvalidMutationProb = errors.New("mutation probability must be in the [0,1] range")
 
 // Mutater is the interface that wraps the Mutate method.
 type Mutater interface {
@@ -47,7 +47,7 @@ func New(mut Mutater) *Mutation {
 
 // SetProb sets the mutation probability,
 //
-// If prob is not in the [0.1,1.0] range SetProb will return
+// If prob is not in the [0,1] range SetProb will return
 // ErrInvalidMutationCount.
 func (op *Mutation) SetProb(prob float64) error {
 	if prob < 0.0 || prob > 1.0 {
@@ -62,9 +62,9 @@ func (op *Mutation) SetProb(prob float64) error {
 //
 // The specific mutation probability will be randomly chosen with the pseudo
 // random number generator argument of Apply, by linearly converting from
-// [0.0,1.0) to [min,max).
+// [0,1) to [min,max).
 //
-// If min and max are not bounded by [0.0,1.0] SetProbRange will return
+// If min and max are not bounded by [0,1] SetProbRange will return
 // ErrInvalidMutationProb.
 func (op *Mutation) SetProbRange(min, max float64) error {
 	if min > max || min < 0.0 || max > 1.0 {
