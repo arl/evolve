@@ -18,3 +18,11 @@ func (bs *Bitstring) Uint32(i uint) uint32 {
 	hiword := bs.data[w+1] & ((1 << off) - 1)
 	return uint32(loword | hiword<<(wordlen-off))
 }
+
+// Uint64 returns the uint64 value represented by the 64 bits starting at the
+// given bit. It panics if there are not enough bits.
+func (bs *Bitstring) Uint64(i uint) uint64 {
+	lohw := bs.Uint32(i)
+	hihw := bs.Uint32(i + 32)
+	return uint64(hihw<<32 | lohw)
+}

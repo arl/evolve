@@ -6,7 +6,7 @@ import (
 
 // Uintn returns the n-bit unsigned integer value represented by the n bits
 // starting at the bit index i. It panics if there are not enough bits or if n
-// is greater than 32.
+// is greater than WordLength.
 // TODO: reverse order of nbits and i params
 func (bs *Bitstring) Uintn(nbits, i uint) word {
 	if nbits > wordlen || nbits < 1 {
@@ -64,7 +64,7 @@ func (bs *Bitstring) Int16(i uint) int16 {
 
 // Intn returns the n-bit signed integer value represented by the n bits
 // starting at the i. It panics if there are not enough bits or if n is greater
-// than 32.
+// than WordLength.
 func (bs *Bitstring) Intn(nbits, i uint) int32 {
 	return int32(bs.Uintn(nbits, i))
 }

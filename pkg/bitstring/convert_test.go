@@ -15,7 +15,7 @@ func TestBitstringUintn(t *testing.T) {
 		nbits, i uint
 		want     word
 	}{
-		// LSB and MSB 8 are both on the same word
+		// LSB and MSB are both on the same word
 		{input: "10",
 			nbits: 1, i: 0, want: 0},
 		{input: "111",
@@ -33,7 +33,7 @@ func TestBitstringUintn(t *testing.T) {
 		{input: "10000000000000000000000000000000",
 			nbits: 1, i: 31, want: 1},
 
-		// // LSB and MSB 8 are on 2 separate words
+		// // LSB and MSB are on 2 separate words
 		{input: "1111111111111111111111111111111111111111111111111111111111111111",
 			nbits: 3, i: 31, want: 7},
 		{input: "1111111111111111111111111111111111111111111111111111111111111111",
@@ -56,13 +56,54 @@ func TestBitstringUintn(t *testing.T) {
 	}
 }
 
+func TestBitstringUint64(t *testing.T) {
+	tests := []struct {
+		input string
+		i     uint
+		want  uint64
+	}{
+		// LSB and MSB are both on the same word
+		{input: "0000000000000000000000000000000000000000000000000000000000000001",
+			i: 0, want: 1},
+		{input: "0000000000000000000000000000000000000000000000000000000000000010",
+			i: 0, want: 2},
+		{input: "0100000000000000000000000000000000000000000000000000000000000010",
+			i: 0, want: 1<<62 + 2},
+		{input: "11111111111111111111111111111111111111111111111111111111111111110100000000000000000000000000000000000000000000000000000000000010",
+			i: 0, want: 1<<62 + 2},
+		{input: "00000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111111111111111111111111111111111111",
+			i: 64, want: 1},
+		{input: "10000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111111111111111111111111111111111111",
+			i: 64, want: 1<<63 + 1},
+
+		// LSB and MSB are on 2 separate words
+		{input: "10000000000000000000000000000000000000000000000000000000000000000",
+			i: 1, want: 1 << 63},
+		{input: "1111111111111111111111111110100000000000000000000000000000000000000000000000000000000000010111111111111111111111111111111111111111111111111111111111111",
+			i: 60, want: 1<<62 + 2},
+		{input: "000011111111111111111111111111111111111111111111111111111111111111100000000000000000000000000000000000000000000000000000000000",
+			i: 58, want: math.MaxUint64 - 1},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			bs, _ := MakeFromString(tt.input)
+			got := bs.Uint64(tt.i)
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Uint64(%d) got %s, want %s", tt.input, tt.i,
+					sprintubits(word(got), 64), sprintubits(word(tt.want), 64))
+			}
+		})
+	}
+}
+
 func TestBitstringUint32(t *testing.T) {
 	tests := []struct {
 		input string
 		i     uint
 		want  uint32
 	}{
-		// LSB and MSB 8 are both on the same word
+		// LSB and MSB are both on the same word
 		{input: "00000000000000000000000000000001",
 			i: 0, want: 1},
 		{input: "00000000000000000000000000000010",
@@ -76,7 +117,7 @@ func TestBitstringUint32(t *testing.T) {
 		{input: "1000000000000000000000000000000111111111111111111111111111111111",
 			i: 32, want: 1<<31 + 1},
 
-		// LSB and MSB 8 are on 2 separate words
+		// LSB and MSB are on 2 separate words
 		{input: "100000000000000000000000000000000",
 			i: 1, want: 1 << 31},
 		{input: "1111111111111111111101000000000000000000000000000010111111111111",
@@ -103,7 +144,7 @@ func TestBitstringUint16(t *testing.T) {
 		i     uint
 		want  uint16
 	}{
-		// LSB and MSB 8 are both on the same word
+		// LSB and MSB are both on the same word
 		{input: "00000000000000000000000000000001",
 			i: 0, want: 1},
 		{input: "00000000000000000000000000000010",
@@ -119,7 +160,7 @@ func TestBitstringUint16(t *testing.T) {
 		{input: "10000000000000000",
 			i: 1, want: 1 << 15},
 
-		// LSB and MSB 8 are on 2 separate words
+		// LSB and MSB are on 2 separate words
 		{input: "111111111111111111111110100000000000010111111111111111111111111",
 			i: 24, want: 1<<14 + 2},
 		{input: "000000000000000000000001111111111111110000000000000000000000000",
@@ -144,7 +185,7 @@ func TestBitstringUint8(t *testing.T) {
 		i     uint
 		want  uint8
 	}{
-		// LSB and MSB 8 are both on the same word
+		// LSB and MSB are both on the same word
 		{input: "00000000000000000000000000000001",
 			i: 0, want: 1},
 		{input: "00000000000000000000000000000010",
@@ -160,7 +201,7 @@ func TestBitstringUint8(t *testing.T) {
 		{input: "100000000",
 			i: 1, want: 1 << 7},
 
-		// LSB and MSB 8 are on separate words
+		// LSB and MSB are on separate words
 		{input: "11111111111111111111111010000101111111111111111111111111111111",
 			i: 31, want: 1<<6 + 2},
 		{input: "00000000000000000000000111111100000000000000000000000000000000",
@@ -188,14 +229,14 @@ func TestBitstringInt32(t *testing.T) {
 		i     uint
 		want  int32
 	}{
-		// LSB and MSB 8 are both on the same word
+		// LSB and MSB are both on the same word
 		{input: "11111111111111111111111111111111",
 			i: 0, want: -1},
 		{input: "01111111111111111111111111111111",
 			i: 0, want: math.MaxInt32},
 		{input: "10000000000000000000000000000000",
 			i: 0, want: math.MinInt32},
-		// LSB and MSB 8 are on 2 separate words
+		// LSB and MSB are on 2 separate words
 		{input: "111111111111111111111111111111110000000000000000000000000000000",
 			i: 31, want: -1},
 		{input: "011111111111111111111111111111110000000000000000000000000000000",
@@ -222,14 +263,14 @@ func TestBitstringInt16(t *testing.T) {
 		i     uint
 		want  int16
 	}{
-		// LSB and MSB 8 are both on the same word
+		// LSB and MSB are both on the same word
 		{input: "1111111111111111",
 			i: 0, want: -1},
 		{input: "0111111111111111",
 			i: 0, want: math.MaxInt16},
 		{input: "1000000000000000",
 			i: 0, want: math.MinInt16},
-		// LSB and MSB 8 are on 2 separate words
+		// LSB and MSB are on 2 separate words
 		{input: "11111111111111110000000000000000000000000000000",
 			i: 31, want: -1},
 		{input: "01111111111111110000000000000000000000000000000",
@@ -258,14 +299,14 @@ func TestBitstringInt8(t *testing.T) {
 		i     uint
 		want  int8
 	}{
-		// LSB and MSB 8 are both on the same word
+		// LSB and MSB are both on the same word
 		{input: "11111111",
 			i: 0, want: -1},
 		{input: "01111111",
 			i: 0, want: math.MaxInt8},
 		{input: "10000000",
 			i: 0, want: math.MinInt8},
-		// LSB and MSB 8 are on 2 separate words
+		// LSB and MSB are on 2 separate words
 		{input: "111111110000000000000000000000000000000",
 			i: 31, want: -1},
 		{input: "011111110000000000000000000000000000000",
