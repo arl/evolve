@@ -5,25 +5,30 @@ import (
 	"testing"
 )
 
-func TestBitstringGray8(t *testing.T) {
+func TestBitstringGrayn(t *testing.T) {
 	tests := []struct {
 		input string
-		want  uint8
+		nbits uint
+		want  word
 	}{
 		{input: "00000000",
-			want: 0},
+			nbits: 1, want: 0},
 		{input: "00000111",
-			want: 5},
+			nbits: 3, want: 5},
+		{input: "00000111",
+			nbits: 4, want: 5},
+		{input: "00000111",
+			nbits: 5, want: 5},
 		{input: "10000000",
-			want: math.MaxUint8},
+			nbits: 8, want: math.MaxUint8},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			bs, _ := MakeFromString(tt.input)
-			got := bs.Gray8(0)
+			got := bs.Grayn(tt.nbits, 0)
 			if tt.want != got {
-				t.Errorf("Bitstring(%s).Gray8() got %s, want %s", tt.input,
-					sprintubits(word(got), 8), sprintubits(word(tt.want), 8))
+				t.Errorf("Bitstring(%s).Grayn(%d, 0) got %s, want %s", tt.input, tt.nbits,
+					sprintubits(word(got), tt.nbits), sprintubits(word(tt.want), tt.nbits))
 			}
 		})
 	}
@@ -96,6 +101,30 @@ func TestBitstringGray64(t *testing.T) {
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Gray64(0) got %s, want %s", tt.input,
 					sprintubits(word(got), 64), sprintubits(word(tt.want), 64))
+			}
+		})
+	}
+}
+
+func TestBitstringGray8(t *testing.T) {
+	tests := []struct {
+		input string
+		want  uint8
+	}{
+		{input: "00000000",
+			want: 0},
+		{input: "00000111",
+			want: 5},
+		{input: "10000000",
+			want: math.MaxUint8},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			bs, _ := MakeFromString(tt.input)
+			got := bs.Gray8(0)
+			if tt.want != got {
+				t.Errorf("Bitstring(%s).Gray8(0) got %s, want %s", tt.input,
+					sprintubits(word(got), 8), sprintubits(word(tt.want), 8))
 			}
 		})
 	}
