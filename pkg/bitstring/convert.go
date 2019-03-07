@@ -53,32 +53,72 @@ func (bs *Bitstring) Uint8(i uint) uint8 {
 // Intn returns the n-bit signed integer value represented by the n bits
 // starting at the i. It panics if there are not enough bits or if n is greater
 // than WordLength.
-func (bs *Bitstring) Intn(nbits, i uint) int32 {
-	return int32(bs.Uintn(nbits, i))
-}
+func (bs *Bitstring) Intn(nbits, i uint) int32 { return int32(bs.Uintn(nbits, i)) }
 
 // Int64 returns the int64 value represented by the 64 bits starting at the
 // given bit. It panics if there are not enough bits.
-func (bs *Bitstring) Int64(i uint) int64 {
-	return int64(bs.Uint64(i))
-}
+func (bs *Bitstring) Int64(i uint) int64 { return int64(bs.Uint64(i)) }
 
 // Int32 returns the int32 value represented by the 32 bits starting at the
 // given bit. It panics if there are not enough bits.
-func (bs *Bitstring) Int32(i uint) int32 {
-	return int32(bs.Uint32(i))
-}
+func (bs *Bitstring) Int32(i uint) int32 { return int32(bs.Uint32(i)) }
 
 // Int16 returns the int16 value represented by the 16 bits starting at the
 // given bit. It panics if there are not enough bits.
-func (bs *Bitstring) Int16(i uint) int16 {
-	return int16(bs.Uint16(i))
-}
+func (bs *Bitstring) Int16(i uint) int16 { return int16(bs.Uint16(i)) }
 
 // Int8 returns the int8 value represented by the 8 bits starting at the
 // given bit. It panics if there are not enough bits.
-func (bs *Bitstring) Int8(i uint) int8 {
-	return int8(bs.Uint8(i))
+func (bs *Bitstring) Int8(i uint) int8 { return int8(bs.Uint8(i)) }
+
+// SetUint8 sets the 8 bits starting at i with the value of x. It panics if
+// there are not enough bits.
+func (bs *Bitstring) SetUint8(i uint, x uint8) {
+	bs.mustExist(i + 7)
+
+	lobit := uint(bitoffset(i))
+	j := wordoffset(i)
+	k := wordoffset(i + 7)
+	if j == k {
+		// fast path: same word
+		neww := word(x) << lobit
+		mask := genmask(lobit, lobit+8)
+		bs.data[j] = transferbits(bs.data[j], neww, mask)
+		return
+	}
+	// slow path: first and last bits are on different words
+	// transfer bits to low word
+	loword := word(x) << lobit
+	bs.data[j] = transferbits(bs.data[j], loword, genhimask(lobit))
+	// transfer bits to high word
+	hibit := 8 - (wordlen - lobit)
+	hiword := word(x) >> (wordlen - lobit)
+	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
+}
+
+// SetUint16 sets the 16 bits starting at i with the value of x. It panics if
+// there are not enough bits.
+func (bs *Bitstring) SetUint16(i uint, x uint16) {
+	bs.mustExist(i + 15)
+
+	lobit := uint(bitoffset(i))
+	j := wordoffset(i)
+	k := wordoffset(i + 15)
+	if j == k {
+		// fast path: same word
+		neww := word(x) << lobit
+		mask := genmask(lobit, lobit+16)
+		bs.data[j] = transferbits(bs.data[j], neww, mask)
+		return
+	}
+	// slow path: first and last bits are on different words
+	// transfer bits to low word
+	loword := word(x) << lobit
+	bs.data[j] = transferbits(bs.data[j], loword, genhimask(lobit))
+	// transfer bits to high word
+	hibit := 16 - (wordlen - lobit)
+	hiword := word(x) >> (wordlen - lobit)
+	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
 }
 
 // prints a string representing the first n bits of the base-2 representatio of x.

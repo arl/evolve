@@ -55,3 +55,9 @@ func findFirstSetBit(w word) uint {
 	}
 	return num
 }
+
+// transferbits returns the word that results from transfering some bits
+// from src to dst, where set bits in mask specify the bits to transfer.
+func transferbits(dst, src, mask word) word {
+	return dst&^mask | src&mask
+}

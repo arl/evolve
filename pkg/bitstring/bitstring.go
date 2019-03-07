@@ -34,11 +34,10 @@ type Bitstring struct {
 // New creates a bit string of the specified length (in bits) with all bits
 // initially set to zero (off).
 func New(length uint) *Bitstring {
-	bs := &Bitstring{
+	return &Bitstring{
 		length: length,
 		data:   make([]word, (length+wordlen-1)/wordlen),
 	}
-	return bs
 }
 
 // Random creates a Bitstring of the length l in which each bit is assigned a

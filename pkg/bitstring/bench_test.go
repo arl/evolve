@@ -18,6 +18,17 @@ func benchmarkUintn(b *testing.B, nbits, i uint) {
 	sink = v
 }
 
+func benchmarkUint64(b *testing.B, i uint) {
+	b.ReportAllocs()
+	bs, _ := MakeFromString("00000000000000000000000000000001010000000000000000000000000000000")
+	var v uint64
+	for n := 0; n < b.N; n++ {
+		v = bs.Uint64(i)
+	}
+	b.StopTimer()
+	sink = v
+}
+
 func benchmarkUint32(b *testing.B, i uint) {
 	b.ReportAllocs()
 	bs, _ := MakeFromString("0000000000000000000000000000000101000000000000000000000000000000")
@@ -53,6 +64,8 @@ func benchmarkUint8(b *testing.B, i uint) {
 
 func BenchmarkUintnSameWord(b *testing.B)        { benchmarkUintn(b, 32, 32) }
 func BenchmarkUintnDifferentWords(b *testing.B)  { benchmarkUintn(b, 32, 31) }
+func BenchmarkUint64SameWord(b *testing.B)       { benchmarkUint64(b, 0) }
+func BenchmarkUint64DifferentWords(b *testing.B) { benchmarkUint64(b, 1) }
 func BenchmarkUint32SameWord(b *testing.B)       { benchmarkUint32(b, 32) }
 func BenchmarkUint32DifferentWords(b *testing.B) { benchmarkUint32(b, 31) }
 func BenchmarkUint16SameWord(b *testing.B)       { benchmarkUint16(b, 32) }
@@ -118,4 +131,15 @@ func BenchmarkEquals(b *testing.B) {
 	}
 	b.StopTimer()
 	sink = res
+}
+
+func BenchmarkSetUint8(b *testing.B) {
+	bs := New(67)
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		bs.SetUint8(59, 255)
+	}
+	b.StopTimer()
+	sink = bs
 }

@@ -28,5 +28,61 @@ func (bs *Bitstring) Uint64(i uint) uint64 {
 	loword := bs.data[w] >> off
 	hiword := bs.data[w+1] & ((1 << off) - 1)
 	return uint64(loword | hiword<<(wordlen-off))
+}
 
+// SetUint32 sets the 32 bits starting at i with the value of x. It panics if
+// there are not enough bits.
+func (bs *Bitstring) SetUint32(i uint, x uint32) {
+	bs.mustExist(i + 31)
+
+	lobit := uint(bitoffset(i))
+	j := wordoffset(i)
+	k := wordoffset(i + 31)
+	if j == k {
+		// fast path: same word
+		neww := word(x) << lobit
+		mask := genmask(lobit, lobit+32)
+		bs.data[j] = transferbits(bs.data[j], neww, mask)
+		return
+	}
+	// slow path: first and last bits are on different words
+	// transfer bits to low word
+	loword := word(x) << lobit
+	bs.data[j] = transferbits(bs.data[j], loword, genhimask(lobit))
+	// transfer bits to high word
+	hibit := 32 - (wordlen - lobit)
+	hiword := word(x) >> (wordlen - lobit)
+	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
+}
+
+// SetUint64 sets the 64 bits starting at i with the value of x. It panics if
+// there are not enough bits.
+func (bs *Bitstring) SetUint64(i uint, x uint64) {
+	bs.mustExist(i + 63)
+
+	lobit := uint(bitoffset(i))
+	j := wordoffset(i)
+
+	// fast path: i is a multiple of 64
+	if i&((1<<6)-1) == 0 {
+		bs.data[i>>6] = x
+		return
+	}
+
+	k := wordoffset(i + 63)
+	if j == k {
+		// fast path: same word
+		neww := word(x) << lobit
+		mask := genmask(lobit, lobit+64)
+		bs.data[j] = transferbits(bs.data[j], neww, mask)
+		return
+	}
+	// slow path: first and last bits are on different words
+	// transfer bits to low word
+	loword := word(x) << lobit
+	bs.data[j] = transferbits(bs.data[j], loword, genhimask(lobit))
+	// transfer bits to high word
+	hibit := 64 - (wordlen - lobit)
+	hiword := word(x) >> (wordlen - lobit)
+	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
 }
