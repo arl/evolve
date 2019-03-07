@@ -31,15 +31,14 @@ func TestBitstringSetBits(t *testing.T) {
 	bs.SetBit(1)
 	bs.SetBit(4)
 
-	// Testing with non-symmetrical string to ensure that there are no endian
-	// or index problems.
+	// Testing with non-symmetrical string to ensure that there
+	// aren't any problem with endianness nor indices.
 	assert.False(t, bs.Bit(0), "Bit 0 should not be set.")
 	assert.True(t, bs.Bit(1), "Bit 1 should be set.")
 	assert.False(t, bs.Bit(2), "Bit 2 should not be set.")
 	assert.False(t, bs.Bit(3), "Bit 3 should not be set.")
 	assert.True(t, bs.Bit(4), "Bit 4 should be set.")
 
-	// Test unsetting a bit.
 	bs.ClearBit(4)
 	assert.False(t, bs.Bit(4), "Bit 4 should be unset.")
 }

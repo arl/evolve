@@ -93,19 +93,19 @@ func MakeFromString(s string) (*Bitstring, error) {
 	return bs, nil
 }
 
-// Len returns the number of bits of bs.
+// Len returns the lenght if bs, that is the number of bits it contains.
 func (bs *Bitstring) Len() int {
 	return int(bs.length)
 }
 
-// Data returns the bitstring underlying slice
+// Data returns the bitstring underlying slice.
 func (bs *Bitstring) Data() []word {
 	return bs.data
 }
 
 // Bit returns a boolean indicating wether the bit at index i is set or not.
 //
-// If i is greater than bs.Len(), Bit will panic.
+// If i is greater than the bitstring length, Bit will panic.
 func (bs *Bitstring) Bit(i uint) bool {
 	bs.mustExist(i)
 	w := wordoffset(i)
@@ -116,7 +116,7 @@ func (bs *Bitstring) Bit(i uint) bool {
 
 // SetBit sets the bit at index i.
 //
-// If i is greater than bs.Len(), SetBit will panic.
+// If i is greater than the bitstring length, SetBit will panic.
 func (bs *Bitstring) SetBit(i uint) {
 	bs.mustExist(i)
 
@@ -127,7 +127,7 @@ func (bs *Bitstring) SetBit(i uint) {
 
 // ClearBit clears the bit at index i.
 //
-// If i is greater than bs.Len(), ClearBit will panic.
+// If i is greater than the bitstring length, ClearBit will panic.
 func (bs *Bitstring) ClearBit(i uint) {
 	bs.mustExist(i)
 
@@ -138,9 +138,7 @@ func (bs *Bitstring) ClearBit(i uint) {
 
 // FlipBit flips (i.e toggles) the bit at index i.
 //
-// param index is the bit to flip (0 is the least-significant bit).
-//
-// If i is greater than bs.Len(), FlipBit will panic.
+// If i is greater than the bitstring length, FlipBit will panic.
 func (bs *Bitstring) FlipBit(i uint) {
 	bs.mustExist(i)
 
@@ -157,7 +155,7 @@ func (bs *Bitstring) mustExist(i uint) {
 	}
 }
 
-// OnesCount returns the number of one bits.
+// OnesCount counts the number of one bits.
 func (bs *Bitstring) OnesCount() uint {
 	var count uint
 	for _, x := range bs.data {
@@ -169,7 +167,7 @@ func (bs *Bitstring) OnesCount() uint {
 	return count
 }
 
-// ZeroesCount returns the number of zero bits.
+// ZeroesCount counts the number of zero bits.
 func (bs *Bitstring) ZeroesCount() uint {
 	return bs.length - bs.OnesCount()
 }

@@ -1,25 +1,26 @@
 package bitstring
 
-// creates a mask keep the nth bit of a word.
+// bitmask returns  a mask where only the nth bit of a word is set.
 func bitmask(n uint) word { return 1 << n }
 
-// for a given bit of a bit string, returns the offset of the word
-// (from the first word of the bitstring) that contains that bit.
+// wordoffset returns, for a given bit n of a bit string, the offset
+// of the word that contains bit n.
 func wordoffset(n uint) word { return word(n / wordlen) }
 
-// for a given bit of a bit string, returns the offset of that bit
-// from the start of the word that contains it.
+// bitoffset returns, for a given bit n of a bit string, the offset
+// of that bit with regards to the first bit of the word that contains
+// bit n.
 func bitoffset(n uint) word { return word(n & (wordlen - 1)) }
 
-// returns a mask that keeps the bits in the range [l, h[
+// genmask returns a mask that keeps the bits in the range [l, h)
 // behaviour undefined if any argument is greater than wordlen.
 func genmask(l, h uint) word { return genlomask(h) & genhimask(l) }
 
-// returns a mask to keep the n LSB (least significant bits).
+// genlomask returns a mask to keep the n LSB (least significant bits).
 // Undefined behaviour if n is greater than wordlen.
 func genlomask(n uint) word { return maxuword >> (wordlen - n) }
 
-// returns a mask to keep the n MSB (most significan bits).
+// genhimask returns a mask to keep the n MSB (most significant bits).
 // Undefined behaviour if n is greater than wordlen.
 func genhimask(n uint) word { return maxuword << n }
 
