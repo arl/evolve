@@ -4,25 +4,25 @@ import (
 	"fmt"
 )
 
-// Uintn returns the n-bit unsigned integer value represented by the n bits
-// starting at the bit index i. It panics if there are not enough bits or if n
-// is greater than WordLength.
+// Uintn returns the n bits unsigned integer value represented by the n bits
+// starting at the bit index i. It panics if there aren't enough bits in bs or
+// if n > WordLength.
 // TODO: reverse order of nbits and i params
-func (bs *Bitstring) Uintn(nbits, i uint) word {
-	if nbits > wordlen || nbits < 1 {
+func (bs *Bitstring) Uintn(n, i uint) word {
+	if n > wordlen || n < 1 {
 		panic(fmt.Sprintf("Uintn supports unsigned integers from 1 to %d bits long", wordlen))
 	}
-	bs.mustExist(i + nbits - 1)
+	bs.mustExist(i + n - 1)
 
 	j := wordoffset(i)
-	k := wordoffset(i + nbits - 1)
+	k := wordoffset(i + n - 1)
 	looff := bitoffset(i)
 	loword := bs.data[j]
 	if j == k {
 		// fast path: same word
-		return (loword >> looff) & genlomask(nbits)
+		return (loword >> looff) & genlomask(n)
 	}
-	hioff := bitoffset(i + nbits)
+	hioff := bitoffset(i + n)
 	hiword := bs.data[k] & genlomask(uint(hioff))
 	loword = genhimask(uint(looff)) & loword >> looff
 	return loword | hiword<<(wordlen-looff)
