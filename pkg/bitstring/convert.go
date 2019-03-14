@@ -121,6 +121,22 @@ func (bs *Bitstring) SetUint16(i uint, x uint16) {
 	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
 }
 
+// SetInt8 sets the 8 bits starting at i with the value of x. It panics if
+// there are not enough bits.
+func (bs *Bitstring) SetInt8(i uint, x int8) { bs.SetUint8(i, uint8(x)) }
+
+// SetInt16 sets the 16 bits starting at i with the value of x. It panics if
+// there are not enough bits.
+func (bs *Bitstring) SetInt16(i uint, x int16) { bs.SetUint16(i, uint16(x)) }
+
+// SetInt32 sets the 32 bits starting at i with the value of x. It panics if
+// there are not enough bits.
+func (bs *Bitstring) SetInt32(i uint, x int32) { bs.SetUint32(i, uint32(x)) }
+
+// SetInt64 sets the 64 bits starting at i with the value of x. It panics if
+// there are not enough bits.
+func (bs *Bitstring) SetInt64(i uint, x int64) { bs.SetUint64(i, uint64(x)) }
+
 // prints a string representing the first n bits of the base-2 representatio of x.
 func printbits(x word, n uint) {
 	fmt.Printf(fmt.Sprintf("%%0%db\n", n), x)

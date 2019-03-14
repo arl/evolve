@@ -568,3 +568,46 @@ func TestBitstringSetUint64(t *testing.T) {
 		})
 	}
 }
+
+func TestBitstringSetInt(t *testing.T) {
+	t.Run("SetInt8", func(t *testing.T) {
+		bs, _ := MakeFromString("00000000")
+		want := int8(math.MinInt8 / 3 * 2)
+		bs.SetInt8(0, want)
+		got := bs.Int8(0)
+		if got != want {
+			t.Errorf("Bitstring().SetInt8(%d, %d) got %d, want %d",
+				0, want, got, want)
+		}
+	})
+	t.Run("SetInt16", func(t *testing.T) {
+		bs, _ := MakeFromString("0000000000000000")
+		want := int16(math.MinInt16 / 3 * 2)
+		bs.SetInt16(0, want)
+		got := bs.Int16(0)
+		if got != want {
+			t.Errorf("Bitstring().SetInt16(%d, %d) got %d, want %d",
+				0, want, got, want)
+		}
+	})
+	t.Run("SetInt32", func(t *testing.T) {
+		bs, _ := MakeFromString("00000000000000000000000000000000")
+		want := int32(math.MinInt32 / 3 * 2)
+		bs.SetInt32(0, want)
+		got := bs.Int32(0)
+		if got != want {
+			t.Errorf("Bitstring().SetInt32(%d, %d) got %d, want %d",
+				0, want, got, want)
+		}
+	})
+	t.Run("SetInt64", func(t *testing.T) {
+		bs, _ := MakeFromString("0000000000000000000000000000000000000000000000000000000000000000")
+		want := int64(math.MinInt64 / 3 * 2)
+		bs.SetInt64(0, want)
+		got := bs.Int64(0)
+		if got != want {
+			t.Errorf("Bitstring().SetInt64(%d, %d) got %d, want %d",
+				0, want, got, want)
+		}
+	})
+}
