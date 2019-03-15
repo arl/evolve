@@ -5,12 +5,12 @@ func bitmask(n uint) word { return 1 << n }
 
 // wordoffset returns, for a given bit n of a bit string, the offset
 // of the word that contains bit n.
-func wordoffset(n uint) word { return word(n / wordlen) }
+func wordoffset(n uint) word { return word(n / uintsize) }
 
 // bitoffset returns, for a given bit n of a bit string, the offset
 // of that bit with regards to the first bit of the word that contains
 // bit n.
-func bitoffset(n uint) word { return word(n & (wordlen - 1)) }
+func bitoffset(n uint) word { return word(n & (uintsize - 1)) }
 
 // genmask returns a mask that keeps the bits in the range [l, h)
 // behaviour undefined if any argument is greater than wordlen.
@@ -18,7 +18,7 @@ func genmask(l, h uint) word { return genlomask(h) & genhimask(l) }
 
 // genlomask returns a mask to keep the n LSB (least significant bits).
 // Undefined behaviour if n is greater than wordlen.
-func genlomask(n uint) word { return maxuword >> (wordlen - n) }
+func genlomask(n uint) word { return maxuword >> (uintsize - n) }
 
 // genhimask returns a mask to keep the n MSB (most significant bits).
 // Undefined behaviour if n is greater than wordlen.
@@ -28,7 +28,7 @@ func genhimask(n uint) word { return maxuword << n }
 func findFirstSetBit(w word) uint {
 	var num uint
 
-	if wordlen == 64 {
+	if uintsize == 64 {
 		if (w & 0xffffffff) == 0 {
 			num += 32
 			w >>= 32

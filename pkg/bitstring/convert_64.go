@@ -10,7 +10,7 @@ func (bs *Bitstring) Uint32(i uint) uint32 {
 	off := bitoffset(i)
 	loword := bs.data[wordoffset(i)] >> off
 	hiword := bs.data[wordoffset(i+31)] & ((1 << off) - 1)
-	return uint32(loword | hiword<<(wordlen-off))
+	return uint32(loword | hiword<<(uintsize-off))
 }
 
 // Uint64 returns the uint64 value represented by the 64 bits starting at the
@@ -27,7 +27,7 @@ func (bs *Bitstring) Uint64(i uint) uint64 {
 	off := bitoffset(i)
 	loword := bs.data[w] >> off
 	hiword := bs.data[w+1] & ((1 << off) - 1)
-	return uint64(loword | hiword<<(wordlen-off))
+	return uint64(loword | hiword<<(uintsize-off))
 }
 
 // SetUint32 sets the 32 bits starting at i with the value of x. It panics if
@@ -48,7 +48,7 @@ func (bs *Bitstring) SetUint32(i uint, x uint32) {
 	// transfer bits to low word
 	bs.data[j] = transferbits(bs.data[j], word(x)<<lobit, genhimask(lobit))
 	// transfer bits to high word
-	lon := wordlen - lobit
+	lon := uintsize - lobit
 	bs.data[k] = transferbits(bs.data[k], word(x)>>lon, genlomask(32-lon))
 }
 
@@ -77,6 +77,6 @@ func (bs *Bitstring) SetUint64(i uint, x uint64) {
 	// transfer bits to low word
 	bs.data[j] = transferbits(bs.data[j], word(x)<<lobit, genhimask(lobit))
 	// transfer bits to high word
-	lon := (wordlen - lobit)
+	lon := (uintsize - lobit)
 	bs.data[k] = transferbits(bs.data[k], word(x)>>lon, genlomask(64-lon))
 }

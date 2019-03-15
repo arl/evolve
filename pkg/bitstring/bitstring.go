@@ -36,7 +36,7 @@ type Bitstring struct {
 func New(length uint) *Bitstring {
 	return &Bitstring{
 		length: length,
-		data:   make([]word, (length+wordlen-1)/wordlen),
+		data:   make([]word, (length+uintsize-1)/uintsize),
 	}
 }
 
@@ -52,7 +52,7 @@ func Random(length uint, rng *rand.Rand) *Bitstring {
 	a := bs.data[:len(bs.data)] // remove bounds-checking
 
 	// fill words with random values
-	switch wordlen {
+	switch uintsize {
 	case 32:
 		for i := range a {
 			a[i] = word(rng.Uint32())
@@ -203,17 +203,17 @@ func SwapRange(bs1, bs2 *Bitstring, start, length uint) {
 	bs2.mustExist(start + length - 1)
 
 	// swap the required bits of the first word
-	i := word(start / wordlen)
+	i := word(start / uintsize)
 	start = uint(bitoffset(start))
-	end := minuint(start+length, wordlen)
+	end := minuint(start+length, uintsize)
 	remain := length - (end - start)
 	swapBits(bs1, bs2, i, genmask(start, end))
 	i++
 
 	// swap whole words but the last one
-	for remain > wordlen {
+	for remain > uintsize {
 		bs1.data[i], bs2.data[i] = bs2.data[i], bs1.data[i]
-		remain -= wordlen
+		remain -= uintsize
 		i++
 	}
 

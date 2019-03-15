@@ -9,8 +9,8 @@ import (
 // if n > WordLength.
 // TODO: reverse order of nbits and i params
 func (bs *Bitstring) Uintn(n, i uint) word {
-	if n > wordlen || n < 1 {
-		panic(fmt.Sprintf("Uintn supports unsigned integers from 1 to %d bits long", wordlen))
+	if n > uintsize || n < 1 {
+		panic(fmt.Sprintf("Uintn supports unsigned integers from 1 to %d bits long", uintsize))
 	}
 	bs.mustExist(i + n - 1)
 
@@ -25,7 +25,7 @@ func (bs *Bitstring) Uintn(n, i uint) word {
 	hioff := bitoffset(i + n)
 	hiword := bs.data[k] & genlomask(uint(hioff))
 	loword = genhimask(uint(looff)) & loword >> looff
-	return loword | hiword<<(wordlen-looff)
+	return loword | hiword<<(uintsize-looff)
 }
 
 // Uint16 returns the uint16 value represented by the 16 bits starting at the
@@ -36,7 +36,7 @@ func (bs *Bitstring) Uint16(i uint) uint16 {
 	off := bitoffset(i)
 	loword := bs.data[wordoffset(i)] >> off
 	hiword := bs.data[wordoffset(i+15)] & ((1 << off) - 1)
-	return uint16(loword | hiword<<(wordlen-off))
+	return uint16(loword | hiword<<(uintsize-off))
 }
 
 // Uint8 returns the uint8 value represented by the 8 bits starting at the
@@ -47,7 +47,7 @@ func (bs *Bitstring) Uint8(i uint) uint8 {
 	off := bitoffset(i)
 	loword := bs.data[wordoffset(i)] >> off
 	hiword := bs.data[wordoffset(i+7)] & ((1 << off) - 1)
-	return uint8(loword | hiword<<(wordlen-off))
+	return uint8(loword | hiword<<(uintsize-off))
 }
 
 // Intn returns the n-bit signed integer value represented by the n bits
@@ -90,7 +90,7 @@ func (bs *Bitstring) SetUintn(n, i uint, x word) {
 	}
 	// slow path: first and last bits are on different words
 	// transfer bits to low word
-	lon := wordlen - lobit // how many bits of n we transfer to loword
+	lon := uintsize - lobit // how many bits of n we transfer to loword
 	bs.data[j] = transferbits(bs.data[j], x<<lobit, genhimask(lon))
 
 	// transfer bits to high word
@@ -115,7 +115,7 @@ func (bs *Bitstring) SetUint8(i uint, x uint8) {
 	// transfer bits to low word
 	bs.data[j] = transferbits(bs.data[j], word(x)<<lobit, genhimask(lobit))
 	// transfer bits to high word
-	lon := wordlen - lobit
+	lon := uintsize - lobit
 	bs.data[k] = transferbits(bs.data[k], word(x)>>lon, genlomask(8-lon))
 }
 
@@ -137,7 +137,7 @@ func (bs *Bitstring) SetUint16(i uint, x uint16) {
 	// transfer bits to low word
 	bs.data[j] = transferbits(bs.data[j], word(x)<<lobit, genhimask(lobit))
 	// transfer bits to high word
-	lon := wordlen - lobit
+	lon := uintsize - lobit
 	bs.data[k] = transferbits(bs.data[k], word(x)>>lon, genlomask(16-lon))
 }
 

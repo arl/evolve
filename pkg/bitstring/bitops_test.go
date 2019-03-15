@@ -7,7 +7,7 @@ import (
 )
 
 func atobin(s string) word {
-	i, err := strconv.ParseUint(s, 2, wordlen)
+	i, err := strconv.ParseUint(s, 2, uintsize)
 	if err != nil {
 		panic(fmt.Sprintf("Can't convert %s to base 2: %s", s, err))
 	}
@@ -22,9 +22,9 @@ func Test_genlomask(t *testing.T) {
 		{n: 0, want: atobin("00000000000000000000000000000000")},
 		{n: 1, want: atobin("00000000000000000000000000000001")},
 		{n: 2, want: atobin("00000000000000000000000000000011")},
-		{n: wordlen - 2, want: maxuword >> 2},
-		{n: wordlen - 1, want: maxuword >> 1},
-		{n: wordlen, want: maxuword},
+		{n: uintsize - 2, want: maxuword >> 2},
+		{n: uintsize - 1, want: maxuword >> 1},
+		{n: uintsize, want: maxuword},
 	}
 	for _, tt := range tests {
 		if got := genlomask(tt.n); got != tt.want {
@@ -41,8 +41,8 @@ func Test_genhimask(t *testing.T) {
 	}{
 		{n: 0, want: maxuword},
 		{n: 1, want: maxuword - 1},
-		{n: wordlen - 2, want: 1<<(wordlen-1) + 1<<(wordlen-2)},
-		{n: wordlen - 1, want: 1 << (wordlen - 1)},
+		{n: uintsize - 2, want: 1<<(uintsize-1) + 1<<(uintsize-2)},
+		{n: uintsize - 1, want: 1 << (uintsize - 1)},
 	}
 	for _, tt := range tests {
 		if got := genhimask(tt.n); got != tt.want {
@@ -85,7 +85,7 @@ func Test_findFirstSetBit(t *testing.T) {
 		{w: atobin("00000000000001111111000000000100"), want: 2},
 		{w: atobin("00000000000001111111000000000000"), want: 12},
 		{w: atobin("10000000000000000000000000000000"), want: 31},
-		{w: atobin("00000000000000000000000000000000"), want: wordlen - 1},
+		{w: atobin("00000000000000000000000000000000"), want: uintsize - 1},
 		{w: atobin("11111111111111111111111111111111"), want: 0},
 	}
 	for _, tt := range tests {
