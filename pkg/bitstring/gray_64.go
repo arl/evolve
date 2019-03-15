@@ -4,7 +4,7 @@ package bitstring
 
 // Grayn returns the n-bit unsigned integer value represented by the n
 // gray-coded bits starting at the bit index i. It panics if there are not
-// enough bits or if n is greater than uintsize.
+// enough bits or if n is greater than the size of a machine word.
 func (bs *Bitstring) Grayn(nbits, i uint) uint {
 	v := bs.Uintn(nbits, i)
 	v ^= v >> 32

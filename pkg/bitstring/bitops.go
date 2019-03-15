@@ -12,7 +12,8 @@ func wordoffset(n uint) uint { return uint(n / uintsize) }
 func bitoffset(n uint) uint { return uint(n & (uintsize - 1)) }
 
 // genmask returns a mask that keeps the bits in the range [l, h)
-// behaviour undefined if any argument is greater than wordlen.
+// behaviour undefined if any argument is greater than the size of
+// a machine word.
 func genmask(l, h uint) uint { return genlomask(h) & genhimask(l) }
 
 // genlomask returns a mask to keep the n LSB (least significant bits).

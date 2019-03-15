@@ -6,7 +6,7 @@ import (
 
 // Uintn returns the n bits unsigned integer value represented by the n bits
 // starting at the bit index i. It panics if there aren't enough bits in bs or
-// if n > uintsize.
+// if n is greater than the size of a machine word.
 // TODO: reverse order of nbits and i params
 func (bs *Bitstring) Uintn(n, i uint) uint {
 	if n > uintsize || n < 1 {
@@ -52,7 +52,7 @@ func (bs *Bitstring) Uint8(i uint) uint8 {
 
 // Intn returns the n-bit signed integer value represented by the n bits
 // starting at the i. It panics if there are not enough bits or if n is greater
-// than uintsize.
+// than the size of a machine word.
 func (bs *Bitstring) Intn(nbits, i uint) int32 { return int32(bs.Uintn(nbits, i)) }
 
 // Int64 returns the int64 value represented by the 64 bits starting at the
@@ -72,11 +72,12 @@ func (bs *Bitstring) Int16(i uint) int16 { return int16(bs.Uint16(i)) }
 func (bs *Bitstring) Int8(i uint) int8 { return int8(bs.Uint8(i)) }
 
 // SetUintn sets the n bits starting at i with the first n bits of value x.
-// It panics if there aren't enough bits in bs or if n > WordLength.
+// It panics if there aren't enough bits in bs or if n is greater than
+// the size of a machine word.
 func (bs *Bitstring) SetUintn(n, i uint, x uint) {
-	// if n > wordlen || n < 1 {
-	// 	panic(fmt.Sprintf("SetUintn supports unsigned integers from 1 to %d bits long", wordlen))
-	// }
+	if n > uintsize || n < 1 {
+		panic(fmt.Sprintf("SetUintn supports unsigned integers from 1 to %d bits long", uintsize))
+	}
 	bs.mustExist(i + n - 1)
 
 	lobit := uint(bitoffset(i))
@@ -142,7 +143,8 @@ func (bs *Bitstring) SetUint16(i uint, x uint16) {
 }
 
 // SetIntn sets the n bits starting at i with the first n bits of value x.
-// It panics if there aren't enough bits in bs or if n > uintsize.
+// It panics if there aren't enough bits in bs or if n is greater than
+// the size of a machine word.
 func (bs *Bitstring) SetIntn(n, i uint, x uint) { bs.SetIntn(n, i, x) }
 
 // SetInt8 sets the 8 bits starting at i with the value of x. It panics if
