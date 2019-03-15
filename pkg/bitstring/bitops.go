@@ -1,34 +1,34 @@
 package bitstring
 
-// bitmask returns  a mask where only the nth bit of a word is set.
-func bitmask(n uint) word { return 1 << n }
+// bitmask returns a mask where only the nth bit of a uint is set.
+func bitmask(n uint) uint { return 1 << n }
 
 // wordoffset returns, for a given bit n of a bit string, the offset
-// of the word that contains bit n.
-func wordoffset(n uint) word { return word(n / wordlen) }
+// of the uint that contains bit n.
+func wordoffset(n uint) uint { return uint(n / uintsize) }
 
-// bitoffset returns, for a given bit n of a bit string, the offset
-// of that bit with regards to the first bit of the word that contains
-// bit n.
-func bitoffset(n uint) word { return word(n & (wordlen - 1)) }
+// bitoffset returns, for a given bit n of a bit string, the offset of
+// that bit with regards to the first bit of the uint that contains it.
+func bitoffset(n uint) uint { return uint(n & (uintsize - 1)) }
 
 // genmask returns a mask that keeps the bits in the range [l, h)
-// behaviour undefined if any argument is greater than wordlen.
-func genmask(l, h uint) word { return genlomask(h) & genhimask(l) }
+// behaviour undefined if any argument is greater than the size of
+// a machine word.
+func genmask(l, h uint) uint { return genlomask(h) & genhimask(l) }
 
 // genlomask returns a mask to keep the n LSB (least significant bits).
-// Undefined behaviour if n is greater than wordlen.
-func genlomask(n uint) word { return maxuword >> (wordlen - n) }
+// Undefined behaviour if n is greater than uintsize.
+func genlomask(n uint) uint { return maxuint >> (uintsize - n) }
 
 // genhimask returns a mask to keep the n MSB (most significant bits).
-// Undefined behaviour if n is greater than wordlen.
-func genhimask(n uint) word { return maxuword << n }
+// Undefined behaviour if n is greater than uintsize.
+func genhimask(n uint) uint { return maxuint << n }
 
 // findFirstSetBit returns the offset of the first set bit in w
-func findFirstSetBit(w word) uint {
+func findFirstSetBit(w uint) uint {
 	var num uint
 
-	if wordlen == 64 {
+	if uintsize == 64 {
 		if (w & 0xffffffff) == 0 {
 			num += 32
 			w >>= 32
@@ -56,8 +56,8 @@ func findFirstSetBit(w word) uint {
 	return num
 }
 
-// transferbits returns the word that results from transfering some bits
+// transferbits returns the uint that results from transfering some bits
 // from src to dst, where set bits in mask specify the bits to transfer.
-func transferbits(dst, src, mask word) word {
+func transferbits(dst, src, mask uint) uint {
 	return dst&^mask | src&mask
 }
