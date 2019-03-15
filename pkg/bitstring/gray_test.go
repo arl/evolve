@@ -9,7 +9,7 @@ func TestBitstringGrayn(t *testing.T) {
 	tests := []struct {
 		input string
 		nbits uint
-		want  word
+		want  uint
 	}{
 		{input: "00000000",
 			nbits: 1, want: 0},
@@ -28,7 +28,7 @@ func TestBitstringGrayn(t *testing.T) {
 			got := bs.Grayn(tt.nbits, 0)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Grayn(%d, 0) got %s, want %s", tt.input, tt.nbits,
-					sprintubits(word(got), tt.nbits), sprintubits(word(tt.want), tt.nbits))
+					sprintubits(uint(got), tt.nbits), sprintubits(uint(tt.want), tt.nbits))
 			}
 		})
 	}
@@ -52,7 +52,7 @@ func TestBitstringGray16(t *testing.T) {
 			got := bs.Gray16(0)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Gray16(0) got %s, want %s", tt.input,
-					sprintubits(word(got), 16), sprintubits(word(tt.want), 16))
+					sprintubits(uint(got), 16), sprintubits(uint(tt.want), 16))
 			}
 		})
 	}
@@ -76,7 +76,7 @@ func TestBitstringGray32(t *testing.T) {
 			got := bs.Gray32(0)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Gray32(0) got %s, want %s", tt.input,
-					sprintubits(word(got), 32), sprintubits(word(tt.want), 32))
+					sprintubits(uint(got), 32), sprintubits(uint(tt.want), 32))
 			}
 		})
 	}
@@ -100,7 +100,7 @@ func TestBitstringGray64(t *testing.T) {
 			got := bs.Gray64(0)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Gray64(0) got %s, want %s", tt.input,
-					sprintubits(word(got), 64), sprintubits(word(tt.want), 64))
+					sprintubits(uint(got), 64), sprintubits(uint(tt.want), 64))
 			}
 		})
 	}
@@ -124,7 +124,7 @@ func TestBitstringGray8(t *testing.T) {
 			got := bs.Gray8(0)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Gray8(0) got %s, want %s", tt.input,
-					sprintubits(word(got), 8), sprintubits(word(tt.want), 8))
+					sprintubits(uint(got), 8), sprintubits(uint(tt.want), 8))
 			}
 		})
 	}

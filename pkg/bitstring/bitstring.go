@@ -28,7 +28,7 @@ type Bitstring struct {
 	length uint
 
 	// bits are packed in an array of 32-bit ints.
-	data []word
+	data []uint
 }
 
 // New creates a bit string of the specified length (in bits) with all bits
@@ -36,7 +36,7 @@ type Bitstring struct {
 func New(length uint) *Bitstring {
 	return &Bitstring{
 		length: length,
-		data:   make([]word, (length+uintsize-1)/uintsize),
+		data:   make([]uint, (length+uintsize-1)/uintsize),
 	}
 }
 
@@ -55,11 +55,11 @@ func Random(length uint, rng *rand.Rand) *Bitstring {
 	switch uintsize {
 	case 32:
 		for i := range a {
-			a[i] = word(rng.Uint32())
+			a[i] = uint(rng.Uint32())
 		}
 	case 64:
 		for i := range a {
-			a[i] = word(rng.Uint64())
+			a[i] = uint(rng.Uint64())
 		}
 	}
 
@@ -98,7 +98,7 @@ func (bs *Bitstring) Len() int {
 }
 
 // Data returns the bitstring underlying slice.
-func (bs *Bitstring) Data() []word {
+func (bs *Bitstring) Data() []uint {
 	return bs.data
 }
 
@@ -203,7 +203,7 @@ func SwapRange(bs1, bs2 *Bitstring, start, length uint) {
 	bs2.mustExist(start + length - 1)
 
 	// swap the required bits of the first word
-	i := word(start / uintsize)
+	i := start / uintsize
 	start = uint(bitoffset(start))
 	end := minuint(start+length, uintsize)
 	remain := length - (end - start)
@@ -226,7 +226,7 @@ func SwapRange(bs1, bs2 *Bitstring, start, length uint) {
 // swapBits swaps range of bits from one word to another.
 // w is the index of the word containing the bits to swap, and m is a mask that specifies
 // whilch bits of that word will be swapped.
-func swapBits(x, y *Bitstring, w, mask word) {
+func swapBits(x, y *Bitstring, w, mask uint) {
 	keep := ^mask
 	xkeep, ykeep := x.data[w]&keep, y.data[w]&keep
 	xswap, yswap := x.data[w]&mask, y.data[w]&mask
@@ -249,7 +249,7 @@ func (bs *Bitstring) String() string {
 
 // Copy creates and returns a new Bitstring that is a copy of src.
 func Copy(src *Bitstring) *Bitstring {
-	dst := make([]word, len(src.data))
+	dst := make([]uint, len(src.data))
 	copy(dst, src.data)
 	return &Bitstring{
 		length: src.length,

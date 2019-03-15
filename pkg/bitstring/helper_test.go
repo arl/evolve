@@ -13,7 +13,7 @@ func sprintubits(val uint, nbits uint) string {
 func sprintsbits(val int, nbits uint) string {
 	if val < 0 {
 		// casting to uint will show us the 2's complement
-		return sprintubits(word(val), nbits)
+		return sprintubits(uint(val), nbits)
 	}
 	return fmt.Sprintf(fmt.Sprintf("%%0%db", nbits), val)
 }
