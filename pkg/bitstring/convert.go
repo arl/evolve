@@ -79,10 +79,9 @@ func (bs *Bitstring) SetUintn(n, i uint, x word) {
 	// }
 	bs.mustExist(i + n - 1)
 
+	lobit := uint(bitoffset(i))
 	j := wordoffset(i)
 	k := wordoffset(i + n - 1)
-	lobit := uint(bitoffset(i))
-
 	if j == k {
 		// fast path: same word
 		x := (x & genlomask(n)) << lobit
@@ -90,14 +89,12 @@ func (bs *Bitstring) SetUintn(n, i uint, x word) {
 		return
 	}
 	// slow path: first and last bits are on different words
-
 	// transfer bits to low word
 	lon := wordlen - lobit // how many bits of n we transfer to loword
-	bs.data[j] = transferbits(bs.data[j], (x&genlomask(lon))<<lobit, genhimask(lon))
+	bs.data[j] = transferbits(bs.data[j], x<<lobit, genhimask(lon))
 
 	// transfer bits to high word
-	himask := genlomask(n - lon) // how many bits of n we transfer to hiword
-	bs.data[k] = transferbits(bs.data[k], (x>>lon)&himask, himask)
+	bs.data[k] = transferbits(bs.data[k], x>>lon, genlomask(n-lon))
 }
 
 // SetUint8 sets the 8 bits starting at i with the value of x. It panics if
@@ -115,14 +112,11 @@ func (bs *Bitstring) SetUint8(i uint, x uint8) {
 		bs.data[j] = transferbits(bs.data[j], neww, mask)
 		return
 	}
-	// slow path: first and last bits are on different words
 	// transfer bits to low word
-	loword := word(x) << lobit
-	bs.data[j] = transferbits(bs.data[j], loword, genhimask(lobit))
+	bs.data[j] = transferbits(bs.data[j], word(x)<<lobit, genhimask(lobit))
 	// transfer bits to high word
-	hibit := 8 - (wordlen - lobit)
-	hiword := word(x) >> (wordlen - lobit)
-	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
+	lon := wordlen - lobit
+	bs.data[k] = transferbits(bs.data[k], word(x)>>lon, genlomask(8-lon))
 }
 
 // SetUint16 sets the 16 bits starting at i with the value of x. It panics if
@@ -140,14 +134,11 @@ func (bs *Bitstring) SetUint16(i uint, x uint16) {
 		bs.data[j] = transferbits(bs.data[j], neww, mask)
 		return
 	}
-	// slow path: first and last bits are on different words
 	// transfer bits to low word
-	loword := word(x) << lobit
-	bs.data[j] = transferbits(bs.data[j], loword, genhimask(lobit))
+	bs.data[j] = transferbits(bs.data[j], word(x)<<lobit, genhimask(lobit))
 	// transfer bits to high word
-	hibit := 16 - (wordlen - lobit)
-	hiword := word(x) >> (wordlen - lobit)
-	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
+	lon := wordlen - lobit
+	bs.data[k] = transferbits(bs.data[k], word(x)>>lon, genlomask(16-lon))
 }
 
 // SetIntn sets the n bits starting at i with the first n bits of value x.

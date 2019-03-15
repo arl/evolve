@@ -49,15 +49,11 @@ func (bs *Bitstring) SetUint32(i uint, x uint32) {
 		bs.data[j] = transferbits(bs.data[j], neww, mask)
 		return
 	}
-	// slow path: first and last bits are on different words
 	// transfer bits to low word
-	loword := word(x) << lobit
-	bs.data[j] = transferbits(bs.data[j], loword, genhimask(lobit))
-
+	bs.data[j] = transferbits(bs.data[j], word(x)<<lobit, genhimask(lobit))
 	// transfer bits to high word
-	hibit := 32 - (wordlen - lobit)
-	hiword := word(x) >> (wordlen - lobit)
-	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
+	lon := wordlen - lobit
+	bs.data[k] = transferbits(bs.data[k], word(x)>>lon, genlomask(32-lon))
 }
 
 // SetUint64 sets the 64 bits starting at i with the value of x. It panics if
