@@ -143,3 +143,14 @@ func BenchmarkSetUint8(b *testing.B) {
 	b.StopTimer()
 	sink = bs
 }
+
+func BenchmarkSetUintn(b *testing.B) {
+	bs := New(117)
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		bs.SetUintn(64, 35, 0x9cfbeb71ee3fcf5f)
+	}
+	b.StopTimer()
+	sink = bs
+}

@@ -329,6 +329,70 @@ func TestBitstringInt8(t *testing.T) {
 // conversion from unsigned integers
 //
 
+func TestBitstringSetUintn(t *testing.T) {
+	tests := []struct {
+		bs       string // starting bitstring
+		x        word   // value to set
+		nbits, i uint
+		want     string
+	}{
+		// LSB and MSB are both on the same word
+		{
+			bs:    "000",
+			nbits: 2, x: 2, i: 0,
+			want: "010"},
+		{
+			bs:    "000",
+			nbits: 2, x: 2, i: 1,
+			want: "100"},
+		{
+			bs:    "1111",
+			nbits: 2, x: 2, i: 1,
+			want: "1101"},
+		{
+			bs:    "00000000000000000000000000000000",
+			nbits: 1, x: 1, i: 19,
+			want: "00000000000010000000000000000000"},
+		{
+			bs:    "00000000000000000000000000000000",
+			nbits: 1, x: 3, i: 19,
+			want: "00000000000010000000000000000000"},
+		{
+			bs:    "00000000011110000000000000000000",
+			nbits: 4, x: 8, i: 19,
+			want: "00000000010000000000000000000000"},
+		{
+			bs:    "0101010101010101010101010101010101010101",
+			nbits: 32, x: 0x80000002, i: 4,
+			want: "0101100000000000000000000000000000100101"},
+		// LSB and MSB are on separate words
+		{
+			bs:    "0000000000000000000000000000000000000000000000000000000000000000000",
+			nbits: 2, x: 3, i: 63,
+			want: "0011000000000000000000000000000000000000000000000000000000000000000"},
+		{
+			bs:    "00000000000000000000000000000000000000000000000000000000000000000000",
+			nbits: 4, x: 9, i: 63,
+			want: "01001000000000000000000000000000000000000000000000000000000000000000"},
+		{
+			bs:    "000000000000000000001101000011010011000001010011010101010101000100101000111101010100000000000000000000000000000000000",
+			nbits: 64, x: 0x9cfbeb71ee3fcf5f, i: 35,
+			want: "000000000000000000100111001111101111101011011100011110111000111111110011110101111100000000000000000000000000000000000"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			bs, _ := MakeFromString(tt.bs)
+			bs.SetUintn(tt.nbits, tt.i, tt.x)
+			want, _ := MakeFromString(tt.want)
+			if !want.Equals(bs) {
+				t.Errorf("Bitstring(%s).SetUintn(%d, %d, %d) got %s, want %s",
+					tt.bs, tt.nbits, tt.i, tt.x, bs, want)
+			}
+		})
+	}
+}
+
 func TestBitstringSetUint8(t *testing.T) {
 	tests := []struct {
 		bs   string // starting bitstring

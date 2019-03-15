@@ -71,6 +71,35 @@ func (bs *Bitstring) Int16(i uint) int16 { return int16(bs.Uint16(i)) }
 // given bit. It panics if there are not enough bits.
 func (bs *Bitstring) Int8(i uint) int8 { return int8(bs.Uint8(i)) }
 
+// SetUintn sets the n bits starting at i with the first n bits of value x.
+// It panics if there aren't enough bits in bs or if n > WordLength.
+func (bs *Bitstring) SetUintn(n, i uint, x word) {
+	// if n > wordlen || n < 1 {
+	// 	panic(fmt.Sprintf("SetUintn supports unsigned integers from 1 to %d bits long", wordlen))
+	// }
+	bs.mustExist(i + n - 1)
+
+	j := wordoffset(i)
+	k := wordoffset(i + n - 1)
+	lobit := uint(bitoffset(i))
+
+	if j == k {
+		// fast path: same word
+		x := (x & genlomask(n)) << lobit
+		bs.data[j] = transferbits(bs.data[j], x, genmask(lobit, lobit+n))
+		return
+	}
+	// slow path: first and last bits are on different words
+
+	// transfer bits to low word
+	lon := wordlen - lobit // how many bits of n we transfer to loword
+	bs.data[j] = transferbits(bs.data[j], (x&genlomask(lon))<<lobit, genhimask(lon))
+
+	// transfer bits to high word
+	himask := genlomask(n - lon) // how many bits of n we transfer to hiword
+	bs.data[k] = transferbits(bs.data[k], (x>>lon)&himask, himask)
+}
+
 // SetUint8 sets the 8 bits starting at i with the value of x. It panics if
 // there are not enough bits.
 func (bs *Bitstring) SetUint8(i uint, x uint8) {
@@ -120,6 +149,10 @@ func (bs *Bitstring) SetUint16(i uint, x uint16) {
 	hiword := word(x) >> (wordlen - lobit)
 	bs.data[k] = transferbits(bs.data[k], hiword, genlomask(hibit))
 }
+
+// SetIntn sets the n bits starting at i with the first n bits of value x.
+// It panics if there aren't enough bits in bs or if n > WordLength.
+func (bs *Bitstring) SetIntn(n, i uint, x word) { bs.SetIntn(n, i, x) }
 
 // SetInt8 sets the 8 bits starting at i with the value of x. It panics if
 // there are not enough bits.
