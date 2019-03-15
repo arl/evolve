@@ -251,7 +251,7 @@ func TestBitstringInt32(t *testing.T) {
 			got := bs.Int32(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Int32(%d) got %s, want %s", tt.input, tt.i,
-					sprintsbits(sword(got), 32), sprintsbits(sword(tt.want), 32))
+					sprintsbits(int(got), 32), sprintsbits(int(tt.want), 32))
 			}
 		})
 	}
@@ -285,7 +285,7 @@ func TestBitstringInt16(t *testing.T) {
 			got := bs.Int16(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Int16(%d) got %s, want %s", tt.input, tt.i,
-					sprintsbits(sword(got), 16), sprintsbits(sword(tt.want), 16))
+					sprintsbits(int(got), 16), sprintsbits(int(tt.want), 16))
 			}
 		})
 	}
@@ -319,7 +319,7 @@ func TestBitstringInt8(t *testing.T) {
 			got := bs.Int8(tt.i)
 			if tt.want != got {
 				t.Errorf("Bitstring(%s).Int8(%d) got %s, want %s", tt.input, tt.i,
-					sprintsbits(sword(got), 8), sprintsbits(sword(tt.want), 8))
+					sprintsbits(int(got), 8), sprintsbits(int(tt.want), 8))
 			}
 		})
 	}

@@ -62,7 +62,7 @@ func (bs *Bitstring) SetUint64(i uint, x uint64) {
 
 	// fast path: i is a multiple of 64
 	if i&((1<<6)-1) == 0 {
-		bs.data[i>>6] = x
+		bs.data[i>>6] = uint(x)
 		return
 	}
 
