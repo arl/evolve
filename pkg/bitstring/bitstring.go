@@ -107,6 +107,7 @@ func (bs *Bitstring) Data() []uint {
 // If i is greater than the bitstring length, Bit will panic.
 func (bs *Bitstring) Bit(i uint) bool {
 	bs.mustExist(i)
+
 	w := wordoffset(i)
 	off := bitoffset(i)
 	mask := bitmask(uint(off))
@@ -144,14 +145,6 @@ func (bs *Bitstring) FlipBit(i uint) {
 	w := wordoffset(i)
 	off := bitoffset(i)
 	bs.data[w] ^= (1 << off)
-}
-
-// mustExist panics if i is not a valid bit index for bs, that is if i is
-// greater than bs.length.
-func (bs *Bitstring) mustExist(i uint) {
-	if i >= bs.length {
-		panic(ErrIndexOutOfRange)
-	}
 }
 
 // OnesCount counts the number of one bits.
