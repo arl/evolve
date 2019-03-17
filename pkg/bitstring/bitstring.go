@@ -175,13 +175,6 @@ func (bs *Bitstring) ZeroesCount() uint {
 func (bs *Bitstring) BigInt() *big.Int {
 	bi := new(big.Int)
 	if _, ok := bi.SetString(bs.String(), 2); !ok {
-		// XXX: by design, this panic should only happen when something very
-		// wrong happens. For bi.SetString to fail the string passed should
-		// contain runes other than 0's and 1's, or be empty.
-		// bs.String() guarantees the string is made of 0's and 1's, plus, of
-		// all the ways to create a Bitstring none of them allows the bitstring
-		// to be empty though one could still have a zero value, by doing
-		// bitstring.Bitstring{}. If it panics in that case that's just fair...
 		panic(fmt.Sprintf("couldn't convert bit string \"%s\" to big.Int", bs.String()))
 	}
 	return bi
