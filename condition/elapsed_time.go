@@ -11,8 +11,8 @@ import (
 type ElapsedTime time.Duration
 
 // IsSatisfied returns true if the time duration has elapsed.
-func (dur ElapsedTime) IsSatisfied(popdata *evolve.PopulationData) bool {
-	return popdata.Elapsed >= time.Duration(dur)
+func (dur ElapsedTime) IsSatisfied(stats *evolve.PopulationStats) bool {
+	return stats.Elapsed >= time.Duration(dur)
 }
 
 // String returns a string representation of this condition.

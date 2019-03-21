@@ -7,18 +7,18 @@ import (
 )
 
 func TestUserAbort(t *testing.T) {
-	popdata := &evolve.PopulationData{}
+	stats := &evolve.PopulationStats{}
 	cond := NewUserAbort()
 
-	if cond.IsSatisfied(popdata) {
+	if cond.IsSatisfied(stats) {
 		t.Errorf("should be false before user abort")
 	}
 	cond.Abort()
-	if !cond.IsSatisfied(popdata) {
+	if !cond.IsSatisfied(stats) {
 		t.Errorf("should be true before user abort")
 	}
 	cond.Reset()
-	if cond.IsSatisfied(popdata) {
+	if cond.IsSatisfied(stats) {
 		t.Errorf("should be false after reset")
 	}
 }

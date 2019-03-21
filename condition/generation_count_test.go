@@ -8,15 +8,15 @@ import (
 
 func TestGenerationCount(t *testing.T) {
 	cond := GenerationCount(5)
-	popdata := &evolve.PopulationData{}
+	stats := &evolve.PopulationStats{}
 
-	popdata.GenNumber = 3
-	if cond.IsSatisfied(popdata) {
+	stats.GenNumber = 3
+	if cond.IsSatisfied(stats) {
 		t.Errorf("should not terminate after 4th generation")
 	}
 
-	popdata.GenNumber = 4
-	if !cond.IsSatisfied(popdata) {
+	stats.GenNumber = 4
+	if !cond.IsSatisfied(stats) {
 		t.Errorf("should terminate after 5th generation")
 	}
 }

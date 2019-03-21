@@ -1,25 +1,24 @@
 package engine
 
-import "github.com/arl/evolve"
+import (
+	"github.com/arl/evolve"
+)
 
 // An Observer monitors the evolution of a population.
 //
-// Once registered within the evolution engine, observers gets notified of every
-// population update, that is, once an epoch is completed.
+// Once registered within the evolution engine, an observer gets notified, after
+// each completed epoch, with the population statistics (i.e once for every
+// completed epoch).
 type Observer interface {
-
-	// PopulationUpdate is called at every population update -once an epoch is
-	// has been completed- with information and statistics about the current
-	// population.
-	PopulationUpdate(data *evolve.PopulationData)
+	Observe(*evolve.PopulationStats)
 }
 
-// TODO: try to come up with a better and short name for PopulationUpdate
-// and PopulationData maybe
-type observerFunc struct{ f func(*evolve.PopulationData) }
+type observerFunc struct{ f func(*evolve.PopulationStats) }
 
-// ObserverFunc returns a type satisfying the Observer interface, for which the
-// PopulationUpdate method forwards to f.
-func ObserverFunc(f func(*evolve.PopulationData)) Observer { return &observerFunc{f: f} }
+// The ObserverFunc type is an adapter to allow the use of
+// ordinary functions as evolution observers. If f is a function
+// with the appropriate signature, ObserverFunc(f) is an
+// Observer that calls f.
+func ObserverFunc(f func(*evolve.PopulationStats)) Observer { return &observerFunc{f: f} }
 
-func (obs *observerFunc) PopulationUpdate(data *evolve.PopulationData) { obs.f(data) }
+func (obs *observerFunc) Observe(stats *evolve.PopulationStats) { obs.f(stats) }

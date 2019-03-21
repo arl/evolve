@@ -12,30 +12,30 @@ func TestTargetFitness(t *testing.T) {
 
 	t.Run("natural fitness", func(t *testing.T) {
 		cond := TargetFitness{Fitness: 10.0, Natural: true}
-		popdata := &evolve.PopulationData{Natural: true}
+		stats := &evolve.PopulationStats{Natural: true}
 
-		popdata.BestFitness = 5.0
-		if cond.IsSatisfied(popdata) {
+		stats.BestFitness = 5.0
+		if cond.IsSatisfied(stats) {
 			t.Errorf("should not terminate before target fitness has been reached")
 		}
 
-		popdata.BestFitness = 10.0
-		if !cond.IsSatisfied(popdata) {
+		stats.BestFitness = 10.0
+		if !cond.IsSatisfied(stats) {
 			t.Errorf("should terminate once target fitness has been reached")
 		}
 	})
 
 	t.Run("non-natural fitness", func(t *testing.T) {
 		cond := TargetFitness{Fitness: 1.0, Natural: false}
-		popdata := &evolve.PopulationData{Natural: false}
+		stats := &evolve.PopulationStats{Natural: false}
 
-		popdata.BestFitness = 5.0
-		if cond.IsSatisfied(popdata) {
+		stats.BestFitness = 5.0
+		if cond.IsSatisfied(stats) {
 			t.Errorf("should not terminate before target fitness has been reached")
 		}
 
-		popdata.BestFitness = 1.0
-		if !cond.IsSatisfied(popdata) {
+		stats.BestFitness = 1.0
+		if !cond.IsSatisfied(stats) {
 			t.Errorf("should terminate once target fitness has been reached")
 		}
 	})

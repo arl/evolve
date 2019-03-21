@@ -55,11 +55,11 @@ func main() {
 	check(err)
 
 	eng.AddObserver(
-		engine.ObserverFunc(func(data *evolve.PopulationData) {
+		engine.ObserverFunc(func(stats *evolve.PopulationStats) {
 			log.Printf("Generation %d: %s (%v)\n",
-				data.GenNumber,
-				data.BestCand,
-				data.BestFitness)
+				stats.GenNumber,
+				stats.BestCand,
+				stats.BestFitness)
 		}))
 
 	bests, _, err := eng.Evolve(

@@ -13,15 +13,16 @@ type TargetFitness struct {
 	Natural bool
 }
 
-// IsSatisfied returns true if the time duration has elapsed.
-func (tc TargetFitness) IsSatisfied(data *evolve.PopulationData) bool {
-	if tc.Natural {
-		return data.BestFitness >= tc.Fitness
+// IsSatisfied returns true if the specified fitness
+// score has been reached or exceeded.
+func (tf TargetFitness) IsSatisfied(stats *evolve.PopulationStats) bool {
+	if tf.Natural {
+		return stats.BestFitness >= tf.Fitness
 	}
-	return data.BestFitness <= tc.Fitness
+	return stats.BestFitness <= tf.Fitness
 }
 
 // String returns a string representation of this condition.
-func (tc TargetFitness) String() string {
-	return fmt.Sprintf("Reached target fitness of %f", tc.Fitness)
+func (tf TargetFitness) String() string {
+	return fmt.Sprintf("Reached target fitness of %f", tf.Fitness)
 }

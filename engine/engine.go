@@ -180,7 +180,7 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Pop
 	return evpop, satisfied, nil
 }
 
-func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Duration) *evolve.PopulationData {
+func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Duration) *evolve.PopulationStats {
 
 	e.stats.Clear()
 	for _, cand := range pop {
@@ -188,7 +188,7 @@ func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Durat
 	}
 
 	// Notify observers with the population state
-	data := evolve.PopulationData{
+	stats := evolve.PopulationStats{
 		BestCand:    pop[0].Candidate,
 		BestFitness: pop[0].Fitness,
 		Mean:        e.stats.ArithmeticMean(),
@@ -201,16 +201,16 @@ func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Durat
 	}
 
 	for o := range e.obs {
-		o.PopulationUpdate(&data)
+		o.Observe(&stats)
 	}
-	return &data
+	return &stats
 }
 
 // shouldContinue determines whether or not the evolution should continue.
-func shouldContinue(data *evolve.PopulationData, conds ...evolve.Condition) []evolve.Condition {
+func shouldContinue(stats *evolve.PopulationStats, conds ...evolve.Condition) []evolve.Condition {
 	satisfied := make([]evolve.Condition, 0)
 	for _, cond := range conds {
-		if cond.IsSatisfied(data) {
+		if cond.IsSatisfied(stats) {
 			satisfied = append(satisfied, cond)
 		}
 	}

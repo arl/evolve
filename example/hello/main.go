@@ -85,11 +85,11 @@ func main() {
 
 	// Define an observer
 	eng.AddObserver(
-		engine.ObserverFunc(func(data *evolve.PopulationData) {
+		engine.ObserverFunc(func(stats *evolve.PopulationStats) {
 			log.Printf("Generation %d: %s (%v)\n",
-				data.GenNumber,
-				data.BestCand,
-				data.BestFitness)
+				stats.GenNumber,
+				stats.BestCand,
+				stats.BestFitness)
 		}))
 
 	// Evolution should end when a candidate with a fitness of 0 has been

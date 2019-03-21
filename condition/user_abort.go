@@ -22,13 +22,15 @@ func NewUserAbort() *UserAbort {
 }
 
 // IsSatisfied reports whether or not Abort has been called.
-func (ua *UserAbort) IsSatisfied(*evolve.PopulationData) bool {
+// It is safe for concurrent use by multiple goroutines.
+func (ua *UserAbort) IsSatisfied(*evolve.PopulationStats) bool {
 	ua.mutex.RLock()
 	defer ua.mutex.RUnlock()
 	return ua.aborted
 }
 
 // Abort triggers the condition.
+// It is safe for concurrent use by multiple goroutines.
 func (ua *UserAbort) Abort() {
 	ua.mutex.Lock()
 	ua.aborted = true
@@ -36,6 +38,7 @@ func (ua *UserAbort) Abort() {
 }
 
 // Reset resets the abort condition to false so that it may be reused.
+// It is safe for concurrent use by multiple goroutines.
 func (ua *UserAbort) Reset() {
 	ua.mutex.Lock()
 	ua.aborted = false

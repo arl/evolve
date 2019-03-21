@@ -83,13 +83,13 @@ func solveSudoku(pattern []string) error {
 	selector := selection.NewTournament()
 	check(selector.SetProb(0.85))
 
-	obs := engine.ObserverFunc(func(data *evolve.PopulationData) {
+	obs := engine.ObserverFunc(func(stats *evolve.PopulationStats) {
 		// only shows multiple of 100 generations
-		if data.GenNumber%100 == 0 {
+		if stats.GenNumber%100 == 0 {
 			return
 		}
 		log.Printf("Gen %d, best solution has %v fitness\n%v\n",
-			data.GenNumber, data.BestFitness, data.BestCand.(*sudoku))
+			stats.GenNumber, stats.BestFitness, stats.BestCand.(*sudoku))
 	})
 
 	gen, err := newGenerator(pattern)

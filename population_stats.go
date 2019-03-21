@@ -2,9 +2,9 @@ package evolve
 
 import "time"
 
-// PopulationData contains statistics about the state of an evolved population
+// PopulationStats contains statistics about the state of an evolved population
 // and a reference to the fittest candidate solution in the population.
-type PopulationData struct {
+type PopulationStats struct {
 
 	// BestCandidate is the fittest candidate present in the population.
 	// TODO: rename into Best (or: why not having an evluated candidate here, so
