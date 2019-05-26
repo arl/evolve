@@ -89,7 +89,7 @@ func TestBitstringToNumber(t *testing.T) {
 	assert.EqualValuesf(t, 513, bint.Int64(), "Incorrect big.Int conversion, want %v, got: %v", 513, bint.Int64())
 }
 
-func TestBitstringCountSetBits(t *testing.T) {
+func TestBitstringOnesCount(t *testing.T) {
 	// Checks that the bit string can correctly count its number of set bits.
 	bs := New(64)
 	assert.Zerof(t, bs.OnesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bs.OnesCount(), bs)
@@ -105,7 +105,7 @@ func TestBitstringCountSetBits(t *testing.T) {
 }
 
 // Checks that the bit string can correctly count its number of unset bits.
-func TestBitstringCountUnsetBits(t *testing.T) {
+func TestBitstringZeroesCount(t *testing.T) {
 	bs := New(12)
 	assert.EqualValuesf(t, 12, bs.ZeroesCount(), "Initial string should have no 1s, got: %v, repr \"%v\"", bs.ZeroesCount(), bs)
 
