@@ -7,13 +7,16 @@ go:
  - "1.11"
  - tip
 
+env:
+ - GO111MODULE=on
+
 matrix:
   allow_failures:
     - go: tip
   fast_finish: true
 
 before_script:
-  - GO_FILES=$(find . -iname '*.go' -type f | grep -v /vendor/)
+  - GO_FILES=$(find . -iname '*.go' -type f)
 
 script:
   - test -z $(gofmt -s -l $GO_FILES)

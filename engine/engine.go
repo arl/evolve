@@ -1,13 +1,14 @@
 package engine
 
 import (
+	"errors"
+	"fmt"
 	"math/rand"
 	"sort"
 	"time"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/mt19937"
-	"github.com/pkg/errors"
 )
 
 // Engine runs an evolutionary algorithm, following all the steps of evolution,
@@ -147,7 +148,7 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Pop
 
 	pop, err := evolve.SeedPopulation(e.gen, popsize, e.seeds, e.rng)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "can't seed population")
+		return nil, nil, fmt.Errorf("can't seed population: %v", err)
 	}
 
 	var satisfied []evolve.Condition
