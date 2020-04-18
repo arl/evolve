@@ -1,28 +1,9 @@
 language: go
-
-sudo: false
-install: true
-
 go:
- - "1.11"
- - tip
-
-env:
- - GO111MODULE=on
-
-matrix:
-  allow_failures:
-    - go: tip
-  fast_finish: true
-
-before_script:
-  - GO_FILES=$(find . -iname '*.go' -type f)
-
+  - tip
+before_install:
+  - go get github.com/mattn/goveralls
 script:
-  - test -z $(gofmt -s -l $GO_FILES)
-  - go vet ./...
-  - go test -v -race ./...
-  - go test -v -cover -covermode=count -coverprofile=coverage.txt ./... > /dev/null
+  - go test -race ./...
+  - $GOPATH/bin/goveralls -service=travis-ci
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
