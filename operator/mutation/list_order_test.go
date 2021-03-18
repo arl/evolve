@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/evolve/generator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,9 +14,10 @@ func TestListOrderMutation(t *testing.T) {
 
 	population := []interface{}{cand}
 
-	op := NewListOrder()
-	op.SetMutations(1)
-	op.SetMutationAmount(1)
+	op := ListOrder{
+		MutationCount:  generator.ConstInt(1),
+		MutationAmount: generator.ConstInt(1),
+	}
 	mutpop := op.Apply(population, rng)
 
 	assert.Len(t, mutpop, len(population), "population size should be unchanged after mutation")
