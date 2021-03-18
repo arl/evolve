@@ -4,8 +4,8 @@ import (
 	"math/rand"
 )
 
-// An IntGenerator generates sequences of integers.
-type IntGenerator interface {
+// An Int generates sequences of integers.
+type Int interface {
 	// Next returns the next number in the sequence.
 	Next() int64
 }

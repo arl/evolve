@@ -4,8 +4,8 @@ import (
 	"math/rand"
 )
 
-// An FloatGenerator generates sequences of floating point numbers.
-type FloatGenerator interface {
+// An Float generates sequences of floating point numbers.
+type Float interface {
 	// Next returns the next number in the sequence.
 	Next() float64
 }
