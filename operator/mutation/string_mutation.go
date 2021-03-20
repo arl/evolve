@@ -2,39 +2,36 @@ package mutation
 
 import (
 	"math/rand"
+
+	"github.com/arl/evolve/generator"
 )
 
-// NewString creates an operator that mutates individual characters in a
-// string according to some probability.
+// String mutates individual characters (single bytes) in a string according to
+// some mutation probabilty.
 //
-// Zero or more characters may be modified. The probability of any given
-// character being modified is governed by the mutation probability.
-func NewString(alphabet string) *stringMutater { // nolint: golint
-	smut := &stringMutater{alphabet: alphabet}
-	smut.Mutation = New(smut)
-	return smut
+// The mutation probablity is generated once for each call to Mutate, then there
+// might be zero or more modified characters. A modified character gets replaced
+// by any other one, randomly chosen from the alphabet string.
+type String struct {
+	Alphabet string
+	MutProb  generator.Float
 }
 
-type stringMutater struct {
-	*Mutation
-	alphabet string
-}
-
-func (op *stringMutater) Mutate(c interface{}, rng *rand.Rand) interface{} {
+// Mutate modifies a string with respect to a mutation probabilty.
+func (op *String) Mutate(c interface{}, rng *rand.Rand) interface{} {
 	s := c.(string)
+
 	buffer := make([]byte, len(s))
 	copy(buffer, []byte(s))
 
-	// get/decide a probability for this run
-	prob := op.prob
-	if op.varprob {
-		prob = op.probmin + (op.probmax-op.probmin)*rng.Float64()
-	}
+	// Find out the probability for this run.
+	prob := op.MutProb.Next()
 
 	for i := range buffer {
 		if rng.Float64() < prob {
-			buffer[i] = op.alphabet[rng.Intn(len(op.alphabet))]
+			buffer[i] = op.Alphabet[rng.Intn(len(op.Alphabet))]
 		}
 	}
+
 	return string(buffer)
 }
