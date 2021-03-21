@@ -14,6 +14,8 @@ import (
 func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	xover := New(BitstringMater{})
+	xover.Probability = generator.ConstFloat64(1)
+	xover.Points = generator.ConstInt(1)
 	f := generator.Bitstring(50)
 
 	pop := evolve.GeneratePopulation(f, 2, rng)
@@ -39,6 +41,8 @@ func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
 	// bugs elsewhere.
 	rng := rand.New(rand.NewSource(99))
 	xover := New(BitstringMater{})
+	xover.Probability = generator.ConstFloat64(1)
+	xover.Points = generator.ConstInt(1)
 
 	bs1 := bitstring.Random(32, rng)
 	bs2 := bitstring.Random(33, rng)
