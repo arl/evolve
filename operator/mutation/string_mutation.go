@@ -9,12 +9,12 @@ import (
 // String mutates individual characters (single bytes) in a string according to
 // some mutation probabilty.
 //
-// The mutation probablity is generated once for each call to Mutate, then there
-// might be zero or more modified characters. A modified character gets replaced
-// by any other one, randomly chosen from the alphabet string.
+// Probability governs the probabilty for each character to be modified by
+// Mutate. If this mutation happens, the mutated character gets replaced by any
+// character in Alphabet.
 type String struct {
-	Alphabet string
-	MutProb  generator.Float
+	Alphabet    string
+	Probability generator.Float
 }
 
 // Mutate modifies a string with respect to a mutation probabilty.
@@ -25,7 +25,7 @@ func (op *String) Mutate(c interface{}, rng *rand.Rand) interface{} {
 	copy(buffer, []byte(s))
 
 	// Find out the probability for this run.
-	prob := op.MutProb.Next()
+	prob := op.Probability.Next()
 
 	for i := range buffer {
 		if rng.Float64() < prob {

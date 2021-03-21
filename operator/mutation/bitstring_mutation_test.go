@@ -17,8 +17,8 @@ func TestBitstringMutationRandom(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	bs := &Bitstring{
-		MutCount: generator.ConstInt(1),
-		MutProb:  generator.ConstFloat64(0.5),
+		FlipCount:   generator.ConstInt(1),
+		Probability: generator.ConstFloat64(0.5),
 	}
 
 	mut := NewMutation(bs)
@@ -43,8 +43,8 @@ func TestBitstringMutationSingleBit(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	bs := &Bitstring{
-		MutCount: generator.ConstInt(1),
-		MutProb:  generator.ConstFloat64(0.5),
+		FlipCount:   generator.ConstInt(1),
+		Probability: generator.ConstFloat64(0.5),
 	}
 
 	mut := NewMutation(bs)

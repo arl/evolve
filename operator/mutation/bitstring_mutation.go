@@ -15,25 +15,25 @@ var ErrInvalidMutationCount = errors.New("mutation count must be in the [0,MaxIn
 // A Bitstring mutates individual bits in a bitstring.Bitstring according to
 // some probability.
 //
-// MutProb is the probability of a bitstring being mutated at all.
-// MutCount is the the number of bits to flip on the bitstring in case it's
+// Probability is the probability of a bitstring being mutated at all.
+// FlipCount is the the number of bits to flip on the bitstring in case it's
 // selected for mutation.
 type Bitstring struct {
-	MutProb  generator.Float
-	MutCount generator.Int
+	Probability generator.Float
+	FlipCount   generator.Int
 }
 
 // Mutate modifies a bitstring.Bitstring with respect to a mutation probabilty.
 func (op *Bitstring) Mutate(c interface{}, rng *rand.Rand) interface{} {
 	// Find out the mutation probabilty
-	prob := op.MutProb.Next()
+	prob := op.Probability.Next()
 
 	if rng.Float64() < prob {
 		bs := c.(*bitstring.Bitstring)
 		mutated := bitstring.Copy(bs)
 
 		// Since there's a mutation to perform, find out how many bits to flip.
-		nmuts := op.MutCount.Next()
+		nmuts := op.FlipCount.Next()
 		for i := int64(0); i < nmuts; i++ {
 			mutated.FlipBit(uint(rng.Intn(mutated.Len())))
 		}
