@@ -145,7 +145,7 @@ func (bs *Bitstring) SetUint16(i uint, x uint16) {
 // SetIntn sets the n bits starting at i with the first n bits of value x.
 // It panics if there aren't enough bits in bs or if n is greater than
 // the size of a machine word.
-func (bs *Bitstring) SetIntn(n, i uint, x uint) { bs.SetIntn(n, i, x) }
+func (bs *Bitstring) SetIntn(n, i uint, x uint) { bs.SetUintn(n, i, x) }
 
 // SetInt8 sets the 8 bits starting at i with the value of x. It panics if
 // there are not enough bits.
@@ -164,6 +164,7 @@ func (bs *Bitstring) SetInt32(i uint, x int32) { bs.SetUint32(i, uint32(x)) }
 func (bs *Bitstring) SetInt64(i uint, x int64) { bs.SetUint64(i, uint64(x)) }
 
 // prints a string representing the first n bits of the base-2 representatio of x.
+//lint:ignore U1000 (unused but useful for debugging)
 func printbits(x, n uint) {
 	fmt.Printf(fmt.Sprintf("%%0%db\n", n), x)
 }
