@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/generator"
@@ -12,8 +14,6 @@ import (
 	"github.com/arl/evolve/operator/mutation"
 	"github.com/arl/evolve/operator/xover"
 	"github.com/arl/evolve/selection"
-
-	"github.com/stretchr/testify/assert"
 )
 
 // Trivial test operator that mutates all integers into zeroes.
@@ -124,8 +124,10 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	checkB(b, err)
 
 	// 1st operator: string mutation
-	mut := mutation.NewString(alphabet)
-	checkB(b, mut.SetProb(0.02))
+	mut := mutation.New(&mutation.String{
+		Alphabet:    alphabet,
+		Probability: generator.ConstFloat64(0.02),
+	})
 
 	// 2nd operator: string crossover
 	xover := xover.New(xover.StringMater{})
