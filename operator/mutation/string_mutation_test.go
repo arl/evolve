@@ -18,7 +18,7 @@ func TestStringMutation(t *testing.T) {
 		Probability: generator.ConstFloat64(0.5),
 	}
 
-	mut := NewMutation(sm)
+	mut := New(sm)
 
 	individual1 := "abcd"
 	individual2 := "abab"

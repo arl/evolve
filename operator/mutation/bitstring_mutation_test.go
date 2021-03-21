@@ -21,7 +21,7 @@ func TestBitstringMutationRandom(t *testing.T) {
 		Probability: generator.ConstFloat64(0.5),
 	}
 
-	mut := NewMutation(bs)
+	mut := New(bs)
 
 	org, err := bitstring.MakeFromString("111100101")
 	assert.NoError(t, err)
@@ -47,7 +47,7 @@ func TestBitstringMutationSingleBit(t *testing.T) {
 		Probability: generator.ConstFloat64(0.5),
 	}
 
-	mut := NewMutation(bs)
+	mut := New(bs)
 
 	org, err := bitstring.MakeFromString("111100101")
 	assert.NoError(t, err)

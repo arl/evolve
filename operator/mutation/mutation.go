@@ -15,7 +15,7 @@ type Mutation struct {
 }
 
 // New Mutation returns an Operator based on mutater.
-func NewMutation(mutater Mutater) *Mutation {
+func New(mutater Mutater) *Mutation {
 	return &Mutation{Mutater: mutater}
 }
 
