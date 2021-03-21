@@ -15,10 +15,7 @@ type BitstringMater struct{}
 //
 // parent1 and parent2 are the two individuals that provides the source
 // material for generating offspring.
-func (BitstringMater) Mate(
-	parent1, parent2 interface{}, nxpts int64,
-	rng *rand.Rand) []interface{} {
-
+func (BitstringMater) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) []interface{} {
 	p1, p2 := parent1.(*bitstring.Bitstring), parent2.(*bitstring.Bitstring)
 
 	if p1.Len() != p2.Len() {
