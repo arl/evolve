@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/arl/evolve"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func checkCellVal(t *testing.T, s *sudoku, i, j, want int) {
@@ -38,9 +40,9 @@ func TestGeneratorValidity(t *testing.T) {
 		"...1.....",
 		"........9",
 	})
-	if err != nil {
-		t.Errorf("can't create generator: %v", err)
-	}
+
+	require.NoError(t, err)
+
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	pop := evolve.GeneratePopulation(gen, 20, rng)
 	for _, iface := range pop {
@@ -69,9 +71,7 @@ func TestGeneratorValidity(t *testing.T) {
 			for _, cell := range row {
 				set[cell.val] = struct{}{}
 			}
-			if len(set) < 9 {
-				t.Errorf("in\n%v\nrow %v contains duplicates", sudo, i)
-			}
+			require.Lenf(t, set, 9, "in\n%v\nrow %v contains duplicates", sudo, i)
 		}
 	}
 }
@@ -127,10 +127,7 @@ func TestGeneratorInvalidPatterns(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := newGenerator(tt.pattern)
-			if err != tt.wantErr {
-				t.Fatalf("newGenerator() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }
