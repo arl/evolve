@@ -14,11 +14,11 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/engine"
+	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
 	"github.com/arl/evolve/operator/xover"
-	"github.com/arl/evolve/selection"
-
 	"github.com/arl/evolve/pkg/mt19937"
+	"github.com/arl/evolve/selection"
 )
 
 func check(err error, v ...interface{}) {
@@ -70,13 +70,15 @@ func solveSudoku(pattern []string) error {
 	// Crossover rows between parents (so offspring is x rows from parent1 and y
 	// rows from parent2).
 	xover := xover.New(mater{})
-	check(xover.SetPoints(1))
+	xover.Points = generator.ConstInt(1)
+	xover.Probability = generator.ConstFloat64(1)
 
-	mutation := newRowMutation()
-	// TODO: use a PoissonGenerator for mutation count and a
-	// DiscreteUniformGenerator for mutation amount
-	check(mutation.SetMutationsRange(1, 2))
-	check(mutation.SetAmountRange(1, 8))
+	rng := rand.New(mt19937.New(time.Now().UnixNano()))
+
+	mutation := &rowMutation{
+		Number: generator.NewPoisson(generator.ConstFloat64(2), rng),
+		Amount: generator.NewUniformtInt(1, 8, rng),
+	}
 
 	pipeline := operator.Pipeline{xover, mutation}
 
@@ -102,7 +104,7 @@ func solveSudoku(pattern []string) error {
 		evaluator{},
 		&epocher,
 		engine.Observe(obs),
-		engine.Rand(rand.New(mt19937.New(time.Now().UnixNano()))),
+		engine.Rand(rng),
 	)
 	check(err)
 

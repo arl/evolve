@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/pkg/mt19937"
 )
 
@@ -26,7 +27,6 @@ func sudokuFromStrings(strs []string) (*sudoku, error) {
 }
 
 func TestSudokuMater(t *testing.T) {
-
 	p1, err := sudokuFromStrings([]string{
 		"1 1 1 1 1 1 1 1 1",
 		"2 2 2 2 2 2 2 2 2",
@@ -62,15 +62,12 @@ func TestSudokuMater(t *testing.T) {
 
 // Tests to ensure that rows are still valid after mutation.  Each row
 // should contain each value 1-9 exactly once.
-func TestRowMutationValidity(t *testing.T) { // nolint: gocyclo
-	rmut := newRowMutation()
-	err := rmut.SetMutations(8)
-	if err != nil {
-		t.Error(err)
-	}
-	err = rmut.SetAmount(1)
-	if err != nil {
-		t.Error(err)
+func TestRowMutationValidity(t *testing.T) {
+	rng := rand.New(mt19937.New(time.Now().UnixNano()))
+
+	rmut := &rowMutation{
+		Number: generator.ConstInt(8),
+		Amount: generator.ConstInt(1),
 	}
 	sudo, err := sudokuFromStrings([]string{
 		"1 2 8 5 4 3 9 6 7",
@@ -89,7 +86,6 @@ func TestRowMutationValidity(t *testing.T) { // nolint: gocyclo
 	pop := []interface{}{sudo}
 
 	counts := make(map[int]struct{})
-	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 
 	for i := 0; i < 20; i++ {
 		pop = rmut.Apply(pop, rng)
@@ -119,14 +115,9 @@ func TestRowMutationValidity(t *testing.T) { // nolint: gocyclo
 
 //Check that the mutation never modifies the value of fixed cells.
 func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
-	rmut := newRowMutation()
-	err := rmut.SetMutations(8)
-	if err != nil {
-		t.Error(err)
-	}
-	err = rmut.SetAmount(1)
-	if err != nil {
-		t.Error(err)
+	rmut := &rowMutation{
+		Number: generator.ConstInt(8),
+		Amount: generator.ConstInt(1),
 	}
 
 	var sudo sudoku
@@ -158,14 +149,5 @@ func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 				}
 			}
 		}
-	}
-}
-
-func TestRowMutationInvalid(t *testing.T) {
-	if err := newRowMutation().SetMutations(0); err != errInvalidMutationCount {
-		t.Errorf("SetMutations(0): want ErrInvalidMutationCount, got %v", err)
-	}
-	if err := newRowMutation().SetAmount(0); err != errInvalidMutationAmount {
-		t.Errorf("SetAmount(0): want ErrInvalidMutationAmount, got %v", err)
 	}
 }
