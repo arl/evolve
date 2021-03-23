@@ -7,7 +7,7 @@ import (
 
 // ErrTooManySeedCandidates is the error returned by SeedPopulation when the
 // number of seed candidates is greater than the population size.
-var ErrTooManySeedCandidates = errors.New("Too many seed candidates for population size")
+var ErrTooManySeedCandidates = errors.New("too many seed candidates for population size")
 
 // A Generator generates random candidates.
 //

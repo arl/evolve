@@ -33,7 +33,8 @@ func main() {
 	xover := xover.New(xover.BitstringMater{})
 	xover.Probability = generator.ConstFloat64(0.7)
 	xover.Points = generator.ConstInt(1)
-	// define the mutation
+
+	// Define the mutation
 	mut := mutation.New(&mutation.Bitstring{
 		Probability: generator.ConstFloat64(0.01),
 		FlipCount:   generator.ConstInt(1),
