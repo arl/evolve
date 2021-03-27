@@ -20,11 +20,11 @@ func (bs *Bitstring) Uintn(n, i uint) uint {
 	loword := bs.data[j]
 	if j == k {
 		// fast path: same word
-		return (loword >> looff) & genlomask(n)
+		return (loword >> looff) & lomask(n)
 	}
 	hioff := bitoffset(i + n)
-	hiword := bs.data[k] & genlomask(uint(hioff))
-	loword = genhimask(uint(looff)) & loword >> looff
+	hiword := bs.data[k] & lomask(uint(hioff))
+	loword = himask(uint(looff)) & loword >> looff
 	return loword | hiword<<(uintsize-looff)
 }
 
@@ -85,17 +85,17 @@ func (bs *Bitstring) SetUintn(n, i uint, x uint) {
 	k := wordoffset(i + n - 1)
 	if j == k {
 		// fast path: same word
-		x := (x & genlomask(n)) << lobit
-		bs.data[j] = transferbits(bs.data[j], x, genmask(lobit, lobit+n))
+		x := (x & lomask(n)) << lobit
+		bs.data[j] = transferbits(bs.data[j], x, mask(lobit, lobit+n))
 		return
 	}
 	// slow path: first and last bits are on different words
 	// transfer bits to low word
 	lon := uintsize - lobit // how many bits of n we transfer to loword
-	bs.data[j] = transferbits(bs.data[j], x<<lobit, genhimask(lon))
+	bs.data[j] = transferbits(bs.data[j], x<<lobit, himask(lon))
 
 	// transfer bits to high word
-	bs.data[k] = transferbits(bs.data[k], x>>lon, genlomask(n-lon))
+	bs.data[k] = transferbits(bs.data[k], x>>lon, lomask(n-lon))
 }
 
 // SetUint8 sets the 8 bits starting at i with the value of x. It panics if
@@ -109,15 +109,15 @@ func (bs *Bitstring) SetUint8(i uint, x uint8) {
 	if j == k {
 		// fast path: same word
 		neww := uint(x) << lobit
-		mask := genmask(lobit, lobit+8)
-		bs.data[j] = transferbits(bs.data[j], neww, mask)
+		msk := mask(lobit, lobit+8)
+		bs.data[j] = transferbits(bs.data[j], neww, msk)
 		return
 	}
 	// transfer bits to low word
-	bs.data[j] = transferbits(bs.data[j], uint(x)<<lobit, genhimask(lobit))
+	bs.data[j] = transferbits(bs.data[j], uint(x)<<lobit, himask(lobit))
 	// transfer bits to high word
 	lon := uintsize - lobit
-	bs.data[k] = transferbits(bs.data[k], uint(x)>>lon, genlomask(8-lon))
+	bs.data[k] = transferbits(bs.data[k], uint(x)>>lon, lomask(8-lon))
 }
 
 // SetUint16 sets the 16 bits starting at i with the value of x. It panics if
@@ -131,15 +131,15 @@ func (bs *Bitstring) SetUint16(i uint, x uint16) {
 	if j == k {
 		// fast path: same word
 		neww := uint(x) << lobit
-		mask := genmask(lobit, lobit+16)
-		bs.data[j] = transferbits(bs.data[j], neww, mask)
+		msk := mask(lobit, lobit+16)
+		bs.data[j] = transferbits(bs.data[j], neww, msk)
 		return
 	}
 	// transfer bits to low word
-	bs.data[j] = transferbits(bs.data[j], uint(x)<<lobit, genhimask(lobit))
+	bs.data[j] = transferbits(bs.data[j], uint(x)<<lobit, himask(lobit))
 	// transfer bits to high word
 	lon := uintsize - lobit
-	bs.data[k] = transferbits(bs.data[k], uint(x)>>lon, genlomask(16-lon))
+	bs.data[k] = transferbits(bs.data[k], uint(x)>>lon, lomask(16-lon))
 }
 
 // SetIntn sets the n bits starting at i with the first n bits of value x.
@@ -163,7 +163,7 @@ func (bs *Bitstring) SetInt32(i uint, x int32) { bs.SetUint32(i, uint32(x)) }
 // there are not enough bits.
 func (bs *Bitstring) SetInt64(i uint, x int64) { bs.SetUint64(i, uint64(x)) }
 
-// prints a string representing the first n bits of the base-2 representatio of x.
+// prints a string representing the first n bits of the base-2 representation of x.
 //lint:ignore U1000 (unused but useful for debugging)
 func printbits(x, n uint) {
 	fmt.Printf(fmt.Sprintf("%%0%db\n", n), x)

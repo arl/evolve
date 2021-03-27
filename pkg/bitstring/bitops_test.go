@@ -14,7 +14,7 @@ func atobin(s string) uint {
 	return uint(i)
 }
 
-func Test_genlomask(t *testing.T) {
+func Test_lomask(t *testing.T) {
 	tests := []struct {
 		n    uint
 		want uint
@@ -27,14 +27,14 @@ func Test_genlomask(t *testing.T) {
 		{n: uintsize, want: maxuint},
 	}
 	for _, tt := range tests {
-		if got := genlomask(tt.n); got != tt.want {
-			t.Errorf("genlomask(%d) got %s, want %s", tt.n,
+		if got := lomask(tt.n); got != tt.want {
+			t.Errorf("lomask(%d) got %s, want %s", tt.n,
 				sprintubits(got, 32), sprintubits(tt.want, 32))
 		}
 	}
 }
 
-func Test_genhimask(t *testing.T) {
+func Test_himask(t *testing.T) {
 	tests := []struct {
 		n    uint
 		want uint
@@ -45,8 +45,8 @@ func Test_genhimask(t *testing.T) {
 		{n: uintsize - 1, want: 1 << (uintsize - 1)},
 	}
 	for _, tt := range tests {
-		if got := genhimask(tt.n); got != tt.want {
-			t.Errorf("genhimask(%d) got %s, want %s", tt.n,
+		if got := himask(tt.n); got != tt.want {
+			t.Errorf("himask(%d) got %s, want %s", tt.n,
 				sprintubits(got, 32), sprintubits(tt.want, 32))
 		}
 	}
@@ -67,8 +67,8 @@ func Test_genmask(t *testing.T) {
 		{l: 0, h: 30, want: atobin("00111111111111111111111111111111")},
 	}
 	for _, tt := range tests {
-		if got := genmask(tt.l, tt.h); got != tt.want {
-			t.Errorf("genmask(%d, %d) got %s, want %s", tt.l, tt.h,
+		if got := mask(tt.l, tt.h); got != tt.want {
+			t.Errorf("mask(%d, %d) got %s, want %s", tt.l, tt.h,
 				sprintubits(got, 32), sprintubits(tt.want, 32))
 		}
 	}
