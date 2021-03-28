@@ -10,12 +10,9 @@ func TestBitstringGray8(t *testing.T) {
 		input string
 		want  uint8
 	}{
-		{input: "00000000",
-			want: 0},
-		{input: "00000111",
-			want: 5},
-		{input: "10000000",
-			want: math.MaxUint8},
+		{input: "00000000", want: 0},
+		{input: "00000111", want: 5},
+		{input: "10000000", want: math.MaxUint8},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -34,12 +31,9 @@ func TestBitstringGray16(t *testing.T) {
 		input string
 		want  uint16
 	}{
-		{input: "0000000000000000",
-			want: 0},
-		{input: "0000000000000111",
-			want: 5},
-		{input: "1000000000000000",
-			want: math.MaxUint16},
+		{input: "0000000000000000", want: 0},
+		{input: "0000000000000111", want: 5},
+		{input: "1000000000000000", want: math.MaxUint16},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -58,12 +52,9 @@ func TestBitstringGray32(t *testing.T) {
 		input string
 		want  uint32
 	}{
-		{input: "00000000000000000000000000000000",
-			want: 0},
-		{input: "00000000000000000000000000000111",
-			want: 5},
-		{input: "10000000000000000000000000000000",
-			want: math.MaxUint32},
+		{input: "00000000000000000000000000000000", want: 0},
+		{input: "00000000000000000000000000000111", want: 5},
+		{input: "10000000000000000000000000000000", want: math.MaxUint32},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -82,12 +73,9 @@ func TestBitstringGray64(t *testing.T) {
 		input string
 		want  uint64
 	}{
-		{input: "0000000000000000000000000000000000000000000000000000000000000000",
-			want: 0},
-		{input: "0000000000000000000000000000000000000000000000000000000000000111",
-			want: 5},
-		{input: "1000000000000000000000000000000000000000000000000000000000000000",
-			want: math.MaxUint64},
+		{input: "0000000000000000000000000000000000000000000000000000000000000000", want: 0},
+		{input: "0000000000000000000000000000000000000000000000000000000000000111", want: 5},
+		{input: "1000000000000000000000000000000000000000000000000000000000000000", want: math.MaxUint64},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
@@ -107,16 +95,11 @@ func TestBitstringGrayn(t *testing.T) {
 		nbits uint
 		want  uint
 	}{
-		{input: "00000000",
-			nbits: 1, want: 0},
-		{input: "00000111",
-			nbits: 3, want: 5},
-		{input: "00000111",
-			nbits: 4, want: 5},
-		{input: "00000111",
-			nbits: 5, want: 5},
-		{input: "10000000",
-			nbits: 8, want: math.MaxUint8},
+		{input: "00000000", nbits: 1, want: 0},
+		{input: "00000111", nbits: 3, want: 5},
+		{input: "00000111", nbits: 4, want: 5},
+		{input: "00000111", nbits: 5, want: 5},
+		{input: "10000000", nbits: 8, want: math.MaxUint8},
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {

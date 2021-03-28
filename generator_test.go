@@ -58,9 +58,11 @@ func testSeedPopulationError(t *testing.T, g Generator) {
 func TestGeneratePopulation(t *testing.T) {
 	testGeneratePopulation(t, intGenerator{})
 }
+
 func TestSeedPopulation(t *testing.T) {
 	testSeedPopulation(t, intGenerator{})
 }
+
 func TestSeedPopulationError(t *testing.T) {
 	testSeedPopulationError(t, intGenerator{})
 }
@@ -68,9 +70,11 @@ func TestSeedPopulationError(t *testing.T) {
 func TestGeneratePopulationFunc(t *testing.T) {
 	testGeneratePopulation(t, GeneratorFunc(generateInt))
 }
+
 func TestSeedPopulationFunc(t *testing.T) {
 	testSeedPopulation(t, GeneratorFunc(generateInt))
 }
+
 func TestSeedPopulationErrorFunc(t *testing.T) {
 	testSeedPopulationError(t, GeneratorFunc(generateInt))
 }

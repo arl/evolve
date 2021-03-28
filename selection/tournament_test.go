@@ -6,8 +6,7 @@ import (
 )
 
 func TestTournamentSelection(t *testing.T) {
-
-	var tests = []struct {
+	tests := []struct {
 		name    string
 		natural bool
 	}{

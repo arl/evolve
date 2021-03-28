@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/evolve/generator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,6 +13,9 @@ func TestByteSliceMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(ByteSliceMater{})
+	xover.Probability = generator.ConstFloat64(1.0)
+	xover.Points = generator.ConstInt(1)
+
 	pop := make([]interface{}, 4)
 	pop[0] = []byte{1, 2, 3, 4, 5}
 	pop[1] = []byte{6, 7, 8, 9, 10}
@@ -48,6 +52,9 @@ func TestByteSliceMaterDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(ByteSliceMater{})
+	xover.Probability = generator.ConstFloat64(1.0)
+	xover.Points = generator.ConstInt(1)
+
 	pop := make([]interface{}, 2)
 	pop[0] = []byte{1, 2, 3, 4, 5}
 	pop[1] = []byte{2, 4, 8, 10, 12, 14, 16}
@@ -87,11 +94,12 @@ func BenchmarkByteSliceAppend(b *testing.B) {
 			}
 
 			b.ReportAllocs()
+			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				// actual benchmark
 				dst = append([]byte{}, org...)
 			}
-			b.StopTimer()
+
 			sink = dst
 		})
 	}
@@ -119,12 +127,12 @@ func BenchmarkByteSliceCopy(b *testing.B) {
 			}
 
 			b.ReportAllocs()
+			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				// actual benchmark
 				dst = make([]byte, len(org))
 				copy(dst, org)
 			}
-			b.StopTimer()
 			sink = dst
 		})
 	}

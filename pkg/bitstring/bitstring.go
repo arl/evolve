@@ -68,7 +68,7 @@ func Random(length uint, rng *rand.Rand) *Bitstring {
 	// out-of-bounds bits.
 	nused := bitoffset(length)
 	if nused != 0 {
-		mask := genlomask(uint(nused))
+		mask := lomask(uint(nused))
 		a[len(a)-1] &= mask
 	}
 	return bs
@@ -193,7 +193,7 @@ func SwapRange(bs1, bs2 *Bitstring, start, length uint) {
 	start = uint(bitoffset(start))
 	end := minuint(start+length, uintsize)
 	remain := length - (end - start)
-	swapBits(bs1, bs2, i, genmask(start, end))
+	swapBits(bs1, bs2, i, mask(start, end))
 	i++
 
 	// swap whole words but the last one
@@ -205,7 +205,7 @@ func SwapRange(bs1, bs2 *Bitstring, start, length uint) {
 
 	// swap the remaining bits of the last word
 	if remain != 0 {
-		swapBits(bs1, bs2, i, genlomask(remain))
+		swapBits(bs1, bs2, i, lomask(remain))
 	}
 }
 

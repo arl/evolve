@@ -73,12 +73,12 @@ func BenchmarkUint16DifferentWords(b *testing.B) { benchmarkUint16(b, 31) }
 func BenchmarkUint8SameWord(b *testing.B)        { benchmarkUint8(b, 32) }
 func BenchmarkUint8DifferentWords(b *testing.B)  { benchmarkUint8(b, 31) }
 
-func Benchmark_genmask(b *testing.B) {
+func Benchmark_mask(b *testing.B) {
 	b.ReportAllocs()
 
 	var v uint
 	for i := 0; i < b.N; i++ {
-		v = genmask(4, 27)
+		v = mask(4, 27)
 	}
 	b.StopTimer()
 	sink = v
@@ -89,7 +89,7 @@ func Benchmark_lomask(b *testing.B) {
 
 	var v uint
 	for i := 0; i < b.N; i++ {
-		v = genlomask(27)
+		v = lomask(27)
 	}
 	b.StopTimer()
 	sink = v

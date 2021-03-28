@@ -11,18 +11,17 @@ func wordoffset(n uint) uint { return uint(n / uintsize) }
 // that bit with regards to the first bit of the uint that contains it.
 func bitoffset(n uint) uint { return uint(n & (uintsize - 1)) }
 
-// genmask returns a mask that keeps the bits in the range [l, h)
-// behaviour undefined if any argument is greater than the size of
-// a machine word.
-func genmask(l, h uint) uint { return genlomask(h) & genhimask(l) }
+// mask returns a mask that keeps the bits in the range [l, h) behaviour
+// undefined if any argument is greater than the size of a machine word.
+func mask(l, h uint) uint { return lomask(h) & himask(l) }
 
-// genlomask returns a mask to keep the n LSB (least significant bits).
-// Undefined behaviour if n is greater than uintsize.
-func genlomask(n uint) uint { return maxuint >> (uintsize - n) }
+// lomask returns a mask to keep the n LSB (least significant bits). Undefined
+// behaviour if n is greater than uintsize.
+func lomask(n uint) uint { return maxuint >> (uintsize - n) }
 
-// genhimask returns a mask to keep the n MSB (most significant bits).
-// Undefined behaviour if n is greater than uintsize.
-func genhimask(n uint) uint { return maxuint << n }
+// himask returns a mask to keep the n MSB (most significant bits). Undefined
+// behaviour if n is greater than uintsize.
+func himask(n uint) uint { return maxuint << n }
 
 // findFirstSetBit returns the offset of the first set bit in w
 func findFirstSetBit(w uint) uint {
@@ -56,8 +55,8 @@ func findFirstSetBit(w uint) uint {
 	return num
 }
 
-// transferbits returns the uint that results from transfering some bits
-// from src to dst, where set bits in mask specify the bits to transfer.
+// transferbits returns the uint that results from transfering some bits from
+// src to dst, where set bits in mask specify the bits to transfer.
 func transferbits(dst, src, mask uint) uint {
 	return dst&^mask | src&mask
 }

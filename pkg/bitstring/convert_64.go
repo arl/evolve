@@ -41,15 +41,15 @@ func (bs *Bitstring) SetUint32(i uint, x uint32) {
 	if j == k {
 		// fast path: same word
 		neww := uint(x) << lobit
-		mask := genmask(lobit, lobit+32)
-		bs.data[j] = transferbits(bs.data[j], neww, mask)
+		msk := mask(lobit, lobit+32)
+		bs.data[j] = transferbits(bs.data[j], neww, msk)
 		return
 	}
 	// transfer bits to low word
-	bs.data[j] = transferbits(bs.data[j], uint(x)<<lobit, genhimask(lobit))
+	bs.data[j] = transferbits(bs.data[j], uint(x)<<lobit, himask(lobit))
 	// transfer bits to high word
 	lon := uintsize - lobit
-	bs.data[k] = transferbits(bs.data[k], uint(x)>>lon, genlomask(32-lon))
+	bs.data[k] = transferbits(bs.data[k], uint(x)>>lon, lomask(32-lon))
 }
 
 // SetUint64 sets the 64 bits starting at i with the value of x. It panics if
@@ -70,13 +70,13 @@ func (bs *Bitstring) SetUint64(i uint, x uint64) {
 	if j == k {
 		// fast path: same word
 		neww := uint(x) << lobit
-		mask := genmask(lobit, lobit+64)
-		bs.data[j] = transferbits(bs.data[j], neww, mask)
+		msk := mask(lobit, lobit+64)
+		bs.data[j] = transferbits(bs.data[j], neww, msk)
 		return
 	}
 	// transfer bits to low word
-	bs.data[j] = transferbits(bs.data[j], uint(x)<<lobit, genhimask(lobit))
+	bs.data[j] = transferbits(bs.data[j], uint(x)<<lobit, himask(lobit))
 	// transfer bits to high word
 	lon := (uintsize - lobit)
-	bs.data[k] = transferbits(bs.data[k], uint(x)>>lon, genlomask(64-lon))
+	bs.data[k] = transferbits(bs.data[k], uint(x)>>lon, lomask(64-lon))
 }

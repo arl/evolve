@@ -7,7 +7,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/pkg/mt19937"
+
+	"github.com/stretchr/testify/require"
 )
 
 func sudokuFromStrings(strs []string) (*sudoku, error) {
@@ -26,7 +29,6 @@ func sudokuFromStrings(strs []string) (*sudoku, error) {
 }
 
 func TestSudokuMater(t *testing.T) {
-
 	p1, err := sudokuFromStrings([]string{
 		"1 1 1 1 1 1 1 1 1",
 		"2 2 2 2 2 2 2 2 2",
@@ -38,9 +40,7 @@ func TestSudokuMater(t *testing.T) {
 		"8 8 8 8 8 8 8 8 8",
 		"9 9 9 9 9 9 9 9 9",
 	})
-	if err != nil {
-		t.Errorf("error creating sudoku from string: %v", err)
-	}
+	require.NoError(t, err)
 
 	p2, err := sudokuFromStrings([]string{
 		"9 9 9 9 9 9 9 9 9",
@@ -53,24 +53,19 @@ func TestSudokuMater(t *testing.T) {
 		"2 2 2 2 2 2 2 2 2",
 		"1 1 1 1 1 1 1 1 1",
 	})
-	if err != nil {
-		t.Errorf("error creating sudoku from string: %v", err)
-	}
+	require.NoError(t, err)
 
 	mater{}.Mate(p1, p2, 1, rand.New(mt19937.New(2)))
 }
 
 // Tests to ensure that rows are still valid after mutation.  Each row
 // should contain each value 1-9 exactly once.
-func TestRowMutationValidity(t *testing.T) { // nolint: gocyclo
-	rmut := newRowMutation()
-	err := rmut.SetMutations(8)
-	if err != nil {
-		t.Error(err)
-	}
-	err = rmut.SetAmount(1)
-	if err != nil {
-		t.Error(err)
+func TestRowMutationValidity(t *testing.T) {
+	rng := rand.New(mt19937.New(time.Now().UnixNano()))
+
+	rmut := &rowMutation{
+		Number: generator.ConstInt(8),
+		Amount: generator.ConstInt(1),
 	}
 	sudo, err := sudokuFromStrings([]string{
 		"1 2 8 5 4 3 9 6 7",
@@ -83,50 +78,40 @@ func TestRowMutationValidity(t *testing.T) { // nolint: gocyclo
 		"9 4 6 8 5 7 3 2 1",
 		"2 3 7 1 9 4 6 8 5",
 	})
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
+
 	pop := []interface{}{sudo}
 
 	counts := make(map[int]struct{})
-	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 
 	for i := 0; i < 20; i++ {
 		pop = rmut.Apply(pop, rng)
-		if len(pop) != 1 {
-			t.Errorf("population size should not be affected by mutation")
-		}
+		require.Len(t, pop, 1, "population size should not be affected by mutation")
+
 		mutated := pop[0].(*sudoku)
 		for j := 0; j < size; j++ {
 			row := mutated[j]
-			if len(row) != size {
-				t.Errorf("row %v has an invalid length: want %v, got %v", j, size, len(row))
-			}
+			require.Lenf(t, row, size, "row %v has an invalid length", j)
+
 			for _, cell := range row {
 				if cell.val <= 0 || cell.val > size {
 					t.Errorf("on row %v cell value is out of range, got %v", j, cell.val)
 				}
 				counts[cell.val] = struct{}{}
 			}
-			if len(counts) != size {
-				t.Errorf("row %v contains some duplicated values", j)
-			}
-			// clear map
+			require.Lenf(t, counts, size, "row %v contains some duplicated values", j)
+
+			// Clear map
 			counts = make(map[int]struct{})
 		}
 	}
 }
 
-//Check that the mutation never modifies the value of fixed cells.
+// Check that the mutation never modifies the value of fixed cells.
 func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
-	rmut := newRowMutation()
-	err := rmut.SetMutations(8)
-	if err != nil {
-		t.Error(err)
-	}
-	err = rmut.SetAmount(1)
-	if err != nil {
-		t.Error(err)
+	rmut := &rowMutation{
+		Number: generator.ConstInt(8),
+		Amount: generator.ConstInt(1),
 	}
 
 	var sudo sudoku
@@ -158,14 +143,5 @@ func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 				}
 			}
 		}
-	}
-}
-
-func TestRowMutationInvalid(t *testing.T) {
-	if err := newRowMutation().SetMutations(0); err != errInvalidMutationCount {
-		t.Errorf("SetMutations(0): want ErrInvalidMutationCount, got %v", err)
-	}
-	if err := newRowMutation().SetAmount(0); err != errInvalidMutationAmount {
-		t.Errorf("SetAmount(0): want ErrInvalidMutationAmount, got %v", err)
 	}
 }

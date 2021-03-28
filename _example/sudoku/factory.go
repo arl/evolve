@@ -12,11 +12,11 @@ var (
 	values                   = [size]int{1, 2, 3, 4, 5, 6, 7, 8, 9}
 )
 
-// generator that generates potential Sudoku solutions from a list of "givens".
+// SudokuGenerator that generates potential Sudoku solutions from a list of "givens".
 // The rows of the generated solutions will all be valid (i.e. no duplicate
 // values) but there are no constraints on the columns or sub-grids (these will
 // be refined by the evolutionary algorithm).
-type generator struct {
+type SudokuGenerator struct {
 	templ    sudoku
 	nonfixed [size][]int
 }
@@ -27,12 +27,12 @@ type generator struct {
 // '1' to '9' (each of which represents a fixed cell in the pattern) or the '.'
 // character, which represents an empty cell. Returns an error if the pattern is
 // not made of 9 strings containing 1 to 9, or '.'
-func newGenerator(pattern []string) (*generator, error) { // nolint: gocyclo
+func newGenerator(pattern []string) (*SudokuGenerator, error) { // nolint: gocyclo
 	if len(pattern) != size {
 		return nil, errWrongNumberOfRows
 	}
 
-	gen := &generator{}
+	gen := &SudokuGenerator{}
 
 	// Keep track of which values in each row are not 'givens'.
 	for i := 0; i < size; i++ {
@@ -73,7 +73,7 @@ func newGenerator(pattern []string) (*generator, error) { // nolint: gocyclo
 // The generated potential solution is guaranteed to have no
 // duplicates in any row but could have duplicates in a column or sub-grid.
 
-func (gen *generator) Generate(rng *rand.Rand) interface{} {
+func (gen *SudokuGenerator) Generate(rng *rand.Rand) interface{} {
 	// Clone the template as the basis for this grid.
 	var rows sudoku
 	copy(rows[:], gen.templ[:])

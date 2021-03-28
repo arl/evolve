@@ -73,7 +73,6 @@ func (ts *Truncation) SetRatioRange(min, max float64) error {
 //
 // Returns the selected candidates.
 func (ts *Truncation) Select(pop evolve.Population, natural bool, size int, rng *rand.Rand) []interface{} {
-
 	sel := make([]interface{}, 0, size)
 
 	// get a random value to decide wether to select the fitter individual

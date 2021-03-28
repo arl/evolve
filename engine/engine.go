@@ -182,7 +182,6 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Pop
 }
 
 func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Duration) *evolve.PopulationStats {
-
 	e.stats.Clear()
 	for _, cand := range pop {
 		e.stats.AddValue(cand.Fitness)

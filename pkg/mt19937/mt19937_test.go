@@ -12,7 +12,6 @@ import (
 // Test to ensure that two distinct RNGs with the same seed return the same
 // sequence of numbers.
 func TestMT19937Repeatability(t *testing.T) {
-
 	// create common seed
 	seed := int64(time.Now().UnixNano())
 

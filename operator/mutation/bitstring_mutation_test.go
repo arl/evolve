@@ -4,29 +4,27 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/arl/evolve/pkg/bitstring"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/arl/evolve/generator"
+	"github.com/arl/evolve/pkg/bitstring"
 )
 
-func errcheck(t *testing.T, err error) {
-	t.Helper()
-	if err != nil {
-		t.Fatalf("want error = nil, got %v", err)
-	}
-}
-
-// Ensures that mutation occurs correctly. Because of the random aspect we
-// can't actually make many assertions. This just ensures that there are no
-// unexpected exceptions and that the length of the bit strings remains as
-// expected.
+// Ensures that mutation occurs correctly. Because of the random aspect we can't
+// actually make many assertions. This just ensures that there are no unexpected
+// exceptions and that the length of the bit strings remains as expected.
 func TestBitstringMutationRandom(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	mut := NewBitstring()
-	errcheck(t, mut.SetProb(0.5))
+	bs := &Bitstring{
+		FlipCount:   generator.ConstInt(1),
+		Probability: generator.ConstFloat64(0.5),
+	}
+
+	mut := New(bs)
 
 	org, err := bitstring.MakeFromString("111100101")
-	errcheck(t, err)
+	assert.NoError(t, err)
 
 	pop := []interface{}{org}
 	for i := 0; i < 20; i++ {
@@ -39,16 +37,20 @@ func TestBitstringMutationRandom(t *testing.T) {
 	}
 }
 
-// Ensures that mutation occurs correctly.  Uses a probability of 1 to
-// make the outcome predictable (all bits will be flipped).
+// Ensures that mutation occurs correctly. Uses a probability of 1 to make the
+// outcome predictable (all bits will be flipped).
 func TestBitstringMutationSingleBit(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	mut := NewBitstring()
-	errcheck(t, mut.SetProb(1.0))
+	bs := &Bitstring{
+		FlipCount:   generator.ConstInt(1),
+		Probability: generator.ConstFloat64(0.5),
+	}
+
+	mut := New(bs)
 
 	org, err := bitstring.MakeFromString("111100101")
-	errcheck(t, err)
+	assert.NoError(t, err)
 
 	pop := []interface{}{org}
 	pop = mut.Apply(pop, rng)
@@ -64,6 +66,3 @@ func TestBitstringMutationSingleBit(t *testing.T) {
 	assert.Truef(t, set == 5 || set == 7, "want 5 or 7 set bits in mutated bit string, got %v", set)
 	assert.Truef(t, unset == 2 || unset == 4, "want 2 or 4 unset bits in mutated bit string, got %v", unset)
 }
-
-// TODO:  test BitstringMutation constructed with options other than default ones
-//func

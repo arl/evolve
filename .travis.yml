@@ -1,9 +1,12 @@
 language: go
 go:
-  - tip
+  - "1.16.x"
 before_install:
-  - go get github.com/mattn/goveralls
+  - go install github.com/mattn/goveralls@latest
+  - go install honnef.co/go/tools/cmd/staticcheck@latest
+  - go install mvdan.cc/gofumpt@latest
 script:
+  - .ci/.gofumpt.sh
+  - staticcheck ./...
   - go test -race ./...
-  - $GOPATH/bin/goveralls -service=travis-ci
-
+  - goveralls -service=travis-ci

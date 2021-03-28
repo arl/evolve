@@ -29,14 +29,16 @@ func check(err error) {
 // in the bit string. The evolution should therefore converge on strings that
 // consist only of ones.
 func main() {
-	// define the crossover
+	// Define the crossover
 	xover := xover.New(xover.BitstringMater{})
-	check(xover.SetPoints(1))
-	check(xover.SetProb(0.7))
+	xover.Probability = generator.ConstFloat64(0.7)
+	xover.Points = generator.ConstInt(1)
 
-	// define the mutation
-	mut := mutation.NewBitstring()
-	check(mut.SetProb(0.01))
+	// Define the mutation
+	mut := mutation.New(&mutation.Bitstring{
+		Probability: generator.ConstFloat64(0.01),
+		FlipCount:   generator.ConstInt(1),
+	})
 
 	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)

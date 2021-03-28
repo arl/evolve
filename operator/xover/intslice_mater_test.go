@@ -5,12 +5,17 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/arl/evolve/generator"
 )
 
 func TestIntSliceMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(IntSliceMater{})
+	xover.Points = generator.ConstInt(1)
+	xover.Probability = generator.ConstFloat64(1)
+
 	pop := make([]interface{}, 4)
 	pop[0] = []int{1, 2, 3, 4, 5}
 	pop[1] = []int{6, 7, 8, 9, 10}
@@ -20,24 +25,21 @@ func TestIntSliceMater(t *testing.T) {
 	for i := 0; i < 20; i++ {
 		values := make(map[int]struct{}, 20)
 		pop = xover.Apply(pop, rng)
-		if len(pop) != 4 {
-			t.Error("population size changed, want 4, got", len(pop))
-		}
+
+		assert.Lenf(t, pop, 4, "population size changed")
 
 		for _, ind := range pop {
 			s := ind.([]int)
-			if len(s) != 5 {
-				t.Error("wrong candidate length, want 5, got", len(s))
-			}
+			assert.Lenf(t, s, 5, "wrong individual length")
+
 			for _, value := range s {
 				values[value] = struct{}{}
 			}
 		}
-		// All of the individual elements should still be present, just jumbled
-		// up between individuals.
-		if len(values) != 20 {
-			t.Error("wrong number of candidates, want 20, got", len(values))
-		}
+
+		// All of the elements should still be present, just jumbled up between
+		// individuals.
+		assert.Lenf(t, values, 20, "wrong number of individuals")
 	}
 }
 
@@ -47,6 +49,9 @@ func TestIntSliceMaterDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(IntSliceMater{})
+	xover.Points = generator.ConstInt(1)
+	xover.Probability = generator.ConstFloat64(1)
+
 	pop := make([]interface{}, 2)
 	pop[0] = []int{1, 2, 3, 4, 5}
 	pop[1] = []int{2}
