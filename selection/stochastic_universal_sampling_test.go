@@ -8,7 +8,7 @@ import (
 // frequencies correspond to expected frequencies.
 
 func TestStochasticUniversalSamplingNatural(t *testing.T) {
-	var tpop = testPopulation{
+	tpop := testPopulation{
 		{name: "Steve", fitness: 10.0, wantMin: 2, wantMax: 3},
 		{name: "John", fitness: 4.5, wantMin: 1, wantMax: 2},
 		{name: "Mary", fitness: 1.0, wantMin: 0, wantMax: 1},
@@ -18,7 +18,7 @@ func TestStochasticUniversalSamplingNatural(t *testing.T) {
 }
 
 func TestStochasticUniversalSamplingNonNatural(t *testing.T) {
-	var tpop = testPopulation{
+	tpop := testPopulation{
 		{name: "Steve", fitness: 0.5, wantMin: 2, wantMax: 3},
 		{name: "John", fitness: 1.0, wantMin: 1, wantMax: 2},
 		{name: "Mary", fitness: 4.5, wantMin: 0, wantMax: 1},

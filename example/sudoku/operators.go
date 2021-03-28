@@ -110,7 +110,6 @@ func (rm *rowMutation) mutate(sudo *sudoku, rng *rand.Rand) *sudoku {
 // Checks whether the proposed mutation would introduce a duplicate of a fixed
 // value into a column or sub-grid.
 func (rm *rowMutation) isAddConflict(sudo *sudoku, row, from, to int) bool {
-
 	fromval, toval := sudo[row][from].val-1, sudo[row][to].val-1
 
 	return rm.fixedcols[from][toval] ||
@@ -122,7 +121,6 @@ func (rm *rowMutation) isAddConflict(sudo *sudoku, row, from, to int) bool {
 // Checks whether the proposed mutation would remove a duplicate of a fixed
 // value from a column or sub-grid.
 func (rm *rowMutation) isRemoveConflict(sudo *sudoku, row, from, to int) bool {
-
 	fromval, toval := sudo[row][from].val-1, sudo[row][to].val-1
 
 	return rm.fixedcols[from][fromval] ||

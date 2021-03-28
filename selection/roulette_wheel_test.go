@@ -30,7 +30,7 @@ func TestRouletteWheelSelectionNonNatural(t *testing.T) {
 }
 
 func TestRouletteWheelSelectionNaturalPerfect(t *testing.T) {
-	var testPop = testPopulation{
+	testPop := testPopulation{
 		{name: "Gary", fitness: 0.0},
 		{name: "Mary", fitness: 8.4},
 		{name: "John", fitness: 9.1},

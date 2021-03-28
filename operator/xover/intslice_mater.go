@@ -10,7 +10,6 @@ type IntSliceMater struct{}
 // Mate performs crossover on a pair of parents to generate a pair of
 // offspring.
 func (m IntSliceMater) Mate(parent1, parent2 interface{}, npts int64, rng *rand.Rand) []interface{} {
-
 	p1, p2 := parent1.([]int), parent2.([]int)
 
 	if len(p1) != len(p2) {

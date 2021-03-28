@@ -9,6 +9,7 @@ import (
 
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/pkg/mt19937"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -106,7 +107,7 @@ func TestRowMutationValidity(t *testing.T) {
 	}
 }
 
-//Check that the mutation never modifies the value of fixed cells.
+// Check that the mutation never modifies the value of fixed cells.
 func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 	rmut := &rowMutation{
 		Number: generator.ConstInt(8),

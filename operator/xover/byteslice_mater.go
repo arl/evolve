@@ -10,7 +10,6 @@ type ByteSliceMater struct{}
 // Mate performs crossover on a pair of parents to generate a pair of
 // offspring.
 func (m ByteSliceMater) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) []interface{} {
-
 	p1, p2 := parent1.([]byte), parent2.([]byte)
 
 	// TODO: we chose to panick here, making those assumptions:

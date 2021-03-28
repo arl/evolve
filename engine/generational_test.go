@@ -144,7 +144,7 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	checkB(b, err)
 
 	// TODO: add option function for singlethread
-	//engine.SetSingleThreaded(!multithread)
+	// engine.SetSingleThreaded(!multithread)
 	cond := condition.TargetFitness{Fitness: 0, Natural: false}
 
 	b.ResetTimer()
@@ -161,18 +161,23 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 func BenchmarkGenerationalEngineSingleThread10(b *testing.B) {
 	benchmarkGenerationalEngine(b, false, 10)
 }
+
 func BenchmarkGenerationalEngineMultithread10(b *testing.B) {
 	benchmarkGenerationalEngine(b, true, 10)
 }
+
 func BenchmarkGenerationalEngineSingleThread100(b *testing.B) {
 	benchmarkGenerationalEngine(b, false, 100)
 }
+
 func BenchmarkGenerationalEngineMultithread100(b *testing.B) {
 	benchmarkGenerationalEngine(b, true, 100)
 }
+
 func BenchmarkGenerationalEngineSingleThread1000(b *testing.B) {
 	benchmarkGenerationalEngine(b, false, 1000)
 }
+
 func BenchmarkGenerationalEngineMultithread1000(b *testing.B) {
 	benchmarkGenerationalEngine(b, true, 1000)
 }
@@ -185,7 +190,6 @@ type evaluator string
 func (s evaluator) Fitness(
 	cand interface{},
 	pop []interface{}) float64 {
-
 	var errors float64
 	sc := cand.(string)
 	for i := range sc {
