@@ -40,13 +40,13 @@ func TestGaussianDynamic(t *testing.T) {
 	checkGaussianDistribution(t, g, gmean.Next(), gstddev.Next())
 }
 
-func checkGaussianDistribution(t *testing.T, gen Float, wantMean, wantStdDev float64) {
+func checkGaussianDistribution(t *testing.T, g Float, wantMean, wantStdDev float64) {
 	t.Helper()
 
 	const iterations = 10000
 	ds := evolve.NewDataset(iterations)
 	for i := 0; i < iterations; i++ {
-		ds.AddValue(gen.Next())
+		ds.AddValue(g.Next())
 	}
 
 	const ε = 0.02

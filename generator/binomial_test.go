@@ -7,6 +7,7 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/mt19937"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,14 +43,14 @@ func TestBinomialDynamic(t *testing.T) {
 	checkBinomialDistribution(t, g, adjustn, adjustp)
 }
 
-func checkBinomialDistribution(t *testing.T, gen Int, n int64, p float64) {
+func checkBinomialDistribution(t *testing.T, g Int, n int64, p float64) {
 	t.Helper()
 
 	const iterations = 10000
 
 	ds := evolve.NewDataset(iterations)
 	for i := 0; i < iterations; i++ {
-		val := gen.Next()
+		val := g.Next()
 		if val < 0 || val > n {
 			t.Errorf("generated value out of range, got %v", val)
 		}
@@ -82,6 +83,7 @@ func Test_floatToFixedBits(t *testing.T) {
 	t.Run("panic when negative", func(t *testing.T) {
 		assert.Panics(t, func() { floatToFixedBits(-0.5) })
 	})
+
 	// floatToFixedBits should panic when given number >= 1 since the
 	// representation doesn't allow such numbers.
 	t.Run("panic when >=1", func(t *testing.T) {

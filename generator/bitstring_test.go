@@ -29,14 +29,12 @@ func TestBitstring(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	t.Run("unseed population", func(t *testing.T) {
-
 		f := Bitstring(length)
 		pop := evolve.GeneratePopulation(f, popsize, rng)
 		checkPop(pop)
 	})
 
 	t.Run("seeded population", func(t *testing.T) {
-
 		f := Bitstring(length)
 		seed1, _ := bitstring.MakeFromString("1111100000")
 		seed2, _ := bitstring.MakeFromString("1010101010")
@@ -53,7 +51,6 @@ func TestBitstring(t *testing.T) {
 	})
 
 	t.Run("too many seed candidates", func(t *testing.T) {
-
 		f := Bitstring(length)
 		cand := bitstring.New(length)
 		// The following call should panic since the 3 seed candidates won't fit

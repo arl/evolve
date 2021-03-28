@@ -46,6 +46,7 @@ func TestAdjustableFloat(t *testing.T) {
 		}
 	}
 }
+
 func TestAdjustableFloatNan(t *testing.T) {
 	var f AdjustableFloat
 	f.Set(math.NaN())
@@ -58,6 +59,7 @@ func TestAdjustableFloatNan(t *testing.T) {
 		t.Errorf("got %v, want Nan", got)
 	}
 }
+
 func TestAdjustableFloatInf(t *testing.T) {
 	var f AdjustableFloat
 	f.Set(math.Inf(1))
