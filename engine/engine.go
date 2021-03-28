@@ -16,7 +16,7 @@ import (
 type Engine struct {
 	obs     map[Observer]struct{}
 	rng     *rand.Rand
-	gen     evolve.Generator
+	factory evolve.Factory
 	eval    evolve.Evaluator
 	epoch   evolve.Epocher
 	stats   *evolve.Dataset
@@ -31,12 +31,12 @@ type Engine struct {
 // gen generates new random candidates solutions.
 // eval evaluates fitness scores of candidates.
 // epoch transforms a whole population into the next generation.
-func New(gen evolve.Generator, eval evolve.Evaluator, epoch evolve.Epocher, options ...func(*Engine) error) (*Engine, error) {
+func New(factory evolve.Factory, eval evolve.Evaluator, epoch evolve.Epocher, options ...func(*Engine) error) (*Engine, error) {
 	eng := Engine{
-		obs:   make(map[Observer]struct{}),
-		gen:   gen,
-		eval:  eval,
-		epoch: epoch,
+		obs:     make(map[Observer]struct{}),
+		factory: factory,
+		eval:    eval,
+		epoch:   epoch,
 	}
 	for _, opt := range options {
 		if err := opt(&eng); err != nil {
@@ -146,7 +146,7 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Pop
 	var ngen int
 	start := time.Now()
 
-	pop, err := evolve.SeedPopulation(e.gen, popsize, e.seeds, e.rng)
+	pop, err := evolve.SeedPopulation(e.factory, popsize, e.seeds, e.rng)
 	if err != nil {
 		return nil, nil, fmt.Errorf("can't seed population: %v", err)
 	}

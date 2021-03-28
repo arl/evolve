@@ -2,7 +2,7 @@ package engine
 
 import (
 	"github.com/arl/evolve"
-	"github.com/arl/evolve/generator"
+	"github.com/arl/evolve/factory"
 
 	"github.com/arl/evolve/pkg/bitstring"
 )
@@ -13,7 +13,7 @@ import (
 func ExampleNew() {
 	var epocher Generational
 
-	gen := generator.Bitstring(2)
+	factory := factory.Bitstring(2)
 
 	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)
@@ -22,5 +22,5 @@ func ExampleNew() {
 			return float64(cand.(*bitstring.Bitstring).OnesCount())
 		})
 
-	New(gen, eval, &epocher)
+	New(factory, eval, &epocher)
 }

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/arl/evolve"
+	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/pkg/bitstring"
 
@@ -16,7 +17,7 @@ func TestBitstringCrossover(t *testing.T) {
 	xover := New(BitstringMater{})
 	xover.Probability = generator.ConstFloat64(1)
 	xover.Points = generator.ConstInt(1)
-	f := generator.Bitstring(50)
+	f := factory.Bitstring(50)
 
 	pop := evolve.GeneratePopulation(f, 2, rng)
 	// Test to make sure that crossover correctly preserves all genetic material

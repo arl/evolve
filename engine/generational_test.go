@@ -9,6 +9,7 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
+	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
 	"github.com/arl/evolve/operator/mutation"
@@ -35,16 +36,14 @@ func (intEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 
 func (intEvaluator) IsNatural() bool { return true }
 
-type zeroGenerator struct{}
-
-func (zeroGenerator) Generate(rng *rand.Rand) interface{} { return 0 }
-
 func check(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
 		t.Error(err)
 	}
 }
+
+var zeroFactory = evolve.FactoryFunc(func(_ *rand.Rand) interface{} { return 0 })
 
 func TestGenerationalEngineElitism(t *testing.T) {
 	epocher := Generational{
@@ -53,7 +52,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 		Sel:  selection.RouletteWheel,
 	}
 
-	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher)
+	eng, _ := New(zeroFactory, intEvaluator{}, &epocher)
 
 	var avgfitness float64
 	// add an observer that record the mean fitness at each generation
@@ -87,7 +86,7 @@ func TestGenerationalEngineSatisfiedConditions(t *testing.T) {
 		Sel:  selection.RouletteWheel,
 	}
 
-	eng, _ := New(zeroGenerator{}, intEvaluator{}, &epocher)
+	eng, _ := New(zeroFactory, intEvaluator{}, &epocher)
 
 	cond := condition.GenerationCount(1)
 	_, satisfied, err := eng.Evolve(10, EndOn(cond))
@@ -120,7 +119,7 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	}
 
 	// Create a string generator
-	fac, err := generator.NewString(alphabet, len(target))
+	fac, err := factory.NewString(alphabet, len(target))
 	checkB(b, err)
 
 	// 1st operator: string mutation

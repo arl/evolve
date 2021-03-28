@@ -10,7 +10,7 @@ import (
 
 // ErrInvalidMutationCount is the error returned when trying to set an invalid
 // mutation count
-var ErrInvalidMutationCount = errors.New("mutation count must be in the [0,MaxInt32] range")
+var ErrInvalidMutationCount = errors.New("mutation count must be in [0, MaxInt32]")
 
 // A Bitstring mutates individual bits in a bitstring.Bitstring according to
 // some probability.
