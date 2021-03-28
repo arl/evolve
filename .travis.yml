@@ -4,9 +4,9 @@ go:
 before_install:
   - go install github.com/mattn/goveralls@latest
   - go install honnef.co/go/tools/cmd/staticcheck@latest
+  - go install mvdan.cc/gofumpt@latest
 script:
+  - .ci/.gofumpt.sh
   - staticcheck ./...
   - go test -race ./...
   - goveralls -service=travis-ci
-  # $GOPATH/bin/goveralls -service=travis-ci
-
