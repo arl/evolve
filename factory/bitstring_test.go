@@ -1,4 +1,4 @@
-package generator
+package factory
 
 import (
 	"math/rand"

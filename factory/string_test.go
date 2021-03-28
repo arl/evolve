@@ -1,4 +1,4 @@
-package generator
+package factory
 
 import (
 	"fmt"
@@ -33,7 +33,6 @@ func TestNewString(t *testing.T) {
 			0,
 			ErrNotASCIIAlphabet,
 		},
-
 		{
 			"empty alphabet",
 			"",
@@ -51,11 +50,11 @@ func TestNewString(t *testing.T) {
 	}
 }
 
-func TestStringGenerator(t *testing.T) {
-	gen, err := NewString("ABCdefg", 2)
+func TestStringFactory(t *testing.T) {
+	factory, err := NewString("ABCdefg", 2)
 	require.NoError(t, err)
 
-	s := gen.Generate(rand.New(rand.NewSource(99)))
+	s := factory.New(rand.New(rand.NewSource(99)))
 	if s, ok := s.(string); !ok {
 		t.Errorf("GenerateCandidate should generate string candidates, got %T", s)
 	}
@@ -63,16 +62,16 @@ func TestStringGenerator(t *testing.T) {
 
 var sink interface{}
 
-func BenchmarkGenerateString(b *testing.B) {
+func BenchmarkNewString(b *testing.B) {
 	rng := rand.New(rand.NewSource(99))
 
 	runs := []int{10, 100, 1000}
 	for _, slen := range runs {
 		b.Run(fmt.Sprintf("%d", slen), func(b *testing.B) {
 			b.ReportAllocs()
-			gen, _ := NewString("A", slen)
+			factory, _ := NewString("A", slen)
 			for i := 0; i < b.N; i++ {
-				sink = gen.Generate(rng)
+				sink = factory.New(rng)
 			}
 		})
 	}
