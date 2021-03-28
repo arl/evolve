@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/evolve/generator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,7 +12,8 @@ func TestPMX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(PMX{})
-	xover.SetPoints(2)
+	xover.Points = generator.ConstInt(2)
+	xover.Probability = generator.ConstFloat64(1)
 
 	pop := make([]interface{}, 2)
 	pop[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
@@ -35,7 +37,7 @@ func TestPMXDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(PMX{})
-	xover.SetPoints(2)
+	xover.Points = generator.ConstInt(2)
 
 	pop := make([]interface{}, 2)
 	pop[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
@@ -50,7 +52,7 @@ func TestPMX2CrossoverPoints(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(PMX{})
-	xover.SetPoints(3)
+	xover.Points = generator.ConstInt(3)
 
 	pop := make([]interface{}, 2)
 	pop[0] = []int{1, 2, 3, 4}

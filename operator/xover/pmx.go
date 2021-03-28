@@ -5,9 +5,11 @@ import (
 )
 
 // PMX implements the partially mapped crossover algorithm.
-// This crossover is indicated when chromomes are lists of a predefined set of elements.
-// It creates offsprings that are non-repeating permutations of the parents by choosing
-// 2 random crossover points and exchanging elements positions.
+//
+// This crossover is indicated when chromomes are lists of a predefined set of
+// elements. It creates offsprings that are non-repeating permutations of the
+// parents by choosing 2 random crossover points and exchanging elements
+// positions.
 type PMX struct{}
 
 // Mate mates 2 parents and generates a pair of offsprings.
@@ -59,9 +61,9 @@ func (p PMX) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) []i
 	return []interface{}{offsp1, offsp2}
 }
 
-// checks elements that are outside of the partially mapped section to
-// see if there are any duplicate items in the list. If there are, they
-// are mapped appropriately.
+// checks elements that are outside of the partially mapped section to see if
+// there are any duplicate items in the list. If there are, they are mapped
+// appropriately.
 func (p PMX) checkUnmappedElements(offspring []int, mapping map[int]int, mapStart, mapEnd int) {
 	for i := range offspring {
 		if !p.isInsideMappedRegion(i, mapStart, mapEnd) {

@@ -15,7 +15,7 @@ func TestListOrderMutation(t *testing.T) {
 	population := []interface{}{cand}
 
 	op := ListOrder{
-		MutationCount:  generator.ConstInt(1),
+		Count:          generator.ConstInt(1),
 		MutationAmount: generator.ConstInt(1),
 	}
 	mutpop := op.Apply(population, rng)

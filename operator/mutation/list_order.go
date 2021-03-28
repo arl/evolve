@@ -7,37 +7,27 @@ import (
 )
 
 type ListOrder struct {
-	MutationCount  generator.Int
+	Count          generator.Int
 	MutationAmount generator.Int
 }
 
 func (op *ListOrder) Apply(sel []interface{}, rng *rand.Rand) []interface{} {
 	mutpop := make([]interface{}, len(sel))
 	for i := range sel {
-		// copy current candidate
+		// Copy current candidate.
 		cand := sel[i].([]int)
 		newCand := make([]int, len(cand))
 		copy(newCand, cand)
 
-		// determine the mutation count
-		nmut := int(op.MutationCount.Next())
-		// if op.varnmut {
-		// 	nmut = op.nmutmin + rng.Intn(op.nmutmax-op.nmutmin)
-		// } else {
-		// 	nmut = op.nmut
-		// }
+		// Determine the mutation count.
+		count := int(op.Count.Next())
 
-		for imut := 0; imut < nmut; imut++ {
+		for i := 0; i < count; i++ {
 			istart := rng.Intn(len(newCand))
 
-			// determine the amount of mutations for current item
-			mutAmount := int(op.MutationAmount.Next())
-			// if op.varMutAmount {
-			// 	mutAmount = op.mutAmountMin + rng.Intn(op.mutAmountMax-op.mutAmountMin)
-			// } else {
-			// 	mutAmount = op.mutAmount
-			// }
-			iend := (istart + mutAmount) % len(newCand)
+			// Determine the amount of mutations for current item.
+			amount := int(op.MutationAmount.Next())
+			iend := (istart + amount) % len(newCand)
 			if iend < 0 {
 				iend += len(newCand)
 			}
