@@ -125,7 +125,7 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	// 1st operator: string mutation
 	mut := mutation.New(&mutation.String{
 		Alphabet:    alphabet,
-		Probability: generator.ConstFloat64(0.02),
+		Probability: generator.Const(0.02),
 	})
 
 	// 2nd operator: string crossover

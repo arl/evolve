@@ -20,7 +20,7 @@ var ErrInvalidMutationCount = errors.New("mutation count must be in [0, MaxInt32
 // selected for mutation.
 type Bitstring struct {
 	Probability generator.Float
-	FlipCount   generator.Int
+	FlipCount   generator.Generator[int]
 }
 
 // Mutate modifies a bitstring.Bitstring with respect to a mutation probabilty.
@@ -34,7 +34,7 @@ func (op *Bitstring) Mutate(c interface{}, rng *rand.Rand) interface{} {
 
 		// Since there's a mutation to perform, find out how many bits to flip.
 		nmuts := op.FlipCount.Next()
-		for i := int64(0); i < nmuts; i++ {
+		for i := 0; i < nmuts; i++ {
 			mutated.FlipBit(uint(rng.Intn(mutated.Len())))
 		}
 

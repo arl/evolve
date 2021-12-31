@@ -68,8 +68,8 @@ func main() {
 		Probability: generator.ConstFloat64(0.02),
 	})
 	xover := xover.New(xover.StringMater{})
-	xover.Points = generator.ConstInt(1)
-	xover.Probability = generator.ConstFloat64(1)
+	xover.Points = generator.Const(1.0)
+	xover.Probability = generator.Const(1.0)
 
 	// Define a composite evolutionary operator, that is a pipeline that applies
 	// to each candidate a string mutation followed by a crossover

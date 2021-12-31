@@ -12,8 +12,8 @@ func TestPMX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(PMX{})
-	xover.Points = generator.ConstInt(2)
-	xover.Probability = generator.ConstFloat64(1)
+	xover.Points = generator.Const(2)
+	xover.Probability = generator.Const(1.0)
 
 	pop := make([]interface{}, 2)
 	pop[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
@@ -37,7 +37,7 @@ func TestPMXDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(PMX{})
-	xover.Points = generator.ConstInt(2)
+	xover.Points = generator.Const(2)
 
 	pop := make([]interface{}, 2)
 	pop[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
@@ -52,7 +52,7 @@ func TestPMX2CrossoverPoints(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(PMX{})
-	xover.Points = generator.ConstInt(3)
+	xover.Points = generator.Const(3)
 
 	pop := make([]interface{}, 2)
 	pop[0] = []int{1, 2, 3, 4}

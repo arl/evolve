@@ -65,7 +65,7 @@ func TestRowMutationValidity(t *testing.T) {
 
 	rmut := &rowMutation{
 		Number: generator.ConstInt(8),
-		Amount: generator.ConstInt(1),
+		Amount: generator.Const(1.0),
 	}
 	sudo, err := sudokuFromStrings([]string{
 		"1 2 8 5 4 3 9 6 7",
@@ -111,7 +111,7 @@ func TestRowMutationValidity(t *testing.T) {
 func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 	rmut := &rowMutation{
 		Number: generator.ConstInt(8),
-		Amount: generator.ConstInt(1),
+		Amount: generator.Const(1.0),
 	}
 
 	var sudo sudoku

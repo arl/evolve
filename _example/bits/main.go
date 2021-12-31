@@ -32,12 +32,12 @@ func main() {
 	// Define the crossover
 	xover := xover.New(xover.BitstringMater{})
 	xover.Probability = generator.ConstFloat64(0.7)
-	xover.Points = generator.ConstInt(1)
+	xover.Points = generator.Const(1.0)
 
 	// Define the mutation
 	mut := mutation.New(&mutation.Bitstring{
 		Probability: generator.ConstFloat64(0.01),
-		FlipCount:   generator.ConstInt(1),
+		FlipCount:   generator.Const(1.0),
 	})
 
 	eval := evolve.EvaluatorFunc(

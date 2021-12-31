@@ -13,8 +13,8 @@ func TestIntSliceMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(IntSliceMater{})
-	xover.Points = generator.ConstInt(1)
-	xover.Probability = generator.ConstFloat64(1)
+	xover.Points = generator.Const(1)
+	xover.Probability = generator.Const(1.0)
 
 	pop := make([]interface{}, 4)
 	pop[0] = []int{1, 2, 3, 4, 5}
@@ -49,8 +49,8 @@ func TestIntSliceMaterDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(IntSliceMater{})
-	xover.Points = generator.ConstInt(1)
-	xover.Probability = generator.ConstFloat64(1)
+	xover.Points = generator.Const(1)
+	xover.Probability = generator.Const(1.0)
 
 	pop := make([]interface{}, 2)
 	pop[0] = []int{1, 2, 3, 4, 5}

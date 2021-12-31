@@ -12,8 +12,8 @@ func TestStringMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(StringMater{})
-	xover.Points = generator.ConstInt(1)
-	xover.Probability = generator.ConstFloat64(1)
+	xover.Points = generator.Const(1)
+	xover.Probability = generator.Const(1.0)
 
 	pop := make([]interface{}, 4)
 	pop[0] = "abcde"
@@ -58,8 +58,8 @@ func BenchmarkStringMater(b *testing.B) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := New(StringMater{})
-	xover.Probability = generator.ConstFloat64(1.0)
-	xover.Points = generator.ConstInt(1)
+	xover.Probability = generator.Const(1.0)
+	xover.Points = generator.Const(1)
 
 	pop := make([]interface{}, 4)
 	pop[0] = "abcde"

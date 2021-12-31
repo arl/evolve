@@ -15,7 +15,7 @@ func TestStringMutation(t *testing.T) {
 
 	sm := &String{
 		Alphabet:    alphabet,
-		Probability: generator.ConstFloat64(0.5),
+		Probability: generator.Const(0.5),
 	}
 
 	mut := New(sm)

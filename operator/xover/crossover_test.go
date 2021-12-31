@@ -32,8 +32,8 @@ func TestCrossover_Apply(t *testing.T) {
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
 		xover := New(StringMater{})
-		xover.Points = generator.ConstInt(0)
-		xover.Probability = generator.ConstFloat64(1)
+		xover.Points = generator.Const(0)
+		xover.Probability = generator.Const(1.0)
 
 		got := xover.Apply(pop, rng)
 		sameStringPop(t, pop, got)
@@ -41,8 +41,8 @@ func TestCrossover_Apply(t *testing.T) {
 
 	t.Run("zero_crossover_probability_is_noop", func(t *testing.T) {
 		xover := New(StringMater{})
-		xover.Points = generator.ConstInt(1)
-		xover.Probability = generator.ConstFloat64(0.0)
+		xover.Points = generator.Const(1)
+		xover.Probability = generator.Const(0.0)
 
 		got := xover.Apply(pop, rng)
 		sameStringPop(t, pop, got)

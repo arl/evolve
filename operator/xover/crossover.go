@@ -32,7 +32,7 @@ type Mater interface {
 type Crossover struct {
 	Mater
 	Probability generator.Float
-	Points      generator.Int
+	Points      generator.Generator[int]
 }
 
 // New creates a Crossover operator based off the provided Mater.
