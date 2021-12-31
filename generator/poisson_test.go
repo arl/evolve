@@ -14,7 +14,7 @@ import (
 func TestPoisson(t *testing.T) {
 	rng := rand.New(mt19937.New(23))
 	const mean = 19
-	g := NewPoisson(Const[float64](mean), rng)
+	g := NewPoisson[uint](Const[float64](mean), rng)
 	checkPoissonDistribution(t, g, mean)
 }
 
@@ -24,7 +24,7 @@ func TestPoissonDynamic(t *testing.T) {
 	rng := rand.New(mt19937.New(23))
 
 	gmean := NewSwappable(Const(initMean))
-	g := NewPoisson(gmean, rng)
+	g := NewPoisson[uint32](gmean, rng)
 	checkPoissonDistribution(t, g, initMean)
 
 	const adjustMean float64 = 13
@@ -33,7 +33,7 @@ func TestPoissonDynamic(t *testing.T) {
 	checkPoissonDistribution(t, g, adjustMean)
 }
 
-func checkPoissonDistribution(t *testing.T, g *Poisson, wantMean float64) {
+func checkPoissonDistribution[U Unsigned](t *testing.T, g *Poisson[U], wantMean float64) {
 	t.Helper()
 
 	const iterations = 10000

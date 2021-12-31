@@ -6,19 +6,19 @@ import (
 )
 
 // Poisson generates Poisson-distributed values.
-type Poisson struct {
+type Poisson[U Unsigned] struct {
 	rng  *rand.Rand
 	mean Float
 }
 
-func NewPoisson(mean Float, rng *rand.Rand) *Poisson {
-	return &Poisson{mean: mean, rng: rng}
+func NewPoisson[U Unsigned](mean Float, rng *rand.Rand) *Poisson[U] {
+	return &Poisson[U]{mean: mean, rng: rng}
 }
 
 // Next returns the next generated Poisson-distributed value.
-func (p *Poisson) Next() int64 {
+func (p *Poisson[U]) Next() U {
 	var (
-		x int64
+		x U
 		t float64
 	)
 	for {

@@ -1,21 +1,30 @@
 package generator
 
-type UnsignedInteger interface {
-	~uint8 | ~uint16 | ~uint32 | ~uint64
+// A Generator generates sequences of values each of which is provided whenever Next is called.
+type Generator[T any] interface {
+	Next() T
+}
+
+type Unsigned interface {
+	~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uint
+}
+
+type Signed interface {
+	~int8 | ~int16 | ~int32 | ~int64 | ~int
 }
 
 // UInt generates unsigned integer values.
-type UInt[T UnsignedInteger] interface {
+type UInt[T Unsigned] interface {
+	Next() T
+}
+
+// Int generates signed integer values.
+type Int[T Signed] interface {
 	Next() T
 }
 
 // Float generates float64 values.
 type Float Generator[float64]
-
-// A Generator generates sequences of values each of which is provided whenever Next is called.
-type Generator[T any] interface {
-	Next() T
-}
 
 type constGen[T any] struct {
 	val T

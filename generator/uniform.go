@@ -1,29 +1,27 @@
 package generator
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 // An UniformInt generates a random sequence of discrete and uniformly
 // distributed integers.
-type UniformInt struct {
+type UniformInt[T Unsigned] struct {
 	rng       *rand.Rand
-	min, rang int64
+	min, rang T
 }
 
 // NewUniformInt returns an UniformInt using rng to generator of integers
 // number generator of uniformly distributed integers.
-func NewUniformtInt(min, max int64, rng *rand.Rand) *UniformInt {
+func NewUniformtInt[T Unsigned](min, max T, rng *rand.Rand) *UniformInt[T] {
 	if min > max {
 		panic("min > max")
 	}
 
-	return &UniformInt{min: min, rang: max - min, rng: rng}
+	return &UniformInt[T]{min: min, rang: max - min, rng: rng}
 }
 
 // Next returns the next element in the sequence.
-func (g *UniformInt) Next() int64 {
-	return g.min + g.rng.Int63n(g.rang)
+func (g *UniformInt[T]) Next() T {
+	return T(g.min) + T(g.rng.Int63n(int64(g.rang)))
 }
 
 // An UniformFloat generates a random sequence of continuous and uniformly

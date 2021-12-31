@@ -42,7 +42,7 @@ func TestBinomialDynamic(t *testing.T) {
 	checkBinomialDistribution[uint64](t, g, adjustn, adjustp)
 }
 
-func checkBinomialDistribution[T UnsignedInteger](t *testing.T, g Generator[T], n T, p float64) {
+func checkBinomialDistribution[T Unsigned](t *testing.T, g Generator[T], n T, p float64) {
 	t.Helper()
 
 	const iterations = 10000
