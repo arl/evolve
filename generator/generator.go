@@ -1,7 +1,7 @@
 package generator
 
 // A Generator generates sequences of values each of which is provided whenever Next is called.
-type Generator[T any] interface {
+type Generator[T Number] interface {
 	Next() T
 }
 
@@ -11,6 +11,10 @@ type Unsigned interface {
 
 type Signed interface {
 	~int8 | ~int16 | ~int32 | ~int64 | ~int
+}
+
+type Number interface {
+	Unsigned | Signed | ~float32 | ~float64
 }
 
 // UInt generates unsigned integer values.
@@ -26,13 +30,13 @@ type Int[T Signed] interface {
 // Float generates float64 values.
 type Float Generator[float64]
 
-type constGen[T any] struct {
+type constGen[T Number] struct {
 	val T
 }
 
 func (c constGen[T]) Next() T { return c.val }
 
 // Const returns a Generator that always returns val.
-func Const[T any](val T) Generator[T] {
+func Const[T Number](val T) Generator[T] {
 	return constGen[T]{val: val}
 }

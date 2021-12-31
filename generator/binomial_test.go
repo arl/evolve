@@ -1,11 +1,9 @@
 package generator
 
 import (
-	"math"
 	"math/rand"
 	"testing"
 
-	"github.com/arl/evolve"
 	"github.com/arl/evolve/pkg/mt19937"
 
 	"github.com/stretchr/testify/assert"
@@ -40,29 +38,6 @@ func TestBinomialDynamic(t *testing.T) {
 	pgen.Swap(Const(adjustp))
 
 	checkBinomialDistribution[uint64](t, g, adjustn, adjustp)
-}
-
-func checkBinomialDistribution[T Unsigned](t *testing.T, g Generator[T], n T, p float64) {
-	t.Helper()
-
-	const iterations = 10000
-
-	ds := evolve.NewDataset(iterations)
-	for i := 0; i < iterations; i++ {
-		val := g.Next()
-		if val < 0 || val > n {
-			t.Errorf("generated value out of range, got %v", val)
-		}
-		ds.AddValue(float64(val))
-	}
-
-	const ε = 0.02
-
-	wantMean := float64(n) * p
-	wantStdDev := math.Sqrt(float64(n) * p * (1 - p))
-
-	assert.InEpsilon(t, wantMean, ds.ArithmeticMean(), ε, "observed mean is outside of acceptable range")
-	assert.InEpsilon(t, wantStdDev, ds.SampleStandardDeviation(), ε, "observed standard deviation is outside of acceptable range")
 }
 
 func Test_floatToFixedBits(t *testing.T) {
