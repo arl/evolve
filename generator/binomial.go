@@ -7,10 +7,10 @@ import (
 )
 
 // Binomial generates of binomially-distributed values.
-type Binomial struct {
+type Binomial[U UnsignedInteger] struct {
 	rng *rand.Rand
 
-	n Int
+	n UInt[U]
 	p Float
 
 	// Cache the fixed-point representation of p to avoid having to
@@ -22,16 +22,16 @@ type Binomial struct {
 
 // NewBinomial creates a Binomial generator.
 //
-// numTrials generates the the number of trials, it's the maximum possible value
+// numTrials generates the number of trials, it's the maximum possible value
 // returned by the generator, the values it generates must be strictly positive.
 // prob generates the probability of success in any one trial, the values it
 // generates must be in the [0 1] range.
-func NewBinomial(numTrials Int, prob Float, rng *rand.Rand) *Binomial {
-	return &Binomial{n: numTrials, p: prob, rng: rng}
+func NewBinomial[U UnsignedInteger](numTrials UInt[U], prob Float, rng *rand.Rand) *Binomial[U] {
+	return &Binomial[U]{n: numTrials, p: prob, rng: rng}
 }
 
 // Next returns the next generated binomially-distributed value.
-func (g *Binomial) Next() int64 {
+func (g *Binomial[U]) Next() U {
 	// Regenerate the fixed point representation of p if it has changed.
 	newP := g.p.Next()
 	if g.pBits == nil || newP != g.lastp {
@@ -39,8 +39,8 @@ func (g *Binomial) Next() int64 {
 		g.pBits = floatToFixedBits(newP)
 	}
 
+	var totalSuccesses U
 	trials := g.n.Next()
-	totalSuccesses := int64(0)
 	pidx := g.pBits.Len() - 1
 
 	for trials > 0 && pidx >= 0 {
@@ -57,12 +57,12 @@ func (g *Binomial) Next() int64 {
 
 // generates a binomial with even probability (p=0.5). We simply generate n
 // random bits and count the 1's.
-func (g *Binomial) evenProbability(n int64) int64 {
+func (g *Binomial[U]) evenProbability(n U) U {
 	bs := bitstring.Random(uint(n), g.rng)
-	return int64(bs.OnesCount())
+	return U(bs.OnesCount())
 }
 
-// floatToFixedBits converts a floating point value [0 1) into a fixed  point
+// floatToFixedBits converts a floating point value [0 1) into a fixed point
 // bit string (with MSB having a value of 0.5).
 func floatToFixedBits(v float64) *bitstring.Bitstring {
 	if v < 0 || v >= 1 {

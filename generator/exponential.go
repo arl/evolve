@@ -7,7 +7,7 @@ import (
 
 // Exponential generates a random sequence following an exponential distribution.
 type Exponential struct {
-	rate Float
+	rate Generator[float64]
 	rng  *rand.Rand
 }
 
@@ -16,7 +16,7 @@ type Exponential struct {
 //
 // The mean of this distribution is 1/rate and its variance is 1/rate².
 // Note: the rate generator must only return strictly positive values.
-func NewExponential(rate Float, rng *rand.Rand) *Exponential {
+func NewExponential(rate Generator[float64], rng *rand.Rand) *Exponential {
 	return &Exponential{rate: rate, rng: rng}
 }
 

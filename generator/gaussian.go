@@ -18,5 +18,5 @@ func NewGaussian(mean, stddev Float, rng *rand.Rand) *Gaussian {
 
 // Next returns the next normally-distributed value.
 func (g *Gaussian) Next() float64 {
-	return g.rng.NormFloat64()*g.stddev.Next() + g.mean.Next()
+	return g.rng.NormFloat64()*float64(g.stddev.Next()) + float64(g.mean.Next())
 }

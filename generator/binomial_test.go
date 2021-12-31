@@ -14,13 +14,12 @@ import (
 func TestBinomial(t *testing.T) {
 	// Check that the observed mean and standard deviation are consistent with
 	// the specified distribution parameters.
-
 	const n, p = 20, 0.163
 
 	rng := rand.New(mt19937.New(99))
 
-	g := NewBinomial(ConstInt(n), ConstFloat64(p), rng)
-	checkBinomialDistribution(t, g, n, p)
+	g := NewBinomial[uint32](Const(uint32(n)), Const(p), rng)
+	checkBinomialDistribution[uint32](t, g, n, p)
 }
 
 func TestBinomialDynamic(t *testing.T) {
@@ -28,22 +27,22 @@ func TestBinomialDynamic(t *testing.T) {
 
 	rng := rand.New(mt19937.New(99))
 
-	ngen := NewAdjustableInt(initn)
-	pgen := NewAdjustableFloat(initp)
+	ngen := NewSwappable(Const(uint64(initn)))
+	pgen := NewSwappable(Const(initp))
 
-	g := NewBinomial(ngen, pgen, rng)
-	checkBinomialDistribution(t, g, initn, initp)
+	g := NewBinomial[uint64](ngen, pgen, rng)
+	checkBinomialDistribution[uint64](t, g, initn, initp)
 
 	// Adjust parameters and ensure that the generator output conforms to this
 	// new distribution.
 	const adjustn, adjustp = 14, 0.32
-	ngen.Set(adjustn)
-	pgen.Set(adjustp)
+	ngen.Swap(Const(uint64(adjustn)))
+	pgen.Swap(Const(adjustp))
 
-	checkBinomialDistribution(t, g, adjustn, adjustp)
+	checkBinomialDistribution[uint64](t, g, adjustn, adjustp)
 }
 
-func checkBinomialDistribution(t *testing.T, g Int, n int64, p float64) {
+func checkBinomialDistribution[T UnsignedInteger](t *testing.T, g Generator[T], n T, p float64) {
 	t.Helper()
 
 	const iterations = 10000

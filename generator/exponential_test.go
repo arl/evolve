@@ -13,8 +13,9 @@ import (
 
 func TestExponential(t *testing.T) {
 	rng := rand.New(mt19937.New(23))
-	const rate = 3.2
-	g := NewExponential(ConstFloat64(rate), rng)
+	const rate float64 = 3.2
+
+	g := NewExponential(Const(rate), rng)
 	checkExponentialDistribution(t, g, rate)
 }
 
@@ -23,17 +24,17 @@ func TestExponentialDynamic(t *testing.T) {
 
 	rng := rand.New(mt19937.New(23))
 
-	grate := NewAdjustableFloat(initRate)
+	grate := NewSwappable(Const(initRate))
 	g := NewExponential(grate, rng)
 	checkExponentialDistribution(t, g, initRate)
 
 	const adjustRate = 1.05
-	grate.Set(adjustRate)
+	grate.Swap(Const(adjustRate))
 
 	checkExponentialDistribution(t, g, adjustRate)
 }
 
-func checkExponentialDistribution(t *testing.T, g Float, rate float64) {
+func checkExponentialDistribution(t *testing.T, g *Exponential, rate float64) {
 	t.Helper()
 
 	const iterations = 10000
