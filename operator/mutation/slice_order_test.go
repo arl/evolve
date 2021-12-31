@@ -8,29 +8,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestListOrderMutation(t *testing.T) {
+func TestSliceOrderMutation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	cand := []int{1, 2, 3, 4, 5}
+	pop := [][]int{{1, 2, 3, 4, 5}}
 
-	population := []interface{}{cand}
-
-	op := ListOrder{
-		Count:          generator.ConstInt(1),
-		MutationAmount: generator.ConstInt(1),
+	op := SliceOrder[int]{
+		Count:  generator.Const(1),
+		Amount: generator.Const(1),
 	}
-	mutpop := op.Apply(population, rng)
+	mutpop := op.Apply(pop, rng)
 
-	assert.Len(t, mutpop, len(population), "population size should be unchanged after mutation")
+	assert.Len(t, mutpop, len(pop), "population size should be unchanged after mutation")
 
-	mutant := mutpop[0].([]int)
-	t.Logf("original: %+v", cand)
+	mutant := mutpop[0]
+	t.Logf("original: %+v", pop[0])
 	t.Logf("mutant : %+v", mutant)
 
-	assert.Len(t, mutant, len(cand), "mutant should be same length as original")
+	assert.Len(t, mutant, len(pop[0]), "mutant should be same length as original")
 
 	// The mutant should have the same elements but in a different order
 	matches := 0
-	for i := range cand {
+	for i := range pop[0] {
+		cand := pop[0]
 		if cand[i] == mutant[i] {
 			matches++
 		} else {
@@ -42,5 +41,5 @@ func TestListOrderMutation(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, matches, len(cand)-2, "All but 2 positions should be unchanged.")
+	assert.Equal(t, matches, len(pop[0])-2, "All but 2 positions should be unchanged.")
 }
