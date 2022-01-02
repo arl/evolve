@@ -11,7 +11,7 @@ type incrEvaluator struct {
 	count   int
 }
 
-func (ie *incrEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
+func (ie *incrEvaluator) Fitness(cand int, pop []int) float64 {
 	ie.count++
 	return float64(ie.count)
 }
@@ -19,13 +19,13 @@ func (ie *incrEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
 func (ie *incrEvaluator) IsNatural() bool { return ie.natural }
 
 func TestFitnessCacheMiss(t *testing.T) {
-	eval := FitnessCache{Wrapped: &incrEvaluator{natural: true}}
-	fitness := eval.Fitness("Test1", nil)
+	eval := FitnessCache[int]{Wrapped: &incrEvaluator{natural: true}}
+	fitness := eval.Fitness(101, nil)
 	if fitness != 1 {
 		t.Errorf("wrong fitness, want 1, got %v", fitness)
 	}
 	// Different candidate so shouldn't return a cached value.
-	fitness = eval.Fitness("Test2", nil)
+	fitness = eval.Fitness(202, nil)
 
 	if fitness != 2 {
 		t.Errorf("wrong fitness, want 2, got %v", fitness)
@@ -33,14 +33,13 @@ func TestFitnessCacheMiss(t *testing.T) {
 }
 
 func TestFitnessCacheHit(t *testing.T) {
-	eval := FitnessCache{Wrapped: &incrEvaluator{natural: true}}
-	cand := "Test"
-	fitness := eval.Fitness(cand, nil)
+	eval := FitnessCache[int]{Wrapped: &incrEvaluator{natural: true}}
+	fitness := eval.Fitness(101, nil)
 	if fitness != 1 {
 		t.Errorf("wrong fitness, want 1, got %v", fitness)
 	}
 
-	fitness = eval.Fitness(cand, nil)
+	fitness = eval.Fitness(101, nil)
 	// If the value is found in the cache it won't have changed. If it is
 	// recalculated, it will have.
 	if fitness != 1 {
@@ -49,11 +48,11 @@ func TestFitnessCacheHit(t *testing.T) {
 }
 
 func TestFitnessCacheNaturalness(t *testing.T) {
-	eval := FitnessCache{Wrapped: &incrEvaluator{natural: true}}
+	eval := FitnessCache[int]{Wrapped: &incrEvaluator{natural: true}}
 	if !eval.IsNatural() {
 		t.Errorf("fitness cache should be natural if wrapped is natural")
 	}
-	eval = FitnessCache{Wrapped: &incrEvaluator{natural: false}}
+	eval = FitnessCache[int]{Wrapped: &incrEvaluator{natural: false}}
 	if eval.IsNatural() {
 		t.Errorf("fitness cache should not be natural if wrapped is not natural")
 	}

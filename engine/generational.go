@@ -23,10 +23,10 @@ import (
 // where it is not permitted for applications to manage their own threads. If
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
-type Generational struct {
-	Op   evolve.Operator
-	Eval evolve.Evaluator
-	Sel  evolve.Selection
+type Generational[T any] struct {
+	Op   evolve.Operator[T]
+	Eval evolve.Evaluator[T]
+	Sel  evolve.Selection[T]
 }
 
 // Epoch performs a single step/iteration of the evolutionary process.
@@ -36,12 +36,12 @@ type Generational struct {
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *Generational) Epoch(pop evolve.Population, nelites int, rng *rand.Rand) evolve.Population {
-	nextpop := make([]interface{}, 0, len(pop))
+func (e *Generational[T]) Epoch(pop evolve.Population[T], nelites int, rng *rand.Rand) evolve.Population[T] {
+	nextpop := make([]T, 0, len(pop))
 
 	// Perform elitism: straightforward copy the n fittest candidates into the
 	// next generation, without any kind of selection.
-	elite := make([]interface{}, nelites)
+	elite := make([]T, nelites)
 	for i := 0; i < nelites; i++ {
 		elite[i] = pop[i].Candidate
 	}

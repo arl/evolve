@@ -20,10 +20,10 @@ import "sync"
 // candidates are evaluated against the other members of the population.  So
 // unless the fitness evaluator ignores the second parameter to the
 // Evaluator.Fitness method, caching must not be used.
-type FitnessCache struct {
+type FitnessCache[T any] struct {
 
 	// Wrapped is the fitness evaluator for which we want to provide caching
-	Wrapped Evaluator
+	Wrapped Evaluator[T]
 	cache   sync.Map
 }
 
@@ -33,7 +33,7 @@ type FitnessCache struct {
 // the fitness evaluator has already calculated the fitness score for the
 // specified candidate that score is returned without delegating to the wrapped
 // evaluator.
-func (c *FitnessCache) Fitness(cand interface{}, pop []interface{}) float64 {
+func (c *FitnessCache[T]) Fitness(cand T, pop []T) float64 {
 	var fitness float64
 	val, ok := c.cache.Load(cand)
 	if ok {
@@ -47,4 +47,4 @@ func (c *FitnessCache) Fitness(cand interface{}, pop []interface{}) float64 {
 
 // IsNatural specifies whether this evaluator generates 'natural' fitness
 // scores or not.
-func (c *FitnessCache) IsNatural() bool { return c.Wrapped.IsNatural() }
+func (c *FitnessCache[T]) IsNatural() bool { return c.Wrapped.IsNatural() }

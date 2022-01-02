@@ -13,16 +13,16 @@ import (
 
 // Engine runs an evolutionary algorithm, following all the steps of evolution,
 // from the creation of the initial population to the end of evolution.
-type Engine struct {
-	obs     map[Observer]struct{}
+type Engine[T any] struct {
+	obs     map[Observer[T]]struct{}
 	rng     *rand.Rand
-	factory evolve.Factory
-	eval    evolve.Evaluator
-	epoch   evolve.Epocher
+	factory evolve.Factory[T]
+	eval    evolve.Evaluator[T]
+	epoch   evolve.Epocher[T]
 	stats   *evolve.Dataset
 	nelites int
-	seeds   []interface{}
-	conds   []evolve.Condition
+	seeds   []T
+	conds   []evolve.Condition[T]
 	size    int
 }
 
@@ -31,9 +31,9 @@ type Engine struct {
 // gen generates new random candidates solutions.
 // eval evaluates fitness scores of candidates.
 // epoch transforms a whole population into the next generation.
-func New(factory evolve.Factory, eval evolve.Evaluator, epoch evolve.Epocher, options ...func(*Engine) error) (*Engine, error) {
-	eng := Engine{
-		obs:     make(map[Observer]struct{}),
+func New[T any](factory evolve.Factory[T], eval evolve.Evaluator[T], epoch evolve.Epocher[T], options ...func(*Engine[T]) error) (*Engine[T], error) {
+	eng := Engine[T]{
+		obs:     make(map[Observer[T]]struct{}),
 		factory: factory,
 		eval:    eval,
 		epoch:   epoch,
@@ -52,26 +52,26 @@ func New(factory evolve.Factory, eval evolve.Evaluator, epoch evolve.Epocher, op
 }
 
 // AddObserver adds an observer of the evolution process.
-func (e *Engine) AddObserver(o Observer) {
+func (e *Engine[T]) AddObserver(o Observer[T]) {
 	e.obs[o] = struct{}{}
 }
 
 // RemoveObserver removes an observer of the evolution process.
-func (e *Engine) RemoveObserver(o Observer) {
+func (e *Engine[T]) RemoveObserver(o Observer[T]) {
 	delete(e.obs, o)
 }
 
 // Rand sets rng as the source of randomness of the engine.
-func Rand(rng *rand.Rand) func(*Engine) error {
-	return func(eng *Engine) error {
+func Rand[T any](rng *rand.Rand) func(*Engine[T]) error {
+	return func(eng *Engine[T]) error {
 		eng.rng = rng
 		return nil
 	}
 }
 
 // Observe adds an observer of the evolution process.
-func Observe(o Observer) func(*Engine) error {
-	return func(eng *Engine) error {
+func Observe[T any](o Observer[T]) func(*Engine[T]) error {
+	return func(eng *Engine[T]) error {
 		eng.obs[o] = struct{}{}
 		return nil
 	}
@@ -86,8 +86,8 @@ func Observe(o Observer) func(*Engine) error {
 // selection for breeding the remainder of the next generation. This value must
 // be non-negative and less than the population size or Evolve will return en
 // error
-func Elites(n int) func(*Engine) error {
-	return func(eng *Engine) error {
+func Elites[T any](n int) func(*Engine[T]) error {
+	return func(eng *Engine[T]) error {
 		if n < 0 || n >= eng.size {
 			return errors.New("invalid number of elites")
 		}
@@ -99,8 +99,8 @@ func Elites(n int) func(*Engine) error {
 // Seeds provides the engine with a set of candidates to seed the starting
 // population with. Successive calls to Seeds will replace the set of seed
 // candidates set in the previous call.
-func Seeds(seeds []interface{}) func(*Engine) error {
-	return func(eng *Engine) error {
+func Seeds[T any](seeds []T) func(*Engine[T]) error {
+	return func(eng *Engine[T]) error {
 		eng.seeds = seeds
 		return nil
 	}
@@ -108,8 +108,8 @@ func Seeds(seeds []interface{}) func(*Engine) error {
 
 // EndOn adds a termination condition to the engine. The engine stops
 // after one or more condition is met.
-func EndOn(cond evolve.Condition) func(*Engine) error {
-	return func(eng *Engine) error {
+func EndOn[T any](cond evolve.Condition[T]) func(*Engine[T]) error {
+	return func(eng *Engine[T]) error {
 		eng.conds = append(eng.conds, cond)
 		return nil
 	}
@@ -125,7 +125,7 @@ func EndOn(cond evolve.Condition) func(*Engine) error {
 //
 // At least one termination condition must be defined with EndOn, or Evolve will
 // return an error.
-func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Population, []evolve.Condition, error) {
+func (e *Engine[T]) Evolve(popsize int, options ...func(*Engine[T]) error) (evolve.Population[T], []evolve.Condition[T], error) {
 	e.size = popsize
 	for _, opt := range options {
 		if err := opt(e); err != nil {
@@ -151,7 +151,7 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Pop
 		return nil, nil, fmt.Errorf("can't seed population: %v", err)
 	}
 
-	var satisfied []evolve.Condition
+	var satisfied []evolve.Condition[T]
 
 	// Evaluate initial population fitness
 	evpop := evolve.EvaluatePopulation(pop, e.eval, true)
@@ -181,14 +181,14 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Pop
 	return evpop, satisfied, nil
 }
 
-func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Duration) *evolve.PopulationStats {
+func (e *Engine[T]) updateStats(pop evolve.Population[T], ngen int, elapsed time.Duration) *evolve.PopulationStats[T] {
 	e.stats.Clear()
 	for _, cand := range pop {
 		e.stats.AddValue(cand.Fitness)
 	}
 
 	// Notify observers with the population state
-	stats := evolve.PopulationStats{
+	stats := evolve.PopulationStats[T]{
 		BestCand:    pop[0].Candidate,
 		BestFitness: pop[0].Fitness,
 		Mean:        e.stats.ArithmeticMean(),
@@ -207,8 +207,8 @@ func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Durat
 }
 
 // shouldContinue determines whether or not the evolution should continue.
-func shouldContinue(stats *evolve.PopulationStats, conds ...evolve.Condition) []evolve.Condition {
-	satisfied := make([]evolve.Condition, 0)
+func shouldContinue[T any](stats *evolve.PopulationStats[T], conds ...evolve.Condition[T]) []evolve.Condition[T] {
+	satisfied := make([]evolve.Condition[T], 0)
 	for _, cond := range conds {
 		if cond.IsSatisfied(stats) {
 			satisfied = append(satisfied, cond)

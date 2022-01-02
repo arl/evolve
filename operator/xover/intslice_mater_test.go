@@ -12,11 +12,11 @@ import (
 func TestIntSliceMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New(IntSliceMater{})
+	xover := New[[]int](IntSliceMater{})
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
-	pop := make([]interface{}, 4)
+	pop := make([][]int, 4)
 	pop[0] = []int{1, 2, 3, 4, 5}
 	pop[1] = []int{6, 7, 8, 9, 10}
 	pop[2] = []int{11, 12, 13, 14, 15}
@@ -29,10 +29,9 @@ func TestIntSliceMater(t *testing.T) {
 		assert.Lenf(t, pop, 4, "population size changed")
 
 		for _, ind := range pop {
-			s := ind.([]int)
-			assert.Lenf(t, s, 5, "wrong individual length")
+			assert.Lenf(t, ind, 5, "wrong individual length")
 
-			for _, value := range s {
+			for _, value := range ind {
 				values[value] = struct{}{}
 			}
 		}
@@ -48,11 +47,11 @@ func TestIntSliceMater(t *testing.T) {
 func TestIntSliceMaterDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New(IntSliceMater{})
+	xover := New[[]int](IntSliceMater{})
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
-	pop := make([]interface{}, 2)
+	pop := make([][]int, 2)
 	pop[0] = []int{1, 2, 3, 4, 5}
 	pop[1] = []int{2}
 

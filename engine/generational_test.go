@@ -20,8 +20,8 @@ import (
 // Trivial test operator that mutates all integers into zeroes.
 type zeroIntMaker struct{}
 
-func (op zeroIntMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) []interface{} {
-	result := make([]interface{}, len(selectedCandidates))
+func (op zeroIntMaker) Apply(selectedCandidates []int, rng *rand.Rand) []int {
+	result := make([]int, len(selectedCandidates))
 	for i := range selectedCandidates {
 		result[i] = 0
 	}
@@ -30,8 +30,8 @@ func (op zeroIntMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) [
 
 type intEvaluator struct{}
 
-func (intEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
-	return float64(cand.(int))
+func (intEvaluator) Fitness(cand int, pop []int) float64 {
+	return float64(cand)
 }
 
 func (intEvaluator) IsNatural() bool { return true }
@@ -43,31 +43,32 @@ func check(t *testing.T, err error) {
 	}
 }
 
-var zeroFactory = evolve.FactoryFunc(func(_ *rand.Rand) interface{} { return 0 })
+var zeroFactory = evolve.FactoryFunc[int](func(_ *rand.Rand) int { return 0 })
 
 func TestGenerationalEngineElitism(t *testing.T) {
-	epocher := Generational{
+	epocher := Generational[int]{
 		Op:   zeroIntMaker{},
 		Eval: intEvaluator{},
-		Sel:  selection.RouletteWheel,
+		Sel:  selection.RouletteWheel[int]{},
 	}
 
-	eng, _ := New(zeroFactory, intEvaluator{}, &epocher)
+	eng, _ := New[int](zeroFactory, intEvaluator{}, &epocher)
 
 	var avgfitness float64
 	// add an observer that record the mean fitness at each generation
-	obs := ObserverFunc(func(stats *evolve.PopulationStats) {
+	obs := ObserverFunc(func(stats *evolve.PopulationStats[int]) {
 		avgfitness = stats.Mean
 	})
 	eng.AddObserver(obs)
 
-	seeds := make([]interface{}, 3)
+	seeds := make([]int, 3)
 	// Add the following seed candidates, all better than any others that can possibly
 	// get into the population (since every other candidate will always be zero).
 	seeds[0] = 7 // This candidate should be discarded by elitism.
 	seeds[1] = 11
 	seeds[2] = 13
-	eng.Evolve(10, Elites(2), Seeds(seeds), EndOn(condition.GenerationCount(3)))
+	cond := condition.GenerationCount[int](3)
+	eng.Evolve(10, Elites[int](2), Seeds[int](seeds), EndOn[int](cond))
 
 	// Then when we have run the evolution, if the elite canidates were
 	// preserved they will lift the average fitness above zero. The exact value
@@ -80,16 +81,16 @@ func TestGenerationalEngineElitism(t *testing.T) {
 }
 
 func TestGenerationalEngineSatisfiedConditions(t *testing.T) {
-	epocher := Generational{
+	epocher := Generational[int]{
 		Op:   zeroIntMaker{},
 		Eval: intEvaluator{},
-		Sel:  selection.RouletteWheel,
+		Sel:  selection.RouletteWheel[int]{},
 	}
 
-	eng, _ := New(zeroFactory, intEvaluator{}, &epocher)
+	eng, _ := New[int](zeroFactory, intEvaluator{}, &epocher)
 
-	cond := condition.GenerationCount(1)
-	_, satisfied, err := eng.Evolve(10, EndOn(cond))
+	cond := condition.GenerationCount[int](1)
+	_, satisfied, err := eng.Evolve(10, EndOn[int](cond))
 	check(t, err)
 	if len(satisfied) != 1 {
 		t.Errorf("want len(satisfied) = 1, got %v", len(satisfied))
@@ -123,33 +124,33 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	checkB(b, err)
 
 	// 1st operator: string mutation
-	mut := mutation.New(&mutation.String{
+	mut := mutation.New[string](&mutation.String{
 		Alphabet:    alphabet,
 		Probability: generator.Const(0.02),
 	})
 
 	// 2nd operator: string crossover
-	xover := xover.New(xover.StringMater{})
+	xover := xover.New[string](xover.StringMater{})
 
 	// Create a pipeline that applies mutation then crossover
-	pipe := operator.Pipeline{mut, xover}
+	pipe := operator.Pipeline[string]{mut, xover}
 
-	epocher := Generational{
+	epocher := Generational[string]{
 		Op:   pipe,
 		Eval: evaluator(target),
-		Sel:  selection.RouletteWheel,
+		Sel:  selection.RouletteWheel[string]{},
 	}
-	eng, err := New(fac, evaluator(target), &epocher)
+	eng, err := New[string](fac, evaluator(target), &epocher)
 	checkB(b, err)
 
 	// TODO: add option function for singlethread
 	// engine.SetSingleThreaded(!multithread)
-	cond := condition.TargetFitness{Fitness: 0, Natural: false}
+	cond := condition.TargetFitness[string]{Fitness: 0, Natural: false}
 
 	b.ResetTimer()
 	var best interface{}
 	for n := 0; n < b.N; n++ {
-		best, _, err = eng.Evolve(100000, Elites(5), EndOn(cond))
+		best, _, err = eng.Evolve(100000, Elites[string](5), EndOn[string](cond))
 		checkB(b, err)
 	}
 	if best.(string) != target {
@@ -184,15 +185,13 @@ func BenchmarkGenerationalEngineMultithread1000(b *testing.B) {
 // This 'evaluator' assigns one "fitness point" for every character in the
 // candidate string that doesn't match the corresponding position in the target
 // string.
+// TODO: rename to charMatchEvaluator or something (maybe generalize for byteseq (~string | ~[]byte) , just maybe...)
 type evaluator string
 
-func (s evaluator) Fitness(
-	cand interface{},
-	pop []interface{}) float64 {
+func (s evaluator) Fitness(cand string, pop []string) float64 {
 	var errors float64
-	sc := cand.(string)
-	for i := range sc {
-		if sc[i] != string(s)[i] {
+	for i := 0; 0 < len(cand); i++ {
+		if cand[i] != string(s)[i] {
 			errors++
 		}
 	}

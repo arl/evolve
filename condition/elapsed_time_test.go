@@ -8,8 +8,8 @@ import (
 )
 
 func TestElapsedTime(t *testing.T) {
-	cond := 1 * ElapsedTime(time.Second)
-	stats := &evolve.PopulationStats{}
+	cond := 1 * ElapsedTime[any](time.Second)
+	stats := &evolve.PopulationStats[any]{}
 
 	stats.Elapsed = 100 * time.Millisecond
 	if cond.IsSatisfied(stats) {

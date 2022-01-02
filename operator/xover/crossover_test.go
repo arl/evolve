@@ -10,16 +10,20 @@ import (
 	"github.com/arl/evolve/generator"
 )
 
-func sameStringPop(t *testing.T, a, b []interface{}) {
+type byteseq interface {
+	~string | ~[]byte
+}
+
+func sameStringPop[T byteseq](t *testing.T, a, b []T) {
 	t.Helper()
 
 	s1 := make([]string, 0)
 	s2 := make([]string, 0)
 	for _, a := range a {
-		s1 = append(s1, a.(string))
+		s1 = append(s1, string(a))
 	}
 	for _, b := range b {
-		s2 = append(s2, b.(string))
+		s2 = append(s2, string(b))
 	}
 	sort.Strings(s1)
 	sort.Strings(s2)
@@ -28,10 +32,10 @@ func sameStringPop(t *testing.T, a, b []interface{}) {
 
 func TestCrossover_Apply(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	pop := []interface{}{"abcde", "fghij", "klmno", "pqrst", "uvwxy"}
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
-		xover := New(StringMater{})
+		pop := [][]byte{[]byte("abcde"), []byte("fghij"), []byte("klmno"), []byte("pqrst"), []byte("uvwxy")}
+		xover := New[[]byte](ByteSliceMater{})
 		xover.Points = generator.Const(0)
 		xover.Probability = generator.Const(1.0)
 
@@ -40,7 +44,8 @@ func TestCrossover_Apply(t *testing.T) {
 	})
 
 	t.Run("zero_crossover_probability_is_noop", func(t *testing.T) {
-		xover := New(StringMater{})
+		pop := []string{string("abcde"), string("fghij"), string("klmno"), string("pqrst"), string("uvwxy")}
+		xover := New[string](StringMater{})
 		xover.Points = generator.Const(1)
 		xover.Probability = generator.Const(0.0)
 

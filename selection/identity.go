@@ -7,20 +7,20 @@ import (
 )
 
 // Identity is a selection strategy that returns identical candidates
-type Identity struct{}
+type Identity[T any] struct{}
 
 // Select selects the specified number of candidates from the population.
-func (Identity) Select(
-	pop evolve.Population,
+func (Identity[T]) Select(
+	pop evolve.Population[T],
 	natural bool,
 	size int,
-	rng *rand.Rand) []interface{} {
+	rng *rand.Rand) []T {
 
-	sel := make([]interface{}, size)
+	sel := make([]T, size)
 	for i := 0; i < size; i++ {
 		sel[i] = pop[i].Candidate
 	}
 	return sel
 }
 
-func (Identity) String() string { return "Identity Selection" }
+func (Identity[T]) String() string { return "Identity Selection" }

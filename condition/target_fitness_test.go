@@ -10,8 +10,8 @@ import (
 // against a pre-determined target.
 func TestTargetFitness(t *testing.T) {
 	t.Run("natural fitness", func(t *testing.T) {
-		cond := TargetFitness{Fitness: 10.0, Natural: true}
-		stats := &evolve.PopulationStats{Natural: true}
+		cond := TargetFitness[any]{Fitness: 10.0, Natural: true}
+		stats := &evolve.PopulationStats[any]{Natural: true}
 
 		stats.BestFitness = 5.0
 		if cond.IsSatisfied(stats) {
@@ -25,8 +25,8 @@ func TestTargetFitness(t *testing.T) {
 	})
 
 	t.Run("non-natural fitness", func(t *testing.T) {
-		cond := TargetFitness{Fitness: 1.0, Natural: false}
-		stats := &evolve.PopulationStats{Natural: false}
+		cond := TargetFitness[any]{Fitness: 1.0, Natural: false}
+		stats := &evolve.PopulationStats[any]{Natural: false}
 
 		stats.BestFitness = 5.0
 		if cond.IsSatisfied(stats) {

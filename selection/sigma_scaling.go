@@ -6,29 +6,31 @@ import (
 	"github.com/arl/evolve"
 )
 
-type sigmaScaling struct{ selector evolve.Selection }
+type SigmaScaling[T any] struct {
+	Selector evolve.Selection[T]
+}
 
 // NewSigmaScaling creates a sigma-scaled selection strategy. This is an
-// alternative to straightforward fitness-proportionate
-// selection such as that offered by RouletteWheelSelection and
-// StochasticUniversalSampling. It uses the mean population fitness and fitness
-// standard deviation to adjust individual fitness scores.
+// alternative to straightforward fitness-proportionate selection such as that
+// offered by RouletteWheelSelection and StochasticUniversalSampling. It uses
+// the mean population fitness and fitness standard deviation to adjust
+// individual fitness scores.
 //
 // selector is the proportionate selector that will be delegated to after
-// fitness scores have been adjusted using sigma scaling.
+// fitness scores have been adjusted using sigma scaling. If selector is nil,
+// then it's set to the stochastic universal samplming selector.
 //
 // Early on in an evolutionary algorithm this helps to avoid premature
 // convergence caused by the dominance of one or two relatively fit candidates
 // in a population of mostly unfit individuals. It also helps to amplify minor
 // fitness differences in a more mature population where the rate of improvement
 // has slowed.
-func NewSigmaScaling(selector evolve.Selection) evolve.Selection {
-	return &sigmaScaling{selector: selector}
+func NewSigmaScaling[T any](selector evolve.Selection[T]) *SigmaScaling[T] {
+	if selector == nil {
+		return &SigmaScaling[T]{Selector: StochasticUniversalSampling[T]{}}
+	}
+	return &SigmaScaling[T]{Selector: selector}
 }
-
-// SigmaScaling is the default sigma scaling selection strategy. It uses
-// StochasticUniversalSampling as its selector.
-var SigmaScaling = NewSigmaScaling(StochasticUniversalSampling{})
 
 // Select selects the specified number of candidates from the population.
 //
@@ -46,32 +48,32 @@ var SigmaScaling = NewSigmaScaling(StochasticUniversalSampling{})
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
-func (sel *sigmaScaling) Select(
-	pop evolve.Population,
+func (sel *SigmaScaling[T]) Select(
+	pop evolve.Population[T],
 	natural bool,
 	size int,
-	rng *rand.Rand) []interface{} {
+	rng *rand.Rand) []T {
 
 	stats := evolve.NewDataset(len(pop))
 	for _, cand := range pop {
 		stats.AddValue(cand.Fitness)
 	}
 
-	scaledPop := make(evolve.Population, len(pop))
+	scaledPop := make(evolve.Population[T], len(pop))
 	for i, cand := range pop {
 		scaledFitness := sigmaScaledFitness(cand.Fitness,
 			stats.ArithmeticMean(),
 			stats.StandardDeviation())
 
-		scaledPop[i] = &evolve.Individual{
+		scaledPop[i] = &evolve.Individual[T]{
 			Candidate: cand.Candidate,
 			Fitness:   scaledFitness,
 		}
 	}
-	return sel.selector.Select(scaledPop, natural, size, rng)
+	return sel.Selector.Select(scaledPop, natural, size, rng)
 }
 
-func (sigmaScaling) String() string { return "Sigma Scaling" }
+func (SigmaScaling[T]) String() string { return "Sigma Scaling" }
 
 func sigmaScaledFitness(candidateFitness, populationMeanFitness, fitnessStandardDeviation float64) float64 {
 	if fitnessStandardDeviation == 0 {

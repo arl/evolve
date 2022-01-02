@@ -11,6 +11,6 @@ type Bitstring uint
 
 // New creates a random bit string in which the distribution of ones and zeroes
 // depends on rng.
-func (i Bitstring) New(rng *rand.Rand) interface{} {
+func (i Bitstring) New(rng *rand.Rand) *bitstring.Bitstring {
 	return bitstring.Random(uint(i), rng)
 }

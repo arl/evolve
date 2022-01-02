@@ -8,14 +8,15 @@ import (
 )
 
 // ElapsedTime is satisfied when a time duration has elapsed.
-type ElapsedTime time.Duration
+type ElapsedTime[T any] time.Duration
 
 // IsSatisfied returns true if the time duration has elapsed.
-func (dur ElapsedTime) IsSatisfied(stats *evolve.PopulationStats) bool {
+// TODO when/if method will accept type parameters we can get rid of T on ElapsedTime[T]
+func (dur ElapsedTime[T]) IsSatisfied(stats *evolve.PopulationStats[T]) bool {
 	return stats.Elapsed >= time.Duration(dur)
 }
 
 // String returns a string representation of this condition.
-func (dur ElapsedTime) String() string {
+func (dur ElapsedTime[T]) String() string {
 	return fmt.Sprintf("Elapsed Time (%v)", time.Duration(dur))
 }

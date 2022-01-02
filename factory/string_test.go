@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestNewString(t *testing.T) {
@@ -47,16 +45,6 @@ func TestNewString(t *testing.T) {
 				t.Errorf("NewString(), wantErr = %v, got %v", tt.wantErr, err)
 			}
 		})
-	}
-}
-
-func TestStringFactory(t *testing.T) {
-	factory, err := NewString("ABCdefg", 2)
-	require.NoError(t, err)
-
-	s := factory.New(rand.New(rand.NewSource(99)))
-	if s, ok := s.(string); !ok {
-		t.Errorf("GenerateCandidate should generate string candidates, got %T", s)
 	}
 }
 

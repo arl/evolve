@@ -18,9 +18,7 @@ import (
 // excessively high occurrences of particular candidates. If this is a problem,
 // StochasticUniversalSampling provides an alternative fitness-proportionate
 // strategy for selection.
-var RouletteWheel = rouletteWheel{}
-
-type rouletteWheel struct{}
+type RouletteWheel[T any] struct{}
 
 // Select selects the required number of candidates from the population with the
 // probability of selecting any particular candidate being proportional to that
@@ -30,11 +28,11 @@ type rouletteWheel struct{}
 // naturalFitnessScores should be true if higher fitness scores indicate fitter
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
-func (rouletteWheel) Select(
-	pop evolve.Population,
+func (RouletteWheel[T]) Select(
+	pop evolve.Population[T],
 	natural bool,
 	size int,
-	rng *rand.Rand) []interface{} {
+	rng *rand.Rand) []T {
 
 	// Record the cumulative fitness scores. It doesn't matter whether the
 	// population is sorted or not. We will use these cumulative scores to
@@ -50,7 +48,7 @@ func (rouletteWheel) Select(
 		cumfitness[i] = cumfitness[i-1] + fitness
 	}
 
-	sel := make([]interface{}, size)
+	sel := make([]T, size)
 	for i := 0; i < size; i++ {
 		rand := rng.Float64() * cumfitness[len(cumfitness)-1]
 		j := sort.SearchFloat64s(cumfitness, rand)
@@ -63,7 +61,7 @@ func (rouletteWheel) Select(
 	return sel
 }
 
-func (rouletteWheel) String() string { return "Roulette Wheel Selection" }
+func (RouletteWheel[T]) String() string { return "Roulette Wheel Selection" }
 
 func abs(a int) int {
 	if a < 0 {

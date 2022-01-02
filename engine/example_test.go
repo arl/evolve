@@ -11,16 +11,16 @@ import (
 // the number of ones.
 // See full example in "evolve/example/bits/main.go"
 func ExampleNew() {
-	var epocher Generational
+	var epocher Generational[*bitstring.Bitstring]
 
 	factory := factory.Bitstring(2)
 
 	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)
-		func(cand interface{}, pop []interface{}) float64 {
+		func(cand *bitstring.Bitstring, pop []*bitstring.Bitstring) float64 {
 			// our evaluator counts the ones in the bitstring
-			return float64(cand.(*bitstring.Bitstring).OnesCount())
+			return float64(cand.OnesCount())
 		})
 
-	New(factory, eval, &epocher)
+	New[*bitstring.Bitstring](factory, eval, &epocher)
 }

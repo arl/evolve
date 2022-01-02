@@ -13,28 +13,28 @@ var ErrTooManySeedCandidates = errors.New("too many seed candidates for populati
 //
 // It is used by evolution engine to increase genetic diversity and/or add new
 // candidates to a population.
-type Factory interface {
+type Factory[T any] interface {
 
 	// New returns a new random candidate, using the provided pseudo-random
 	// number generator.
-	New(*rand.Rand) interface{}
+	New(*rand.Rand) T
 }
 
 // The FactoryFunc type is an adapter to allow the use of ordinary
 // functions as candidate generators. If f is a function with the appropriate
 // signature, FactoryFunc(f) is a Factory that calls f.
-type FactoryFunc func(*rand.Rand) interface{}
+type FactoryFunc[T any] func(*rand.Rand) T
 
 // New calls f(rng) and returns its return value.
-func (f FactoryFunc) New(rng *rand.Rand) interface{} { return f(rng) }
+func (f FactoryFunc[T]) New(rng *rand.Rand) T { return f(rng) }
 
 // GeneratePopulation returns a slice of count random candidates, generated
 // with the provided Generator.
 //
 // If some control is required over the composition of the initial population,
 // consider using SeedPopulation.
-func GeneratePopulation(gen Factory, count int, rng *rand.Rand) []interface{} {
-	pop := make([]interface{}, count)
+func GeneratePopulation[T any](gen Factory[T], count int, rng *rand.Rand) []T {
+	pop := make([]T, count)
 	for i := 0; i < count; i++ {
 		pop[i] = gen.New(rng)
 	}
@@ -49,7 +49,7 @@ func GeneratePopulation(gen Factory, count int, rng *rand.Rand) []interface{} {
 // the evolution process. If the number of seed candidates is less than the
 // required population size, gen will generate the additional candidates to fill
 // the remaining spaces in the population.
-func SeedPopulation(gen Factory, count int, seeds []interface{}, rng *rand.Rand) ([]interface{}, error) {
+func SeedPopulation[T any](gen Factory[T], count int, seeds []T, rng *rand.Rand) ([]T, error) {
 	if len(seeds) > count {
 		return nil, ErrTooManySeedCandidates
 	}

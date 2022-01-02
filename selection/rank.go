@@ -15,8 +15,8 @@ import (
 // RankBased is implemented in terms of a mapping function and delegation to a
 // fitness-proportionate selector. The mapping function converts ranks into
 // relative fitness scores that are used to drive the delegate selector.
-type RankBased struct {
-	Selector evolve.Selection
+type RankBased[T any] struct {
+	Selector evolve.Selection[T]
 	Map      MappingFunc
 }
 
@@ -30,15 +30,15 @@ type RankBased struct {
 // potentially be selected more than once).
 //
 // Returns the selected candidates.
-func (rb RankBased) Select(
-	pop evolve.Population,
+func (rb RankBased[T]) Select(
+	pop evolve.Population[T],
 	natural bool,
 	size int,
-	rng *rand.Rand) []interface{} {
+	rng *rand.Rand) []T {
 
-	ranked := make(evolve.Population, len(pop))
+	ranked := make(evolve.Population[T], len(pop))
 	for i, cand := range pop {
-		ranked[i] = &evolve.Individual{
+		ranked[i] = &evolve.Individual[T]{
 			Candidate: cand.Candidate,
 			// use candidate 1-based index
 			Fitness: rb.Map(i+1, len(pop)),
@@ -47,7 +47,7 @@ func (rb RankBased) Select(
 	return rb.Selector.Select(ranked, true, size, rng)
 }
 
-func (RankBased) String() string { return "Rank-Based Selection" }
+func (RankBased[T]) String() string { return "Rank-Based Selection" }
 
 // MapRankToScore maps a population index to a relative pseudo-fitness score
 // that can be used for fitness-proportionate selection. The general contract
@@ -74,7 +74,9 @@ type MappingFunc func(rank, size int) float64
 // Rank is a preconfigured all-round rank-based selection strategy. It uses
 // StochasticUniversalSampling as selector and MapRankToScore as mapping
 // function.
-var Rank = RankBased{
-	Selector: StochasticUniversalSampling{},
-	Map:      MapRankToScore,
+func Rank[T any]() RankBased[T] {
+	return RankBased[T]{
+		Selector: StochasticUniversalSampling[T]{},
+		Map:      MapRankToScore,
+	}
 }

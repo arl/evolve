@@ -5,9 +5,9 @@ import (
 )
 
 func TestRankSelectionNatural(t *testing.T) {
-	testFitnessBasedSelection(t, Rank, fitnessBasedPopNatural, true)
+	testFitnessBasedSelection(t, Rank[string](), fitnessBasedPopNatural, true)
 }
 
 func TestRankSelectionNonNatural(t *testing.T) {
-	testFitnessBasedSelection(t, Rank, fitnessBasedPopNonNatural, false)
+	testFitnessBasedSelection(t, Rank[string](), fitnessBasedPopNonNatural, false)
 }

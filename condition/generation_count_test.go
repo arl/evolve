@@ -7,8 +7,8 @@ import (
 )
 
 func TestGenerationCount(t *testing.T) {
-	cond := GenerationCount(5)
-	stats := &evolve.PopulationStats{}
+	cond := GenerationCount[any](5)
+	stats := &evolve.PopulationStats[any]{}
 
 	stats.GenNumber = 3
 	if cond.IsSatisfied(stats) {

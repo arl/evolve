@@ -12,11 +12,11 @@ import (
 func TestByteSliceMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New(ByteSliceMater{})
+	xover := New[[]byte](ByteSliceMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 
-	pop := make([]interface{}, 4)
+	pop := make([][]byte, 4)
 	pop[0] = []byte{1, 2, 3, 4, 5}
 	pop[1] = []byte{6, 7, 8, 9, 10}
 	pop[2] = []byte{11, 12, 13, 14, 15}
@@ -29,12 +29,11 @@ func TestByteSliceMater(t *testing.T) {
 			t.Error("population size changed, want 4, got", len(pop))
 		}
 
-		for _, individual := range pop {
-			s := individual.([]byte)
-			if len(s) != 5 {
-				t.Error("wrong candidate length, want 5, got", len(s))
+		for _, ind := range pop {
+			if len(ind) != 5 {
+				t.Error("wrong candidate length, want 5, got", len(ind))
 			}
-			for _, value := range s {
+			for _, value := range ind {
 				values[value] = struct{}{}
 			}
 		}
@@ -51,11 +50,11 @@ func TestByteSliceMater(t *testing.T) {
 func TestByteSliceMaterDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New(ByteSliceMater{})
+	xover := New[[]byte](ByteSliceMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 
-	pop := make([]interface{}, 2)
+	pop := make([][]byte, 2)
 	pop[0] = []byte{1, 2, 3, 4, 5}
 	pop[1] = []byte{2, 4, 8, 10, 12, 14, 16}
 

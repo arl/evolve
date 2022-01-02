@@ -11,11 +11,11 @@ import (
 func TestStringMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New(StringMater{})
+	xover := New[string](StringMater{})
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
-	pop := make([]interface{}, 4)
+	pop := make([]string, 4)
 	pop[0] = "abcde"
 	pop[1] = "fghij"
 	pop[2] = "klmno"
@@ -27,11 +27,10 @@ func TestStringMater(t *testing.T) {
 
 		assert.Lenf(t, pop, 4, "population size changed")
 
-		for _, individual := range pop {
-			s := individual.(string)
-			assert.Lenf(t, s, 5, "wrong individual length")
+		for _, ind := range pop {
+			assert.Lenf(t, ind, 5, "wrong individual length")
 
-			for _, value := range s {
+			for _, value := range ind {
 				values[value] = struct{}{}
 			}
 		}
@@ -48,8 +47,8 @@ func TestStringMater(t *testing.T) {
 func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New(StringMater{})
-	pop := []interface{}{"abcde", "fghijklm"}
+	xover := New[string](StringMater{})
+	pop := []string{"abcde", "fghijklm"}
 
 	assert.Panics(t, func() { xover.Apply(pop, rng) })
 }
@@ -57,19 +56,14 @@ func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 func BenchmarkStringMater(b *testing.B) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New(StringMater{})
+	xover := New[string](StringMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 
-	pop := make([]interface{}, 4)
-	pop[0] = "abcde"
-	pop[1] = "fghij"
-	pop[2] = "klmno"
-	pop[3] = "pqrst"
+	pop := []string{"abcde", "fghij", "klmno", "pqrst"}
 
 	b.ReportAllocs()
 	b.ResetTimer()
-
 	for n := 0; n < b.N; n++ {
 		pop = xover.Apply(pop, rng)
 	}

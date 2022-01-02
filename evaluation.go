@@ -11,26 +11,26 @@ import "sync"
 //
 // Returns the evaluated population (a slice of individuals, each of which
 // associated with its fitness).
-func EvaluatePopulation(pop []interface{}, e Evaluator, concurrent bool) Population {
-	var evpop Population
+func EvaluatePopulation[T any](pop []T, e Evaluator[T], concurrent bool) Population[T] {
+	var evpop Population[T]
 
 	if !concurrent {
-		evpop = make(Population, len(pop))
+		evpop = make(Population[T], len(pop))
 		for i, candidate := range pop {
-			evpop[i] = &Individual{
+			evpop[i] = &Individual[T]{
 				Candidate: candidate,
 				Fitness:   e.Fitness(candidate, pop),
 			}
 		}
 	} else {
-		evpop = make(Population, len(pop))
+		evpop = make(Population[T], len(pop))
 
 		var w sync.WaitGroup
 		w.Add(len(pop))
 
 		for i := range pop {
 			go func(i int) {
-				ind := &Individual{
+				ind := &Individual[T]{
 					Candidate: pop[i],
 					Fitness:   e.Fitness(pop[i], pop),
 				}

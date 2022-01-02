@@ -5,15 +5,15 @@ import (
 )
 
 func TestSigmaScalingNaturalFitness(t *testing.T) {
-	testFitnessBasedSelection(t, SigmaScaling, fitnessBasedPopNatural, true)
+	testFitnessBasedSelection(t, NewSigmaScaling[string](nil), fitnessBasedPopNatural, true)
 }
 
 func TestSigmaScalingNonNaturalFitness(t *testing.T) {
-	testFitnessBasedSelection(t, SigmaScaling, fitnessBasedPopNonNatural, false)
+	testFitnessBasedSelection(t, NewSigmaScaling[string](nil), fitnessBasedPopNonNatural, false)
 }
 
 // If all fitness scores are equal, standard deviation is zero.
 func TestSigmaScalingNoVariance(t *testing.T) {
-	testFitnessBasedSelection(t, SigmaScaling, fitnessBasedPopAllEqual, true)
-	testFitnessBasedSelection(t, SigmaScaling, fitnessBasedPopAllEqual, false)
+	testFitnessBasedSelection(t, NewSigmaScaling[string](nil), fitnessBasedPopAllEqual, true)
+	testFitnessBasedSelection(t, NewSigmaScaling[string](nil), fitnessBasedPopAllEqual, false)
 }

@@ -5,7 +5,7 @@ import (
 )
 
 // Epocher is the interface implemented by objects having an Epoch method.
-type Epocher interface {
+type Epocher[T any] interface {
 
 	// Epoch performs one epoch (i.e generation) of the evolutionary process.
 	//
@@ -15,5 +15,5 @@ type Epocher interface {
 	// source of randomess.
 	//
 	// It returns the next generation.
-	Epoch(Population, int, *rand.Rand) Population
+	Epoch(Population[T], int, *rand.Rand) Population[T]
 }

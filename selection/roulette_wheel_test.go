@@ -11,8 +11,8 @@ import (
 // candidates are selected.
 func testRouletteWheelSelection(t *testing.T, tpop testPopulation, natural bool) {
 	for i := 0; i < 20; i++ {
-		testRandomBasedSelection(t, RouletteWheel, tpop, natural, 2,
-			func(selected []interface{}) error {
+		testRandomBasedSelection(t, RouletteWheel[string]{}, tpop, natural, 2,
+			func(selected []string) error {
 				if len(selected) != 2 {
 					return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
 				}

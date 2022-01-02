@@ -14,7 +14,7 @@ func TestStochasticUniversalSamplingNatural(t *testing.T) {
 		{name: "Mary", fitness: 1.0, wantMin: 0, wantMax: 1},
 		{name: "Gary", fitness: 0.5, wantMin: 0, wantMax: 1},
 	}
-	testFitnessBasedSelection(t, Rank, tpop, true)
+	testFitnessBasedSelection(t, Rank[string](), tpop, true)
 }
 
 func TestStochasticUniversalSamplingNonNatural(t *testing.T) {
@@ -24,5 +24,5 @@ func TestStochasticUniversalSamplingNonNatural(t *testing.T) {
 		{name: "Mary", fitness: 4.5, wantMin: 0, wantMax: 1},
 		{name: "Gary", fitness: 10.0, wantMin: 0, wantMax: 1},
 	}
-	testFitnessBasedSelection(t, Rank, tpop, false)
+	testFitnessBasedSelection(t, Rank[string](), tpop, false)
 }

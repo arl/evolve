@@ -16,7 +16,8 @@ var ErrInvalidTruncRatio = errors.New("truncation selection ratio must be in the
 // Truncation implements the selection of n candidates from a population by
 // simply selecting the n candidates with the highest fitness scores (the rest
 // is discarded). The same candidate is never selected more than once.
-type Truncation struct {
+// TODO should use number generators here
+type Truncation[T any] struct {
 	ratio, minratio, maxratio float64
 	varratio                  bool
 }
@@ -26,15 +27,15 @@ type Truncation struct {
 //
 // If no options are provided the selection ratio will vary uniformly between 0
 // and 1.
-func NewTruncation() *Truncation {
-	return &Truncation{varratio: true, minratio: 0.5, maxratio: 1.0}
+func NewTruncation[T any]() *Truncation[T] {
+	return &Truncation[T]{varratio: true, minratio: 0.5, maxratio: 1.0}
 }
 
 // SetRatio sets a constant selection ratio, that is the proportion of the
 // highest ranked candidates to select from the population.
 //
 // If ratio is not in the (0,1] range SetRatio will return ErrInvalidTruncRatio
-func (ts *Truncation) SetRatio(ratio float64) error {
+func (ts *Truncation[T]) SetRatio(ratio float64) error {
 	if ratio <= 0.0 || ratio > 1.0 {
 		return ErrInvalidTruncRatio
 	}
@@ -51,7 +52,7 @@ func (ts *Truncation) SetRatio(ratio float64) error {
 //
 // If min and max are not bounded by [0,1] SetRatioRange will return
 // ErrInvalidTruncRatio.
-func (ts *Truncation) SetRatioRange(min, max float64) error {
+func (ts *Truncation[T]) SetRatioRange(min, max float64) error {
 	if min > max || min <= 0.0 || max > 1.0 {
 		return ErrInvalidTruncRatio
 	}
@@ -72,8 +73,8 @@ func (ts *Truncation) SetRatioRange(min, max float64) error {
 // size is the number of candidates to select from the evolved population.
 //
 // Returns the selected candidates.
-func (ts *Truncation) Select(pop evolve.Population, natural bool, size int, rng *rand.Rand) []interface{} {
-	sel := make([]interface{}, 0, size)
+func (ts *Truncation[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
+	sel := make([]T, 0, size)
 
 	// get a random value to decide wether to select the fitter individual
 	// or the weaker one.
@@ -99,7 +100,7 @@ func (ts *Truncation) Select(pop evolve.Population, natural bool, size int, rng 
 	return sel
 }
 
-func (ts *Truncation) String() string {
+func (ts *Truncation[T]) String() string {
 	s := "Truncation Selection (%v%%)"
 	if ts.varratio {
 		return fmt.Sprintf(s, fmt.Sprintf("%5.2f-%5.2f", 100*ts.minratio, 100*ts.maxratio))

@@ -4,12 +4,12 @@ import "time"
 
 // PopulationStats contains statistics about the state of an evolved population
 // and a reference to the fittest candidate solution in the population.
-type PopulationStats struct {
+type PopulationStats[T any] struct {
 
 	// BestCandidate is the fittest candidate present in the population.
 	// TODO: rename into Best (or: why not having an evluated candidate here, so
 	// we would have the best candidate ANd their fitness)
-	BestCand interface{}
+	BestCand T
 
 	// BestFitness is the fitness score for the fittest candidate in the
 	// population.

@@ -11,7 +11,7 @@ import (
 // fitness-proportionate selection strategy. Ensures that the frequency of
 // selection for each candidate is consistent with its expected frequency of
 // selection.
-type StochasticUniversalSampling struct{}
+type StochasticUniversalSampling[T any] struct{}
 
 // Select selects the specified number of candidates from the population.
 //
@@ -29,11 +29,11 @@ type StochasticUniversalSampling struct{}
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
-func (StochasticUniversalSampling) Select(
-	pop evolve.Population,
+func (StochasticUniversalSampling[T]) Select(
+	pop evolve.Population[T],
 	natural bool,
 	size int,
-	rng *rand.Rand) []interface{} {
+	rng *rand.Rand) []T {
 
 	// Calculate the sum of all fitness values.
 	var sum float64
@@ -41,7 +41,7 @@ func (StochasticUniversalSampling) Select(
 		sum += adjustedFitness(cand.Fitness, natural)
 	}
 
-	sel := make([]interface{}, 0, size)
+	sel := make([]T, 0, size)
 
 	// Pick a random offset between 0 and 1 as the starting point for
 	// selection.
@@ -67,7 +67,7 @@ func (StochasticUniversalSampling) Select(
 	return sel
 }
 
-func (StochasticUniversalSampling) String() string { return "Stochastic Universal Sampling" }
+func (StochasticUniversalSampling[T]) String() string { return "Stochastic Universal Sampling" }
 
 func adjustedFitness(fitness float64, natural bool) float64 {
 	if natural {

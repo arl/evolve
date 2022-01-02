@@ -7,8 +7,8 @@ import (
 )
 
 func TestUserAbort(t *testing.T) {
-	stats := &evolve.PopulationStats{}
-	cond := NewUserAbort()
+	stats := &evolve.PopulationStats[any]{}
+	cond := NewUserAbort[any]()
 
 	if cond.IsSatisfied(stats) {
 		t.Errorf("should be false before user abort")

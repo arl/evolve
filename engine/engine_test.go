@@ -8,15 +8,15 @@ import (
 
 func TestEngineArgumentErrors(t *testing.T) {
 	var (
-		eng *Engine
+		eng *Engine[int]
 		err error
 	)
 
 	t.Run("invalid elite count", func(t *testing.T) {
 		for _, nelites := range []int{10, -1} {
-			eng, err = New(zeroFactory, intEvaluator{}, nil)
+			eng, err = New[int](zeroFactory, intEvaluator{}, nil)
 			check(t, err)
-			_, _, err = eng.Evolve(10, Elites(nelites), EndOn(condition.GenerationCount(10)))
+			_, _, err = eng.Evolve(10, Elites[int](nelites), EndOn[int](condition.GenerationCount[int](10)))
 			if err == nil {
 				t.Errorf("Evolve(Elites(%v)), want error, got nil", nelites)
 			}
@@ -24,7 +24,7 @@ func TestEngineArgumentErrors(t *testing.T) {
 	})
 
 	t.Run("no condition condition", func(t *testing.T) {
-		eng, err = New(zeroFactory, intEvaluator{}, nil)
+		eng, err = New[int](zeroFactory, intEvaluator{}, nil)
 		check(t, err)
 		_, _, err = eng.Evolve(10)
 		if err == nil {
@@ -33,9 +33,9 @@ func TestEngineArgumentErrors(t *testing.T) {
 	})
 
 	t.Run("elite count", func(t *testing.T) {
-		eng, err = New(zeroFactory, intEvaluator{}, nil)
+		eng, err = New[int](zeroFactory, intEvaluator{}, nil)
 		check(t, err)
-		_, _, err = eng.Evolve(0, EndOn(condition.GenerationCount(1)))
+		_, _, err = eng.Evolve(0, EndOn[int](condition.GenerationCount[int](1)))
 		if err == nil {
 			t.Error("Evolve(), want error, got nil")
 		}

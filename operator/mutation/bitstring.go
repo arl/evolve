@@ -24,12 +24,11 @@ type Bitstring struct {
 }
 
 // Mutate modifies a bitstring.Bitstring with respect to a mutation probabilty.
-func (op *Bitstring) Mutate(c interface{}, rng *rand.Rand) interface{} {
+func (op *Bitstring) Mutate(bs *bitstring.Bitstring, rng *rand.Rand) *bitstring.Bitstring {
 	// Find out the mutation probabilty
 	prob := op.Probability.Next()
 
 	if rng.Float64() < prob {
-		bs := c.(*bitstring.Bitstring)
 		mutated := bitstring.Copy(bs)
 
 		// Since there's a mutation to perform, find out how many bits to flip.
@@ -41,5 +40,5 @@ func (op *Bitstring) Mutate(c interface{}, rng *rand.Rand) interface{} {
 		return mutated
 	}
 
-	return c
+	return bs
 }

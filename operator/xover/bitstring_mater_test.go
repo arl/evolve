@@ -14,22 +14,20 @@ import (
 
 func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	xover := New(BitstringMater{})
+	xover := New[*bitstring.Bitstring](BitstringMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 	f := factory.Bitstring(50)
 
-	pop := evolve.GeneratePopulation(f, 2, rng)
+	pop := evolve.GeneratePopulation[*bitstring.Bitstring](f, 2, rng)
 	// Test to make sure that crossover correctly preserves all genetic material
 	// originally present in the population and does not introduce anything new.
-	want := pop[0].(*bitstring.Bitstring).OnesCount() +
-		pop[1].(*bitstring.Bitstring).OnesCount()
+	want := pop[0].OnesCount() + pop[1].OnesCount()
 	for i := 0; i < 50; i++ {
 		// Test several generations.
 		pop = xover.Apply(pop, rng)
 
-		got := pop[0].(*bitstring.Bitstring).OnesCount() +
-			pop[1].(*bitstring.Bitstring).OnesCount()
+		got := pop[0].OnesCount() + pop[1].OnesCount()
 		assert.Equal(t, got, want, "bitstring crossover should not change the total number of set bits in population")
 	}
 }
@@ -41,13 +39,13 @@ func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
 	// panicking should be considered a bug since it could lead to hard to trace
 	// bugs elsewhere.
 	rng := rand.New(rand.NewSource(99))
-	xover := New(BitstringMater{})
+	xover := New[*bitstring.Bitstring](BitstringMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 
 	bs1 := bitstring.Random(32, rng)
 	bs2 := bitstring.Random(33, rng)
-	pop := []interface{}{bs1, bs2}
+	pop := []*bitstring.Bitstring{bs1, bs2}
 
 	assert.Panics(t, func() {
 		// This should panic since the parents are different lengths.

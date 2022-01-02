@@ -8,7 +8,7 @@ import (
 // Selection is the interface that wraps the Select method.
 //
 // Select implements "natural" selection.
-type Selection interface {
+type Selection[T any] interface {
 	fmt.Stringer
 
 	// Select selects the specified number of candidates from the population.
@@ -21,5 +21,5 @@ type Selection interface {
 	// potentially be selected more than once).
 	//
 	// Returns the selected candidates.
-	Select(pop Population, natural bool, size int, rng *rand.Rand) []interface{}
+	Select(pop Population[T], natural bool, size int, rng *rand.Rand) []T
 }

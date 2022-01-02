@@ -21,19 +21,18 @@ func TestBitstringMutationRandom(t *testing.T) {
 		Probability: generator.Const(0.5),
 	}
 
-	mut := New(bs)
+	mut := New[*bitstring.Bitstring](bs)
 
 	org, err := bitstring.MakeFromString("111100101")
 	assert.NoError(t, err)
 
-	pop := []interface{}{org}
+	pop := []*bitstring.Bitstring{org}
 	for i := 0; i < 20; i++ {
 		// Perform several iterations to get different mutations.
 		pop = mut.Apply(pop, rng)
 		mutated := pop[0]
 		assert.IsType(t, &bitstring.Bitstring{}, mutated)
-		ms := mutated.(*bitstring.Bitstring)
-		assert.Equalf(t, 9, ms.Len(), "want ms.Len() = 9, got %v", ms.Len())
+		assert.Equalf(t, 9, mutated.Len(), "want mutated.Len() = 9, got %v", mutated.Len())
 	}
 }
 
@@ -47,22 +46,21 @@ func TestBitstringMutationSingleBit(t *testing.T) {
 		Probability: generator.Const(0.5),
 	}
 
-	mut := New(bs)
+	mut := New[*bitstring.Bitstring](bs)
 
 	org, err := bitstring.MakeFromString("111100101")
 	assert.NoError(t, err)
 
-	pop := []interface{}{org}
+	pop := []*bitstring.Bitstring{org}
 	pop = mut.Apply(pop, rng)
 
 	mutated := pop[0]
 	assert.IsType(t, &bitstring.Bitstring{}, mutated)
-	ms := mutated.(*bitstring.Bitstring)
 
-	assert.False(t, ms.Equals(org), "want mutant to be different from original, got equals")
-	assert.Equalf(t, 9, ms.Len(), "want mutated bit string to not change length, 9, got %v", ms.Len())
-	set := ms.OnesCount()
-	unset := ms.ZeroesCount()
+	assert.False(t, mutated.Equals(org), "want mutant to be different from original, got equals")
+	assert.Equalf(t, 9, mutated.Len(), "want mutated bit string to not change length, 9, got %v", mutated.Len())
+	set := mutated.OnesCount()
+	unset := mutated.ZeroesCount()
 	assert.Truef(t, set == 5 || set == 7, "want 5 or 7 set bits in mutated bit string, got %v", set)
 	assert.Truef(t, unset == 2 || unset == 4, "want 2 or 4 unset bits in mutated bit string, got %v", unset)
 }

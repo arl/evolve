@@ -5,7 +5,7 @@ package evolve
 //
 // Fitness evaluations may be executed concurrently and therefore any concurrent
 // access to a shared state should be properly synchronized.
-type Evaluator interface {
+type Evaluator[T any] interface {
 
 	// Fitness calculates a fitness score for the given candidate.
 	//
@@ -28,7 +28,7 @@ type Evaluator interface {
 	// Returns the fitness score for the specified candidate. Must always be a
 	// non-negative value regardless of natural or non-natural evaluation is
 	// being used.
-	Fitness(cand interface{}, pop []interface{}) float64
+	Fitness(cand T, pop []T) float64
 
 	// IsNatural specifies whether this evaluator generates 'natural' fitness
 	// scores or not.
@@ -62,20 +62,20 @@ type Evaluator interface {
 
 // FitnessFunc is the type of function computing the fitness of a candidate
 // solution.
-type FitnessFunc func(interface{}, []interface{}) float64
+type FitnessFunc[T any] func(T, []T) float64
 
-type evaluatorFunc struct {
-	f FitnessFunc
+type evaluatorFunc[T any] struct {
+	f FitnessFunc[T]
 	n bool
 }
 
-func (e evaluatorFunc) Fitness(cand interface{}, pop []interface{}) float64 { return e.f(cand, pop) }
-func (e evaluatorFunc) IsNatural() bool                                     { return e.n }
+func (e evaluatorFunc[T]) Fitness(cand T, pop []T) float64 { return e.f(cand, pop) }
+func (e evaluatorFunc[T]) IsNatural() bool                 { return e.n }
 
 // EvaluatorFunc is an adapter to allow the use of ordinary functions as fitness
 // evaluators. If f is a function with the appropriate signature, EvaluatorFunc
 // returns an object satisfying the Evaluator interface, for which the Fitness
 // method calls f and IsNatural returns natural.
-func EvaluatorFunc(natural bool, f FitnessFunc) evaluatorFunc { // nolint: golint
-	return evaluatorFunc{f: f, n: natural}
+func EvaluatorFunc[T any](natural bool, f FitnessFunc[T]) evaluatorFunc[T] { // nolint: golint
+	return evaluatorFunc[T]{f: f, n: natural}
 }

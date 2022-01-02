@@ -1,8 +1,6 @@
 package xover
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 // PMX implements the partially mapped crossover algorithm.
 //
@@ -10,26 +8,25 @@ import (
 // elements. It creates offsprings that are non-repeating permutations of the
 // parents by choosing 2 random crossover points and exchanging elements
 // positions.
-type PMX struct{}
+type PMX[T comparable] struct{}
 
 // Mate mates 2 parents and generates a pair of offsprings.
 //
 // parent1 and parent2 are the two individuals that provides the source
 // material for generating offspring.
-func (p PMX) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) []interface{} {
+func (p PMX[T]) Mate(p1, p2 []T, nxpts int64, rng *rand.Rand) [][]T {
 	if nxpts != 2 {
 		panic("PMX is only defined for 2 cut points")
 	}
 
-	p1, p2 := parent1.([]int), parent2.([]int)
 	if len(p1) != len(p2) {
 		panic("PMX cannot mate parents of different lengths")
 	}
 
 	plen := len(p1)
 
-	offsp1 := make([]int, plen)
-	offsp2 := make([]int, plen)
+	offsp1 := make([]T, plen)
+	offsp2 := make([]T, plen)
 	copy(offsp1, p1)
 	copy(offsp2, p2)
 
@@ -42,8 +39,8 @@ func (p PMX) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) []i
 		length += len(p1)
 	}
 
-	m1 := make(map[int]int, plen*2)
-	m2 := make(map[int]int, plen*2)
+	m1 := make(map[T]T, plen*2)
+	m2 := make(map[T]T, plen*2)
 
 	for i := 0; i < length; i++ {
 		index := (i + pt1) % plen
@@ -58,13 +55,13 @@ func (p PMX) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) []i
 	p.checkUnmappedElements(offsp1, m2, pt1, pt2)
 	p.checkUnmappedElements(offsp2, m1, pt1, pt2)
 
-	return []interface{}{offsp1, offsp2}
+	return [][]T{offsp1, offsp2}
 }
 
 // checks elements that are outside of the partially mapped section to see if
 // there are any duplicate items in the list. If there are, they are mapped
 // appropriately.
-func (p PMX) checkUnmappedElements(offspring []int, mapping map[int]int, mapStart, mapEnd int) {
+func (p PMX[T]) checkUnmappedElements(offspring []T, mapping map[T]T, mapStart, mapEnd int) {
 	for i := range offspring {
 		if !p.isInsideMappedRegion(i, mapStart, mapEnd) {
 			mapped := offspring[i]
@@ -85,7 +82,7 @@ func (p PMX) checkUnmappedElements(offspring []int, mapping map[int]int, mapStar
 // pos is the position to check
 // start is the (inclusive) start index of the mapped region
 // end is the (exclusive) end index of the mapped region
-func (p PMX) isInsideMappedRegion(pos, start, end int) bool {
+func (p PMX[T]) isInsideMappedRegion(pos, start, end int) bool {
 	enclosed := pos < end && pos >= start
 	wrapAround := start > end && (pos >= start || pos < end)
 	return enclosed || wrapAround

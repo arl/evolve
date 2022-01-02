@@ -16,7 +16,8 @@ var ErrInvalidTournamentProb = errors.New("crossover probability must be in the 
 // and then selects the fitter of the two candidates with probability p, where p
 // is the configured selection probability (therefore the probability of the
 // less fit candidate being selected is 1 - p).
-type Tournament struct {
+// TODO should use number generators here
+type Tournament[T any] struct {
 	prob             float64
 	varprob          bool
 	probmin, probmax float64
@@ -25,9 +26,9 @@ type Tournament struct {
 // NewTournament creates a TournamentSelection selection strategy where the
 // probability of selecting the fitter of two randomly chosen candidates is set
 // to 0.7.
-func NewTournament() *Tournament {
+func NewTournament[T any]() *Tournament[T] {
 	// create with a selection probability of 0.7
-	return &Tournament{prob: 0.7, varprob: false, probmin: 0.7, probmax: 0.7}
+	return &Tournament[T]{prob: 0.7, varprob: false, probmin: 0.7, probmax: 0.7}
 }
 
 // SetProb sets a constant probability that fitter of two randomly chosen
@@ -38,7 +39,7 @@ func NewTournament() *Tournament {
 // pressure is in favour of weaker candidates, which is counter-productive).
 // If prob is not in the (0.5,1] range SetProb will return
 // ErrInvalidTournamentProb
-func (ts *Tournament) SetProb(prob float64) error {
+func (ts *Tournament[T]) SetProb(prob float64) error {
 	if prob <= 0.5 || prob > 1.0 {
 		return ErrInvalidTournamentProb
 	}
@@ -55,7 +56,7 @@ func (ts *Tournament) SetProb(prob float64) error {
 //
 // If min and max are not bounded by (0.5,1] SetProbRange will return
 // ErrInvalidTournamentProb.
-func (ts *Tournament) SetProbRange(min, max float64) error {
+func (ts *Tournament[T]) SetProbRange(min, max float64) error {
 	if min > max || min < 0.5 || max > 1.0 {
 		return ErrInvalidTournamentProb
 	}
@@ -66,13 +67,13 @@ func (ts *Tournament) SetProbRange(min, max float64) error {
 }
 
 // Select selects the specified number of candidates from the population.
-func (ts *Tournament) Select(
-	pop evolve.Population,
+func (ts *Tournament[T]) Select(
+	pop evolve.Population[T],
 	natural bool,
 	size int,
-	rng *rand.Rand) []interface{} {
+	rng *rand.Rand) []T {
 
-	sel := make([]interface{}, size)
+	sel := make([]T, size)
 	for i := 0; i < size; i++ {
 		// Pick two candidates at random.
 		cand1 := pop[rng.Intn(len(pop))]
@@ -102,7 +103,7 @@ func (ts *Tournament) Select(
 	return sel
 }
 
-func (ts *Tournament) String() string {
+func (ts *Tournament[T]) String() string {
 	s := "Tournament Selection (p = %v)"
 	if ts.varprob {
 		return fmt.Sprintf(s, fmt.Sprintf("[%v,%v]", ts.probmin, ts.probmax))

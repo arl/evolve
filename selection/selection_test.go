@@ -58,13 +58,13 @@ var randomBasedPopNonNatural = testPopulation{
 	{name: "Steve", fitness: 10.0},
 }
 
-func testFitnessBasedSelection(t *testing.T, ss evolve.Selection, tpop testPopulation, natural bool) {
+func testFitnessBasedSelection(t *testing.T, ss evolve.Selection[string], tpop testPopulation, natural bool) {
 	rng := rand.New(rand.NewSource(99))
 
 	// create the population
-	pop := evolve.Population{}
+	pop := evolve.Population[string]{}
 	for i := range tpop {
-		cand := &evolve.Individual{
+		cand := &evolve.Individual[string]{
 			Candidate: tpop[i].name,
 			Fitness:   tpop[i].fitness,
 		}
@@ -85,10 +85,10 @@ func testFitnessBasedSelection(t *testing.T, ss evolve.Selection, tpop testPopul
 	}
 }
 
-func frequency(slice []interface{}, val interface{}) int {
+func frequency[T comparable](slice []T, val T) int {
 	var count int
 	for _, s := range slice {
-		if s.(string) == val {
+		if s == val {
 			count++
 		}
 	}
@@ -97,14 +97,14 @@ func frequency(slice []interface{}, val interface{}) int {
 
 // test a random based selection strategy ss by selecting the n best candidates
 // of tpop, running the result to checkfn (returns nil or test fail message)
-func testRandomBasedSelection(t *testing.T, ss evolve.Selection, tpop testPopulation, natural bool, n int, checkfn func([]interface{}) error) {
+func testRandomBasedSelection(t *testing.T, ss evolve.Selection[string], tpop testPopulation, natural bool, n int, checkfn func([]string) error) {
 	seed := time.Now().UnixNano()
 	rng := rand.New(rand.NewSource(seed))
 
 	// create the population
-	pop := evolve.Population{}
+	pop := evolve.Population[string]{}
 	for i := range tpop {
-		cand := &evolve.Individual{
+		cand := &evolve.Individual[string]{
 			Candidate: tpop[i].name,
 			Fitness:   tpop[i].fitness,
 		}

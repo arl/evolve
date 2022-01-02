@@ -6,27 +6,27 @@ import (
 )
 
 // Individual associates a candidate solution with its fitness score.
-type Individual struct {
-	Candidate interface{}
+type Individual[T any] struct {
+	Candidate T
 	Fitness   float64
 }
 
 // Population is a group of individual.
 // TODO: check if and where we would benefit of having a slice of structs
 // instead of pointers
-type Population []*Individual
+type Population[T any] []*Individual[T]
 
 // Len is the number of elements in the collection.
-func (s Population) Len() int { return len(s) }
+func (s Population[T]) Len() int { return len(s) }
 
 // Less reports whether the element with
 // index a should sort before the element with index b.
-func (s Population) Less(i, j int) bool { return s[i].Fitness < s[j].Fitness }
+func (s Population[T]) Less(i, j int) bool { return s[i].Fitness < s[j].Fitness }
 
 // Swap swaps the elements with indexes i and j.
-func (s Population) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s Population[T]) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 
-func (s Population) String() string {
+func (s Population[T]) String() string {
 	reprs := make([]string, 0, len(s))
 	for _, cand := range s {
 		if cand != nil {

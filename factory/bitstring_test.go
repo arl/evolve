@@ -16,13 +16,12 @@ func TestBitstring(t *testing.T) {
 	)
 
 	// local test function
-	checkPop := func(pop []interface{}) {
+	checkPop := func(pop []*bitstring.Bitstring) {
 		// Make sure the correct number of candidates were generated.
 		assert.Lenf(t, pop, popsize, "want population size = %v, got %v", popsize, len(pop))
 		// Make sure that each individual is the right length.
 		for _, cand := range pop {
-			bs := cand.(*bitstring.Bitstring)
-			assert.Equalf(t, length, bs.Len(), "want bitstring length = %v, got %v", length, bs.Len())
+			assert.Equalf(t, length, cand.Len(), "want bitstring length = %v, got %v", length, cand.Len())
 		}
 	}
 
@@ -30,7 +29,7 @@ func TestBitstring(t *testing.T) {
 
 	t.Run("unseed population", func(t *testing.T) {
 		f := Bitstring(length)
-		pop := evolve.GeneratePopulation(f, popsize, rng)
+		pop := evolve.GeneratePopulation[*bitstring.Bitstring](f, popsize, rng)
 		checkPop(pop)
 	})
 
@@ -38,8 +37,8 @@ func TestBitstring(t *testing.T) {
 		f := Bitstring(length)
 		seed1, _ := bitstring.MakeFromString("1111100000")
 		seed2, _ := bitstring.MakeFromString("1010101010")
-		seeds := []interface{}{seed1, seed2}
-		pop, err := evolve.SeedPopulation(f, popsize, seeds, rng)
+		seeds := []*bitstring.Bitstring{seed1, seed2}
+		pop, err := evolve.SeedPopulation[*bitstring.Bitstring](f, popsize, seeds, rng)
 		if err != nil {
 			t.Error(err)
 		}
@@ -55,8 +54,8 @@ func TestBitstring(t *testing.T) {
 		cand := bitstring.New(length)
 		// The following call should panic since the 3 seed candidates won't fit
 		// into a population of size 2.
-		seeds := []interface{}{cand, cand, cand}
-		_, err := evolve.SeedPopulation(f, 2, seeds, rng)
+		seeds := []*bitstring.Bitstring{cand, cand, cand}
+		_, err := evolve.SeedPopulation[*bitstring.Bitstring](f, 2, seeds, rng)
 		if err != evolve.ErrTooManySeedCandidates {
 			t.Errorf("wantErr = %v, got %v", evolve.ErrTooManySeedCandidates, err)
 		}

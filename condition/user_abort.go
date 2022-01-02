@@ -8,14 +8,14 @@ import (
 
 // UserAbort is a condition satisfied when Abort has been called. It allows for
 // user-initiated termination of an evolution algorithm.
-type UserAbort struct {
+type UserAbort[T any] struct {
 	mutex   *sync.RWMutex
 	aborted bool
 }
 
 // NewUserAbort creates a UserAbort condition.
-func NewUserAbort() *UserAbort {
-	return &UserAbort{
+func NewUserAbort[T any]() *UserAbort[T] {
+	return &UserAbort[T]{
 		mutex:   &sync.RWMutex{},
 		aborted: false,
 	}
@@ -23,7 +23,7 @@ func NewUserAbort() *UserAbort {
 
 // IsSatisfied reports whether or not Abort has been called.
 // It is safe for concurrent use by multiple goroutines.
-func (ua *UserAbort) IsSatisfied(*evolve.PopulationStats) bool {
+func (ua *UserAbort[T]) IsSatisfied(*evolve.PopulationStats[T]) bool {
 	ua.mutex.RLock()
 	defer ua.mutex.RUnlock()
 	return ua.aborted
@@ -31,7 +31,7 @@ func (ua *UserAbort) IsSatisfied(*evolve.PopulationStats) bool {
 
 // Abort triggers the condition.
 // It is safe for concurrent use by multiple goroutines.
-func (ua *UserAbort) Abort() {
+func (ua *UserAbort[T]) Abort() {
 	ua.mutex.Lock()
 	ua.aborted = true
 	ua.mutex.Unlock()
@@ -39,11 +39,11 @@ func (ua *UserAbort) Abort() {
 
 // Reset resets the abort condition to false so that it may be reused.
 // It is safe for concurrent use by multiple goroutines.
-func (ua *UserAbort) Reset() {
+func (ua *UserAbort[T]) Reset() {
 	ua.mutex.Lock()
 	ua.aborted = false
 	ua.mutex.Unlock()
 }
 
 // String returns a string representation of this condition.
-func (UserAbort) String() string { return "Abort called" }
+func (UserAbort[T]) String() string { return "Abort called" }
