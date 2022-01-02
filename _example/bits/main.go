@@ -30,34 +30,34 @@ func check(err error) {
 // consist only of ones.
 func main() {
 	// Define the crossover
-	xover := xover.New(xover.BitstringMater{})
-	xover.Probability = generator.ConstFloat64(0.7)
-	xover.Points = generator.Const(1.0)
+	xover := xover.New[*bitstring.Bitstring](xover.BitstringMater{})
+	xover.Probability = generator.Const(0.7)
+	xover.Points = generator.Const(1)
 
 	// Define the mutation
-	mut := mutation.New(&mutation.Bitstring{
-		Probability: generator.ConstFloat64(0.01),
-		FlipCount:   generator.Const(1.0),
+	mut := mutation.New[*bitstring.Bitstring](&mutation.Bitstring{
+		Probability: generator.Const(0.01),
+		FlipCount:   generator.Const(1),
 	})
 
 	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)
-		func(cand interface{}, pop []interface{}) float64 {
+		func(cand *bitstring.Bitstring, pop []*bitstring.Bitstring) float64 {
 			// our evaluator counts the ones in the bitstring
-			return float64(cand.(*bitstring.Bitstring).OnesCount())
+			return float64(cand.OnesCount())
 		})
 
-	epocher := engine.Generational{
-		Op:   operator.Pipeline{xover, mut},
+	epocher := engine.Generational[*bitstring.Bitstring]{
+		Op:   operator.Pipeline[*bitstring.Bitstring]{xover, mut},
 		Eval: eval,
-		Sel:  selection.RouletteWheel,
+		Sel:  selection.RouletteWheel[*bitstring.Bitstring]{},
 	}
 
-	eng, err := engine.New(generator.Bitstring(nbits), eval, &epocher)
+	eng, err := engine.New[*bitstring.Bitstring](generator.Bitstring(nbits), eval, &epocher)
 	check(err)
 
 	eng.AddObserver(
-		engine.ObserverFunc(func(stats *evolve.PopulationStats) {
+		engine.ObserverFunc(func(stats *evolve.PopulationStats[*bitstring.Bitstring]) {
 			log.Printf("Generation %d: %s (%v)\n",
 				stats.GenNumber,
 				stats.BestCand,
@@ -65,9 +65,9 @@ func main() {
 		}))
 
 	bests, _, err := eng.Evolve(
-		100,              // 100 candidates in the population
-		engine.Elites(2), // best 2 are put into next population
-		engine.EndOn(condition.TargetFitness{
+		100,                                    // 100 candidates in the population
+		engine.Elites[*bitstring.Bitstring](2), // best 2 are put into next population
+		engine.EndOn[*bitstring.Bitstring](condition.TargetFitness[*bitstring.Bitstring]{
 			Fitness: float64(nbits),
 			Natural: true,
 		}),
