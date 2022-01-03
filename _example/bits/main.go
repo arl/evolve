@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
@@ -53,7 +55,12 @@ func main() {
 		Sel:  selection.RouletteWheel[*bitstring.Bitstring]{},
 	}
 
-	eng, err := engine.New[*bitstring.Bitstring](generator.Bitstring(nbits), eval, &epocher)
+	// bitstring.Random(length uint, rng *rand.Rand)
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	fac := func(*rand.Rand) *bitstring.Bitstring {
+		return bitstring.Random(nbits, rng)
+	}
+	eng, err := engine.New[*bitstring.Bitstring](evolve.FactoryFunc[*bitstring.Bitstring](fac), eval, &epocher)
 	check(err)
 
 	eng.AddObserver(
