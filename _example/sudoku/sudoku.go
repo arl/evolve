@@ -36,18 +36,17 @@ func (s *sudoku) String() string {
 // fitter individual.
 type evaluator struct{}
 
-func (evaluator) Fitness(cand interface{}, pop []interface{}) float64 { // nolint: golint
+func (evaluator) Fitness(cand *sudoku, pop []*sudoku) float64 { // nolint: golint
 	// We can assume that there are no duplicates in any rows because the
 	// candidate generator and evolutionary operators we use do not permit rows
 	// to contain duplicates.
 	var fitness int
-	sudo := cand.(*sudoku)
 
 	// Check columns for duplicates.
 	values := make(map[int]struct{})
 	for col := 0; col < size; col++ {
 		for row := 0; row < size; row++ {
-			values[sudo[row][col].val] = struct{}{}
+			values[cand[row][col].val] = struct{}{}
 		}
 		fitness += size - len(values)
 		values = make(map[int]struct{})
@@ -58,7 +57,7 @@ func (evaluator) Fitness(cand interface{}, pop []interface{}) float64 { // nolin
 		for stack := 0; stack < size; stack += 3 {
 			for row := band; row < band+3; row++ {
 				for col := stack; col < stack+3; col++ {
-					values[sudo[row][col].val] = struct{}{}
+					values[cand[row][col].val] = struct{}{}
 				}
 			}
 			fitness += size - len(values)

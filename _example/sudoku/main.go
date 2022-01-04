@@ -54,42 +54,42 @@ func readPattern(r io.Reader) ([]string, error) {
 func solveSudoku(pattern []string) error {
 	// Crossover rows between parents (so offspring is x rows from parent1 and y
 	// rows from parent2).
-	xover := xover.New(mater{})
-	xover.Points = generator.Const(1.0)
+	xover := xover.New[*sudoku](mater{})
+	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 
 	mutation := &rowMutation{
-		Number: generator.NewPoisson(generator.ConstFloat64(2), rng),
-		Amount: generator.NewUniformtInt(1, 8, rng),
+		Number: generator.NewPoisson[uint](generator.Const(2.0), rng),
+		Amount: generator.NewUniformtInt[uint](1, 8, rng),
 	}
 
-	pipeline := operator.Pipeline{xover, mutation}
+	pipeline := operator.Pipeline[*sudoku]{xover, mutation}
 
-	selector := selection.NewTournament()
+	selector := selection.NewTournament[*sudoku]()
 	check(selector.SetProb(0.85))
 
-	obs := engine.ObserverFunc(func(stats *evolve.PopulationStats) {
+	obs := engine.ObserverFunc(func(stats *evolve.PopulationStats[*sudoku]) {
 		// Only shows multiple of 100 generations
 		if stats.GenNumber%100 == 0 {
 			return
 		}
 		log.Printf("Gen %d, best solution has a fitness of %v\n%v\n",
-			stats.GenNumber, stats.BestFitness, stats.BestCand.(*sudoku))
+			stats.GenNumber, stats.BestFitness, stats.BestCand)
 	})
 
-	gen, err := newGenerator(pattern)
+	gen, err := newFactory(pattern)
 	check(err)
 
-	epocher := engine.Generational{Op: pipeline, Eval: evaluator{}, Sel: selector}
+	epocher := engine.Generational[*sudoku]{Op: pipeline, Eval: evaluator{}, Sel: selector}
 
-	eng, err := engine.New(
+	eng, err := engine.New[*sudoku](
 		gen,
 		evaluator{},
 		&epocher,
 		engine.Observe(obs),
-		engine.Rand(rng),
+		engine.Rand[*sudoku](rng),
 	)
 	check(err)
 
@@ -99,13 +99,13 @@ func solveSudoku(pattern []string) error {
 	)
 	bests, _, err := eng.Evolve(
 		popsize,
-		engine.Elites(nelites),
-		engine.EndOn(condition.TargetFitness{Fitness: 0, Natural: false}),
-		engine.EndOn(condition.NewUserAbort()),
+		engine.Elites[*sudoku](nelites),
+		engine.EndOn[*sudoku](condition.TargetFitness[*sudoku]{Fitness: 0, Natural: false}),
+		engine.EndOn[*sudoku](condition.NewUserAbort[*sudoku]()),
 	)
 	check(err)
 
-	log.Printf("Sudoku solution:\n%v\n", bests[0].Candidate.(*sudoku))
+	log.Printf("Sudoku solution:\n%v\n", bests[0].Candidate)
 	return nil
 }
 
