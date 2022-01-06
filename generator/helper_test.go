@@ -106,9 +106,9 @@ func checkUniformDistribution[T constraints.Integer | constraints.Float](t *test
 	ds := evolve.NewDataset(iterations)
 	for i := 0; i < iterations; i++ {
 		val := g.Next()
-		// if val < 0 {
-		// 	t.Errorf("generated value must be non-negative, got %v", val)
-		// }
+		if val < 0 {
+			t.Fatalf("generated value must be non-negative, got %v", val)
+		}
 		ds.AddValue(float64(val))
 	}
 

@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"constraints"
 	"math"
 	"math/rand"
 	"testing"
@@ -9,35 +10,26 @@ import (
 )
 
 func TestUniformInt(t *testing.T) {
-	const (
-		min, max = 150, 500
-		rang     = max - min
-	)
-
-	const mean = (rang / 2) + min
-
-	// For a uniformly distributed [0 n] range, standard deviation should be n/sqrt(12).
-	stddev := float64(rang) / math.Sqrt(12)
-
-	rng := rand.New(mt19937.New(0))
-	g := NewUniformtInt[uint16](min, max, rng)
-
-	checkUniformDistribution[uint16](t, g, mean, stddev)
+	testUniform[uint16](22, 122, t)
+	testUniform[float64](100, 222, t)
+	testUniform[uint32](22, 500, t)
+	testUniform[byte](0, 255, t)
+	testUniform[float64](100, 222, t)
+	testUniform[float32](100, 222, t)
+	testUniform[float32](0, math.MaxFloat32, t)
+	testUniform[float64](0, math.MaxFloat32, t)
 }
 
-func TestUniformAcrossZero(t *testing.T) {
-	const (
-		min, max = -150, 500
-		rang     = max - min
-	)
+func testUniform[T constraints.Unsigned | constraints.Float](min, max T, t *testing.T) {
+	diff := max - min
+	mean := (diff / 2) + min
 
-	const mean = (rang / 2) + min
-
-	// For a uniformly distributed [0 n] range, standard deviation should be n/sqrt(12).
-	stddev := float64(rang) / math.Sqrt(12)
+	// For a uniformly distributed [0 n] range, standard deviation should be
+	// n/sqrt(12).
+	stddev := float64(diff) / math.Sqrt(12)
 
 	rng := rand.New(mt19937.New(0))
-	g := NewUniformtInt[int16](min, max, rng)
+	g := Uniform(min, max, rng)
 
-	checkUniformDistribution[int16](t, g, mean, stddev)
+	checkUniformDistribution(t, g, float64(mean), stddev)
 }
