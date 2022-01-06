@@ -35,7 +35,7 @@ func TestCrossover_Apply(t *testing.T) {
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
 		pop := [][]byte{[]byte("abcde"), []byte("fghij"), []byte("klmno"), []byte("pqrst"), []byte("uvwxy")}
-		xover := New[[]byte](ByteSliceMater{})
+		xover := New[[]byte](SliceMater[byte]{})
 		xover.Points = generator.Const(0)
 		xover.Probability = generator.Const(1.0)
 
