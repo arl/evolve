@@ -8,7 +8,7 @@ import (
 
 func TestSwappable(t *testing.T) {
 	var v float64 = math.MaxFloat64
-	s := NewSwappable[float64](Const(v))
+	s := NewSwappable(Const(v))
 	if got := s.Next(); got != v {
 		t.Errorf("got %v, want %v", got, v)
 	}
@@ -23,7 +23,7 @@ func TestSwappable(t *testing.T) {
 func TestAtomicSwappable(t *testing.T) {
 	// To run with -test.race
 	var v float64 = math.MaxFloat64
-	s := NewAtomicSwappable[float64](Const(v))
+	s := NewAtomicSwappable(Const(v))
 	if got := s.Next(); got != v {
 		t.Errorf("got %v, want %v", got, v)
 	}
