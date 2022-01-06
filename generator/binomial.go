@@ -1,16 +1,17 @@
 package generator
 
 import (
+	"constraints"
 	"math/rand"
 
 	"github.com/arl/evolve/pkg/bitstring"
 )
 
 // Binomial generates of binomially-distributed, unsigned integers.
-type Binomial[U Unsigned] struct {
+type Binomial[U constraints.Unsigned] struct {
 	rng *rand.Rand
 
-	n UInt[U]
+	n Unsigned[U]
 	p Float
 
 	// Cache the fixed-point representation of p to avoid having to
@@ -26,7 +27,7 @@ type Binomial[U Unsigned] struct {
 // returned by the generator, the values it generates must be strictly positive.
 // prob generates the probability of success in any one trial, the values it
 // generates must be in the [0 1] range.
-func NewBinomial[U Unsigned](numTrials UInt[U], prob Float, rng *rand.Rand) *Binomial[U] {
+func NewBinomial[U constraints.Unsigned](numTrials Unsigned[U], prob Float, rng *rand.Rand) *Binomial[U] {
 	return &Binomial[U]{n: numTrials, p: prob, rng: rng}
 }
 

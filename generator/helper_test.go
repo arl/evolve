@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"constraints"
 	"math"
 	"testing"
 
@@ -25,7 +26,7 @@ func checkGaussianDistribution(t *testing.T, g Float, wantMean, wantStdDev float
 	assert.InEpsilon(t, wantStdDev, ds.SampleStandardDeviation(), ε, "observed standard deviation is outside of acceptable range")
 }
 
-func checkBinomialDistribution[T Number](t *testing.T, g Generator[T], n T, p float64) {
+func checkBinomialDistribution[T constraints.Integer | constraints.Float](t *testing.T, g Generator[T], n T, p float64) {
 	t.Helper()
 
 	const iterations = 10000
@@ -75,7 +76,7 @@ func checkExponentialDistribution(t *testing.T, g Float, rate float64) {
 		"observed median is outside of acceptable range")
 }
 
-func checkPoissonDistribution[U Unsigned](t *testing.T, g *Poisson[U], wantMean float64) {
+func checkPoissonDistribution[U constraints.Unsigned](t *testing.T, g *Poisson[U], wantMean float64) {
 	t.Helper()
 
 	const iterations = 10000
@@ -98,7 +99,7 @@ func checkPoissonDistribution[U Unsigned](t *testing.T, g *Poisson[U], wantMean 
 		"observed standard deviation is outside of acceptable range")
 }
 
-func checkUniformDistribution[T Number](t *testing.T, g Generator[T], wantMean, wantStddev float64) {
+func checkUniformDistribution[T constraints.Integer | constraints.Float](t *testing.T, g Generator[T], wantMean, wantStddev float64) {
 	t.Helper()
 
 	const iterations = 10000

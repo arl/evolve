@@ -1,17 +1,18 @@
 package generator
 
 import (
+	"constraints"
 	"math"
 	"math/rand"
 )
 
 // Poisson generates Poisson-distributed values.
-type Poisson[U Unsigned] struct {
+type Poisson[U constraints.Unsigned] struct {
 	rng  *rand.Rand
 	mean Float
 }
 
-func NewPoisson[U Unsigned](mean Float, rng *rand.Rand) *Poisson[U] {
+func NewPoisson[U constraints.Unsigned](mean Float, rng *rand.Rand) *Poisson[U] {
 	return &Poisson[U]{mean: mean, rng: rng}
 }
 

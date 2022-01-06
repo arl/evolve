@@ -1,17 +1,20 @@
 package generator
 
-import "math/rand"
+import (
+	"constraints"
+	"math/rand"
+)
 
 // An UniformInt generates a random sequence of discrete and uniformly
 // distributed integers.
-type UniformInt[T Signed | Unsigned] struct {
+type UniformInt[T constraints.Integer] struct {
 	rng       *rand.Rand
 	min, rang T
 }
 
 // NewUniformInt returns an UniformInt using rng to generator of integers
 // number generator of uniformly distributed integers.
-func NewUniformtInt[T Signed | Unsigned](min, max T, rng *rand.Rand) *UniformInt[T] {
+func NewUniformtInt[T constraints.Integer](min, max T, rng *rand.Rand) *UniformInt[T] {
 	if min > max {
 		panic("min > max")
 	}

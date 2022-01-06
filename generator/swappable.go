@@ -1,16 +1,17 @@
 package generator
 
 import (
+	"constraints"
 	"sync/atomic"
 )
 
 // A Swappable embeds a generator that can be swapped with another. Not safe for concurrent use.
-type Swappable[T Number] struct {
+type Swappable[T constraints.Integer | constraints.Float] struct {
 	g Generator[T]
 }
 
 // NewSwappable returns a new Swappable generator, initialized with g.
-func NewSwappable[T Number](g Generator[T]) *Swappable[T] {
+func NewSwappable[T constraints.Integer | constraints.Float](g Generator[T]) *Swappable[T] {
 	return &Swappable[T]{g: g}
 }
 
@@ -26,12 +27,12 @@ func (m *Swappable[T]) Next() T {
 
 // An AtomicSwappable embeds a generator that can be swapped with another,
 // atomically. This is the concurrent-safe counterpart of Swappable.
-type AtomicSwappable[T Number] struct {
+type AtomicSwappable[T constraints.Integer | constraints.Float] struct {
 	g atomic.Value
 }
 
 // NewAtomicSwappable returns a new AtomicSwappable generator, initialized with g.
-func NewAtomicSwappable[T Number](g Generator[T]) *AtomicSwappable[T] {
+func NewAtomicSwappable[T constraints.Integer | constraints.Float](g Generator[T]) *AtomicSwappable[T] {
 	var a AtomicSwappable[T]
 	a.g.Store(g)
 	return &a
