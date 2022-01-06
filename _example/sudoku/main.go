@@ -62,7 +62,7 @@ func solveSudoku(pattern []string) error {
 
 	mutation := &rowMutation{
 		Number: generator.NewPoisson[uint](generator.Const(2.0), rng),
-		Amount: generator.NewUniformtInt[uint](1, 8, rng),
+		Amount: generator.Uniform[uint](1, 8, rng),
 	}
 
 	pipeline := operator.Pipeline[*sudoku]{xover, mutation}
