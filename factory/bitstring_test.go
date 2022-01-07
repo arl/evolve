@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/bitstring"
 	"github.com/arl/evolve"
-	"github.com/arl/evolve/pkg/bitstring"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,8 +35,8 @@ func TestBitstring(t *testing.T) {
 
 	t.Run("seeded population", func(t *testing.T) {
 		f := Bitstring(length)
-		seed1, _ := bitstring.MakeFromString("1111100000")
-		seed2, _ := bitstring.MakeFromString("1010101010")
+		seed1, _ := bitstring.NewFromString("1111100000")
+		seed2, _ := bitstring.NewFromString("1010101010")
 		seeds := []*bitstring.Bitstring{seed1, seed2}
 		pop, err := evolve.SeedPopulation[*bitstring.Bitstring](f, popsize, seeds, rng)
 		if err != nil {

@@ -4,7 +4,7 @@ import (
 	"constraints"
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/bitstring"
+	"github.com/arl/bitstring"
 )
 
 // Binomial generates of binomially-distributed, unsigned integers.
@@ -47,7 +47,7 @@ func (g *Binomial[U]) Next() U {
 	for trials > 0 && pidx >= 0 {
 		successes := g.evenProbability(trials)
 		trials -= successes
-		if g.pBits.Bit(uint(pidx)) {
+		if g.pBits.Bit(pidx) {
 			totalSuccesses += successes
 		}
 		pidx--
@@ -59,7 +59,7 @@ func (g *Binomial[U]) Next() U {
 // generates a binomial with even probability (p=0.5). We simply generate n
 // random bits and count the 1's.
 func (g *Binomial[U]) evenProbability(n U) U {
-	bs := bitstring.Random(uint(n), g.rng)
+	bs := bitstring.Random(int(n), g.rng)
 	return U(bs.OnesCount())
 }
 
@@ -85,6 +85,6 @@ func floatToFixedBits(v float64) *bitstring.Bitstring {
 		i++
 	}
 
-	bs, _ := bitstring.MakeFromString(string(s[:i]))
+	bs, _ := bitstring.NewFromString(string(s[:i]))
 	return bs
 }

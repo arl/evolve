@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/arl/bitstring"
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/engine"
@@ -13,7 +14,6 @@ import (
 	"github.com/arl/evolve/operator"
 	"github.com/arl/evolve/operator/mutation"
 	"github.com/arl/evolve/operator/xover"
-	"github.com/arl/evolve/pkg/bitstring"
 	"github.com/arl/evolve/selection"
 )
 

@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/arl/bitstring"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/pkg/bitstring"
 )
 
 // Ensures that mutation occurs correctly. Because of the random aspect we can't
@@ -23,7 +23,7 @@ func TestBitstringMutationRandom(t *testing.T) {
 
 	mut := New[*bitstring.Bitstring](bs)
 
-	org, err := bitstring.MakeFromString("111100101")
+	org, err := bitstring.NewFromString("111100101")
 	assert.NoError(t, err)
 
 	pop := []*bitstring.Bitstring{org}
@@ -48,7 +48,7 @@ func TestBitstringMutationSingleBit(t *testing.T) {
 
 	mut := New[*bitstring.Bitstring](bs)
 
-	org, err := bitstring.MakeFromString("111100101")
+	org, err := bitstring.NewFromString("111100101")
 	assert.NoError(t, err)
 
 	pop := []*bitstring.Bitstring{org}

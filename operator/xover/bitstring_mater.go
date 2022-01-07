@@ -3,7 +3,7 @@ package xover
 import (
 	"math/rand"
 
-	"github.com/arl/evolve/pkg/bitstring"
+	"github.com/arl/bitstring"
 )
 
 // BitstringMater mates a pair of bit-strings to produce a new pair of
@@ -19,15 +19,15 @@ func (BitstringMater) Mate(p1, p2 *bitstring.Bitstring, nxpts int64, rng *rand.R
 	if p1.Len() != p2.Len() {
 		panic("Cannot mate parents of different lengths")
 	}
-	off1 := bitstring.Copy(p1)
-	off2 := bitstring.Copy(p2)
+	off1 := bitstring.Clone(p1)
+	off2 := bitstring.Clone(p2)
 
 	// Apply as many crossovers as required.
 	for i := int64(0); i < nxpts; i++ {
 		// Cross-over index is always greater than zero and less than the
 		// length of the parent so that we always pick a point that will
 		// result in a meaningful crossover.
-		bitstring.SwapRange(off1, off2, 0, uint(1+rng.Intn(p1.Len()-1)))
+		bitstring.SwapRange(off1, off2, 0, 1+rng.Intn(p1.Len()-1))
 	}
 	return []*bitstring.Bitstring{off1, off2}
 }

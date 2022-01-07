@@ -4,8 +4,8 @@ import (
 	"errors"
 	"math/rand"
 
+	"github.com/arl/bitstring"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/pkg/bitstring"
 )
 
 // ErrInvalidMutationCount is the error returned when trying to set an invalid
@@ -29,12 +29,12 @@ func (op *Bitstring) Mutate(bs *bitstring.Bitstring, rng *rand.Rand) *bitstring.
 	prob := op.Probability.Next()
 
 	if rng.Float64() < prob {
-		mutated := bitstring.Copy(bs)
+		mutated := bitstring.Clone(bs)
 
 		// Since there's a mutation to perform, find out how many bits to flip.
 		nmuts := op.FlipCount.Next()
 		for i := 0; i < nmuts; i++ {
-			mutated.FlipBit(uint(rng.Intn(mutated.Len())))
+			mutated.FlipBit(rng.Intn(mutated.Len()))
 		}
 
 		return mutated

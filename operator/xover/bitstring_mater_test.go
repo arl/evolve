@@ -4,10 +4,10 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/bitstring"
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/pkg/bitstring"
 
 	"github.com/stretchr/testify/assert"
 )

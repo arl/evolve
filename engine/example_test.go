@@ -1,10 +1,9 @@
 package engine
 
 import (
+	"github.com/arl/bitstring"
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/factory"
-
-	"github.com/arl/evolve/pkg/bitstring"
 )
 
 // Create an engine evolving bit strings, in which the generator simply counts
