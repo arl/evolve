@@ -48,12 +48,7 @@ func NewSigmaScaling[T any](selector evolve.Selection[T]) *SigmaScaling[T] {
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
-func (sel *SigmaScaling[T]) Select(
-	pop evolve.Population[T],
-	natural bool,
-	size int,
-	rng *rand.Rand) []T {
-
+func (sel *SigmaScaling[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
 	stats := evolve.NewDataset(len(pop))
 	for _, cand := range pop {
 		stats.AddValue(cand.Fitness)

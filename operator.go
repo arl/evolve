@@ -15,7 +15,6 @@ import (
 // candidate objects. However, an operator is not required to create copies of
 // unmodified individuals, they may be returned directly.
 type Operator[T any] interface {
-
 	// Apply applies the operation to each entry in the list of selected
 	// candidates.
 	//

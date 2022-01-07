@@ -16,8 +16,8 @@ func TestPMX(t *testing.T) {
 	xover.Probability = generator.Const(1.0)
 
 	pop := [][]int{
-		[]int{1, 2, 3, 4, 5, 6, 7, 8},
-		[]int{3, 7, 5, 1, 6, 8, 2, 4},
+		{1, 2, 3, 4, 5, 6, 7, 8},
+		{3, 7, 5, 1, 6, 8, 2, 4},
 	}
 
 	// Perform multiple crossovers to check different crossover points.

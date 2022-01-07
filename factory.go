@@ -14,7 +14,6 @@ var ErrTooManySeedCandidates = errors.New("too many seed candidates for populati
 // It is used by evolution engine to increase genetic diversity and/or add new
 // candidates to a population.
 type Factory[T any] interface {
-
 	// New returns a new random candidate, using the provided pseudo-random
 	// number generator.
 	New(*rand.Rand) T

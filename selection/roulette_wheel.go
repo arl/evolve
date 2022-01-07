@@ -28,12 +28,7 @@ type RouletteWheel[T any] struct{}
 // naturalFitnessScores should be true if higher fitness scores indicate fitter
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
-func (RouletteWheel[T]) Select(
-	pop evolve.Population[T],
-	natural bool,
-	size int,
-	rng *rand.Rand) []T {
-
+func (RouletteWheel[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
 	// Record the cumulative fitness scores. It doesn't matter whether the
 	// population is sorted or not. We will use these cumulative scores to
 	// work out an index into the population. The cumulative array itself is

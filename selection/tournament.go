@@ -67,12 +67,7 @@ func (ts *Tournament[T]) SetProbRange(min, max float64) error {
 }
 
 // Select selects the specified number of candidates from the population.
-func (ts *Tournament[T]) Select(
-	pop evolve.Population[T],
-	natural bool,
-	size int,
-	rng *rand.Rand) []T {
-
+func (ts *Tournament[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
 	sel := make([]T, size)
 	for i := 0; i < size; i++ {
 		// Pick two candidates at random.

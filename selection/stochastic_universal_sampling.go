@@ -29,12 +29,7 @@ type StochasticUniversalSampling[T any] struct{}
 //
 // Returns a slice containing the selected candidates. Some individual
 // candidates may potentially have been selected multiple times.
-func (StochasticUniversalSampling[T]) Select(
-	pop evolve.Population[T],
-	natural bool,
-	size int,
-	rng *rand.Rand) []T {
-
+func (StochasticUniversalSampling[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
 	// Calculate the sum of all fitness values.
 	var sum float64
 	for _, cand := range pop {

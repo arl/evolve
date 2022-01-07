@@ -30,12 +30,7 @@ type RankBased[T any] struct {
 // potentially be selected more than once).
 //
 // Returns the selected candidates.
-func (rb RankBased[T]) Select(
-	pop evolve.Population[T],
-	natural bool,
-	size int,
-	rng *rand.Rand) []T {
-
+func (rb RankBased[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
 	ranked := make(evolve.Population[T], len(pop))
 	for i, cand := range pop {
 		ranked[i] = &evolve.Individual[T]{

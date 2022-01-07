@@ -6,7 +6,6 @@ package evolve
 // Fitness evaluations may be executed concurrently and therefore any concurrent
 // access to a shared state should be properly synchronized.
 type Evaluator[T any] interface {
-
 	// Fitness calculates a fitness score for the given candidate.
 	//
 	// Whether a higher score indicates a fitter candidate or not depends on

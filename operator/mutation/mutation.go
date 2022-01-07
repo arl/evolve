@@ -30,7 +30,6 @@ func (op *Mutation[T]) Apply(population []T, rng *rand.Rand) []T {
 
 // A Mutater mutates individuals.
 type Mutater[T any] interface {
-
 	// Mutate performs mutation on an individual.
 	//
 	// The original individual must be let untouched while the mutant is

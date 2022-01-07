@@ -6,7 +6,6 @@ import (
 
 // Epocher is the interface implemented by objects having an Epoch method.
 type Epocher[T any] interface {
-
 	// Epoch performs one epoch (i.e generation) of the evolutionary process.
 	//
 	// It takes as argument the population to evolve in that step, the elitism

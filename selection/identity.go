@@ -10,12 +10,7 @@ import (
 type Identity[T any] struct{}
 
 // Select selects the specified number of candidates from the population.
-func (Identity[T]) Select(
-	pop evolve.Population[T],
-	natural bool,
-	size int,
-	rng *rand.Rand) []T {
-
+func (Identity[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
 	sel := make([]T, size)
 	for i := 0; i < size; i++ {
 		sel[i] = pop[i].Candidate
