@@ -15,7 +15,7 @@ type Mater[T any] interface {
 	// parent1 and parent2 are the two individuals that provides the source
 	// material for generating offspring.
 	// TODO: should return 2 values of a slice of 2 values
-	Mate(parent1, parent2 T, nxpts int64, rng *rand.Rand) []T
+	Mate(parent1, parent2 T, nxpts int, rng *rand.Rand) []T
 }
 
 // Crossover implements a standard crossover operator.
@@ -77,7 +77,7 @@ func (op *Crossover[T]) Apply(sel []T, rng *rand.Rand) []T {
 				npts = int(op.Points.Next())
 			}
 			if npts > 0 {
-				res = append(res, op.Mate(p1, p2, int64(npts), rng)...)
+				res = append(res, op.Mate(p1, p2, npts, rng)...)
 			} else {
 				// If there is no crossover to perform, just add the parents to the
 				// results unaltered.

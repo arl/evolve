@@ -14,7 +14,7 @@ type PMX[T comparable] struct{}
 //
 // parent1 and parent2 are the two individuals that provides the source
 // material for generating offspring.
-func (p PMX[T]) Mate(p1, p2 []T, nxpts int64, rng *rand.Rand) [][]T {
+func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) [][]T {
 	if nxpts != 2 {
 		panic("PMX is only defined for 2 cut points")
 	}
@@ -30,10 +30,7 @@ func (p PMX[T]) Mate(p1, p2 []T, nxpts int64, rng *rand.Rand) [][]T {
 	copy(offsp1, p1)
 	copy(offsp2, p2)
 
-	pt1 := rng.Intn(plen)
-	pt2 := rng.Intn(plen)
-
-	//
+	pt1, pt2 := rng.Intn(plen), rng.Intn(plen)
 	length := pt2 - pt1
 	if length < 0 {
 		length += len(p1)

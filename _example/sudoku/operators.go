@@ -12,13 +12,13 @@ import (
 type mater struct{}
 
 // sudokuMater applies crossover vertically on sudoku puzzles square grids
-func (m mater) Mate(p1, p2 *sudoku, nxpts int64, rng *rand.Rand) []*sudoku {
+func (m mater) Mate(p1, p2 *sudoku, nxpts int, rng *rand.Rand) []*sudoku {
 	var off1, off2 sudoku
 	copy(off1[:], p1[:])
 	copy(off2[:], p2[:])
 
 	// Apply as many cross-overs as required.
-	for i := int64(0); i < nxpts; i++ {
+	for i := 0; i < nxpts; i++ {
 		// Cross-over index is always greater than zero and less than the length
 		// of the parent so that we always pick a point that will result in a
 		// meaningful cross-over.
