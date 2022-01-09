@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Individual associates a candidate solution with its fitness score.
+// Individual associates a candidate solution and its fitness score.
 type Individual[T any] struct {
 	Candidate T
 	Fitness   float64

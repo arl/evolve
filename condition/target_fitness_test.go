@@ -13,12 +13,12 @@ func TestTargetFitness(t *testing.T) {
 		cond := TargetFitness[any]{Fitness: 10.0, Natural: true}
 		stats := &evolve.PopulationStats[any]{Natural: true}
 
-		stats.BestFitness = 5.0
+		stats.Best.Fitness = 5.0
 		if cond.IsSatisfied(stats) {
 			t.Errorf("should not terminate before target fitness has been reached")
 		}
 
-		stats.BestFitness = 10.0
+		stats.Best.Fitness = 10.0
 		if !cond.IsSatisfied(stats) {
 			t.Errorf("should terminate once target fitness has been reached")
 		}
@@ -28,12 +28,12 @@ func TestTargetFitness(t *testing.T) {
 		cond := TargetFitness[any]{Fitness: 1.0, Natural: false}
 		stats := &evolve.PopulationStats[any]{Natural: false}
 
-		stats.BestFitness = 5.0
+		stats.Best.Fitness = 5.0
 		if cond.IsSatisfied(stats) {
 			t.Errorf("should not terminate before target fitness has been reached")
 		}
 
-		stats.BestFitness = 1.0
+		stats.Best.Fitness = 1.0
 		if !cond.IsSatisfied(stats) {
 			t.Errorf("should terminate once target fitness has been reached")
 		}

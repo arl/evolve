@@ -125,14 +125,16 @@ func (e *Engine[T]) updateStats(pop evolve.Population[T], ngen int, elapsed time
 
 	// Notify observers with the population state
 	stats := evolve.PopulationStats[T]{
-		BestCand:    pop[0].Candidate,
-		BestFitness: pop[0].Fitness,
-		Mean:        e.stats.ArithmeticMean(),
-		StdDev:      e.stats.StandardDeviation(),
-		Natural:     e.Evaluator.IsNatural(),
-		Size:        e.stats.Len(),
-		GenNumber:   ngen,
-		Elapsed:     elapsed,
+		Best: evolve.Individual[T]{
+			Candidate: pop[0].Candidate,
+			Fitness:   pop[0].Fitness,
+		},
+		Mean:       e.stats.ArithmeticMean(),
+		StdDev:     e.stats.StandardDeviation(),
+		Natural:    e.Evaluator.IsNatural(),
+		Size:       e.stats.Len(),
+		Generation: ngen,
+		Elapsed:    elapsed,
 	}
 
 	for _, o := range e.Observers {

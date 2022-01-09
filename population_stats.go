@@ -5,14 +5,8 @@ import "time"
 // PopulationStats contains statistics about the state of an evolved population
 // and a reference to the fittest candidate solution in the population.
 type PopulationStats[T any] struct {
-	// BestCandidate is the fittest candidate present in the population.
-	// TODO: rename into Best (or: why not having an evluated candidate here, so
-	// we would have the best candidate ANd their fitness)
-	BestCand T
-
-	// BestFitness is the fitness score for the fittest candidate in the
-	// population.
-	BestFitness float64
+	// Best is the fittest individual of the population.
+	Best Individual[T]
 
 	// Mean is the arithmetic mean of fitness scores for each member of
 	// the population.
@@ -30,9 +24,8 @@ type PopulationStats[T any] struct {
 	// NumElites is the number of candidates preserved via elitism.
 	NumElites int
 
-	// GenNumber is the (zero-based) number of the last generation that was
-	// processed.
-	GenNumber int
+	// Generation is the 0-based index of the generation that was processed.
+	Generation int
 
 	// Elapsed is the duration elapsed since the evolution start.
 	Elapsed time.Duration

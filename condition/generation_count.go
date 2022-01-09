@@ -13,7 +13,7 @@ type GenerationCount[T any] int
 // IsSatisfied reports whether or not evolution
 // should finish at the current point.
 func (n GenerationCount[T]) IsSatisfied(stats *evolve.PopulationStats[T]) bool {
-	return stats.GenNumber+1 >= int(n)
+	return stats.Generation+1 >= int(n)
 }
 
 // String returns a string representation of this condition.

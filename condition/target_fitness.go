@@ -17,9 +17,9 @@ type TargetFitness[T any] struct {
 // score has been reached or exceeded.
 func (tf TargetFitness[T]) IsSatisfied(stats *evolve.PopulationStats[T]) bool {
 	if tf.Natural {
-		return stats.BestFitness >= tf.Fitness
+		return stats.Best.Fitness >= tf.Fitness
 	}
-	return stats.BestFitness <= tf.Fitness
+	return stats.Best.Fitness <= tf.Fitness
 }
 
 // String returns a string representation of this condition.

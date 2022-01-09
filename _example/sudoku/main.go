@@ -98,11 +98,10 @@ func solveSudoku(pattern []string) error {
 
 	eng.AddObserver(engine.ObserverFunc(func(stats *evolve.PopulationStats[*sudoku]) {
 		// Only shows multiple of 100 generations
-		if stats.GenNumber%100 == 0 {
+		if stats.Generation%100 == 0 {
 			return
 		}
-		log.Printf("Gen %d, best solution has a fitness of %v\n%v\n",
-			stats.GenNumber, stats.BestFitness, stats.BestCand)
+		log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best.Candidate, stats.Best.Fitness)
 	}))
 
 	bests, _, err := eng.Evolve(popsize)
