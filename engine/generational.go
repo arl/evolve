@@ -2,6 +2,7 @@ package engine
 
 import (
 	"math/rand"
+	"runtime"
 
 	"github.com/arl/evolve"
 )
@@ -23,6 +24,11 @@ type Generational[T any] struct {
 	// This value must be non-negative and less than the population size or
 	// Evolve will return en error
 	Elites int
+
+	// Number of concurrent processes to use (defaults to the number of cores).
+	Concurrency int
+
+	init bool
 }
 
 // Epoch performs a single step/iteration of the evolutionary process.
@@ -32,6 +38,13 @@ type Generational[T any] struct {
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
 func (e *Generational[T]) Epoch(pop evolve.Population[T], rng *rand.Rand) evolve.Population[T] {
+	if !e.init {
+		if e.Concurrency == 0 {
+			e.Concurrency = runtime.NumCPU()
+		}
+		e.init = true
+	}
+
 	nextpop := make([]T, 0, len(pop))
 
 	// Perform elitism: straightforward copy the n fittest candidates into the
@@ -49,5 +62,5 @@ func (e *Generational[T]) Epoch(pop evolve.Population[T], rng *rand.Rand) evolve
 
 	// While the elites, if any, are added, untouched, to the next population.
 	nextpop = append(nextpop, elite...)
-	return evolve.EvaluatePopulation(nextpop, e.Evaluator, true)
+	return evolve.EvaluatePopulation(nextpop, e.Evaluator, e.Concurrency)
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"runtime"
 	"sort"
 	"time"
 
@@ -34,7 +35,11 @@ type Engine[T any] struct {
 
 	// RNG is the source of randomness of the engine. If nil, it's set to a
 	// mt19937 pseudo random number generator.
-	RNG   *rand.Rand
+	RNG *rand.Rand
+
+	// Number of concurrent processes to use (defaults to the number of cores).
+	Concurrency int
+
 	stats *evolve.Dataset
 }
 
@@ -71,6 +76,10 @@ func (e *Engine[T]) Evolve(popsize int) (evolve.Population[T], []evolve.Conditio
 		return nil, nil, errors.New("no termination condition specified")
 	}
 
+	if e.Concurrency == 0 {
+		e.Concurrency = runtime.NumCPU()
+	}
+
 	if e.RNG == nil {
 		seed := time.Now().UnixNano()
 		e.RNG = rand.New(mt19937.New(seed))
@@ -90,7 +99,7 @@ func (e *Engine[T]) Evolve(popsize int) (evolve.Population[T], []evolve.Conditio
 	var satisfied []evolve.Condition[T]
 
 	// Evaluate initial population fitness
-	evpop := evolve.EvaluatePopulation(pop, e.Evaluator, true)
+	evpop := evolve.EvaluatePopulation(pop, e.Evaluator, e.Concurrency)
 
 	for {
 		// Sort population according to fitness.
