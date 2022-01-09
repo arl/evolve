@@ -50,10 +50,10 @@ func main() {
 		})
 
 	epocher := engine.Generational[*bitstring.Bitstring]{
-		Op:     operator.Pipeline[*bitstring.Bitstring]{xover, mut},
-		Eval:   eval,
-		Sel:    selection.RouletteWheel[*bitstring.Bitstring]{},
-		Elites: 2, // best 2 candidates gets copied to the next generation, no matter what.
+		Operator:  operator.Pipeline[*bitstring.Bitstring]{xover, mut},
+		Evaluator: eval,
+		Selection: selection.RouletteWheel[*bitstring.Bitstring]{},
+		Elites:    2, // best 2 candidates gets copied to the next generation, no matter what.
 	}
 
 	// bitstring.Random(length uint, rng *rand.Rand)

@@ -50,10 +50,10 @@ func TestGenerationalEngineElitism(t *testing.T) {
 		Factory:   zeroFactory,
 		Evaluator: intEvaluator{},
 		Epocher: &Generational[int]{
-			Op:     zeroIntMaker{},
-			Eval:   intEvaluator{},
-			Sel:    selection.RouletteWheel[int]{},
-			Elites: 2,
+			Operator:  zeroIntMaker{},
+			Evaluator: intEvaluator{},
+			Selection: selection.RouletteWheel[int]{},
+			Elites:    2,
 		},
 		// Seed candidates, all better than any others that can possibly get
 		// into the population (since every other candidate will always be
@@ -88,9 +88,9 @@ func TestGenerationalEngineSatisfiedConditions(t *testing.T) {
 		Factory:   zeroFactory,
 		Evaluator: intEvaluator{},
 		Epocher: &Generational[int]{
-			Op:   zeroIntMaker{},
-			Eval: intEvaluator{},
-			Sel:  selection.RouletteWheel[int]{},
+			Operator:  zeroIntMaker{},
+			Evaluator: intEvaluator{},
+			Selection: selection.RouletteWheel[int]{},
 		},
 		EndConditions: []evolve.Condition[int]{
 			condition.GenerationCount[int](1),
@@ -128,20 +128,21 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	checkB(b, err)
 
 	eng := Engine[string]{
+
 		Factory:   factory,
 		Evaluator: evaluator(target),
 		Epocher: &Generational[string]{
 			// Create a operator pipeline that first apply a string muration then a crossover.
-			Op: operator.Pipeline[string]{
+			Operator: operator.Pipeline[string]{
 				mutation.New[string](&mutation.String{
 					Alphabet:    alphabet,
 					Probability: generator.Const(0.02),
 				}),
 				xover.New[string](xover.StringMater{}),
 			},
-			Eval:   evaluator(target),
-			Sel:    selection.RouletteWheel[string]{},
-			Elites: 5,
+			Evaluator: evaluator(target),
+			Selection: selection.RouletteWheel[string]{},
+			Elites:    5,
 		},
 		EndConditions: []evolve.Condition[string]{
 			condition.TargetFitness[string]{Fitness: 0, Natural: false},

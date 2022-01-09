@@ -79,10 +79,10 @@ func solveSudoku(pattern []string) error {
 	check(err)
 
 	epocher := engine.Generational[*sudoku]{
-		Op:     pipeline,
-		Eval:   evaluator{},
-		Sel:    selector,
-		Elites: nelites,
+		Operator:  pipeline,
+		Evaluator: evaluator{},
+		Selection: selector,
+		Elites:    nelites,
 	}
 
 	eng := &engine.Engine[*sudoku]{

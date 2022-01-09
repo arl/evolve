@@ -78,10 +78,10 @@ func main() {
 	pipeline := operator.Pipeline[string]{mutation, xover}
 
 	generational := &engine.Generational[string]{
-		Op:     pipeline,
-		Eval:   evaluator,
-		Sel:    selection.RouletteWheel[string]{},
-		Elites: 5,
+		Operator:  pipeline,
+		Evaluator: evaluator,
+		Selection: selection.RouletteWheel[string]{},
+		Elites:    5,
 	}
 
 	// Define the components of our engine
