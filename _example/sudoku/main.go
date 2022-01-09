@@ -52,6 +52,11 @@ func readPattern(r io.Reader) ([]string, error) {
 }
 
 func solveSudoku(pattern []string) error {
+	const (
+		popsize = 500
+		nelites = 500 * 0.05
+	)
+
 	// Crossover rows between parents (so offspring is x rows from parent1 and y
 	// rows from parent2).
 	xover := xover.New[*sudoku](mater{})
@@ -70,39 +75,37 @@ func solveSudoku(pattern []string) error {
 	selector := selection.NewTournament[*sudoku]()
 	check(selector.SetProb(0.85))
 
-	obs := engine.ObserverFunc(func(stats *evolve.PopulationStats[*sudoku]) {
+	fac, err := newFactory(pattern)
+	check(err)
+
+	epocher := engine.Generational[*sudoku]{
+		Op:     pipeline,
+		Eval:   evaluator{},
+		Sel:    selector,
+		Elites: nelites,
+	}
+
+	eng := &engine.Engine[*sudoku]{
+		Factory:   fac,
+		Evaluator: evaluator{},
+		Epocher:   &epocher,
+		RNG:       rng,
+		EndConditions: []evolve.Condition[*sudoku]{
+			condition.TargetFitness[*sudoku]{Fitness: 0, Natural: false},
+			condition.NewUserAbort[*sudoku](),
+		},
+	}
+
+	eng.AddObserver(engine.ObserverFunc(func(stats *evolve.PopulationStats[*sudoku]) {
 		// Only shows multiple of 100 generations
 		if stats.GenNumber%100 == 0 {
 			return
 		}
 		log.Printf("Gen %d, best solution has a fitness of %v\n%v\n",
 			stats.GenNumber, stats.BestFitness, stats.BestCand)
-	})
+	}))
 
-	gen, err := newFactory(pattern)
-	check(err)
-
-	epocher := engine.Generational[*sudoku]{Op: pipeline, Eval: evaluator{}, Sel: selector}
-
-	eng, err := engine.New[*sudoku](
-		gen,
-		evaluator{},
-		&epocher,
-		engine.Observe(obs),
-		engine.Rand[*sudoku](rng),
-	)
-	check(err)
-
-	const (
-		popsize = 500
-		nelites = 500 * 0.05
-	)
-	bests, _, err := eng.Evolve(
-		popsize,
-		engine.Elites[*sudoku](nelites),
-		engine.EndOn[*sudoku](condition.TargetFitness[*sudoku]{Fitness: 0, Natural: false}),
-		engine.EndOn[*sudoku](condition.NewUserAbort[*sudoku]()),
-	)
+	bests, _, err := eng.Evolve(popsize)
 	check(err)
 
 	log.Printf("Sudoku solution:\n%v\n", bests[0].Candidate)

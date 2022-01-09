@@ -50,18 +50,27 @@ func main() {
 		})
 
 	epocher := engine.Generational[*bitstring.Bitstring]{
-		Op:   operator.Pipeline[*bitstring.Bitstring]{xover, mut},
-		Eval: eval,
-		Sel:  selection.RouletteWheel[*bitstring.Bitstring]{},
+		Op:     operator.Pipeline[*bitstring.Bitstring]{xover, mut},
+		Eval:   eval,
+		Sel:    selection.RouletteWheel[*bitstring.Bitstring]{},
+		Elites: 2, // best 2 candidates gets copied to the next generation, no matter what.
 	}
 
 	// bitstring.Random(length uint, rng *rand.Rand)
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	fac := func(*rand.Rand) *bitstring.Bitstring {
+	factory := evolve.FactoryFunc[*bitstring.Bitstring](func(*rand.Rand) *bitstring.Bitstring {
 		return bitstring.Random(nbits, rng)
+	})
+
+	eng := &engine.Engine[*bitstring.Bitstring]{
+		Factory:   factory,
+		Evaluator: eval,
+		Epocher:   &epocher,
+		EndConditions: []evolve.Condition[*bitstring.Bitstring]{condition.TargetFitness[*bitstring.Bitstring]{
+			Fitness: float64(nbits),
+			Natural: true,
+		}},
 	}
-	eng, err := engine.New[*bitstring.Bitstring](evolve.FactoryFunc[*bitstring.Bitstring](fac), eval, &epocher)
-	check(err)
 
 	eng.AddObserver(
 		engine.ObserverFunc(func(stats *evolve.PopulationStats[*bitstring.Bitstring]) {
@@ -71,14 +80,7 @@ func main() {
 				stats.BestFitness)
 		}))
 
-	bests, _, err := eng.Evolve(
-		100,                                    // 100 candidates in the population
-		engine.Elites[*bitstring.Bitstring](2), // best 2 are put into next population
-		engine.EndOn[*bitstring.Bitstring](condition.TargetFitness[*bitstring.Bitstring]{
-			Fitness: float64(nbits),
-			Natural: true,
-		}),
-	)
+	bests, _, err := eng.Evolve(100)
 	check(err)
 	fmt.Println(bests[0])
 }

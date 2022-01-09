@@ -40,10 +40,20 @@ func main() {
 		}
 	}
 
+	// Our factory generates random strings that have the same length as the
+	// target string.
+	factory := func(rng *rand.Rand) string {
+		b := make([]byte, len(target))
+		for i := 0; i < len(target); i++ {
+			b[i] = alphabet[rng.Intn(len(target))]
+		}
+		return string(b)
+	}
+
+	// Our candidate evaluator assigns one "fitness point" for every character
+	// in the candidate string that doesn't match the corresponding position in
+	// the target string.
 	evaluator := evolve.EvaluatorFunc[string](false, func(cand string, _ []string) float64 {
-		// Assigns one "fitness point" for every character in the candidate
-		// string that doesn't match the corresponding position in the
-		// target string.
 		var n int
 		for i := range cand {
 			if cand[i] != target[i] {
@@ -67,24 +77,24 @@ func main() {
 	// to each candidate a string mutation followed by a crossover
 	pipeline := operator.Pipeline[string]{mutation, xover}
 
-	// This evaluator assigns one "fitness point" for every character in the
-	// The epocher is generational evolutionary engine.
-	epocher := engine.Generational[string]{
-		Op:   pipeline,
-		Eval: evaluator,
-		Sel:  selection.RouletteWheel[string]{},
+	generational := &engine.Generational[string]{
+		Op:     pipeline,
+		Eval:   evaluator,
+		Sel:    selection.RouletteWheel[string]{},
+		Elites: 5,
 	}
 
-	nchars := len(target)
 	// Define the components of our engine
-	eng, err := engine.New[string](evolve.FactoryFunc[string](func(rng *rand.Rand) string {
-		b := make([]byte, nchars)
-		for i := 0; i < nchars; i++ {
-			b[i] = alphabet[rng.Int31n(int32(nchars))]
-		}
-		return string(b)
-	}), evaluator, &epocher)
-	check(err)
+	eng := engine.Engine[string]{
+		Factory:   evolve.FactoryFunc[string](factory),
+		Evaluator: evaluator,
+		Epocher:   generational,
+		EndConditions: []evolve.Condition[string]{
+			// Evolution terminates when a candidate reach fitness 0 (0 chars
+			// are different from the target string).
+			condition.TargetFitness[string]{Fitness: 0, Natural: false},
+		},
+	}
 
 	// Define an observer
 	eng.AddObserver(
@@ -95,16 +105,8 @@ func main() {
 				stats.BestFitness)
 		}))
 
-	// Evolution should end when a candidate with a fitness of 0 has been
-	// reached (0 different chars between candidate and target string)
-	cond := engine.EndOn[string](condition.TargetFitness[string]{Fitness: 0, Natural: false})
-
 	// Start evolution engine and print the best result
-	bests, _, err := eng.Evolve(
-		100,                      // population zize
-		engine.Elites[string](5), // number of elites, if any
-		cond,
-	)
+	bests, _, err := eng.Evolve(100)
 	check(err)
 	log.Println(bests[0])
 }

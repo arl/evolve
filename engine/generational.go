@@ -24,35 +24,35 @@ import (
 // there are no restrictions on concurrency, applications should enable
 // multi-threading for improved performance.
 type Generational[T any] struct {
-	Op   evolve.Operator[T]
-	Eval evolve.Evaluator[T]
-	Sel  evolve.Selection[T]
+	Op     evolve.Operator[T]
+	Eval   evolve.Evaluator[T]
+	Sel    evolve.Selection[T]
+	Elites int // Enable elitism
 }
 
 // Epoch performs a single step/iteration of the evolutionary process.
 //
-// pop is the population at the beginning of the process.
-// nelites is the number of the fittest individuals that must be preserved.
+// pop is the population to evolve, sorted by fitness, the fittest first.
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *Generational[T]) Epoch(pop evolve.Population[T], nelites int, rng *rand.Rand) evolve.Population[T] {
+func (e *Generational[T]) Epoch(pop evolve.Population[T], rng *rand.Rand) evolve.Population[T] {
 	nextpop := make([]T, 0, len(pop))
 
 	// Perform elitism: straightforward copy the n fittest candidates into the
 	// next generation, without any kind of selection.
-	elite := make([]T, nelites)
-	for i := 0; i < nelites; i++ {
+	elite := make([]T, e.Elites)
+	for i := 0; i < e.Elites; i++ {
 		elite[i] = pop[i].Candidate
 	}
 
-	// Select the rest of population through natural selection
-	selected := e.Sel.Select(pop, e.Eval.IsNatural(), len(pop)-nelites, rng)
+	// Select the rest of population through natural selection.
+	selected := e.Sel.Select(pop, e.Eval.IsNatural(), len(pop)-e.Elites, rng)
 
-	// Apply genetic operators on the selected candidates
+	// Apply genetic operators on the selected candidates.
 	nextpop = e.Op.Apply(append(nextpop, selected...), rng)
 
-	// While the elite is added, untouched, to the next population
+	// While the elites, if any, are added, untouched, to the next population.
 	nextpop = append(nextpop, elite...)
 	return evolve.EvaluatePopulation(nextpop, e.Eval, true)
 }
