@@ -54,7 +54,7 @@ func readPattern(r io.Reader) ([]string, error) {
 func solveSudoku(pattern []string) error {
 	const (
 		popsize = 500
-		nelites = 500 * 0.05
+		nelites = 25
 	)
 
 	// Crossover rows between parents (so offspring is x rows from parent1 and y
