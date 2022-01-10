@@ -72,8 +72,7 @@ func solveSudoku(pattern []string) error {
 
 	pipeline := operator.Pipeline[*sudoku]{xover, mutation}
 
-	selector := selection.NewTournament[*sudoku]()
-	check(selector.SetProb(0.85))
+	selector := &selection.Tournament[*sudoku]{Probability: generator.Const(0.85)}
 
 	fac, err := newFactory(pattern)
 	check(err)

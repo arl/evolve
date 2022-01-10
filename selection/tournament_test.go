@@ -3,6 +3,8 @@ package selection
 import (
 	"fmt"
 	"testing"
+
+	"github.com/arl/evolve/generator"
 )
 
 func TestTournamentSelection(t *testing.T) {
@@ -15,8 +17,7 @@ func TestTournamentSelection(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ts := NewTournament[string]()
-			errcheck(t, ts.SetProb(0.7))
+			ts := &Tournament[string]{Probability: generator.Const(0.7)}
 			testRandomBasedSelection(t, ts, randomBasedPopNonNatural, tt.natural, 2,
 				func(selected []string) error {
 					if len(selected) != 2 {
@@ -25,16 +26,5 @@ func TestTournamentSelection(t *testing.T) {
 					return nil
 				})
 		})
-	}
-}
-
-func TestTournamentSelectionSetProb(t *testing.T) {
-	err := NewTournament[string]().SetProb(0.5)
-	if err != ErrInvalidTournamentProb {
-		t.Errorf("want ts.SetProb(0.5) = ErrInvalidTournamentProb, got %v", err)
-	}
-	err = NewTournament[string]().SetProbRange(0.4, 0.6)
-	if err != ErrInvalidTournamentProb {
-		t.Errorf("want ts.SetProb(0.4, 0.6) = ErrInvalidTournamentProb, got %v", err)
 	}
 }
