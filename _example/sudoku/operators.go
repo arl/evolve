@@ -12,7 +12,7 @@ import (
 type mater struct{}
 
 // sudokuMater applies crossover vertically on sudoku puzzles square grids
-func (m mater) Mate(p1, p2 *sudoku, nxpts int, rng *rand.Rand) []*sudoku {
+func (m mater) Mate(p1, p2 *sudoku, nxpts int, rng *rand.Rand) (*sudoku, *sudoku) {
 	var off1, off2 sudoku
 	copy(off1[:], p1[:])
 	copy(off2[:], p2[:])
@@ -28,7 +28,7 @@ func (m mater) Mate(p1, p2 *sudoku, nxpts int, rng *rand.Rand) []*sudoku {
 		}
 	}
 
-	return []*sudoku{&off1, &off2}
+	return &off1, &off2
 }
 
 // rowMutation rows in a potential Sudoku solution by manipulating the order of

@@ -6,13 +6,13 @@ import "math/rand"
 type SliceMater[T any] struct{}
 
 // Mate performs crossover on a pair of parents to generate a pair of offspring.
-func (m SliceMater[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) [][]T {
+func (m SliceMater[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 	if len(p1) != len(p2) {
 		panic("SliceMater only mates slices of the same length")
 	}
 
-	off1 := make([]T, len(p1))
-	off2 := make([]T, len(p2))
+	off1 = make([]T, len(p1))
+	off2 = make([]T, len(p2))
 	copy(off1, p1)
 	copy(off2, p2)
 
@@ -27,5 +27,6 @@ func (m SliceMater[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) [][]T {
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return [][]T{off1, off2}
+
+	return
 }

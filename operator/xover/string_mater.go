@@ -8,7 +8,7 @@ type StringMater struct{}
 // Mate performs crossover on a pair of parents to generate a pair of
 // offspring.
 // TODO: benchmark this and compare with []slice (using strings is probably allocating way more given their immutability)
-func (m StringMater) Mate(p1, p2 string, nxpts int, rng *rand.Rand) []string {
+func (m StringMater) Mate(p1, p2 string, nxpts int, rng *rand.Rand) (string, string) {
 	if len(p1) != len(p2) {
 		panic("StringMater only mates string having the same length")
 	}
@@ -26,5 +26,5 @@ func (m StringMater) Mate(p1, p2 string, nxpts int, rng *rand.Rand) []string {
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-	return []string{string(off1), string(off2)}
+	return string(off1), string(off2)
 }

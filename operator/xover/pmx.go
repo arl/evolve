@@ -14,7 +14,7 @@ type PMX[T comparable] struct{}
 //
 // parent1 and parent2 are the two individuals that provides the source
 // material for generating offspring.
-func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) [][]T {
+func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 	if nxpts != 2 {
 		panic("PMX is only defined for 2 cut points")
 	}
@@ -25,10 +25,10 @@ func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) [][]T {
 
 	plen := len(p1)
 
-	offsp1 := make([]T, plen)
-	offsp2 := make([]T, plen)
-	copy(offsp1, p1)
-	copy(offsp2, p2)
+	off1 = make([]T, plen)
+	off2 = make([]T, plen)
+	copy(off1, p1)
+	copy(off2, p2)
 
 	pt1, pt2 := rng.Intn(plen), rng.Intn(plen)
 	length := pt2 - pt1
@@ -41,18 +41,18 @@ func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) [][]T {
 
 	for i := 0; i < length; i++ {
 		index := (i + pt1) % plen
-		item1 := offsp1[index]
-		item2 := offsp2[index]
-		offsp1[index] = item2
-		offsp2[index] = item1
+		item1 := off1[index]
+		item2 := off2[index]
+		off1[index] = item2
+		off2[index] = item1
 		m1[item1] = item2
 		m2[item2] = item1
 	}
 
-	p.checkUnmappedElements(offsp1, m2, pt1, pt2)
-	p.checkUnmappedElements(offsp2, m1, pt1, pt2)
+	p.checkUnmappedElements(off1, m2, pt1, pt2)
+	p.checkUnmappedElements(off2, m1, pt1, pt2)
 
-	return [][]T{offsp1, offsp2}
+	return
 }
 
 // checks elements that are outside of the partially mapped section to see if
