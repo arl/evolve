@@ -4,10 +4,7 @@ import (
 	"testing"
 )
 
-func TestRankSelectionNatural(t *testing.T) {
-	testFitnessBasedSelection(t, Rank[string](), fitnessBasedPopNatural, true)
-}
-
-func TestRankSelectionNonNatural(t *testing.T) {
-	testFitnessBasedSelection(t, Rank[string](), fitnessBasedPopNonNatural, false)
+func TestRank(t *testing.T) {
+	t.Run("natural", testFitnessBasedSelection(Rank[string](), fitnessBasedPopNatural, true))
+	t.Run("non-natural", testFitnessBasedSelection(Rank[string](), fitnessBasedPopNonNatural, false))
 }

@@ -5,34 +5,34 @@ import (
 	"testing"
 
 	"github.com/arl/evolve/generator"
-	"github.com/stretchr/testify/assert"
 )
 
-// Unit test for truncation selection strategy ensures the 2 best candidates are
-// selected.
-func testTruncationSelection(t *testing.T, tpop testPopulation, natural bool) {
-	ts := &Truncation[string]{SelectionRatio: generator.Const(0.5)}
-	testRandomBasedSelection(t, ts, tpop, natural, 2,
-		func(selected []string) error {
-			if len(selected) != 2 {
-				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
+func TestTruncationSelection(t *testing.T) {
+	test := func(tpop testPopulation, natural bool) func(*testing.T) {
+		check := func(s []string) error {
+			if len(s) != 2 {
+				return fmt.Errorf("got %d selected elements, want 2", len(s))
 			}
 
-			sstr := []string{}
-			for _, c := range selected {
-				sstr = append(sstr, c)
+			// Have we selected the 2 fittest individuals?
+			i0, i1 := false, false
+			for _, c := range s {
+				i0 = i0 || (c == tpop[0].name)
+				i1 = i1 || (c == tpop[1].name)
 			}
-
-			assert.Contains(t, sstr, tpop[0].name, "best candidate not selected")
-			assert.Contains(t, sstr, tpop[1].name, "second best candidate not selected")
+			if !i0 {
+				t.Errorf("best candidate %q not selected", tpop[0].name)
+			}
+			if !i1 {
+				t.Errorf("second best candidate %q not selected", tpop[1].name)
+			}
 			return nil
-		})
-}
+		}
 
-func TestTruncationSelectionNatural(t *testing.T) {
-	testTruncationSelection(t, randomBasedPopNatural, true)
-}
+		truncation := &Truncation[string]{SelectionRatio: generator.Const(0.5)}
+		return testRandomBasedSelection(truncation, tpop, natural, 2, check)
+	}
 
-func TestTruncationSelectionNonNatural(t *testing.T) {
-	testTruncationSelection(t, randomBasedPopNonNatural, false)
+	t.Run("natural", test(randomBasedPopNatural, true))
+	t.Run("non-natural", test(randomBasedPopNonNatural, false))
 }

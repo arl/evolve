@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/arl/evolve"
-	"github.com/stretchr/testify/assert"
 )
 
 type testPopulation []struct {
@@ -58,29 +57,33 @@ var randomBasedPopNonNatural = testPopulation{
 	{name: "Steve", fitness: 10.0},
 }
 
-func testFitnessBasedSelection(t *testing.T, ss evolve.Selection[string], tpop testPopulation, natural bool) {
-	rng := rand.New(rand.NewSource(99))
+func testFitnessBasedSelection(ss evolve.Selection[string], tpop testPopulation, natural bool) func(*testing.T) {
+	return func(t *testing.T) {
+		rng := rand.New(rand.NewSource(99))
 
-	// create the population
-	pop := evolve.Population[string]{}
-	for i := range tpop {
-		cand := &evolve.Individual[string]{
-			Candidate: tpop[i].name,
-			Fitness:   tpop[i].fitness,
+		// create the population
+		pop := evolve.Population[string]{}
+		for i := range tpop {
+			cand := &evolve.Individual[string]{
+				Candidate: tpop[i].name,
+				Fitness:   tpop[i].fitness,
+			}
+			pop = append(pop, cand)
 		}
-		pop = append(pop, cand)
-	}
 
-	// apply selection
-	sel := ss.Select(pop, natural, 4, rng)
-	assert.Len(t, sel, 4, "got selection size:", len(sel), "want 4")
+		// apply selection
+		sel := ss.Select(pop, natural, 4, rng)
+		if len(sel) != 4 {
+			t.Fatalf("selected %d individuals, want 4", len(sel))
+		}
 
-	// check candidate frequencies match expected results
-	for i := range tpop {
-		tcand := tpop[i]
-		freq := frequency(sel, tcand.name)
-		if freq < tcand.wantMin || freq > tcand.wantMax {
-			t.Errorf("want %s selected [%v,%v] times, got %v", tcand.name, tcand.wantMin, tcand.wantMax, freq)
+		// Check that frequencies of candidate selection match expectations.
+		for i := range tpop {
+			tcand := tpop[i]
+			freq := frequency(sel, tcand.name)
+			if freq < tcand.wantMin || freq > tcand.wantMax {
+				t.Errorf("freq = %v want = %s selected [%v,%v] times", freq, tcand.name, tcand.wantMin, tcand.wantMax)
+			}
 		}
 	}
 }
@@ -96,32 +99,27 @@ func frequency[T comparable](slice []T, val T) int {
 }
 
 // test a random based selection strategy ss by selecting the n best candidates
-// of tpop, running the result to checkfn (returns nil or test fail message)
-func testRandomBasedSelection(t *testing.T, ss evolve.Selection[string], tpop testPopulation, natural bool, n int, checkfn func([]string) error) {
-	seed := time.Now().UnixNano()
-	rng := rand.New(rand.NewSource(seed))
+// of tpop, running the result to check.
+func testRandomBasedSelection(s evolve.Selection[string], tpop testPopulation, natural bool, n int, check func([]string) error) func(*testing.T) {
+	return func(t *testing.T) {
+		seed := time.Now().UnixNano()
+		rng := rand.New(rand.NewSource(seed))
 
-	// create the population
-	pop := evolve.Population[string]{}
-	for i := range tpop {
-		cand := &evolve.Individual[string]{
-			Candidate: tpop[i].name,
-			Fitness:   tpop[i].fitness,
+		// create the population
+		pop := evolve.Population[string]{}
+		for i := range tpop {
+			cand := &evolve.Individual[string]{
+				Candidate: tpop[i].name,
+				Fitness:   tpop[i].fitness,
+			}
+			pop = append(pop, cand)
 		}
-		pop = append(pop, cand)
-	}
 
-	// apply selection
-	selected := ss.Select(pop, natural, n, rng)
-	msg := checkfn(selected)
-	if msg != nil {
-		t.Fatalf("%v with seed %v: %v", ss.String(), seed, msg)
-	}
-}
-
-func errcheck(t *testing.T, err error) {
-	t.Helper()
-	if err != nil {
-		t.Fatalf("want error = nil, got %v", err)
+		// Apply selection.
+		selected := s.Select(pop, natural, n, rng)
+		msg := check(selected)
+		if msg != nil {
+			t.Fatalf("%v with seed %v: %v", s.String(), seed, msg)
+		}
 	}
 }

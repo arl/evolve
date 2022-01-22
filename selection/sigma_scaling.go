@@ -8,11 +8,10 @@ import (
 
 // SigmaScaling creates a sigma-scaled selection strategy. This is an
 // alternative to straightforward fitness-proportionate selection such as that
-// offered by RouletteWheel and StochasticUniversalSampling. It uses the mean
-// population fitness and fitness standard deviation to adjust individual
-// fitness scores.
+// offered by RouletteWheel and SUS. Uses the mean population fitness and
+// fitness standard deviation to adjust individual fitness scores.
 //
-// Early on in an evolutionary algorithm this helps to avoid premature
+// Early on in an evolutionary algorithm this may help to avoid premature
 // convergence caused by the dominance of one or two relatively fit candidates
 // in a population of mostly unfit individuals. It also helps to amplify minor
 // fitness differences in a more mature population where the rate of improvement
@@ -20,29 +19,14 @@ import (
 type SigmaScaling[T any] struct {
 	// Selector is the proportionate selector that will be delegated to after
 	// fitness scores have been adjusted using sigma scaling. If selector is
-	// nil, then it's set to the StochasticUniversalSampling selector.
+	// nil, then it's set to the SUS selector.
 	Selector evolve.Selection[T]
 }
 
-// Select selects the specified number of candidates from the population.
-//
-// Implementations may assume that the population is sorted in descending
-// order according to fitness (so the fittest individual is the first item
-// in the list).
-// NOTE: It is an error to call this method with an empty or null population.
-//
-// pop is the population from which to select.
-// natural indicates whether higher fitness values represent fitter individuals
-// or not.
-// size is the number of individual selections to make (not necessarily the
-// number of distinct candidates to select, since the same individual may
-// potentially be selected more than once).
-//
-// Returns a slice containing the selected candidates. Some individual
-// candidates may potentially have been selected multiple times.
-func (sel *SigmaScaling[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
+// Select select candidates from the population using a sigma scaling strategy.
+func (sel *SigmaScaling[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
 	if sel.Selector == nil {
-		sel.Selector = StochasticUniversalSampling[T]{}
+		sel.Selector = SUS[T]{}
 	}
 
 	stats := evolve.NewDataset(len(pop))
@@ -57,7 +41,7 @@ func (sel *SigmaScaling[T]) Select(pop evolve.Population[T], natural bool, size 
 			Fitness:   sigmaScaledFitness(cand.Fitness, stats.ArithmeticMean(), stats.StandardDeviation()),
 		}
 	}
-	return sel.Selector.Select(scaledPop, natural, size, rng)
+	return sel.Selector.Select(scaledPop, natural, n, rng)
 }
 
 func (SigmaScaling[T]) String() string { return "Sigma Scaling" }

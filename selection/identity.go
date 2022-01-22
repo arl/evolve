@@ -6,13 +6,13 @@ import (
 	"github.com/arl/evolve"
 )
 
-// Identity is a selection strategy that returns identical candidates
+// Identity is a selection strategy that returns identical candidates.
 type Identity[T any] struct{}
 
-// Select selects the specified number of candidates from the population.
-func (Identity[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
-	sel := make([]T, size)
-	for i := 0; i < size; i++ {
+// Select selects the n fittest candidates from the poipulation.
+func (Identity[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
+	sel := make([]T, n)
+	for i := 0; i < n; i++ {
 		sel[i] = pop[i].Candidate
 	}
 	return sel

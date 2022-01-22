@@ -8,23 +8,14 @@ import (
 )
 
 func TestTournamentSelection(t *testing.T) {
-	tests := []struct {
-		name    string
-		natural bool
-	}{
-		{name: "natural", natural: true},
-		{name: "non-natural", natural: false},
+	tournament := &Tournament[string]{Probability: generator.Const(0.7)}
+	check := func(s []string) error {
+		if len(s) != 2 {
+			return fmt.Errorf("got %d selected elements, want 2", len(s))
+		}
+		return nil
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ts := &Tournament[string]{Probability: generator.Const(0.7)}
-			testRandomBasedSelection(t, ts, randomBasedPopNonNatural, tt.natural, 2,
-				func(selected []string) error {
-					if len(selected) != 2 {
-						return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
-					}
-					return nil
-				})
-		})
-	}
+
+	t.Run("natural", testRandomBasedSelection(tournament, randomBasedPopNatural, true, 2, check))
+	t.Run("non-natural", testRandomBasedSelection(tournament, randomBasedPopNonNatural, false, 2, check))
 }

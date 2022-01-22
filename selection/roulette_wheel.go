@@ -7,17 +7,15 @@ import (
 	"github.com/arl/evolve"
 )
 
-// RouletteWheel implements selection of N candidates from a population
-// by selecting N candidates at random where the probability of each candidate
-// getting selected is proportional to its fitness score.
+// RouletteWheel is a selection strategy where the probability of picking a
+// candidate is proportional to its fitness score.
 //
 // This is analogous to each candidate being assigned an area on a roulette
 // wheel proportionate to its fitness and the wheel being spun N times.
-// Candidates may be selected more than once.  In some instances, particularly
+// Candidates may be selected more than once. In some instances, particularly
 // with small population sizes, the randomness of selection may result in
 // excessively high occurrences of particular candidates. If this is a problem,
-// StochasticUniversalSampling provides an alternative fitness-proportionate
-// strategy for selection.
+// SUS provides an alternative fitness-proportionate strategy for selection.
 type RouletteWheel[T any] struct{}
 
 // Select selects the required number of candidates from the population with the
@@ -28,7 +26,7 @@ type RouletteWheel[T any] struct{}
 // naturalFitnessScores should be true if higher fitness scores indicate fitter
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
-func (RouletteWheel[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
+func (RouletteWheel[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
 	// Record the cumulative fitness scores. It doesn't matter whether the
 	// population is sorted or not. We will use these cumulative scores to
 	// work out an index into the population. The cumulative array itself is
@@ -43,8 +41,8 @@ func (RouletteWheel[T]) Select(pop evolve.Population[T], natural bool, size int,
 		cumfitness[i] = cumfitness[i-1] + fitness
 	}
 
-	sel := make([]T, size)
-	for i := 0; i < size; i++ {
+	sel := make([]T, n)
+	for i := 0; i < n; i++ {
 		rand := rng.Float64() * cumfitness[len(cumfitness)-1]
 		j := sort.SearchFloat64s(cumfitness, rand)
 		if j < 0 {

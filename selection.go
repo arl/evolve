@@ -9,11 +9,11 @@ import (
 type Selection[T any] interface {
 	fmt.Stringer
 
-	// Select selects a given number of candidates from a population. pop must
-	// be sorted by descending fitness (i.e pop[0] is the fittest), natural
-	// indicates whether candidates have natural fitness (if true, the higher
-	// the better). Size if the number of selections to perform (not necessarily
-	// the number of distinct candidates to select, since the same individual
-	// may potentially be selected more than once).
-	Select(pop Population[T], natural bool, size int, rng *rand.Rand) []T
+	// Select selects a given number of candidates from a population.
+	//
+	// The population must be sorted by descending fitness (i.e. pop[0] is the
+	// fittest). A natural fitness means that the higher fitness, the better. n
+	// is the number of candidates to select and return. Note that since a same
+	// individual can be selected more than once, they may not be all distinct.
+	Select(pop Population[T], natural bool, n int, rng *rand.Rand) []T
 }

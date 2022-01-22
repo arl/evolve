@@ -9,16 +9,16 @@ import (
 
 // Tournament is a selection strategy that picks a pair of candidates at random
 // and then selects the fitter of the two candidates with probability p, where p
-// is the selection probability (therefore the probability of the less fit
-// candidate being selected is 1 - p).
+// is the selection probability (i.e the probability of the less fit candidate
+// being selected is 1 - p).
 type Tournament[T any] struct {
 	Probability generator.Float
 }
 
 // Select selects the specified number of candidates from the population.
-func (ts *Tournament[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
-	sel := make([]T, size)
-	for i := 0; i < size; i++ {
+func (ts *Tournament[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
+	sel := make([]T, n)
+	for i := 0; i < n; i++ {
 		// Pick two candidates at random.
 		cand1 := pop[rng.Intn(len(pop))]
 		cand2 := pop[rng.Intn(len(pop))]

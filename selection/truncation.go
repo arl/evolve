@@ -9,40 +9,33 @@ import (
 	"github.com/arl/evolve/generator"
 )
 
-// Truncation implements the selection of n candidates from a population by
-// simply selecting the n candidates with the highest fitness scores (the rest
-// is discarded). The same candidate is never selected more than once.
+// Truncation is a selection strategy that selects the fittest individuals of a
+// population. The number of individuals that are selected depends on the
+// SelectionRatio.
 type Truncation[T any] struct {
-	// TODO: document
+	// SelectionRatio informs the ratio of the fittest individuals that are
+	// selected. For example, a value of 0.5 would selects from the fittest
+	// half. A value of 1 would select from the whole population.
 	SelectionRatio generator.Float
 }
 
-// Select selects the fittest candidates. If the SelectionRatio results in fewer
-// selected candidates than required, then these candidates are selected
-// multiple times to make up the shortfall.
-//
-// pop is the population of evolved and evaluated candidates from which to
-// select. natural indicates whether higher fitness values represent fitter
-// individuals or not. size is the number of candidates to select from the
-// evolved population.
-//
-// Returns the selected candidates.
-func (ts *Truncation[T]) Select(pop evolve.Population[T], natural bool, size int, rng *rand.Rand) []T {
-	sel := make([]T, 0, size)
+// Select selects n individuals from a ratio of the fittest individuals. If the
+// set of eligible candidates is smaller than n, the fittest are selected more
+// than once.
+func (ts *Truncation[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
+	sel := make([]T, 0, n)
 
-	// get a random value to decide wether to select the fitter individual
-	// or the weaker one.
 	eligible := int(math.Round(ts.SelectionRatio.Next() * float64(len(pop))))
-	if eligible > size {
-		eligible = size
+	if eligible > n {
+		eligible = n
 	}
 
 	for {
-		count := min(eligible, size-len(sel))
+		count := min(eligible, n-len(sel))
 		for i := 0; i < count; i++ {
 			sel = append(sel, pop[i].Candidate)
 		}
-		if len(sel) >= size {
+		if len(sel) >= n {
 			break
 		}
 	}
