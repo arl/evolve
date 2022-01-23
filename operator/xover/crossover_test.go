@@ -54,3 +54,23 @@ func TestCrossoverApply(t *testing.T) {
 		sameStringPop(t, pop, got)
 	})
 }
+
+var sink any
+
+func BenchmarkCrossoverApply(b *testing.B) {
+	b.ReportAllocs()
+	rng := rand.New(rand.NewSource(99))
+
+	pop := [][]byte{[]byte("abcde"), []byte("fghij"), []byte("klmno"), []byte("pqrst"), []byte("uvwxy")}
+
+	b.ResetTimer()
+	var res [][]byte
+	for n := 0; n < b.N; n++ {
+		xover := New[[]byte](SliceMater[byte]{})
+		xover.Points = generator.Const(1)
+		xover.Probability = generator.Const(1.0)
+		res = xover.Apply(pop, rng)
+	}
+
+	sink = res
+}
