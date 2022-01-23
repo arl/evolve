@@ -1,13 +1,8 @@
 package evolve
 
 import (
-	"errors"
 	"math/rand"
 )
-
-// ErrTooManySeedCandidates is the error returned by SeedPopulation when the
-// number of seed candidates is greater than the population size.
-var ErrTooManySeedCandidates = errors.New("too many seed candidates for population size")
 
 // A Factory generates random candidates.
 //
@@ -45,15 +40,12 @@ func GeneratePopulation[T any](fac Factory[T], n int, rng *rand.Rand) []T {
 // Sometimes it is desirable to seed the initial population with some known good
 // candidates, providing some hints for the evolution process.
 //
-func SeedPopulation[T any](gen Factory[T], count int, seeds []T, rng *rand.Rand) ([]T, error) {
-	if len(seeds) > count {
-		return nil, ErrTooManySeedCandidates
+// Note: The returned slice never exceeds n.
+func SeedPopulation[T any](fac Factory[T], n int, seeds []T, rng *rand.Rand) []T {
+	pop := make([]T, n)
+	copied := copy(pop, seeds)
+	for i := copied; i < n; i++ {
+		pop[i] = fac.New(rng)
 	}
-
-	// directory add the generated candidates to the backing array of seeds,
-	// but seeds won't be modified
-	for i := len(seeds); i < count; i++ {
-		seeds = append(seeds, gen.New(rng))
-	}
-	return seeds, nil
+	return pop
 }

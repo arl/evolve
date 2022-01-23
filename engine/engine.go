@@ -2,7 +2,6 @@ package engine
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"runtime"
 	"sort"
@@ -84,17 +83,14 @@ func (e *Engine[T]) Evolve(popsize int) (evolve.Population[T], []evolve.Conditio
 		seed := time.Now().UnixNano()
 		e.RNG = rand.New(mt19937.New(seed))
 	}
-	//
-	// create the dataset
+
+	// Track down evolution stats in a dataset.
 	e.stats = evolve.NewDataset(popsize)
 
 	var ngen int
 	start := time.Now()
 
-	pop, err := evolve.SeedPopulation(e.Factory, popsize, e.Seeds, e.RNG)
-	if err != nil {
-		return nil, nil, fmt.Errorf("can't seed population: %v", err)
-	}
+	pop := evolve.SeedPopulation(e.Factory, popsize, e.Seeds, e.RNG)
 
 	var satisfied []evolve.Condition[T]
 

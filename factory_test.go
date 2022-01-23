@@ -3,70 +3,86 @@ package evolve
 import (
 	"math/rand"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-type intFactory struct{}
-
-func (intFactory) New(rng *rand.Rand) int { return rng.Int() }
-
-func generateInt(rng *rand.Rand) int { return rng.Int() }
-
-func testGeneratePopulation(t *testing.T, g Factory[int]) {
-	rng := rand.New(rand.NewSource(99))
-
-	pop := GeneratePopulation[int](intFactory{}, 10, rng)
-	assert.Len(t, pop, 10)
-}
-
-func testSeedPopulation(t *testing.T, g Factory[int]) {
-	rng := rand.New(rand.NewSource(99))
-
-	// seed 5 candidates over 10
-	seeds := make([]int, 5)
-	for i := 0; i < 5; i++ {
-		seeds[i] = i
-	}
-
-	pop, err := SeedPopulation[int](intFactory{}, 10, seeds, rng)
-	assert.NoError(t, err)
-	assert.Len(t, pop, 10)
-}
-
-func testSeedPopulationError(t *testing.T, g Factory[int]) {
-	rng := rand.New(rand.NewSource(99))
-
-	seeds := make([]int, 10)
-	for i := 0; i < 10; i++ {
-		seeds[i] = i
-	}
-
-	pop, err := SeedPopulation[int](intFactory{}, 5, seeds, rng)
-	assert.Nil(t, pop)
-	assert.ErrorIs(t, err, ErrTooManySeedCandidates)
-}
-
 func TestGeneratePopulation(t *testing.T) {
-	testGeneratePopulation(t, intFactory{})
+	rng := rand.New(rand.NewSource(99))
+
+	fac := FactoryFunc[int](
+		func(rng *rand.Rand) int {
+			return rng.Int()
+		},
+	)
+
+	if pop := GeneratePopulation[int](fac, 10, rng); len(pop) == 10 {
+		t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+	}
+}
+
+func occurrences(vals []int) map[int]int {
+	m := make(map[int]int)
+	for _, v := range vals {
+		m[v]++
+	}
+	return m
 }
 
 func TestSeedPopulation(t *testing.T) {
-	testSeedPopulation(t, intFactory{})
-}
+	rng := rand.New(rand.NewSource(99))
 
-func TestSeedPopulationError(t *testing.T) {
-	testSeedPopulationError(t, intFactory{})
-}
+	// Factory that generates -1 (so we can check later whether a candidate is a
+	// seed or not).
+	fac := FactoryFunc[int](
+		func(rng *rand.Rand) int {
+			return -1
+		},
+	)
 
-func TestGeneratePopulationFunc(t *testing.T) {
-	testGeneratePopulation(t, FactoryFunc[int](generateInt))
-}
+	t.Run("no seeds", func(t *testing.T) {
+		var seeds []int
+		pop := SeedPopulation[int](fac, 10, seeds, rng)
+		if len(pop) != 10 {
+			t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+		}
+		m := occurrences(pop)
+		if m[-1] != 10 {
+			t.Errorf("got %d generated candidates (not seeded) in population, want %d", m[-1], 0)
+		}
+	})
 
-func TestSeedPopulationFunc(t *testing.T) {
-	testSeedPopulation(t, FactoryFunc[int](generateInt))
-}
+	t.Run("2 seeds", func(t *testing.T) {
+		seeds := []int{1, 2}
+		pop := SeedPopulation[int](fac, 10, seeds, rng)
+		if len(pop) != 10 {
+			t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+		}
+		m := occurrences(pop)
+		if m[-1] != 8 {
+			t.Errorf("got %d generated candidates (not seeded) in population, want %d", m[-1], 8)
+		}
+	})
 
-func TestSeedPopulationErrorFunc(t *testing.T) {
-	testSeedPopulationError(t, FactoryFunc[int](generateInt))
+	t.Run("only seeds", func(t *testing.T) {
+		seeds := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+		pop := SeedPopulation[int](fac, 10, seeds, rng)
+		if len(pop) != 10 {
+			t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+		}
+		m := occurrences(pop)
+		if m[-1] != 0 {
+			t.Errorf("got %d generated candidates (not seeded) in population, want %d", m[-1], 0)
+		}
+	})
+
+	t.Run("len(seeds)>n", func(t *testing.T) {
+		seeds := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+		pop := SeedPopulation[int](fac, 10, seeds, rng)
+		if len(pop) != 10 {
+			t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+		}
+		m := occurrences(pop)
+		if m[-1] != 0 {
+			t.Errorf("got %d generated candidates (not seeded) in population, want %d", m[-1], 0)
+		}
+	})
 }
