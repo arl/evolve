@@ -18,9 +18,9 @@ func (m SliceMater[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 [
 
 	// Apply as many crossovers as required.
 	for i := 0; i < nxpts; i++ {
-		// Cross-over index is always greater than zero and less than
-		// the length of the parent so that we always pick a point that
-		// will result in a meaningful crossover.
+		// Cross-over index is always greater than zero and less than the length
+		// of the parent so that we always pick a point that will result in a
+		// meaningful crossover.
 		xidx := (1 + rng.Intn(len(p1)-1))
 		for j := 0; j < xidx; j++ {
 			// swap elements j of both offsprings

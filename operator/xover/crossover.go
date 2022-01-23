@@ -20,7 +20,7 @@ type Mater[T any] interface {
 // Crossover implements a standard crossover operator.
 //
 // It supports all crossover processes that operate on a pair of parent
-// candidates.
+// candidates via the Mater interface.
 // Both the number of crossovers points and the crossover probability are
 // configurable. Crossover is applied to a proportion of selected parent pairs,
 // with the remainder copied unchanged into the output population. The size of

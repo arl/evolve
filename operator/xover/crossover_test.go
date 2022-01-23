@@ -2,10 +2,9 @@ package xover
 
 import (
 	"math/rand"
+	"reflect"
 	"sort"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 
 	"github.com/arl/evolve/generator"
 )
@@ -27,10 +26,12 @@ func sameStringPop[T byteseq](t *testing.T, a, b []T) {
 	}
 	sort.Strings(s1)
 	sort.Strings(s2)
-	assert.EqualValues(t, s1, s2)
+	if !reflect.DeepEqual(s1, s2) {
+		t.Errorf("different strings\na = %v\nb = %v", s1, s2)
+	}
 }
 
-func TestCrossover_Apply(t *testing.T) {
+func TestCrossoverApply(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {

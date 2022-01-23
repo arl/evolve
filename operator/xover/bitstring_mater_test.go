@@ -33,11 +33,6 @@ func TestBitstringCrossover(t *testing.T) {
 }
 
 func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
-	// The BitstringCrossover operator is only defined to work on populations
-	// containing Strings of equal lengths. Any attempt to apply the operation
-	// to populations that contain different length strings should panic. Not
-	// panicking should be considered a bug since it could lead to hard to trace
-	// bugs elsewhere.
 	rng := rand.New(rand.NewSource(99))
 	xover := New[*bitstring.Bitstring](BitstringMater{})
 	xover.Probability = generator.Const(1.0)
@@ -48,7 +43,6 @@ func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
 	pop := []*bitstring.Bitstring{bs1, bs2}
 
 	assert.Panics(t, func() {
-		// This should panic since the parents are different lengths.
 		xover.Apply(pop, rng)
 	})
 }

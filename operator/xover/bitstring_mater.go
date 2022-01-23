@@ -10,14 +10,13 @@ import (
 // bit-strings
 type BitstringMater struct{}
 
-// Mate performs crossover on a pair of parents to generate a pair of
-// offspring.
+// Mate performs crossover on a pair of parents to generate a pair of offspring.
 //
-// parent1 and parent2 are the two individuals that provides the source
-// material for generating offspring.
+// p1 and p2 are the two individuals that provides the source material for
+// generating offspring.
 func (BitstringMater) Mate(p1, p2 *bitstring.Bitstring, nxpts int, rng *rand.Rand) (off1, off2 *bitstring.Bitstring) {
 	if p1.Len() != p2.Len() {
-		panic("Cannot mate parents of different lengths")
+		panic("Cannot mate Bitstring of different lengths")
 	}
 	off1 = bitstring.Clone(p1)
 	off2 = bitstring.Clone(p2)
