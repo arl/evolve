@@ -2,15 +2,16 @@ package xover
 
 import "math/rand"
 
-// PMX implements the partially mapped crossover algorithm or PMX.
+// PMX implements the partially mapped crossover algorithm or PMX, on slices.
 //
-// This crossover is indicated when chromosomes are lists of a predefined set of
-// elements. It creates offsprings that are non-repeating permutations of the
-// parents by choosing 2 random crossover points and exchanging elements
-// positions.
+// This crossover is indicated when chromosomes hold lists of a predefined set
+// of elements, for example indexes of cities in TSP. It creates offsprings that
+// are permutations of the parents by choosing 2 random crossover points and
+// exchanging elements positions.
 type PMX[T comparable] struct{}
 
-// Mate mates 2 parents and generates a pair of offsprings with PMX.
+// Mate mates 2 parents and generates a pair of offsprings with PMX. Only
+// defined for 2 cut points, panics if nxpts != 2.
 func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 	if nxpts != 2 {
 		panic("PMX is only defined for 2 cut points")
@@ -20,6 +21,7 @@ func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 		panic("PMX cannot mate parents of different lengths")
 	}
 
+	// Create identical copies.
 	off1 = make([]T, len(p1))
 	off2 = make([]T, len(p1))
 	copy(off1, p1)
@@ -46,34 +48,33 @@ func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 
 	p.checkUnmappedElements(off1, m2, pt1, pt2)
 	p.checkUnmappedElements(off2, m1, pt1, pt2)
-
 	return
 }
 
 // checks elements that are outside of the partially mapped section to see if
 // there are any duplicate items in the list. If there are, they are mapped
 // appropriately.
-func (p PMX[T]) checkUnmappedElements(offspring []T, mapping map[T]T, mapStart, mapEnd int) {
+func (p PMX[T]) checkUnmappedElements(offspring []T, m map[T]T, start, end int) {
 	for i := range offspring {
-		if !p.isInsideMappedRegion(i, mapStart, mapEnd) {
-			mapped := offspring[i]
-			for {
-				_, ok := mapping[mapped]
-				if !ok {
-					break
-				}
-
-				mapped = mapping[mapped]
-			}
-			offspring[i] = mapped
+		if p.isInsideMappedRegion(i, start, end) {
+			continue
 		}
+		mapped := offspring[i]
+		for {
+			_, ok := m[mapped]
+			if !ok {
+				break
+			}
+			mapped = m[mapped]
+		}
+		offspring[i] = mapped
 	}
 }
 
 // checks whether a given list position is within the partially mapped region
 // used for pmx. pos is the position to check start is the (inclusive) start
 // index of the mapped region end is the (exclusive) end index of the mapped
-// region
+// region.
 func (p PMX[T]) isInsideMappedRegion(pos, start, end int) bool {
 	enclosed := pos < end && pos >= start
 	wrapAround := start > end && (pos >= start || pos < end)
