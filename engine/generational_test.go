@@ -64,8 +64,8 @@ func TestGenerationalEngineElitism(t *testing.T) {
 		},
 	}
 
+	// Add an observer that records the mean fitness at each generation.
 	var avgfitness float64
-	// add an observer that record the mean fitness at each generation
 	obs := ObserverFunc(func(stats *evolve.PopulationStats[int]) {
 		avgfitness = stats.Mean
 	})
