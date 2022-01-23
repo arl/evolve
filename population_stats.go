@@ -6,7 +6,10 @@ import "time"
 // and a reference to the fittest candidate solution in the population.
 type PopulationStats[T any] struct {
 	// Best is the fittest individual of the population.
-	Best Individual[T]
+	Best T
+
+	// Best is the best fitness.
+	BestFitness float64
 
 	// Mean is the arithmetic mean of fitness scores for each member of
 	// the population.

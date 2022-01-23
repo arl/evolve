@@ -13,7 +13,7 @@ type Identity[T any] struct{}
 func (Identity[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
 	sel := make([]T, n)
 	for i := 0; i < n; i++ {
-		sel[i] = pop[i].Candidate
+		sel[i] = pop.Candidates[i]
 	}
 	return sel
 }

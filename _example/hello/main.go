@@ -99,11 +99,11 @@ func main() {
 	// Define an observer
 	eng.AddObserver(
 		engine.ObserverFunc(func(stats *evolve.PopulationStats[string]) {
-			log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best.Candidate, stats.Best.Fitness)
+			log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best, stats.BestFitness)
 		}))
 
 	// Start evolution engine and print the best result
 	bests, _, err := eng.Evolve(100)
 	check(err)
-	log.Println(bests[0])
+	log.Println(bests.Candidates[0], bests.Fitness[0])
 }

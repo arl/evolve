@@ -37,7 +37,7 @@ type Generational[T any] struct {
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *Generational[T]) Epoch(pop evolve.Population[T], rng *rand.Rand) evolve.Population[T] {
+func (e *Generational[T]) Epoch(pop *evolve.Population[T], rng *rand.Rand) *evolve.Population[T] {
 	if !e.init {
 		if e.Concurrency == 0 {
 			e.Concurrency = runtime.NumCPU()
@@ -45,17 +45,17 @@ func (e *Generational[T]) Epoch(pop evolve.Population[T], rng *rand.Rand) evolve
 		e.init = true
 	}
 
-	nextpop := make([]T, 0, len(pop))
+	nextpop := make([]T, 0, pop.Len())
 
 	// Perform elitism: straightforward copy the n fittest candidates into the
 	// next generation, without any kind of selection.
 	elite := make([]T, e.Elites)
 	for i := 0; i < e.Elites; i++ {
-		elite[i] = pop[i].Candidate
+		elite[i] = pop.Candidates[i]
 	}
 
 	// Select the rest of population through natural selection.
-	selected := e.Selection.Select(pop, e.Evaluator.IsNatural(), len(pop)-e.Elites, rng)
+	selected := e.Selection.Select(pop, e.Evaluator.IsNatural(), pop.Len()-e.Elites, rng)
 
 	// Apply genetic operators on the selected candidates.
 	nextpop = e.Operator.Apply(append(nextpop, selected...), rng)

@@ -16,27 +16,32 @@ type Tournament[T any] struct {
 }
 
 // Select selects the specified number of candidates from the population.
-func (ts *Tournament[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
+func (ts *Tournament[T]) Select(pop *evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
 	sel := make([]T, n)
+	selidx := 0
 	for i := 0; i < n; i++ {
 		// Pick two candidates at random.
-		cand1 := pop[rng.Intn(len(pop))]
-		cand2 := pop[rng.Intn(len(pop))]
+		idx1 := rng.Intn(pop.Len())
+		idx2 := rng.Intn(pop.Len())
 
 		// Get probability for this selection.
-		if natural && rng.Float64() < ts.Probability.Next() { // Select the fitter candidate.
-			if cand2.Fitness > cand1.Fitness {
-				sel[i] = cand2.Candidate
+		if natural && rng.Float64() < ts.Probability.Next() {
+			// Select the fitter candidate.
+			if pop.Fitness[idx2] > pop.Fitness[idx1] {
+				selidx = idx2
 			} else {
-				sel[i] = cand1.Candidate
+				selidx = idx1
 			}
-		} else { // Select the less fit candidate.
-			if cand2.Fitness > cand1.Fitness {
-				sel[i] = cand1.Candidate
+		} else {
+			// Select the less fit candidate.
+			if pop.Fitness[idx2] > pop.Fitness[idx1] {
+				selidx = idx1
 			} else {
-				sel[i] = cand2.Candidate
+				selidx = idx2
 			}
 		}
+
+		sel[i] = pop.Candidates[selidx]
 	}
 	return sel
 }

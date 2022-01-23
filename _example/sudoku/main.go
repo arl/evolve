@@ -100,13 +100,13 @@ func solveSudoku(pattern []string) error {
 		if stats.Generation%100 == 0 {
 			return
 		}
-		log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best.Candidate, stats.Best.Fitness)
+		log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best, stats.BestFitness)
 	}))
 
 	bests, _, err := eng.Evolve(popsize)
 	check(err)
 
-	log.Printf("Sudoku solution:\n%v\n", bests[0].Candidate)
+	log.Printf("Sudoku solution:\n%v\n", bests.Candidates[0])
 	return nil
 }
 

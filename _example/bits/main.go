@@ -74,10 +74,10 @@ func main() {
 
 	eng.AddObserver(
 		engine.ObserverFunc(func(stats *evolve.PopulationStats[*bitstring.Bitstring]) {
-			log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best.Candidate, stats.Best.Fitness)
+			log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best, stats.BestFitness)
 		}))
 
 	bests, _, err := eng.Evolve(100)
 	check(err)
-	fmt.Println(bests[0])
+	fmt.Println(bests.Candidates[0], "=>", bests.Fitness[0])
 }

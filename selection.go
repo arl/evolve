@@ -15,5 +15,5 @@ type Selection[T any] interface {
 	// fittest). A natural fitness means that the higher fitness, the better. n
 	// is the number of candidates to select and return. Note that since a same
 	// individual can be selected more than once, they may not be all distinct.
-	Select(pop Population[T], natural bool, n int, rng *rand.Rand) []T
+	Select(pop *Population[T], natural bool, n int, rng *rand.Rand) []T
 }

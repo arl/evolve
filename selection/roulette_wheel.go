@@ -26,7 +26,7 @@ type RouletteWheel[T any] struct{}
 // naturalFitnessScores should be true if higher fitness scores indicate fitter
 // individuals, false if lower fitness scores indicate fitter individuals.
 // selectionSize is the number of selections to make.
-func (RouletteWheel[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
+func (RouletteWheel[T]) Select(pop *evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
 	// Record the cumulative fitness scores. It doesn't matter whether the
 	// population is sorted or not. We will use these cumulative scores to
 	// work out an index into the population. The cumulative array itself is
@@ -34,10 +34,10 @@ func (RouletteWheel[T]) Select(pop evolve.Population[T], natural bool, n int, rn
 	// previous one. The numerical difference between an element and the
 	// previous one is directly proportional to the probability of the
 	// corresponding candidate in the population being selected.
-	cumfitness := make([]float64, len(pop))
-	cumfitness[0] = adjustedFitness(pop[0].Fitness, natural)
-	for i := 1; i < len(pop); i++ {
-		fitness := adjustedFitness(pop[i].Fitness, natural)
+	cumfitness := make([]float64, pop.Len())
+	cumfitness[0] = adjustedFitness(pop.Fitness[0], natural)
+	for i := 1; i < pop.Len(); i++ {
+		fitness := adjustedFitness(pop.Fitness[i], natural)
 		cumfitness[i] = cumfitness[i-1] + fitness
 	}
 
@@ -49,7 +49,7 @@ func (RouletteWheel[T]) Select(pop evolve.Population[T], natural bool, n int, rn
 			// Convert negative insertion point to array index.
 			j = abs(j + 1)
 		}
-		sel[i] = pop[j].Candidate
+		sel[i] = pop.Candidates[j]
 	}
 	return sel
 }

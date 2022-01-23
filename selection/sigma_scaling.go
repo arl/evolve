@@ -24,22 +24,20 @@ type SigmaScaling[T any] struct {
 }
 
 // Select select candidates from the population using a sigma scaling strategy.
-func (sel *SigmaScaling[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
+func (sel *SigmaScaling[T]) Select(pop *evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
 	if sel.Selector == nil {
 		sel.Selector = SUS[T]{}
 	}
 
-	stats := evolve.NewDataset(len(pop))
-	for _, cand := range pop {
-		stats.AddValue(cand.Fitness)
+	stats := evolve.NewDataset(pop.Len())
+	for i := 0; i < pop.Len(); i++ {
+		stats.AddValue(pop.Fitness[i])
 	}
 
-	scaledPop := make(evolve.Population[T], len(pop))
-	for i, cand := range pop {
-		scaledPop[i] = &evolve.Individual[T]{
-			Candidate: cand.Candidate,
-			Fitness:   sigmaScaledFitness(cand.Fitness, stats.ArithmeticMean(), stats.StandardDeviation()),
-		}
+	scaledPop := evolve.NewPopulation[T](pop.Len())
+	for i := 0; i < pop.Len(); i++ {
+		scaledPop.Candidates[i] = pop.Candidates[i]
+		scaledPop.Fitness[i] = sigmaScaledFitness(pop.Fitness[i], stats.ArithmeticMean(), stats.StandardDeviation())
 	}
 	return sel.Selector.Select(scaledPop, natural, n, rng)
 }

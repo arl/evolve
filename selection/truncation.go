@@ -22,10 +22,10 @@ type Truncation[T any] struct {
 // Select selects n individuals from a ratio of the fittest individuals. If the
 // set of eligible candidates is smaller than n, the fittest are selected more
 // than once.
-func (ts *Truncation[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
+func (ts *Truncation[T]) Select(pop *evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
 	sel := make([]T, 0, n)
 
-	eligible := int(math.Round(ts.SelectionRatio.Next() * float64(len(pop))))
+	eligible := int(math.Round(ts.SelectionRatio.Next() * float64(pop.Len())))
 	if eligible > n {
 		eligible = n
 	}
@@ -33,7 +33,7 @@ func (ts *Truncation[T]) Select(pop evolve.Population[T], natural bool, n int, r
 	for {
 		count := min(eligible, n-len(sel))
 		for i := 0; i < count; i++ {
-			sel = append(sel, pop[i].Candidate)
+			sel = append(sel, pop.Candidates[i])
 		}
 		if len(sel) >= n {
 			break

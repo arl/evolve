@@ -26,14 +26,12 @@ type RankBased[T any] struct {
 }
 
 // Select selects a given number of candidates from a population.
-func (rb RankBased[T]) Select(pop evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
-	ranked := make(evolve.Population[T], len(pop))
-	for i, cand := range pop {
-		ranked[i] = &evolve.Individual[T]{
-			Candidate: cand.Candidate,
-			// use candidate 1-based index
-			Fitness: rb.Map(i+1, len(pop)),
-		}
+func (rb RankBased[T]) Select(pop *evolve.Population[T], natural bool, n int, rng *rand.Rand) []T {
+	ranked := evolve.NewPopulation[T](pop.Len())
+	for i := range pop.Candidates {
+		ranked.Candidates[i] = pop.Candidates[i]
+		// use candidate 1-based index
+		ranked.Fitness[i] = rb.Map(i+1, pop.Len())
 	}
 	return rb.Selector.Select(ranked, true, n, rng)
 }

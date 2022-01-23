@@ -67,7 +67,7 @@ func (e *Engine[T]) RemoveObserver(o Observer[T]) {
 //
 // At least one termination condition must be defined with EndOn, or Evolve will
 // return an error.
-func (e *Engine[T]) Evolve(popsize int) (evolve.Population[T], []evolve.Condition[T], error) {
+func (e *Engine[T]) Evolve(popsize int) (*evolve.Population[T], []evolve.Condition[T], error) {
 	if popsize <= 0 {
 		return nil, nil, errors.New("invalid population size")
 	}
@@ -96,7 +96,6 @@ func (e *Engine[T]) Evolve(popsize int) (evolve.Population[T], []evolve.Conditio
 
 	// Evaluate initial population fitness
 	evpop := evolve.EvaluatePopulation(pop, e.Evaluator, e.Concurrency)
-
 	for {
 		// Sort population according to fitness.
 		if e.Evaluator.IsNatural() {
@@ -122,24 +121,22 @@ func (e *Engine[T]) Evolve(popsize int) (evolve.Population[T], []evolve.Conditio
 	return evpop, satisfied, nil
 }
 
-func (e *Engine[T]) updateStats(pop evolve.Population[T], ngen int, elapsed time.Duration) *evolve.PopulationStats[T] {
+func (e *Engine[T]) updateStats(pop *evolve.Population[T], ngen int, elapsed time.Duration) *evolve.PopulationStats[T] {
 	e.stats.Clear()
-	for _, cand := range pop {
-		e.stats.AddValue(cand.Fitness)
+	for i := 0; i < pop.Len(); i++ {
+		e.stats.AddValue(pop.Fitness[i])
 	}
 
 	// Notify observers with the population state
 	stats := evolve.PopulationStats[T]{
-		Best: evolve.Individual[T]{
-			Candidate: pop[0].Candidate,
-			Fitness:   pop[0].Fitness,
-		},
-		Mean:       e.stats.ArithmeticMean(),
-		StdDev:     e.stats.StandardDeviation(),
-		Natural:    e.Evaluator.IsNatural(),
-		Size:       e.stats.Len(),
-		Generation: ngen,
-		Elapsed:    elapsed,
+		Best:        pop.Candidates[0],
+		BestFitness: pop.Fitness[0],
+		Mean:        e.stats.ArithmeticMean(),
+		StdDev:      e.stats.StandardDeviation(),
+		Natural:     e.Evaluator.IsNatural(),
+		Size:        e.stats.Len(),
+		Generation:  ngen,
+		Elapsed:     elapsed,
 	}
 
 	for _, o := range e.Observers {

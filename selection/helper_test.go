@@ -61,17 +61,14 @@ func testFitnessBasedSelection(ss evolve.Selection[string], tpop testPopulation,
 	return func(t *testing.T) {
 		rng := rand.New(rand.NewSource(99))
 
-		// create the population
-		pop := evolve.Population[string]{}
+		// Create population.
+		pop := evolve.NewPopulation[string](len(tpop))
 		for i := range tpop {
-			cand := &evolve.Individual[string]{
-				Candidate: tpop[i].name,
-				Fitness:   tpop[i].fitness,
-			}
-			pop = append(pop, cand)
+			pop.Candidates[i] = tpop[i].name
+			pop.Fitness[i] = tpop[i].fitness
 		}
 
-		// apply selection
+		// Apply selection.
 		sel := ss.Select(pop, natural, 4, rng)
 		if len(sel) != 4 {
 			t.Fatalf("selected %d individuals, want 4", len(sel))
@@ -105,14 +102,10 @@ func testRandomBasedSelection(s evolve.Selection[string], tpop testPopulation, n
 		seed := time.Now().UnixNano()
 		rng := rand.New(rand.NewSource(seed))
 
-		// create the population
-		pop := evolve.Population[string]{}
+		pop := evolve.NewPopulation[string](len(tpop))
 		for i := range tpop {
-			cand := &evolve.Individual[string]{
-				Candidate: tpop[i].name,
-				Fitness:   tpop[i].fitness,
-			}
-			pop = append(pop, cand)
+			pop.Candidates[i] = tpop[i].name
+			pop.Fitness[i] = tpop[i].fitness
 		}
 
 		// Apply selection.
