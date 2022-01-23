@@ -14,7 +14,7 @@ func TestGeneratePopulation(t *testing.T) {
 		},
 	)
 
-	if pop := GeneratePopulation[int](fac, 10, rng); len(pop) == 10 {
+	if pop := GeneratePopulation[int](fac, 10, rng); len(pop) != 10 {
 		t.Errorf("len(pop) = %d, want %d", len(pop), 10)
 	}
 }
