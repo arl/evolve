@@ -15,12 +15,12 @@ func TestTargetFitness(t *testing.T) {
 
 		stats.BestFitness = 5.0
 		if cond.IsSatisfied(stats) {
-			t.Errorf("should not terminate before target fitness has been reached")
+			t.Errorf("fitness = %v, termination condition should not be satisfied", stats.BestFitness)
 		}
 
 		stats.BestFitness = 10.0
 		if !cond.IsSatisfied(stats) {
-			t.Errorf("should terminate once target fitness has been reached")
+			t.Errorf("fitness = %v, termination condition should be satisfied", stats.BestFitness)
 		}
 	})
 
@@ -30,12 +30,12 @@ func TestTargetFitness(t *testing.T) {
 
 		stats.BestFitness = 5.0
 		if cond.IsSatisfied(stats) {
-			t.Errorf("should not terminate before target fitness has been reached")
+			t.Errorf("fitness = %v, termination condition should not be satisfied", stats.BestFitness)
 		}
 
 		stats.BestFitness = 1.0
 		if !cond.IsSatisfied(stats) {
-			t.Errorf("should terminate once target fitness has been reached")
+			t.Errorf("fitness = %v, termination condition should be satisfied", stats.BestFitness)
 		}
 	})
 }

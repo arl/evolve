@@ -12,11 +12,11 @@ func TestGenerationCount(t *testing.T) {
 
 	stats.Generation = 3
 	if cond.IsSatisfied(stats) {
-		t.Errorf("should not terminate after 4th generation")
+		t.Errorf("generation = %v, termination condition should not be satisfied", stats.Generation)
 	}
 
 	stats.Generation = 4
 	if !cond.IsSatisfied(stats) {
-		t.Errorf("should terminate after 5th generation")
+		t.Errorf("generation = %v, termination condition should be satisfied", stats.Generation)
 	}
 }

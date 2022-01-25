@@ -84,6 +84,8 @@ func solveSudoku(pattern []string) error {
 		Elites:    nelites,
 	}
 
+	var userAbort condition.UserAbort[*sudoku]
+
 	eng := &engine.Engine[*sudoku]{
 		Factory:   fac,
 		Evaluator: evaluator{},
@@ -91,7 +93,7 @@ func solveSudoku(pattern []string) error {
 		RNG:       rng,
 		EndConditions: []evolve.Condition[*sudoku]{
 			condition.TargetFitness[*sudoku]{Fitness: 0, Natural: false},
-			condition.NewUserAbort[*sudoku](),
+			&userAbort,
 		},
 	}
 

@@ -13,11 +13,11 @@ func TestElapsedTime(t *testing.T) {
 
 	stats.Elapsed = 100 * time.Millisecond
 	if cond.IsSatisfied(stats) {
-		t.Errorf("should not terminate before elapsed time")
+		t.Errorf("elapsed = %v, termination condition should not be satisfied", stats.Elapsed)
 	}
 
 	stats.Elapsed = time.Second
 	if !cond.IsSatisfied(stats) {
-		t.Errorf("should terminate after elapsed time")
+		t.Errorf("elapsed = %v, termination condition should be satisfied", stats.Elapsed)
 	}
 }
