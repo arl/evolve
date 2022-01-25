@@ -128,7 +128,6 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	checkB(b, err)
 
 	eng := Engine[string]{
-
 		Factory:   factory,
 		Evaluator: evaluator(target),
 		Epocher: &Generational[string]{
