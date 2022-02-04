@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"math/bits"
 	"math/rand"
 
 	"github.com/arl/bitstring"
@@ -60,8 +61,17 @@ func (g *Binomial[U]) Next() U {
 // generates a binomial with even probability (p=0.5). We simply generate n
 // random bits and count the 1's.
 func (g *Binomial[U]) evenProbability(n U) U {
-	bs := bitstring.Random(int(n), g.rng)
-	return U(bs.OnesCount())
+	var u U
+	for n > 64 {
+		u += U(bits.OnesCount64(g.rng.Uint64()))
+		n -= 64
+	}
+	if n > 0 {
+		tmp := g.rng.Uint64() & ((1 << n) - 1)
+		u += U(bits.OnesCount64(tmp))
+		n -= 64
+	}
+	return u
 }
 
 // floatToFixedBits converts a floating point value [0 1) into a fixed point

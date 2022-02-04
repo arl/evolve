@@ -12,12 +12,22 @@ import (
 func TestBinomial(t *testing.T) {
 	// Check that the observed mean and standard deviation are consistent with
 	// the specified distribution parameters.
-	const n, p = 20, 0.163
+	tests := []struct {
+		n uint32
+		p float64
+	}{
+		{n: 20, p: 0.163},
+		{n: 2000, p: 0.163},
+		{n: 20000, p: 0.163},
+		{n: 20000, p: 0.1},
+		{n: 20000, p: 0.9},
+	}
 
 	rng := rand.New(mt19937.New(99))
-
-	g := NewBinomial[uint32](Const(uint32(n)), Const(p), rng)
-	checkBinomialDistribution[uint32](t, g, n, p)
+	for _, tt := range tests {
+		g := NewBinomial[uint32](Const(uint32(tt.n)), Const(tt.p), rng)
+		checkBinomialDistribution[uint32](t, g, tt.n, tt.p)
+	}
 }
 
 func TestBinomialDynamic(t *testing.T) {
@@ -63,4 +73,20 @@ func Test_floatToFixedBits(t *testing.T) {
 	t.Run("panic when >=1", func(t *testing.T) {
 		assert.Panics(t, func() { floatToFixedBits(1) })
 	})
+}
+
+func benchmarkBinomialEvenProbability(n int) func(b *testing.B) {
+	return func(b *testing.B) {
+		rng := rand.New(mt19937.New(99))
+		g := NewBinomial[uint32](Const(uint32(n)), Const(0.163), rng)
+		for i := 0; i < b.N; i++ {
+			g.evenProbability(uint32(n))
+		}
+	}
+}
+
+func Benchmark_evenProbability(b *testing.B) {
+	b.Run("10", benchmarkBinomialEvenProbability(10))
+	b.Run("100", benchmarkBinomialEvenProbability(100))
+	b.Run("1000", benchmarkBinomialEvenProbability(1000))
 }
