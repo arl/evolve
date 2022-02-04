@@ -1,10 +1,11 @@
 package generator
 
 import (
-	"constraints"
 	"math/rand"
 
 	"github.com/arl/bitstring"
+
+	"golang.org/x/exp/constraints"
 )
 
 // Binomial generates of binomially-distributed, unsigned integers.

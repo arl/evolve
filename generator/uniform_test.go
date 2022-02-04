@@ -1,12 +1,12 @@
 package generator
 
 import (
-	"constraints"
 	"math"
 	"math/rand"
 	"testing"
 
 	"github.com/arl/evolve/pkg/mt19937"
+	"golang.org/x/exp/constraints"
 )
 
 func TestUniformInt(t *testing.T) {

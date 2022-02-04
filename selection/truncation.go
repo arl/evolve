@@ -1,9 +1,10 @@
 package selection
 
 import (
-	"constraints"
 	"math"
 	"math/rand"
+
+	"golang.org/x/exp/constraints"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"

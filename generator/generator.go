@@ -1,6 +1,6 @@
 package generator
 
-import "constraints"
+import "golang.org/x/exp/constraints"
 
 // A Generator generates sequences of values each of which is provided whenever Next is called.
 type Generator[T constraints.Integer | constraints.Float] interface {

@@ -1,12 +1,12 @@
 package generator
 
 import (
-	"constraints"
 	"math"
 	"testing"
 
 	"github.com/arl/evolve"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/constraints"
 )
 
 func checkGaussianDistribution(t *testing.T, g Float, wantMean, wantStdDev float64) {

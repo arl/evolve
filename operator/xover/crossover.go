@@ -1,10 +1,10 @@
 package xover
 
 import (
-	"constraints"
 	"math/rand"
 
 	"github.com/arl/evolve/generator"
+	"golang.org/x/exp/constraints"
 )
 
 // Mater is the interface implemented by objects defining the Mate function.

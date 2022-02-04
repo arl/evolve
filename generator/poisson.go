@@ -1,9 +1,10 @@
 package generator
 
 import (
-	"constraints"
 	"math"
 	"math/rand"
+
+	"golang.org/x/exp/constraints"
 )
 
 // Poisson generates Poisson-distributed values.

@@ -1,9 +1,10 @@
 package generator
 
 import (
-	"constraints"
 	"math/rand"
 	"reflect"
+
+	"golang.org/x/exp/constraints"
 )
 
 // Uniform returns a generator of random numbers which are uniformly distributed

@@ -1,8 +1,9 @@
 package generator
 
 import (
-	"constraints"
 	"sync/atomic"
+
+	"golang.org/x/exp/constraints"
 )
 
 // A Swappable embeds a generator that can be swapped with another. Not safe for concurrent use.
