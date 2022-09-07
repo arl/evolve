@@ -7,20 +7,20 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Poisson generates Poisson-distributed values.
-type Poisson[U constraints.Unsigned] struct {
+// Poisson generates Poisson-distributed values, that are always positive.
+type Poisson[I constraints.Integer] struct {
 	rng  *rand.Rand
 	mean Float
 }
 
-func NewPoisson[U constraints.Unsigned](mean Float, rng *rand.Rand) *Poisson[U] {
-	return &Poisson[U]{mean: mean, rng: rng}
+func NewPoisson[I constraints.Integer](mean Float, rng *rand.Rand) *Poisson[I] {
+	return &Poisson[I]{mean: mean, rng: rng}
 }
 
 // Next returns the next generated Poisson-distributed value.
-func (p *Poisson[U]) Next() U {
+func (p *Poisson[I]) Next() I {
 	var (
-		x U
+		i I
 		t float64
 	)
 	for {
@@ -28,8 +28,8 @@ func (p *Poisson[U]) Next() U {
 		if t > 1.0 {
 			break
 		}
-		x++
+		i++
 	}
 
-	return x
+	return i
 }
