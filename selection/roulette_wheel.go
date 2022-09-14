@@ -20,7 +20,7 @@ type RouletteWheel[T any] struct{}
 
 // Select selects the required number of candidates from the population with the
 // probability of selecting any particular candidate being proportional to that
-// candidate's fitness score.  Selection is with replacement (the same candidate
+// candidate's fitness score. Selection is with replacement (the same candidate
 // may be selected multiple times).
 //
 // naturalFitnessScores should be true if higher fitness scores indicate fitter
