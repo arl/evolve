@@ -13,8 +13,9 @@ func TestSliceOrderMutation(t *testing.T) {
 	pop := [][]int{{1, 2, 3, 4, 5}}
 
 	op := SliceOrder[int]{
-		Count:  generator.Const(1),
-		Amount: generator.Const(1),
+		Count:       generator.Const(1),
+		Amount:      generator.Const(1),
+		Probability: generator.Const(1.0),
 	}
 	mutpop := op.Apply(pop, rng)
 
