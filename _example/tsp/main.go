@@ -1,27 +1,33 @@
 package main
 
 import (
-	"flag"
-	"log"
+	"image/color"
 	"math/rand"
-	"os"
 	"time"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	myApp := app.New()
+	w := myApp.NewWindow("TSP")
 
-	if _, err := os.Stat("index.html"); os.IsNotExist(err) {
-		log.Fatal("tsp example should be run from _example/tsp directory")
-	}
+	tspw := newTSPWindow()
+	tspw.buildUI(w)
 
-	host := "localhost:8080"
-	flag.StringVar(&host, "host", host, "serve web gui at [host]:[port]")
-	flag.Parse()
+	w.Resize(fyne.NewSize(800, 600))
+	w.ShowAndRun()
+}
 
-	server := newServer()
-	server.serve(host)
-	if err := server.start(); err != nil {
-		log.Fatal(err)
+func updatePath(w fyne.Window) {
+	tick := time.NewTicker(500 * time.Millisecond)
+	for {
+		<-tick.C
+		line := canvas.NewLine(color.White)
+		width := 1 + rand.Intn(4)
+		line.StrokeWidth = float32(width)
+		w.SetContent(line)
 	}
 }

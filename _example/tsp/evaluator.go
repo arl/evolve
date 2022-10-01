@@ -4,8 +4,6 @@ import (
 	"math"
 )
 
-type point struct{ X, Y int }
-
 type routeEvaluator struct {
 	cities []point
 	dists  [][]float64
