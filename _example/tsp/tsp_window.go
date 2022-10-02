@@ -40,6 +40,7 @@ type tspWindow struct {
 	generation *widget.Label
 	distance   *widget.Label
 	stddev     *widget.Label
+	elapsed    *widget.Label
 }
 
 func newTSPWindow() *tspWindow {
@@ -78,8 +79,9 @@ func (w *tspWindow) buildUI(wnd fyne.Window) {
 	w.generation = widget.NewLabel("generation: ")
 	w.distance = widget.NewLabel("distance: ")
 	w.stddev = widget.NewLabel("std dev: ")
+	w.elapsed = widget.NewLabel("elapsed: ")
 
-	stats := container.New(layout.NewVBoxLayout(), w.generation, w.distance, w.stddev)
+	stats := container.New(layout.NewVBoxLayout(), w.generation, w.distance, w.stddev, w.elapsed)
 	pathAndStats := container.New(layout.NewHBoxLayout(), w.path, stats)
 
 	content := container.New(layout.NewVBoxLayout(), controls, layout.NewSpacer(), pathAndStats)
@@ -87,16 +89,21 @@ func (w *tspWindow) buildUI(wnd fyne.Window) {
 }
 
 func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
+	start := time.Now()
+	prevFitness := 0.0
+
 	return engine.ObserverFunc[[]int](func(stats *evolve.PopulationStats[[]int]) {
-		if stats.Generation%1000 != 0 {
+		if stats.Generation%100 != 0 && prevFitness == stats.BestFitness {
 			return
 		}
 
 		fmt.Printf("[%d]: distance: %v\n", stats.Generation, stats.BestFitness)
+		prevFitness = stats.BestFitness
 
 		w.generation.SetText(fmt.Sprintf("generation: %d", stats.Generation))
 		w.distance.SetText(fmt.Sprintf("distance: %f", stats.BestFitness))
-		w.stddev.SetText(fmt.Sprintf("std dev: %f", stats.StdDev))
+		w.stddev.SetText(fmt.Sprintf("std dev: %.3f", stats.StdDev))
+		w.elapsed.SetText(fmt.Sprintf("elapsed: %s", time.Since(start).Round(time.Millisecond)))
 
 		dc := gg.NewContextForImage(w.img)
 		dc.SetColor(color.White)
@@ -115,12 +122,6 @@ func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 	})
 }
 
-const (
-	numCities  = 26
-	plotEach   = 200
-	xmax, ymax = 200, 200
-)
-
 type point struct{ X, Y int }
 
 func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]int], error) {
@@ -133,7 +134,6 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 	pipeline = append(pipeline, xover)
 
 	// Define the mutation operator.
-
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 	mut := &mutation.SliceOrder[int]{
 		Count:       generator.NewPoisson[int](generator.Const(2.0), rng),
@@ -159,7 +159,7 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 		// Selection: &selection.SigmaScaling[[]int]{
 		// 	&selection.RouletteWheel[[]int]{},
 		// },
-		Elites: 1,
+		Elites: 2,
 	}
 
 	eng := engine.Engine[[]int]{
