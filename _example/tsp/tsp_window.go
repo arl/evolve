@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -31,9 +32,11 @@ type tspWindow struct {
 	running    bool
 	maxw, maxh int // max cities coords
 	cities     []point
+
+	done chan struct{}
+
 	path       *canvas.Image
 	img        *image.RGBA
-
 	generation *widget.Label
 	distance   *widget.Label
 	stddev     *widget.Label
@@ -48,6 +51,7 @@ func newTSPWindow() *tspWindow {
 		cities: cities,
 		maxw:   maxw,
 		maxh:   maxh,
+		done:   make(chan struct{}),
 	}
 }
 
@@ -56,8 +60,12 @@ func (w *tspWindow) buildUI(wnd fyne.Window) {
 	// - controls at the top
 	// - path visualization and stats at the bottom
 
+	var once sync.Once
 	startButton := widget.NewButton("start", func() {
-		runTSP(w.cities, w.updatePathAndStats())
+		once.Do(func() {
+			runTSP(w.cities, w.updatePathAndStats())
+			close(w.done)
+		})
 	})
 
 	controls := container.New(layout.NewHBoxLayout(), startButton)
@@ -116,20 +124,23 @@ const (
 type point struct{ X, Y int }
 
 func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]int], error) {
-	rng := rand.New(mt19937.New(time.Now().UnixNano()))
+	var pipeline operator.Pipeline[[]int]
 
 	// Define the crossover operator.
 	xover := xover.New[[]int](xover.PMX[int]{})
-	xover.Points = generator.Const(2)
+	xover.Points = generator.Const(2) // unused for cycle crossover
 	xover.Probability = generator.Const(1.0)
+	pipeline = append(pipeline, xover)
 
 	// Define the mutation operator.
 
+	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 	mut := &mutation.SliceOrder[int]{
 		Count:       generator.NewPoisson[int](generator.Const(2.0), rng),
 		Amount:      generator.NewPoisson[int](generator.Const(4.0), rng),
-		Probability: generator.Const(0.1),
+		Probability: generator.Const(2.0),
 	}
+	pipeline = append(pipeline, mut)
 
 	indices := make([]int, len(cities))
 	for i := 0; i < len(cities); i++ {
@@ -139,7 +150,7 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 	eval := newRouteEvaluator(cities)
 
 	generational := engine.Generational[[]int]{
-		Operator:  operator.Pipeline[[]int]{xover, mut},
+		Operator:  pipeline,
 		Evaluator: eval,
 		// Selection: &selection.Tournament[[]int]{
 		// 	Probability: generator.Const(0.7),
@@ -148,7 +159,7 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 		// Selection: &selection.SigmaScaling[[]int]{
 		// 	&selection.RouletteWheel[[]int]{},
 		// },
-		Elites: 4,
+		Elites: 1,
 	}
 
 	eng := engine.Engine[[]int]{
@@ -168,7 +179,7 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 
 	eng.AddObserver(obs)
 
-	pop, cond, err := eng.Evolve(100)
+	pop, cond, err := eng.Evolve(150)
 	fmt.Printf("TSP ended, reason: %v\n", cond)
 
 	return pop, err
