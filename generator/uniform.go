@@ -2,7 +2,6 @@ package generator
 
 import (
 	"math/rand"
-	"reflect"
 
 	"golang.org/x/exp/constraints"
 )
@@ -11,7 +10,7 @@ import (
 // in the [min max) range. The range must be made of positive numbers only. In
 // other words if T is a floating point number type, then min must be positive.
 // Uniform panics if max <= min.
-func Uniform[T constraints.Unsigned | constraints.Float](min, max T, rng *rand.Rand) Generator[T] {
+func Uniform[T constraints.Integer | constraints.Float](min, max T, rng *rand.Rand) Generator[T] {
 	diff := max - min
 	if diff <= 0 {
 		panic("must have min < max")
@@ -23,22 +22,22 @@ func Uniform[T constraints.Unsigned | constraints.Float](min, max T, rng *rand.R
 	// TODO(generics) check status of generic type switches proposal
 	// https://github.com/golang/go/issues/45380
 	var t T
-	switch reflect.TypeOf(t).Kind() {
-	case reflect.Int, reflect.Uint,
-		reflect.Int8, reflect.Uint8,
-		reflect.Int16, reflect.Uint16,
-		reflect.Int32, reflect.Uint32,
-		reflect.Int64, reflect.Uint64:
+	switch any(t).(type) {
+	case int, uint,
+		int8, uint8,
+		int16, uint16,
+		int32, uint32,
+		int64, uint64:
 		idiff := int64(diff)
 		return uniform[T](func() T {
 			return min + T(rng.Int63n(idiff))
 		})
-	case reflect.Float32:
+	case float32:
 		f32diff := float32(diff)
 		return uniform[T](func() T {
 			return min + T(rng.Float32())*T(f32diff)
 		})
-	case reflect.Float64:
+	case float64:
 		return uniform[T](func() T {
 			return min + T(rng.Float64())*T(diff)
 		})
