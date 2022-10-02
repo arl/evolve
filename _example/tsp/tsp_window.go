@@ -135,11 +135,16 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 
 	// Define the mutation operator.
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
-	mut := &mutation.SliceOrder[int]{
-		Count:       generator.NewPoisson[int](generator.Const(2.0), rng),
-		Amount:      generator.NewPoisson[int](generator.Const(4.0), rng),
-		Probability: generator.Const(2.0),
-	}
+	mut := operator.NewSwitch[[]int](
+		&mutation.SliceOrder[int]{
+			Count:       generator.Const(1),
+			Amount:      generator.Uniform[int](1, len(cities), rng),
+			Probability: generator.Const(0.99),
+		},
+		&EM[int]{
+			Probability: generator.Const(.99),
+		},
+	)
 	pipeline = append(pipeline, mut)
 
 	indices := make([]int, len(cities))
