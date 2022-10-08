@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"runtime"
 	"sync"
 	"time"
 
@@ -176,9 +177,10 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 	}
 
 	eng := engine.Engine[[]int]{
-		Factory:   factory.Permutation[int](indices),
-		Evaluator: eval,
-		Epocher:   &generational,
+		Factory:     factory.Permutation[int](indices),
+		Evaluator:   eval,
+		Epocher:     &generational,
+		Concurrency: runtime.NumCPU() * 2,
 	}
 	var userAbort condition.UserAbort[[]int]
 	go func() {
