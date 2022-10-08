@@ -28,6 +28,12 @@ func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 	copy(off2, p2)
 
 	pt1, pt2 := rng.Intn(len(p1)), rng.Intn(len(p1))
+
+	mapBasedPMX(p1, p2, off1, off2, pt1, pt2)
+	return
+}
+
+func mapBasedPMX[T comparable](p1, p2, off1, off2 []T, pt1, pt2 int) {
 	length := pt2 - pt1
 	if length < 0 {
 		length += len(p1)
@@ -46,17 +52,16 @@ func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 		m2[item2] = item1
 	}
 
-	p.checkUnmappedElements(off1, m2, pt1, pt2)
-	p.checkUnmappedElements(off2, m1, pt1, pt2)
-	return
+	checkUnmappedElements(off1, m2, pt1, pt2)
+	checkUnmappedElements(off2, m1, pt1, pt2)
 }
 
 // checks elements that are outside of the partially mapped section to see if
 // there are any duplicate items in the list. If there are, they are mapped
 // appropriately.
-func (p PMX[T]) checkUnmappedElements(offspring []T, m map[T]T, start, end int) {
+func checkUnmappedElements[T comparable](offspring []T, m map[T]T, start, end int) {
 	for i := range offspring {
-		if p.isInsideMappedRegion(i, start, end) {
+		if isInsideMappedRegion(i, start, end) {
 			continue
 		}
 		mapped := offspring[i]
@@ -75,7 +80,7 @@ func (p PMX[T]) checkUnmappedElements(offspring []T, m map[T]T, start, end int) 
 // used for pmx. pos is the position to check start is the (inclusive) start
 // index of the mapped region end is the (exclusive) end index of the mapped
 // region.
-func (p PMX[T]) isInsideMappedRegion(pos, start, end int) bool {
+func isInsideMappedRegion(pos, start, end int) bool {
 	enclosed := pos < end && pos >= start
 	wrapAround := start > end && (pos >= start || pos < end)
 	return enclosed || wrapAround
