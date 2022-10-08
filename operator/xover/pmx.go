@@ -1,6 +1,8 @@
 package xover
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 // PMX implements the partially mapped crossover algorithm or PMX, on slices.
 //
@@ -28,7 +30,6 @@ func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 	copy(off2, p2)
 
 	pt1, pt2 := rng.Intn(len(p1)), rng.Intn(len(p1))
-
 	mapBasedPMX(p1, p2, off1, off2, pt1, pt2)
 	return
 }
