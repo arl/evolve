@@ -141,7 +141,10 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 			Amount:      generator.Uniform[int](1, len(cities), rng),
 			Probability: generator.Const(0.99),
 		},
-		&EM[int]{
+		&mutation.SRS[int]{
+			Probability: generator.Const(.99),
+		},
+		&mutation.CIM[int]{
 			Probability: generator.Const(.99),
 		},
 	)
