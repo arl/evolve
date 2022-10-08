@@ -15,6 +15,8 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/fogleman/gg"
+
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/engine"
@@ -25,7 +27,6 @@ import (
 	"github.com/arl/evolve/operator/xover"
 	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/arl/evolve/selection"
-	"github.com/fogleman/gg"
 )
 
 type tspWindow struct {
