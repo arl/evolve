@@ -90,12 +90,16 @@ func (w *tspWindow) buildUI(wnd fyne.Window) {
 
 func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 	start := time.Now()
+	last := start
 	prevFitness := 0.0
+	const refreshInterval = 250 * time.Millisecond
 
 	return engine.ObserverFunc[[]int](func(stats *evolve.PopulationStats[[]int]) {
-		if stats.Generation%100 != 0 && prevFitness == stats.BestFitness {
+		now := time.Now()
+		if now.Sub(last) < refreshInterval && (stats.Generation%100 != 0 || prevFitness == stats.BestFitness) {
 			return
 		}
+		last = now
 
 		fmt.Printf("[%d]: distance: %v\n", stats.Generation, stats.BestFitness)
 		prevFitness = stats.BestFitness
