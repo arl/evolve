@@ -101,7 +101,7 @@ func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 		prevFitness = stats.BestFitness
 
 		w.generation.SetText(fmt.Sprintf("generation: %d", stats.Generation))
-		w.distance.SetText(fmt.Sprintf("distance: %f", stats.BestFitness))
+		w.distance.SetText(fmt.Sprintf("distance: %d", int(stats.BestFitness)))
 		w.stddev.SetText(fmt.Sprintf("std dev: %.3f", stats.StdDev))
 		w.elapsed.SetText(fmt.Sprintf("elapsed: %s", time.Since(start).Round(time.Millisecond)))
 

@@ -22,15 +22,15 @@ func TestRouteEvaluator(t *testing.T) {
 
 	tests := []struct {
 		a, b int
-		want float64
+		want int
 	}{
 		{a: 0, b: 1, want: 20},
 		{a: 0, b: 3, want: 20},
 		{a: 2, b: 3, want: 30},
-		{a: 1, b: 2, want: math.Sqrt(20*20 + 10*10)},
+		{a: 1, b: 2, want: int(math.Sqrt(20*20 + 10*10))},
 	}
 
-	var tot float64
+	var tot int
 	for _, tt := range tests {
 		ab := e.dists[tt.a][tt.b]
 		ba := e.dists[tt.b][tt.a]
@@ -46,7 +46,7 @@ func TestRouteEvaluator(t *testing.T) {
 	}
 
 	if !t.Failed() {
-		got := e.Fitness([]int{0, 1, 2, 3}, nil)
+		got := int(e.Fitness([]int{0, 1, 2, 3}, nil))
 		if got != tot {
 			t.Errorf("got total distance = %v, want %v", got, tot)
 		}
