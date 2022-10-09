@@ -147,10 +147,13 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 	var pipeline operator.Pipeline[[]int]
 
 	// Define the crossover operator.
-	xover := xover.New[[]int](xover.PMX[int]{})
-	xover.Points = generator.Const(2) // unused for cycle crossover
-	xover.Probability = generator.Const(1.0)
-	pipeline = append(pipeline, xover)
+	pmx := xover.New[[]int](xover.PMX[int]{})
+	pmx.Points = generator.Const(2) // unused for cycle crossover
+	pmx.Probability = generator.Const(1.0)
+
+	pipeline = append(pipeline, pmx)
+
+	const mutationRate = 0.05
 
 	// Define the mutation operator.
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
@@ -158,13 +161,13 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 		&mutation.SliceOrder[int]{
 			Count:       generator.Const(1),
 			Amount:      generator.Uniform[int](1, len(cities), rng),
-			Probability: generator.Const(0.99),
+			Probability: generator.Const(mutationRate),
 		},
 		&mutation.SRS[int]{
-			Probability: generator.Const(.99),
+			Probability: generator.Const(mutationRate),
 		},
 		&mutation.CIM[int]{
-			Probability: generator.Const(.99),
+			Probability: generator.Const(mutationRate),
 		},
 	)
 	pipeline = append(pipeline, mut)
@@ -179,14 +182,8 @@ func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]in
 	generational := engine.Generational[[]int]{
 		Operator:  pipeline,
 		Evaluator: eval,
-		// Selection: &selection.Tournament[[]int]{
-		// 	Probability: generator.Const(0.7),
-		// },
 		Selection: &selection.RouletteWheel[[]int]{},
-		// Selection: &selection.SigmaScaling[[]int]{
-		// 	&selection.RouletteWheel[[]int]{},
-		// },
-		Elites: 2,
+		Elites:    2,
 	}
 
 	eng := engine.Engine[[]int]{
