@@ -95,6 +95,8 @@ func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 	last := start
 	prevFitness := 0.0
 	const refreshInterval = 250 * time.Millisecond
+	red := color.RGBA{255, 0, 0, 255}
+	cityDiameter := 4.0
 
 	return engine.ObserverFunc[[]int](func(stats *evolve.PopulationStats[[]int]) {
 		now := time.Now()
@@ -114,12 +116,23 @@ func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 		dc := gg.NewContextForImage(w.img)
 		dc.SetColor(color.White)
 		dc.Clear()
+
+		dc.SetColor(red)
+		for i := 1; i < len(stats.Best); i++ {
+			x := float64(w.cities[stats.Best[i]].X)
+			y := float64(w.cities[stats.Best[i]].Y)
+			dc.DrawPoint(x, y, cityDiameter)
+		}
+		dc.Stroke()
+
 		dc.SetColor(color.Black)
 		dc.MoveTo(float64(w.cities[stats.Best[0]].X), float64(w.cities[stats.Best[0]].Y))
 		for i := 1; i < len(stats.Best); i++ {
-			dc.LineTo(float64(w.cities[stats.Best[i]].X), float64(w.cities[stats.Best[i]].Y))
+			x := float64(w.cities[stats.Best[i]].X)
+			y := float64(w.cities[stats.Best[i]].Y)
+			dc.LineTo(x, y)
 		}
-		dc.SetLineWidth(2)
+		dc.SetLineWidth(1)
 		dc.ClosePath()
 		dc.Stroke()
 
