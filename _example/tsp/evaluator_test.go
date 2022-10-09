@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"testing"
 )
@@ -22,15 +23,15 @@ func TestRouteEvaluator(t *testing.T) {
 
 	tests := []struct {
 		a, b int
-		want int
+		want float64
 	}{
 		{a: 0, b: 1, want: 20},
 		{a: 0, b: 3, want: 20},
 		{a: 2, b: 3, want: 30},
-		{a: 1, b: 2, want: int(math.Sqrt(20*20 + 10*10))},
+		{a: 1, b: 2, want: math.Sqrt(20*20 + 10*10)},
 	}
 
-	var tot int
+	var tot float64
 	for _, tt := range tests {
 		ab := e.dists[tt.a][tt.b]
 		ba := e.dists[tt.b][tt.a]
@@ -46,9 +47,19 @@ func TestRouteEvaluator(t *testing.T) {
 	}
 
 	if !t.Failed() {
-		got := int(e.Fitness([]int{0, 1, 2, 3}, nil))
+		got := e.Fitness([]int{0, 1, 2, 3}, nil)
 		if got != tot {
 			t.Errorf("got total distance = %v, want %v", got, tot)
 		}
 	}
+}
+
+func TestBerlin52Opt(t *testing.T) {
+	opt := []int{1, 49, 32, 45, 19, 41, 8, 9, 10, 43, 33, 51, 11, 52, 14, 13, 47, 26, 27, 28, 12, 25, 4, 6, 15, 5, 24, 48, 38, 37, 40, 39, 36, 35, 34, 44, 46, 16, 29, 50, 20, 23, 30, 2, 7, 42, 21, 17, 3, 18, 31, 22}
+	for i := range opt {
+		opt[i] = opt[i] - 1
+	}
+
+	e := newRouteEvaluator(berlin52)
+	fmt.Println(e.Fitness(opt, nil))
 }

@@ -52,8 +52,8 @@ func newTSPWindow() *tspWindow {
 
 	return &tspWindow{
 		cities: cities,
-		maxw:   maxw,
-		maxh:   maxh,
+		maxw:   int(maxw + 1),
+		maxh:   int(maxh + 1),
 		done:   make(chan struct{}),
 	}
 }
@@ -109,8 +109,8 @@ func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 		prevFitness = stats.BestFitness
 
 		w.generation.SetText(fmt.Sprintf("generation: %d", stats.Generation))
-		w.distance.SetText(fmt.Sprintf("distance: %d", int(stats.BestFitness)))
-		w.stddev.SetText(fmt.Sprintf("std dev: %.3f", stats.StdDev))
+		w.distance.SetText(fmt.Sprintf("distance: %.2f", stats.BestFitness))
+		w.stddev.SetText(fmt.Sprintf("std dev: %.2f", stats.StdDev))
 		w.elapsed.SetText(fmt.Sprintf("elapsed: %s", time.Since(start).Round(time.Millisecond)))
 
 		dc := gg.NewContextForImage(w.img)
@@ -141,7 +141,7 @@ func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 	})
 }
 
-type point struct{ X, Y int }
+type point struct{ X, Y float64 }
 
 func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]int], error) {
 	var pipeline operator.Pipeline[[]int]

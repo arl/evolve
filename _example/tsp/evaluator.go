@@ -6,7 +6,7 @@ import (
 
 type routeEvaluator struct {
 	cities []point
-	dists  [][]int
+	dists  [][]float64
 }
 
 func newRouteEvaluator(cities []point) *routeEvaluator {
@@ -14,17 +14,17 @@ func newRouteEvaluator(cities []point) *routeEvaluator {
 	ncities := len(cities)
 
 	// TODO(arl): see if a 1D array could help
-	dists := make([][]int, ncities)
+	dists := make([][]float64, ncities)
 	for i := 0; i < ncities; i++ {
-		dists[i] = make([]int, ncities)
+		dists[i] = make([]float64, ncities)
 	}
 
 	// Compute all distances.
 	for i := 0; i < ncities; i++ {
 		for j := 0; j < ncities; j++ {
-			hypot := math.Hypot(float64(cities[i].X-cities[j].X), float64(cities[i].Y-cities[j].Y))
-			dists[i][j] = int(hypot)
-			dists[j][i] = int(hypot)
+			hypot := math.Hypot(cities[i].X-cities[j].X, cities[i].Y-cities[j].Y)
+			dists[i][j] = hypot
+			dists[j][i] = hypot
 		}
 	}
 
@@ -35,13 +35,13 @@ func newRouteEvaluator(cities []point) *routeEvaluator {
 
 func (e *routeEvaluator) Fitness(ind []int, pop [][]int) float64 {
 	// Compute perimeter of the polygon formed by the closed path.
-	var tot int
+	var tot float64
 	for i := 0; i < len(ind)-1; i++ {
 		tot += e.dists[ind[i]][ind[i+1]]
 	}
 	tot += e.dists[0][len(ind)-1]
 
-	return float64(tot)
+	return tot
 }
 
 func (e *routeEvaluator) IsNatural() bool {
