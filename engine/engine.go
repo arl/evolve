@@ -36,7 +36,7 @@ type Engine[T any] struct {
 	// mt19937 pseudo random number generator.
 	RNG *rand.Rand
 
-	// Number of concurrent processes to use (defaults to the number of cores).
+	// Concurrency is the number of concurrent workers (defaults to the number of cores).
 	Concurrency int
 
 	stats *evolve.Dataset
