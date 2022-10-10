@@ -4,10 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"math/rand"
-	"os"
-	"os/signal"
-	"runtime"
 	"sync"
 	"time"
 
@@ -21,15 +17,7 @@ import (
 	"github.com/fogleman/gg"
 
 	"github.com/arl/evolve"
-	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/engine"
-	"github.com/arl/evolve/factory"
-	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
-	"github.com/arl/evolve/operator/mutation"
-	"github.com/arl/evolve/operator/xover"
-	"github.com/arl/evolve/pkg/mt19937"
-	"github.com/arl/evolve/selection"
 )
 
 type tspWindow struct {
@@ -68,7 +56,7 @@ func (w *tspWindow) buildUI(wnd fyne.Window) {
 	var once sync.Once
 	startButton := widget.NewButton("start", func() {
 		once.Do(func() {
-			runTSP(w.cities, w.updatePathAndStats())
+			runTSP(w.cities, -1, w.updatePathAndStats())
 			close(w.done)
 		})
 	})
@@ -93,27 +81,25 @@ func (w *tspWindow) buildUI(wnd fyne.Window) {
 }
 
 func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
-	start := time.Now()
-	last := start
+	prev := time.Duration(0)
 	prevFitness := 0.0
 	const refreshInterval = 250 * time.Millisecond
 	red := color.RGBA{255, 0, 0, 255}
 	cityDiameter := 4.0
 
 	return engine.ObserverFunc[[]int](func(stats *evolve.PopulationStats[[]int]) {
-		now := time.Now()
-		if now.Sub(last) < refreshInterval && (stats.Generation%100 != 0 || prevFitness == stats.BestFitness) {
+		if stats.Elapsed-prev < refreshInterval && (stats.Generation%100 != 0 || prevFitness == stats.BestFitness) {
 			return
 		}
-		last = now
+		prev = stats.Elapsed
 
-		fmt.Printf("[%d]: distance: %v\n", stats.Generation, stats.BestFitness)
+		fmt.Printf("[%d]: distance: %.2f\n", stats.Generation, stats.BestFitness)
 		prevFitness = stats.BestFitness
 
 		w.generation.SetText(fmt.Sprintf("generation: %d", stats.Generation))
 		w.distance.SetText(fmt.Sprintf("distance: %.2f", stats.BestFitness))
 		w.stddev.SetText(fmt.Sprintf("std dev: %.2f", stats.StdDev))
-		w.elapsed.SetText(fmt.Sprintf("elapsed: %s", time.Since(start).Round(time.Millisecond)))
+		w.elapsed.SetText(fmt.Sprintf("elapsed: %s", stats.Elapsed.Round(time.Millisecond)))
 
 		dc := gg.NewContextForImage(w.img)
 		dc.SetColor(color.White)
@@ -141,73 +127,4 @@ func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 		w.path.Image = dc.Image()
 		canvas.Refresh(w.path)
 	})
-}
-
-type point struct{ X, Y float64 }
-
-func runTSP(cities []point, obs engine.Observer[[]int]) (*evolve.Population[[]int], error) {
-	var pipeline operator.Pipeline[[]int]
-
-	// Define the crossover operator.
-	pmx := xover.New[[]int](xover.PMX[int]{})
-	pmx.Points = generator.Const(2) // unused for cycle crossover
-	pmx.Probability = generator.Const(1.0)
-
-	pipeline = append(pipeline, pmx)
-
-	const mutationRate = 0.05
-
-	// Define the mutation operator.
-	rng := rand.New(mt19937.New(time.Now().UnixNano()))
-	mut := operator.NewSwitch[[]int](
-		&mutation.SliceOrder[int]{
-			Count:       generator.Const(1),
-			Amount:      generator.Uniform[int](1, len(cities), rng),
-			Probability: generator.Const(mutationRate),
-		},
-		&mutation.SRS[int]{
-			Probability: generator.Const(mutationRate),
-		},
-		&mutation.CIM[int]{
-			Probability: generator.Const(mutationRate),
-		},
-	)
-	pipeline = append(pipeline, mut)
-
-	indices := make([]int, len(cities))
-	for i := 0; i < len(cities); i++ {
-		indices[i] = i
-	}
-
-	eval := newRouteEvaluator(cities)
-
-	generational := engine.Generational[[]int]{
-		Operator:  pipeline,
-		Evaluator: eval,
-		Selection: &selection.RouletteWheel[[]int]{},
-		Elites:    2,
-	}
-
-	eng := engine.Engine[[]int]{
-		Factory:     factory.Permutation[int](indices),
-		Evaluator:   eval,
-		Epocher:     &generational,
-		Concurrency: runtime.NumCPU() * 2,
-	}
-	var userAbort condition.UserAbort[[]int]
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt)
-		<-c
-		userAbort.Abort()
-	}()
-
-	eng.EndConditions = append(eng.EndConditions, &userAbort)
-
-	eng.AddObserver(obs)
-
-	pop, cond, err := eng.Evolve(150)
-	fmt.Printf("TSP ended, reason: %v\n", cond)
-
-	return pop, err
 }

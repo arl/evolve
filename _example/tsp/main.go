@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"runtime/pprof"
 
+	"evolve/example/tsp/internal/tsp"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"github.com/arl/statsviz"
@@ -19,6 +21,9 @@ func main() {
 	memprofile := flag.String("memprofile", "", "write memory profile to `file`")
 	memprofilerate := flag.Int64("memprofilerate", 0, "set runtime.MemProfileRate to `rate`")
 	statsvizAddr := flag.String("statsviz", "", "enable statsviz endpoint at `host:port`")
+	nogui := flag.Bool("nogui", false, "disable gui, just starts the algorithm")
+	maxgen := flag.Int("maxgen", -1, "maximum generation, -1, run forever")
+	tspfname := flag.String("tspfile", "berlin52", "tspfile to load, by default, pre-load berlin52")
 	flag.Parse()
 
 	if *cpuprofile != "" {
@@ -44,10 +49,27 @@ func main() {
 		startStatsviz(*statsvizAddr)
 	}
 
-	myApp := app.New()
-	w := myApp.NewWindow("TSP")
+	// Fill config
+	f, err := os.Open(*tspfname)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
 
-	tspw := newTSPWindow()
+	tspf, err := tsp.Load(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if *nogui {
+		runTSP(tspf.Nodes, *maxgen, printStatsToCli())
+		return
+	}
+
+	app := app.New()
+	w := app.NewWindow("TSP")
+
+	tspw := newTSPWindow(tspf)
 	tspw.buildUI(w)
 
 	go func() {
