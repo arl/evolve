@@ -11,7 +11,7 @@ import (
 var berlin52 []byte
 
 func TestOpenFile(t *testing.T) {
-	f, err := OpenFile(bytes.NewReader(berlin52))
+	f, err := Load(bytes.NewReader(berlin52))
 	if err != nil {
 		t.Fatal(err)
 	}

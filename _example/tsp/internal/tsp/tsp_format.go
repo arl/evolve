@@ -7,6 +7,7 @@ package tsp
 
 import (
 	"bufio"
+	_ "embed"
 	"fmt"
 	"io"
 	"strconv"
@@ -47,8 +48,8 @@ type File struct {
 // Point2D is the point coordinates in 2D space.
 type Point2D struct{ X, Y float64 }
 
-// OpenFile tries to create a *File from a reader reading a TSP file.
-func OpenFile(r io.Reader) (*File, error) {
+// Load fills a *File from a reader reading a TSP file.
+func Load(r io.Reader) (*File, error) {
 	f := File{}
 	s := bufio.NewScanner(r)
 

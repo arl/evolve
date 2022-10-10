@@ -1,6 +1,10 @@
 package main
 
-import "golang.org/x/exp/constraints"
+import (
+	"evolve/example/tsp/internal/tsp"
+
+	"golang.org/x/exp/constraints"
+)
 
 func min[T constraints.Ordered](a, b T) T {
 	if a < b {
@@ -16,7 +20,7 @@ func max[T constraints.Ordered](a, b T) T {
 	return b
 }
 
-func worldBounds(cities []point) (maxw, maxh float64) {
+func worldBounds(cities []tsp.Point2D) (maxw, maxh float64) {
 	for _, c := range cities {
 		maxw = max(maxw, c.X)
 		maxh = max(maxw, c.Y)

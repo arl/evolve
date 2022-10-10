@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"evolve/example/tsp/internal/tsp"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -33,7 +35,7 @@ import (
 type tspWindow struct {
 	running    bool
 	maxw, maxh int // max cities coords
-	cities     []point
+	cities     []tsp.Point2D
 
 	done chan struct{}
 
@@ -45,8 +47,8 @@ type tspWindow struct {
 	elapsed    *widget.Label
 }
 
-func newTSPWindow() *tspWindow {
-	cities := berlin52
+func newTSPWindow(tspf *tsp.File) *tspWindow {
+	cities := tspf.Nodes
 	maxw, maxh := worldBounds(cities)
 	fmt.Println("world bounds", maxw, "x", maxh)
 

@@ -2,14 +2,16 @@ package main
 
 import (
 	"math"
+
+	"evolve/example/tsp/internal/tsp"
 )
 
 type routeEvaluator struct {
-	cities []point
+	cities []tsp.Point2D
 	dists  [][]float64
 }
 
-func newRouteEvaluator(cities []point) *routeEvaluator {
+func newRouteEvaluator(cities []tsp.Point2D) *routeEvaluator {
 	// Store precomputed distances in a 2D array.
 	ncities := len(cities)
 
