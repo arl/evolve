@@ -13,11 +13,11 @@ func TestRouteEvaluator(t *testing.T) {
 	// |            \
 	// d_____________c
 	//
-	a := point{0, 20}  // cities[0]
-	b := point{20, 20} // cities[1]
-	c := point{30, 0}  // cities[2]
-	d := point{0, 0}   // cities[3]
-	cities := []point{a, b, c, d}
+	a := tsp.Point2D{X: 0, Y: 20}  // cities[0]
+	b := tsp.Point2D{X: 20, Y: 20} // cities[1]
+	c := tsp.Point2D{X: 30, Y: 0}  // cities[2]
+	d := tsp.Point2D{X: 0, Y: 0}   // cities[3]
+	cities := []tsp.Point2D{a, b, c, d}
 
 	e := newRouteEvaluator(cities)
 

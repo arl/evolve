@@ -44,7 +44,7 @@ func runTSP(cities []tsp.Point2D, maxgen int, obs engine.Observer[[]int]) (*evol
 	mut := operator.NewSwitch[[]int](
 		&mutation.SliceOrder[int]{
 			Count:       generator.Const(1),
-			Amount:      generator.Uniform[int](1, len(cities), rng),
+			Amount:      generator.Uniform(1, len(cities), rng),
 			Probability: generator.Const(mutationRate),
 		},
 		&mutation.SRS[int]{
@@ -91,7 +91,7 @@ func runTSP(cities []tsp.Point2D, maxgen int, obs engine.Observer[[]int]) (*evol
 	}
 
 	var latestStats *evolve.PopulationStats[[]int]
-	eng.AddObserver(engine.ObserverFunc[[]int](func(stats *evolve.PopulationStats[[]int]) {
+	eng.AddObserver(engine.ObserverFunc(func(stats *evolve.PopulationStats[[]int]) {
 		obs.Observe(stats)
 		latestStats = stats
 	}))
@@ -109,7 +109,7 @@ func printStatsToCli() engine.Observer[[]int] {
 	prevFitness := 0.0
 	const refreshInterval = 1 * time.Second
 
-	return engine.ObserverFunc[[]int](func(stats *evolve.PopulationStats[[]int]) {
+	return engine.ObserverFunc(func(stats *evolve.PopulationStats[[]int]) {
 		now := time.Now()
 		if now.Sub(last) < refreshInterval && (stats.Generation%100 != 0 || prevFitness == stats.BestFitness) {
 			return
