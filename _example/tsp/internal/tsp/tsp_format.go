@@ -56,7 +56,7 @@ func Load(r io.Reader) (*File, error) {
 scanLoop:
 	for s.Scan() {
 		if k, v, found := strings.Cut(s.Text(), ":"); found {
-			switch k {
+			switch strings.TrimSpace(k) {
 			case "NAME":
 				f.Name = strings.TrimSpace(v)
 			case "TYPE":
