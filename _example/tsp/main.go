@@ -2,13 +2,16 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
 	"evolve/example/tsp/internal/tsp"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
+	"gioui.org/app"
+	"gioui.org/font/gofont"
+	"gioui.org/unit"
+	"gioui.org/widget/material"
 )
 
 func main() {
@@ -17,7 +20,7 @@ func main() {
 	memprofilerate := flag.Int("memprofilerate", 0, "set runtime.MemProfileRate to `rate`")
 	statsvizAddr := flag.String("statsviz", "", "enable statsviz endpoint at `host:port`")
 	nogui := flag.Bool("nogui", false, "disable gui, just starts the algorithm")
-	maxgen := flag.Int("maxgen", -1, "maximum generation, -1, run forever")
+	maxgen := flag.Int("maxgen", 0, "max number of generations to evolve. 0:forever")
 	tspfname := flag.String("tspfile", "berlin52.tsp", "tspfile to load, by default, pre-load berlin52")
 	flag.Parse()
 
@@ -30,6 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer f.Close()
+	fmt.Println("loaded", *tspfname, "successfully")
 
 	tspf, err := tsp.Load(f)
 	if err != nil {
@@ -37,21 +41,26 @@ func main() {
 	}
 
 	if *nogui {
-		runTSP(tspf.Nodes, *maxgen, printStatsToCli())
+		runTSP(config{cities: tspf.Nodes, maxgen: *maxgen}, printStatsToCli())
 		return
 	}
 
-	app := app.New()
-	w := app.NewWindow("TSP")
-
-	tspw := newTSPWindow(tspf)
-	tspw.buildUI(w)
-
 	go func() {
-		<-tspw.done
-		w.Close()
+		theme := material.NewTheme(gofont.Collection())
+
+		gui := gui{
+			theme: theme,
+			tspf:  tspf,
+		}
+		w := app.NewWindow(
+			app.Title("evolve/TSP"),
+			app.Size(unit.Dp(800), unit.Dp(600)),
+		)
+		if err := gui.run(w); err != nil {
+			log.Fatal(err)
+		}
+		os.Exit(0)
 	}()
 
-	w.Resize(fyne.NewSize(800, 600))
-	w.ShowAndRun()
+	app.Main()
 }

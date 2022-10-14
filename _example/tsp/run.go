@@ -24,10 +24,9 @@ import (
 type config struct {
 	cities []tsp.Point2D
 	maxgen int
-	// ...
 }
 
-func runTSP(cities []tsp.Point2D, maxgen int, obs engine.Observer[[]int]) (*evolve.Population[[]int], *evolve.PopulationStats[[]int], error) {
+func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], *evolve.PopulationStats[[]int], error) {
 	var pipeline operator.Pipeline[[]int]
 
 	// Define the crossover operator.
@@ -44,7 +43,7 @@ func runTSP(cities []tsp.Point2D, maxgen int, obs engine.Observer[[]int]) (*evol
 	mut := operator.NewSwitch[[]int](
 		&mutation.SliceOrder[int]{
 			Count:       generator.Const(1),
-			Amount:      generator.Uniform(1, len(cities), rng),
+			Amount:      generator.Uniform(1, len(cfg.cities), rng),
 			Probability: generator.Const(mutationRate),
 		},
 		&mutation.SRS[int]{
@@ -56,12 +55,12 @@ func runTSP(cities []tsp.Point2D, maxgen int, obs engine.Observer[[]int]) (*evol
 	)
 	pipeline = append(pipeline, mut)
 
-	indices := make([]int, len(cities))
-	for i := 0; i < len(cities); i++ {
+	indices := make([]int, len(cfg.cities))
+	for i := 0; i < len(cfg.cities); i++ {
 		indices[i] = i
 	}
 
-	eval := newRouteEvaluator(cities)
+	eval := newRouteEvaluator(cfg.cities)
 
 	generational := engine.Generational[[]int]{
 		Operator:  pipeline,
@@ -86,8 +85,8 @@ func runTSP(cities []tsp.Point2D, maxgen int, obs engine.Observer[[]int]) (*evol
 	}()
 
 	eng.EndConditions = append(eng.EndConditions, &userAbort)
-	if maxgen != -1 {
-		eng.EndConditions = append(eng.EndConditions, condition.GenerationCount[[]int](maxgen))
+	if cfg.maxgen != 0 {
+		eng.EndConditions = append(eng.EndConditions, condition.GenerationCount[[]int](cfg.maxgen))
 	}
 
 	var latestStats *evolve.PopulationStats[[]int]

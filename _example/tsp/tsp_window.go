@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"fmt"
 	"image"
@@ -128,3 +129,4 @@ func (w *tspWindow) updatePathAndStats() engine.Observer[[]int] {
 		canvas.Refresh(w.path)
 	})
 }
+*/

@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"math"
+	"os"
 	"testing"
+
+	"evolve/example/tsp/internal/tsp"
 )
 
 func TestRouteEvaluator(t *testing.T) {
@@ -54,12 +57,23 @@ func TestRouteEvaluator(t *testing.T) {
 	}
 }
 
-func TestBerlin52Opt(t *testing.T) {
+func TestBerlin52Optimum(t *testing.T) {
+	t.Log("this is not the optimum tour, optimum tour is 7544.3659 long")
 	opt := []int{1, 49, 32, 45, 19, 41, 8, 9, 10, 43, 33, 51, 11, 52, 14, 13, 47, 26, 27, 28, 12, 25, 4, 6, 15, 5, 24, 48, 38, 37, 40, 39, 36, 35, 34, 44, 46, 16, 29, 50, 20, 23, 30, 2, 7, 42, 21, 17, 3, 18, 31, 22}
 	for i := range opt {
 		opt[i] = opt[i] - 1
 	}
 
-	e := newRouteEvaluator(berlin52)
+	f, err := os.Open("berlin52.tsp")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	tspf, err := tsp.Load(f)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	e := newRouteEvaluator(tspf.Nodes)
 	fmt.Println(e.Fitness(opt, nil))
 }
