@@ -20,7 +20,6 @@ import (
 	"gioui.org/op/paint"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"golang.org/x/exp/constraints"
 )
 
 type (
@@ -120,6 +119,13 @@ type pathWidget struct {
 }
 
 func newPathWidget(cities []tsp.Point2D) *pathWidget {
+	max := func(a, b float32) float32 {
+		if a > b {
+			return a
+		}
+		return b
+	}
+
 	// Compute world bounds
 	var citymax f32.Point
 	for _, c := range cities {
@@ -206,18 +212,4 @@ func (btn *startButton) handleClicked() (firstClick bool) {
 		}
 	}
 	return
-}
-
-func min[T constraints.Ordered](a, b T) T {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max[T constraints.Ordered](a, b T) T {
-	if a > b {
-		return a
-	}
-	return b
 }

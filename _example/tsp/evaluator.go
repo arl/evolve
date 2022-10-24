@@ -7,8 +7,7 @@ import (
 )
 
 type routeEvaluator struct {
-	cities []tsp.Point2D
-	dists  [][]float64
+	dists [][]float64
 }
 
 func newRouteEvaluator(cities []tsp.Point2D) *routeEvaluator {
