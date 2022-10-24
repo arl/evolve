@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"runtime"
 	"time"
 
 	"github.com/arl/evolve"
@@ -70,11 +71,10 @@ func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], 
 	}
 
 	eng := engine.Engine[[]int]{
-		Factory:   factory.Permutation[int](indices),
-		Evaluator: eval,
-		Epocher:   &generational,
-		// Concurrency: runtime.NumCPU() * 2,
-		Concurrency: 1,
+		Factory:     factory.Permutation[int](indices),
+		Evaluator:   eval,
+		Epocher:     &generational,
+		Concurrency: runtime.NumCPU(),
 	}
 	var userAbort condition.UserAbort[[]int]
 	go func() {
@@ -98,7 +98,6 @@ func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], 
 	pop, cond, err := eng.Evolve(150)
 	fmt.Printf("TSP ended, reason: %v\n", cond)
 
-	// eng.
 	return pop, latestStats, err
 }
 
