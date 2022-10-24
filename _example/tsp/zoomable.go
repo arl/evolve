@@ -11,17 +11,16 @@ import (
 	"gioui.org/op/clip"
 )
 
-type zoomable struct {
+type Zoomable struct {
 	scroll gesture.Scroll
 	mouse  f32.Point
 	tr     f32.Affine2D
 }
 
-func (z *zoomable) Layout(gtx C, zoomed layout.Widget) D {
+func (z *Zoomable) Layout(gtx C, zoomed layout.Widget) D {
 	{
-		stack := clip.Rect{
-			Max: gtx.Constraints.Max,
-		}.Push(gtx.Ops)
+		r := clip.Rect{Max: gtx.Constraints.Max}
+		r.Push(gtx.Ops)
 
 		z.scroll.Add(gtx.Ops, image.Rect(0, -1, 0, 1))
 		nscroll := z.scroll.Scroll(gtx.Metric, gtx, gtx.Now, gesture.Vertical)
@@ -40,16 +39,15 @@ func (z *zoomable) Layout(gtx C, zoomed layout.Widget) D {
 		if nscroll != 0 {
 			var change float32
 			if nscroll > 0 {
-				change = 1.1
-			} else {
 				change = 0.9
+			} else {
+				change = 1.1
 			}
 
 			z.tr = z.tr.Scale(z.mouse, f32.Pt(change, change))
 		}
 
 		op.Affine(z.tr).Add(gtx.Ops)
-		stack.Pop()
 	}
 	return zoomed(gtx)
 }

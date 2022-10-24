@@ -1,25 +1,55 @@
 package main
 
 import (
-	"evolve/example/tsp/internal/tsp"
 	"fmt"
 	"image"
 	"image/color"
 	"sync/atomic"
 	"time"
 
+	"evolve/example/tsp/internal/tsp"
+
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/engine"
+	"github.com/arl/gioexp/component/property"
 
 	"gioui.org/app"
-	"gioui.org/f32"
 	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
-	"gioui.org/op/clip"
-	"gioui.org/op/paint"
+	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+)
+
+var (
+	bgColor    = color.NRGBA{R: 247, G: 231, B: 190, A: 255}
+	panelColor = color.NRGBA{R: 218, G: 234, B: 240, A: 255}
+
+	borderColor = color.NRGBA{R: 131, G: 140, B: 143, A: 255}
+	borderWidth = unit.Dp(1)
+
+	propertyColor = color.NRGBA{R: 216, G: 202, B: 227, A: 255}
+)
+
+var (
+	entriesPanel = Panel{
+		Axis: layout.Vertical,
+		Size: unit.Dp(270),
+
+		Background:  panelColor,
+		Border:      borderColor,
+		BorderWidth: borderWidth,
+	}
+
+	entriesHeaderPanel = Panel{
+		Axis: layout.Horizontal,
+		Size: unit.Dp(80),
+
+		Background:  panelColor,
+		Border:      borderColor,
+		BorderWidth: borderWidth,
+	}
 )
 
 type (
@@ -27,18 +57,53 @@ type (
 	D = layout.Dimensions
 )
 
-type gui struct {
-	theme *material.Theme
+// state holds the application state
+type state struct {
+	stats *evolve.PopulationStats[[]int]
 	tspf  *tsp.File
 }
 
-func (g *gui) run(w *app.Window) error {
-	// Our widgets
-	zoomed := zoomable{}
-	btn := startButton{theme: g.theme}
-	pw := newPathWidget(g.tspf.Nodes)
+type UI struct {
+	state state
+	theme *material.Theme
 
-	solutions := make(chan []int)
+	list *property.List
+
+	startButton *startButton
+	zoomable    *Zoomable
+	pathWidget  *pathWidget
+}
+
+func newUI(theme *material.Theme, tspf *tsp.File) *UI {
+	return &UI{
+		theme: theme,
+		state: state{
+			tspf:  tspf,
+			stats: &evolve.PopulationStats[[]int]{},
+		},
+		list: property.NewList(),
+	}
+}
+
+func (ui *UI) run(w *app.Window) error {
+	ui.startButton = &startButton{}
+	ui.pathWidget = newPathWidget(ui.state.tspf.Nodes)
+
+	gen := property.NewFloat64(0)
+	gen.Editable = false
+	dist := property.NewFloat64(0)
+	dist.Editable = false
+	stddev := property.NewFloat64(0)
+	stddev.Editable = false
+	elapsed := property.NewString("")
+	elapsed.Editable = false
+
+	ui.list.Add("Generation", gen)
+	ui.list.Add("Distance", dist)
+	ui.list.Add("Std dev", stddev)
+	ui.list.Add("Elapsed", elapsed)
+
+	solutions := make(chan *evolve.PopulationStats[[]int])
 	var prev, paused time.Duration
 	prevFitness := 0.0
 
@@ -47,7 +112,7 @@ func (g *gui) run(w *app.Window) error {
 		// all executed synchronously after each epoch, so blocking here means
 		// blocking the whole evolution ^-^.
 		before := time.Now()
-		for !btn.isRunning() {
+		for !ui.startButton.isRunning() {
 			// UI is paused
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -63,45 +128,36 @@ func (g *gui) run(w *app.Window) error {
 		prev = stats.Elapsed
 		prevFitness = stats.BestFitness
 
-		fmt.Printf("[%d]: distance: %.2f\n", stats.Generation, stats.BestFitness)
-		solutions <- stats.Best
+		// fmt.Printf("[%d]: distance: %.2f\n", stats.Generation, stats.BestFitness)
+		solutions <- stats
 	})
 
-	var bestPath []int
 	var ops op.Ops
+
 	for {
 		select {
-		case path := <-solutions:
-			bestPath = path
+		case stats := <-solutions:
+			// Substract paused time
+			stats.Elapsed -= paused
+			ui.state.stats = stats
+
+			gen.SetValue(float64(stats.Generation))
+			dist.SetValue(stats.BestFitness)
+			stddev.SetValue(stats.StdDev)
+			elapsed.SetValue(fmt.Sprintf("%v", ui.state.stats.Elapsed.Round(time.Millisecond)))
+
 		case e := <-w.Events():
 			switch e := e.(type) {
 			case system.FrameEvent:
 				gtx := layout.NewContext(&ops, e)
 
-				if firstClick := btn.handleClicked(); firstClick {
+				if firstClick := ui.startButton.handleClicked(); firstClick {
 					// Start the TSP generic algorithm.
-					cfg := config{cities: g.tspf.Nodes, maxgen: 0}
-					go runTSP(cfg, observer)
-					// firstStart = false
+					go runTSP(config{cities: ui.state.tspf.Nodes, maxgen: 0}, observer)
 				}
 
-				layout.Flex{
-					Axis:    layout.Vertical,
-					Spacing: layout.SpaceBetween,
-				}.Layout(gtx,
-					layout.Rigid(func(gtx C) D {
-						return layout.Flex{
-							Axis:    layout.Horizontal,
-							Spacing: layout.SpaceBetween,
-						}.Layout(gtx,
-							layout.Flexed(1, btn.Layout))
-					}),
-					layout.Flexed(1, func(gtx C) D {
-						return zoomed.Layout(gtx, func(gtx C) D {
-							return pw.layout(gtx, !btn.isStarted(), bestPath)
-						})
-					}),
-				)
+				ui.Layout(gtx)
+
 				e.Frame(gtx.Ops)
 			case system.DestroyEvent:
 				return e.Err
@@ -110,70 +166,43 @@ func (g *gui) run(w *app.Window) error {
 	}
 }
 
-type pathWidget struct {
-	citymax f32.Point
-	cities  []tsp.Point2D
-}
+func (ui *UI) Layout(gtx C) D {
+	// TODO(arl) we probably can move all startButton logic into a method of UI
+	// instead of a specific struct.
+	drawPath := !ui.startButton.isStarted()
 
-func newPathWidget(cities []tsp.Point2D) *pathWidget {
-	max := func(a, b float32) float32 {
-		if a > b {
-			return a
-		}
-		return b
-	}
-
-	// Compute world bounds
-	var citymax f32.Point
-	for _, c := range cities {
-		citymax.X = max(citymax.X, float32(c.X))
-		citymax.Y = max(citymax.Y, float32(c.Y))
-	}
-	fmt.Println("world bounds", citymax)
-
-	return &pathWidget{cities: cities, citymax: citymax}
-}
-
-var (
-	pathColor = color.NRGBA{A: 255}
-	dotColor  = color.NRGBA{R: 200, A: 255}
-)
-
-func (pw *pathWidget) layout(gtx C, onlyCities bool, sol []int) D {
-	// Draw cities as red dots
-	const cityRadius = 5
-	for i := range pw.cities {
-		city := pw.cities[i]
-		circle := clip.Ellipse{
-			Min: image.Pt(int(city.X-cityRadius), int(city.Y-cityRadius)),
-			Max: image.Pt(int(city.X+cityRadius), int(city.Y+cityRadius)),
-		}.Op(gtx.Ops)
-		paint.FillShape(gtx.Ops, dotColor, circle)
-	}
-
-	if !onlyCities && len(sol) != 0 {
-		// At start we may not have received the first solution yet.
-		p := clip.Path{}
-		p.Begin(gtx.Ops)
-		pt := f32.Pt(float32(pw.cities[sol[0]].X), float32(pw.cities[sol[0]].Y))
-		p.MoveTo(pt)
-		for i := 1; i < len(sol); i++ {
-			pt := f32.Pt(float32(pw.cities[sol[i]].X), float32(pw.cities[sol[i]].Y))
-			p.LineTo(pt)
-		}
-		p.LineTo(pt)
-		paint.FillShape(gtx.Ops, pathColor, clip.Stroke{Path: p.End(), Width: 1}.Op())
-	}
-
-	op.InvalidateOp{}.Add(gtx.Ops)
-	return layout.Dimensions{Size: gtx.Constraints.Max}
+	gtx.Constraints.Min = gtx.Constraints.Max
+	return layout.Flex{
+		Axis: layout.Horizontal,
+	}.Layout(gtx,
+		layout.Rigid(func(gtx C) D {
+			return layout.Flex{
+				Axis:    layout.Vertical,
+				Spacing: layout.SpaceEnd,
+			}.Layout(gtx,
+				layout.Rigid(func(gtx C) D {
+					// TODO(arl) we have a bug in property.List it should not
+					// take up all vertical space.
+					//
+					// gtx.Constraints.Min.X = 400
+					// gtx.Constraints.Max.X = 400
+					gtx.Constraints = layout.Exact(image.Pt(400, 200))
+					return ui.list.Layout(ui.theme, gtx)
+				}),
+				layout.Rigid(func(gtx C) D {
+					return ui.startButton.Layout(ui.theme, gtx)
+				}),
+			)
+		}),
+		layout.Flexed(1, func(gtx C) D {
+			return ui.pathWidget.Layout(drawPath, ui.state.stats.Best, gtx)
+		}),
+	)
 }
 
 // startButton is a single button used to start, pause and resume the
 // evolutionnary algorithm.
 type startButton struct {
-	theme *material.Theme
-
 	widget.Clickable
 	started bool
 	running atomic.Bool // running/paused
@@ -189,7 +218,7 @@ func (btn *startButton) isRunning() bool {
 	return btn.running.Load()
 }
 
-func (btn *startButton) Layout(gtx C) D {
+func (btn *startButton) Layout(theme *material.Theme, gtx C) D {
 	txt := ""
 	if !btn.started {
 		txt = "Start"
@@ -200,7 +229,8 @@ func (btn *startButton) Layout(gtx C) D {
 			txt = "Resume"
 		}
 	}
-	button := material.Button(btn.theme, &btn.Clickable, txt)
+	button := material.Button(theme, &btn.Clickable, txt)
+	button.Inset = layout.UniformInset(12)
 	return button.Layout(gtx)
 }
 
@@ -211,10 +241,9 @@ func (btn *startButton) handleClicked() (firstClick bool) {
 		if !btn.started {
 			btn.started = true
 			btn.running.Store(true)
-			firstClick = true
-		} else {
-			btn.running.Store(!btn.running.Load())
+			return true
 		}
+		btn.running.Store(!btn.running.Load())
 	}
-	return
+	return false
 }

@@ -10,7 +10,6 @@ import (
 
 	"gioui.org/app"
 	"gioui.org/font/gofont"
-	"gioui.org/unit"
 	"gioui.org/widget/material"
 )
 
@@ -48,15 +47,12 @@ func main() {
 	go func() {
 		theme := material.NewTheme(gofont.Collection())
 
-		gui := gui{
-			theme: theme,
-			tspf:  tspf,
-		}
+		ui := newUI(theme, tspf)
 		w := app.NewWindow(
 			app.Title("evolve/TSP"),
-			app.Size(unit.Dp(800), unit.Dp(600)),
+			app.Size(1400, 900),
 		)
-		if err := gui.run(w); err != nil {
+		if err := ui.run(w); err != nil {
 			log.Fatal(err)
 		}
 		os.Exit(0)
