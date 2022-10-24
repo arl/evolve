@@ -172,6 +172,8 @@ func (pw *pathWidget) layout(gtx C, onlyCities bool, sol []int) D {
 	return layout.Dimensions{Size: gtx.Constraints.Max}
 }
 
+// startButton is a single button used to start, pause and resume the
+// evolutionnary algorithm.
 type startButton struct {
 	theme *material.Theme
 
