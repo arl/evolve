@@ -33,12 +33,9 @@ type gui struct {
 }
 
 func (g *gui) run(w *app.Window) error {
-	var ops op.Ops
-
+	// Our widgets
 	zoomed := zoomable{}
-
 	btn := startButton{theme: g.theme}
-
 	pw := newPathWidget(g.tspf.Nodes)
 
 	solutions := make(chan []int)
@@ -49,12 +46,12 @@ func (g *gui) run(w *app.Window) error {
 		// Handle paused UI. We can do this here since evolution observers are
 		// all executed synchronously after each epoch, so blocking here means
 		// blocking the whole evolution ^-^.
-		bef := time.Now()
+		before := time.Now()
 		for !btn.isRunning() {
 			// UI is paused
 			time.Sleep(100 * time.Millisecond)
 		}
-		paused += time.Since(bef)
+		paused += time.Since(before)
 
 		// In case of many consecutive improvements of the solution, we want
 		// anyway to limit us to to drawning 30 fps.
@@ -71,7 +68,7 @@ func (g *gui) run(w *app.Window) error {
 	})
 
 	var bestPath []int
-	var firstStart = true
+	var ops op.Ops
 	for {
 		select {
 		case path := <-solutions:
@@ -81,11 +78,11 @@ func (g *gui) run(w *app.Window) error {
 			case system.FrameEvent:
 				gtx := layout.NewContext(&ops, e)
 
-				if started := btn.handleClicked(); started && firstStart {
+				if firstClick := btn.handleClicked(); firstClick {
 					// Start the TSP generic algorithm.
 					cfg := config{cities: g.tspf.Nodes, maxgen: 0}
 					go runTSP(cfg, observer)
-					firstStart = false
+					// firstStart = false
 				}
 
 				layout.Flex{
@@ -101,7 +98,7 @@ func (g *gui) run(w *app.Window) error {
 					}),
 					layout.Flexed(1, func(gtx C) D {
 						return zoomed.Layout(gtx, func(gtx C) D {
-							return pw.layout(gtx, firstStart, bestPath)
+							return pw.layout(gtx, !btn.isStarted(), bestPath)
 						})
 					}),
 				)
@@ -182,6 +179,12 @@ type startButton struct {
 	running atomic.Bool // running/paused
 }
 
+// isStarted returns whether the start button has been clicked at least once.
+func (btn *startButton) isStarted() bool {
+	return btn.started
+}
+
+// isRunning returns whether the button is currently running (as opposed to paused).
 func (btn *startButton) isRunning() bool {
 	return btn.running.Load()
 }
