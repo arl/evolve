@@ -5,37 +5,33 @@ import (
 	"testing"
 )
 
-// Unit test for roulette selection strategy. We cannot easily test
-// that the correct candidates are returned because of the random aspect
-// of the selection, but we can at least make sure the right number of
-// candidates are selected.
-func testRouletteWheelSelection(t *testing.T, tpop testPopulation, natural bool) {
-	for i := 0; i < 20; i++ {
-		testRandomBasedSelection(t, RouletteWheel, tpop, natural, 2,
-			func(selected []interface{}) error {
-				if len(selected) != 2 {
-					return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
-				}
-				return nil
-			})
+func testRouletteWheelSelection(tpop testPopulation, natural bool) func(t *testing.T) {
+	return func(t *testing.T) {
+		// We can't easily test that the correct candidates are returned because of
+		// the random aspect of the selection, but we can at least make sure the
+		// right number of candidates are selected.
+		check := func(s []string) error {
+			if len(s) != 2 {
+				return fmt.Errorf("got %d selected elements, want 2", len(s))
+			}
+			return nil
+		}
+
+		for i := 0; i < 20; i++ {
+			t.Run(fmt.Sprintf("run_%d", i), testRandomBasedSelection(RouletteWheel[string]{}, tpop, natural, 2, check))
+		}
 	}
 }
 
-func TestRouletteWheelSelectionNatural(t *testing.T) {
-	testRouletteWheelSelection(t, randomBasedPopNatural, true)
-}
+func TestRouletteWheelSelection(t *testing.T) {
+	t.Run("natural", testRouletteWheelSelection(randomBasedPopNatural, true))
+	t.Run("non-natural", testRouletteWheelSelection(randomBasedPopNonNatural, false))
 
-func TestRouletteWheelSelectionNonNatural(t *testing.T) {
-	testRouletteWheelSelection(t, randomBasedPopNonNatural, false)
-}
-
-func TestRouletteWheelSelectionNaturalPerfect(t *testing.T) {
-	testPop := testPopulation{
+	perfect := testPopulation{
 		{name: "Gary", fitness: 0.0},
 		{name: "Mary", fitness: 8.4},
 		{name: "John", fitness: 9.1},
 		{name: "Steve", fitness: 10.0},
 	}
-
-	testRouletteWheelSelection(t, testPop, true)
+	t.Run("natural-perfect", testRouletteWheelSelection(perfect, true))
 }

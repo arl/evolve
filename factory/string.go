@@ -43,7 +43,7 @@ func NewString(alphabet string, length int) (*String, error) {
 }
 
 // New creates a random string.
-func (gen *String) New(rng *rand.Rand) interface{} {
+func (gen *String) New(rng *rand.Rand) string {
 	b := make([]byte, gen.length)
 	for i := 0; i < gen.length; i++ {
 		b[i] = gen.alphabet[rand.Int31n(int32(len(gen.alphabet)))]

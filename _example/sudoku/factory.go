@@ -12,27 +12,27 @@ var (
 	values                   = [size]int{1, 2, 3, 4, 5, 6, 7, 8, 9}
 )
 
-// SudokuGenerator that generates potential Sudoku solutions from a list of "givens".
+// factory that generates potential Sudoku solutions from a list of "givens".
 // The rows of the generated solutions will all be valid (i.e. no duplicate
 // values) but there are no constraints on the columns or sub-grids (these will
 // be refined by the evolutionary algorithm).
-type SudokuGenerator struct {
+type factory struct {
 	templ    sudoku
 	nonfixed [size][]int
 }
 
-// Creates a generator of random candidate solutions for a specified Sudoku
-// puzzle. pattern is a slice of strings, each representing one row of sudoku.
-// Each character represents a single cell. Permitted characters are the digits
-// '1' to '9' (each of which represents a fixed cell in the pattern) or the '.'
-// character, which represents an empty cell. Returns an error if the pattern is
-// not made of 9 strings containing 1 to 9, or '.'
-func newGenerator(pattern []string) (*SudokuGenerator, error) { // nolint: gocyclo
+// newFactory creates a generator of random candidate solutions for a specified
+// Sudoku puzzle. pattern is a slice of strings, each representing one row of
+// sudoku. Each character represents a single cell. Permitted characters are the
+// digits '1' to '9' (each of which represents a fixed cell in the pattern) or
+// the '.' character, which represents an empty cell. Returns an error if the
+// pattern is not made of 9 strings containing 1 to 9, or '.'
+func newFactory(pattern []string) (*factory, error) { // nolint: gocyclo
 	if len(pattern) != size {
 		return nil, errWrongNumberOfRows
 	}
 
-	gen := &SudokuGenerator{}
+	gen := &factory{}
 
 	// Keep track of which values in each row are not 'givens'.
 	for i := 0; i < size; i++ {
@@ -73,7 +73,7 @@ func newGenerator(pattern []string) (*SudokuGenerator, error) { // nolint: gocyc
 // The generated potential solution is guaranteed to have no
 // duplicates in any row but could have duplicates in a column or sub-grid.
 
-func (gen *SudokuGenerator) Generate(rng *rand.Rand) interface{} {
+func (gen *factory) New(rng *rand.Rand) *sudoku {
 	// Clone the template as the basis for this grid.
 	var rows sudoku
 	copy(rows[:], gen.templ[:])

@@ -1,63 +1,51 @@
 package evolve
 
 import (
-	"errors"
 	"math/rand"
 )
-
-// ErrTooManySeedCandidates is the error returned by SeedPopulation when the
-// number of seed candidates is greater than the population size.
-var ErrTooManySeedCandidates = errors.New("too many seed candidates for population size")
 
 // A Factory generates random candidates.
 //
 // It is used by evolution engine to increase genetic diversity and/or add new
 // candidates to a population.
-type Factory interface {
-
+type Factory[T any] interface {
 	// New returns a new random candidate, using the provided pseudo-random
 	// number generator.
-	New(*rand.Rand) interface{}
+	New(*rand.Rand) T
 }
 
 // The FactoryFunc type is an adapter to allow the use of ordinary
 // functions as candidate generators. If f is a function with the appropriate
 // signature, FactoryFunc(f) is a Factory that calls f.
-type FactoryFunc func(*rand.Rand) interface{}
+type FactoryFunc[T any] func(*rand.Rand) T
 
 // New calls f(rng) and returns its return value.
-func (f FactoryFunc) New(rng *rand.Rand) interface{} { return f(rng) }
+func (f FactoryFunc[T]) New(rng *rand.Rand) T { return f(rng) }
 
-// GeneratePopulation returns a slice of count random candidates, generated
-// with the provided Generator.
+// GeneratePopulation returns a slice of n random candidates, generated
+// with the provided Factory.
 //
 // If some control is required over the composition of the initial population,
 // consider using SeedPopulation.
-func GeneratePopulation(gen Factory, count int, rng *rand.Rand) []interface{} {
-	pop := make([]interface{}, count)
-	for i := 0; i < count; i++ {
-		pop[i] = gen.New(rng)
+func GeneratePopulation[T any](fac Factory[T], n int, rng *rand.Rand) []T {
+	pop := make([]T, 0, n)
+	for i := 0; i < n; i++ {
+		pop = append(pop, fac.New(rng))
 	}
 	return pop
 }
 
-// SeedPopulation seeds all or a part of an initial population with some
-// candidates.
+// SeedPopulation returns a slice of n candidates, where a part of them are
+// seeded while the rest is generated randomly using the provided factory.
+// Sometimes it is desirable to seed the initial population with some known good
+// candidates, providing some hints for the evolution process.
 //
-// Sometimes it is desirable to seed the initial population with some known
-// good candidates, or partial solutions, in order to provide some hints for
-// the evolution process. If the number of seed candidates is less than the
-// required population size, gen will generate the additional candidates to fill
-// the remaining spaces in the population.
-func SeedPopulation(gen Factory, count int, seeds []interface{}, rng *rand.Rand) ([]interface{}, error) {
-	if len(seeds) > count {
-		return nil, ErrTooManySeedCandidates
+// Note: The returned slice never exceeds n.
+func SeedPopulation[T any](fac Factory[T], n int, seeds []T, rng *rand.Rand) []T {
+	pop := make([]T, n)
+	copied := copy(pop, seeds)
+	for i := copied; i < n; i++ {
+		pop[i] = fac.New(rng)
 	}
-
-	// directory add the generated candidates to the backing array of seeds,
-	// but seeds won't be modified
-	for i := len(seeds); i < count; i++ {
-		seeds = append(seeds, gen.New(rng))
-	}
-	return seeds, nil
+	return pop
 }

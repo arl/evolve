@@ -15,10 +15,9 @@ type Dataset struct {
 	min, max float64
 }
 
-// NewDataset creates an empty data set with the provided initial capacity.
-//
-// The initial capacity for the data set corresponds to the number of values
-// that can be added without needing to resize the internal data storage.
+// NewDataset creates an empty data set with the provided initial capacity. The
+// initial capacity corresponds to the number of values that can be added
+// without further allocations.
 func NewDataset(capacity int) *Dataset {
 	return &Dataset{
 		min:      math.MaxFloat64,
@@ -103,7 +102,6 @@ func (ds *Dataset) Max() float64 {
 func (ds *Dataset) Median() float64 {
 	ds.mustNotEmpty()
 	// Sort the data (take a copy to do this)
-	// TODO: why exactly ??
 	cpy := make([]float64, len(ds.values))
 	copy(cpy, ds.values)
 	sort.Float64s(cpy)

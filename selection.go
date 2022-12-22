@@ -6,20 +6,14 @@ import (
 )
 
 // Selection is the interface that wraps the Select method.
-//
-// Select implements "natural" selection.
-type Selection interface {
+type Selection[T any] interface {
 	fmt.Stringer
 
-	// Select selects the specified number of candidates from the population.
+	// Select selects a given number of candidates from a population.
 	//
-	// - pop must be sorted by descending fitness, i.e the fittest individual of the
-	// population should be pop[0].
-	// - natural indicates fitter individuals have fitness scores.
-	// - size is the number of individual selections to perform (not necessarily the
-	// number of distinct candidates to select, since the same individual may
-	// potentially be selected more than once).
-	//
-	// Returns the selected candidates.
-	Select(pop Population, natural bool, size int, rng *rand.Rand) []interface{}
+	// The population must be sorted by descending fitness (i.e. pop[0] is the
+	// fittest). A natural fitness means that the higher fitness, the better. n
+	// is the number of candidates to select and return. Note that since a same
+	// individual can be selected more than once, they may not be all distinct.
+	Select(pop *Population[T], natural bool, n int, rng *rand.Rand) []T
 }

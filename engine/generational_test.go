@@ -20,8 +20,8 @@ import (
 // Trivial test operator that mutates all integers into zeroes.
 type zeroIntMaker struct{}
 
-func (op zeroIntMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) []interface{} {
-	result := make([]interface{}, len(selectedCandidates))
+func (op zeroIntMaker) Apply(selectedCandidates []int, rng *rand.Rand) []int {
+	result := make([]int, len(selectedCandidates))
 	for i := range selectedCandidates {
 		result[i] = 0
 	}
@@ -30,8 +30,8 @@ func (op zeroIntMaker) Apply(selectedCandidates []interface{}, rng *rand.Rand) [
 
 type intEvaluator struct{}
 
-func (intEvaluator) Fitness(cand interface{}, pop []interface{}) float64 {
-	return float64(cand.(int))
+func (intEvaluator) Fitness(cand int, pop []int) float64 {
+	return float64(cand)
 }
 
 func (intEvaluator) IsNatural() bool { return true }
@@ -43,31 +43,35 @@ func check(t *testing.T, err error) {
 	}
 }
 
-var zeroFactory = evolve.FactoryFunc(func(_ *rand.Rand) interface{} { return 0 })
+var zeroFactory = evolve.FactoryFunc[int](func(_ *rand.Rand) int { return 0 })
 
 func TestGenerationalEngineElitism(t *testing.T) {
-	epocher := Generational{
-		Op:   zeroIntMaker{},
-		Eval: intEvaluator{},
-		Sel:  selection.RouletteWheel,
+	eng := Engine[int]{
+		Factory:   zeroFactory,
+		Evaluator: intEvaluator{},
+		Epocher: &Generational[int]{
+			Operator:  zeroIntMaker{},
+			Evaluator: intEvaluator{},
+			Selection: selection.RouletteWheel[int]{},
+			Elites:    2,
+		},
+		// Seed candidates, all better than any others that can possibly get
+		// into the population (since every other candidate will always be
+		// zero). Though elitism should discard 7.
+		Seeds: []int{7, 11, 13},
+		EndConditions: []evolve.Condition[int]{
+			condition.GenerationCount[int](3),
+		},
 	}
 
-	eng, _ := New(zeroFactory, intEvaluator{}, &epocher)
-
+	// Add an observer that records the mean fitness at each generation.
 	var avgfitness float64
-	// add an observer that record the mean fitness at each generation
-	obs := ObserverFunc(func(stats *evolve.PopulationStats) {
+	obs := ObserverFunc(func(stats *evolve.PopulationStats[int]) {
 		avgfitness = stats.Mean
 	})
 	eng.AddObserver(obs)
-
-	seeds := make([]interface{}, 3)
-	// Add the following seed candidates, all better than any others that can possibly
-	// get into the population (since every other candidate will always be zero).
-	seeds[0] = 7 // This candidate should be discarded by elitism.
-	seeds[1] = 11
-	seeds[2] = 13
-	eng.Evolve(10, Elites(2), Seeds(seeds), EndOn(condition.GenerationCount(3)))
+	_, _, err := eng.Evolve(10)
+	check(t, err)
 
 	// Then when we have run the evolution, if the elite canidates were
 	// preserved they will lift the average fitness above zero. The exact value
@@ -80,22 +84,23 @@ func TestGenerationalEngineElitism(t *testing.T) {
 }
 
 func TestGenerationalEngineSatisfiedConditions(t *testing.T) {
-	epocher := Generational{
-		Op:   zeroIntMaker{},
-		Eval: intEvaluator{},
-		Sel:  selection.RouletteWheel,
+	eng := Engine[int]{
+		Factory:   zeroFactory,
+		Evaluator: intEvaluator{},
+		Epocher: &Generational[int]{
+			Operator:  zeroIntMaker{},
+			Evaluator: intEvaluator{},
+			Selection: selection.RouletteWheel[int]{},
+		},
+		EndConditions: []evolve.Condition[int]{
+			condition.GenerationCount[int](1),
+		},
 	}
 
-	eng, _ := New(zeroFactory, intEvaluator{}, &epocher)
-
-	cond := condition.GenerationCount(1)
-	_, satisfied, err := eng.Evolve(10, EndOn(cond))
+	_, satisfied, err := eng.Evolve(10)
 	check(t, err)
 	if len(satisfied) != 1 {
 		t.Errorf("want len(satisfied) = 1, got %v", len(satisfied))
-	}
-	if satisfied[0] != cond {
-		t.Errorf("want satisfied[0] == cond, got != (cond[0]: %v)", satisfied[0])
 	}
 }
 
@@ -119,37 +124,34 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 	}
 
 	// Create a string generator
-	fac, err := factory.NewString(alphabet, len(target))
+	factory, err := factory.NewString(alphabet, len(target))
 	checkB(b, err)
 
-	// 1st operator: string mutation
-	mut := mutation.New(&mutation.String{
-		Alphabet:    alphabet,
-		Probability: generator.ConstFloat64(0.02),
-	})
-
-	// 2nd operator: string crossover
-	xover := xover.New(xover.StringMater{})
-
-	// Create a pipeline that applies mutation then crossover
-	pipe := operator.Pipeline{mut, xover}
-
-	epocher := Generational{
-		Op:   pipe,
-		Eval: evaluator(target),
-		Sel:  selection.RouletteWheel,
+	eng := Engine[string]{
+		Factory:   factory,
+		Evaluator: evaluator(target),
+		Epocher: &Generational[string]{
+			// Create a operator pipeline that first apply a string muration then a crossover.
+			Operator: operator.Pipeline[string]{
+				mutation.New[string](&mutation.String{
+					Alphabet:    alphabet,
+					Probability: generator.Const(0.02),
+				}),
+				xover.New[string](xover.StringMater{}),
+			},
+			Evaluator: evaluator(target),
+			Selection: selection.RouletteWheel[string]{},
+			Elites:    5,
+		},
+		EndConditions: []evolve.Condition[string]{
+			condition.TargetFitness[string]{Fitness: 0, Natural: false},
+		},
 	}
-	eng, err := New(fac, evaluator(target), &epocher)
-	checkB(b, err)
-
-	// TODO: add option function for singlethread
-	// engine.SetSingleThreaded(!multithread)
-	cond := condition.TargetFitness{Fitness: 0, Natural: false}
 
 	b.ResetTimer()
 	var best interface{}
 	for n := 0; n < b.N; n++ {
-		best, _, err = eng.Evolve(100000, Elites(5), EndOn(cond))
+		best, _, err = eng.Evolve(100000)
 		checkB(b, err)
 	}
 	if best.(string) != target {
@@ -184,15 +186,13 @@ func BenchmarkGenerationalEngineMultithread1000(b *testing.B) {
 // This 'evaluator' assigns one "fitness point" for every character in the
 // candidate string that doesn't match the corresponding position in the target
 // string.
+// TODO: rename to charMatchEvaluator or something (maybe generalize for byteseq (~string | ~[]byte) , just maybe...)
 type evaluator string
 
-func (s evaluator) Fitness(
-	cand interface{},
-	pop []interface{}) float64 {
+func (s evaluator) Fitness(cand string, pop []string) float64 {
 	var errors float64
-	sc := cand.(string)
-	for i := range sc {
-		if sc[i] != string(s)[i] {
+	for i := 0; 0 < len(cand); i++ {
+		if cand[i] != string(s)[i] {
 			errors++
 		}
 	}

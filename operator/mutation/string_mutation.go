@@ -18,20 +18,17 @@ type String struct {
 }
 
 // Mutate modifies a string with respect to a mutation probabilty.
-func (op *String) Mutate(c interface{}, rng *rand.Rand) interface{} {
-	s := c.(string)
-
-	buffer := make([]byte, len(s))
-	copy(buffer, []byte(s))
+func (op *String) Mutate(s string, rng *rand.Rand) string {
+	buf := []byte(s)
 
 	// Find out the probability for this run.
 	prob := op.Probability.Next()
 
-	for i := range buffer {
+	for i := range buf {
 		if rng.Float64() < prob {
-			buffer[i] = op.Alphabet[rng.Intn(len(op.Alphabet))]
+			buf[i] = op.Alphabet[rng.Intn(len(op.Alphabet))]
 		}
 	}
 
-	return string(buffer)
+	return string(buf)
 }

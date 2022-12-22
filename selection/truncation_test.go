@@ -2,77 +2,37 @@ package selection
 
 import (
 	"fmt"
-	"math"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/arl/evolve/generator"
 )
 
-// Unit test for truncation selection strategy ensures the 2 best candidates are
-// selected.
-func testTruncationSelection(t *testing.T, tpop testPopulation, natural bool) {
-	ts := NewTruncation()
-	errcheck(t, ts.SetRatio(0.5))
-	testRandomBasedSelection(t, ts, tpop, natural, 2,
-		func(selected []interface{}) error {
-			if len(selected) != 2 {
-				return fmt.Errorf("want len(selected) == 2, got %v", len(selected))
+func TestTruncationSelection(t *testing.T) {
+	test := func(tpop testPopulation, natural bool) func(*testing.T) {
+		check := func(s []string) error {
+			if len(s) != 2 {
+				return fmt.Errorf("got %d selected elements, want 2", len(s))
 			}
 
-			sstr := []string{}
-			for _, c := range selected {
-				sstr = append(sstr, c.(string))
+			// Have we selected the 2 fittest individuals?
+			i0, i1 := false, false
+			for _, c := range s {
+				i0 = i0 || (c == tpop[0].name)
+				i1 = i1 || (c == tpop[1].name)
 			}
-
-			assert.Contains(t, sstr, tpop[0].name, "best candidate not selected")
-			assert.Contains(t, sstr, tpop[1].name, "second best candidate not selected")
+			if !i0 {
+				t.Errorf("best candidate %q not selected", tpop[0].name)
+			}
+			if !i1 {
+				t.Errorf("second best candidate %q not selected", tpop[1].name)
+			}
 			return nil
-		})
-}
-
-func TestTruncationSelectionNatural(t *testing.T) {
-	testTruncationSelection(t, randomBasedPopNatural, true)
-}
-
-func TestTruncationSelectionNonNatural(t *testing.T) {
-	testTruncationSelection(t, randomBasedPopNonNatural, false)
-}
-
-func TestTruncationSelectionSetRatio(t *testing.T) {
-	tests := []struct {
-		ratio   float64
-		wantErr error
-	}{
-		{ratio: -1, wantErr: ErrInvalidTruncRatio},
-		{ratio: 0, wantErr: ErrInvalidTruncRatio},
-		{ratio: 1.00001, wantErr: ErrInvalidTruncRatio},
-		{ratio: math.SmallestNonzeroFloat64, wantErr: nil},
-		{ratio: 0.5, wantErr: nil},
-		{ratio: 1.0, wantErr: nil},
-	}
-	for _, tt := range tests {
-		if got := NewTruncation().SetRatio(tt.ratio); got != tt.wantErr {
-			t.Errorf("SetRatio(%v), got err = %v, wantErr = %v", tt.ratio, got, tt.wantErr)
 		}
-	}
-}
 
-func TestTruncationSelectionSetRatioRange(t *testing.T) {
-	tests := []struct {
-		min, max float64
-		wantErr  error
-	}{
-		{min: 0, max: 1, wantErr: ErrInvalidTruncRatio},
-		{min: -1, max: 1, wantErr: ErrInvalidTruncRatio},
-		{min: 0, max: 1.00001, wantErr: ErrInvalidTruncRatio},
-		{min: 0.2, max: 0.1, wantErr: ErrInvalidTruncRatio},
-		{min: 0.1, max: 0.2, wantErr: nil},
-		{min: 0.1, max: 1, wantErr: nil},
-		{min: 0.1, max: 1.01, wantErr: ErrInvalidTruncRatio},
+		truncation := &Truncation[string]{SelectionRatio: generator.Const(0.5)}
+		return testRandomBasedSelection(truncation, tpop, natural, 2, check)
 	}
-	for _, tt := range tests {
-		if got := NewTruncation().SetRatioRange(tt.min, tt.max); got != tt.wantErr {
-			t.Errorf("SetRatioRange(%v, %v), got err = %v, wantErr = %v", tt.min, tt.max, got, tt.wantErr)
-		}
-	}
+
+	t.Run("natural", test(randomBasedPopNatural, true))
+	t.Run("non-natural", test(randomBasedPopNonNatural, false))
 }

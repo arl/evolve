@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 
@@ -27,26 +28,6 @@ func check(err error) {
 	}
 }
 
-// This evaluator assigns one "fitness point" for every character in the
-// candidate string that doesn't match the corresponding position in the
-// target string.
-type evaluator struct{}
-
-func (evaluator) Fitness(cand interface{}, pop []interface{}) float64 {
-	// count differences between candidate and target strings
-	var nerrors int
-	sc := cand.(string)
-	for i := range sc {
-		if sc[i] != target[i] {
-			nerrors++
-		}
-	}
-	return float64(nerrors)
-}
-
-// Non natural fitness, lower is better
-func (evaluator) IsNatural() bool { return false }
-
 func main() {
 	if len(os.Args) == 2 {
 		target = strings.ToUpper(os.Args[1])
@@ -55,53 +36,74 @@ func main() {
 	// Setup a generator of random strings
 	for _, c := range target {
 		if !strings.ContainsRune(alphabet, c) {
-			log.Fatalf("Target string must be solely made of \"%v\"", alphabet)
+			log.Fatalf("Target string must only be made of runes in %q", alphabet)
 		}
 	}
-	gen, err := generator.NewString(alphabet, len(target))
-	check(err)
+
+	// Our factory generates random strings that have the same length as the
+	// target string.
+	factory := func(rng *rand.Rand) string {
+		b := make([]byte, len(target))
+		for i := 0; i < len(target); i++ {
+			b[i] = alphabet[rng.Intn(len(target))]
+		}
+		return string(b)
+	}
+
+	// Our candidate evaluator assigns one "fitness point" for every character
+	// in the candidate string that doesn't match the corresponding position in
+	// the target string.
+	evaluator := evolve.EvaluatorFunc[string](false, func(cand string, _ []string) float64 {
+		var n int
+		for i := range cand {
+			if cand[i] != target[i] {
+				n++
+			}
+		}
+		return float64(n)
+	})
 
 	// Define our evolutionary operators, a string mutation where each rune has
 	// a probability of mutation of 0.02, plus a default string crossover.
-	mutation := mutation.New(&mutation.String{
+	mutation := mutation.New[string](&mutation.String{
 		Alphabet:    alphabet,
-		Probability: generator.ConstFloat64(0.02),
+		Probability: generator.Const(0.02),
 	})
-	xover := xover.New(xover.StringMater{})
-	xover.Points = generator.ConstInt(1)
-	xover.Probability = generator.ConstFloat64(1)
+	xover := xover.New[string](xover.StringMater{})
+	xover.Points = generator.Const(1)
+	xover.Probability = generator.Const(1.0)
 
 	// Define a composite evolutionary operator, that is a pipeline that applies
 	// to each candidate a string mutation followed by a crossover
-	pipeline := operator.Pipeline{mutation, xover}
+	pipeline := operator.Pipeline[string]{mutation, xover}
 
-	// This evaluator assigns one "fitness point" for every character in the
-	// The epocher is generational evolutionary engine.
-	epocher := engine.Generational{
-		Op:   pipeline,
-		Eval: evaluator{},
-		Sel:  selection.RouletteWheel,
+	generational := &engine.Generational[string]{
+		Operator:  pipeline,
+		Evaluator: evaluator,
+		Selection: selection.RouletteWheel[string]{},
+		Elites:    5,
 	}
 
 	// Define the components of our engine
-	eng, err := engine.New(gen, evaluator{}, &epocher)
-	check(err)
+	eng := engine.Engine[string]{
+		Factory:   evolve.FactoryFunc[string](factory),
+		Evaluator: evaluator,
+		Epocher:   generational,
+		EndConditions: []evolve.Condition[string]{
+			// Evolution terminates when a candidate reach fitness 0 (0 chars
+			// are different from the target string).
+			condition.TargetFitness[string]{Fitness: 0, Natural: false},
+		},
+	}
 
 	// Define an observer
 	eng.AddObserver(
-		engine.ObserverFunc(func(stats *evolve.PopulationStats) {
-			log.Printf("Generation %d: %s (%v)\n",
-				stats.GenNumber,
-				stats.BestCand,
-				stats.BestFitness)
+		engine.ObserverFunc(func(stats *evolve.PopulationStats[string]) {
+			log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best, stats.BestFitness)
 		}))
 
-	// Evolution should end when a candidate with a fitness of 0 has been
-	// reached (0 different chars between candidate and target string)
-	cond := condition.TargetFitness{Fitness: 0, Natural: false}
-
 	// Start evolution engine and print the best result
-	bests, _, err := eng.Evolve(100, engine.Elites(5), engine.EndOn(cond))
+	bests, _, err := eng.Evolve(100)
 	check(err)
-	log.Println(bests[0])
+	log.Println(bests.Candidates[0], bests.Fitness[0])
 }

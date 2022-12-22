@@ -29,7 +29,7 @@ func checkCellFixed(t *testing.T, s *sudoku, i, j int) {
 // Checks to make sure that the givens are correctly placed and that each row
 // contains each value exactly once.
 func TestGeneratorValidity(t *testing.T) {
-	gen, err := newGenerator([]string{
+	gen, err := newFactory([]string{
 		".9.......",
 		".........",
 		"........5",
@@ -44,10 +44,8 @@ func TestGeneratorValidity(t *testing.T) {
 	require.NoError(t, err)
 
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	pop := evolve.GeneratePopulation(gen, 20, rng)
-	for _, iface := range pop {
-		sudo := iface.(*sudoku)
-
+	pop := evolve.GeneratePopulation[*sudoku](gen, 20, rng)
+	for _, sudo := range pop {
 		// Check givens are correctly placed.
 		checkCellFixed(t, sudo, 2, 8)
 		checkCellVal(t, sudo, 2, 8, 5)
@@ -126,7 +124,7 @@ func TestGeneratorInvalidPatterns(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := newGenerator(tt.pattern)
+			_, err := newFactory(tt.pattern)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

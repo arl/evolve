@@ -4,16 +4,11 @@ import (
 	"testing"
 )
 
-func TestSigmaScalingNaturalFitness(t *testing.T) {
-	testFitnessBasedSelection(t, SigmaScaling, fitnessBasedPopNatural, true)
-}
+func TestSigmaScaling(t *testing.T) {
+	t.Run("natural", testFitnessBasedSelection(&SigmaScaling[string]{}, fitnessBasedPopNatural, true))
+	t.Run("non-natural", testFitnessBasedSelection(&SigmaScaling[string]{}, fitnessBasedPopNonNatural, false))
 
-func TestSigmaScalingNonNaturalFitness(t *testing.T) {
-	testFitnessBasedSelection(t, SigmaScaling, fitnessBasedPopNonNatural, false)
-}
-
-// If all fitness scores are equal, standard deviation is zero.
-func TestSigmaScalingNoVariance(t *testing.T) {
-	testFitnessBasedSelection(t, SigmaScaling, fitnessBasedPopAllEqual, true)
-	testFitnessBasedSelection(t, SigmaScaling, fitnessBasedPopAllEqual, false)
+	// If all fitness scores are equal, standard deviation is zero.
+	t.Run("no-variance/natural", testFitnessBasedSelection(&SigmaScaling[string]{}, fitnessBasedPopAllEqual, true))
+	t.Run("no-variance/non-natural", testFitnessBasedSelection(&SigmaScaling[string]{}, fitnessBasedPopAllEqual, false))
 }

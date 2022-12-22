@@ -2,8 +2,8 @@ package engine
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
+	"runtime"
 	"sort"
 	"time"
 
@@ -13,105 +13,47 @@ import (
 
 // Engine runs an evolutionary algorithm, following all the steps of evolution,
 // from the creation of the initial population to the end of evolution.
-type Engine struct {
-	obs     map[Observer]struct{}
-	rng     *rand.Rand
-	factory evolve.Factory
-	eval    evolve.Evaluator
-	epoch   evolve.Epocher
-	stats   *evolve.Dataset
-	nelites int
-	seeds   []interface{}
-	conds   []evolve.Condition
-	size    int
-}
+type Engine[T any] struct {
+	// Factory creates candidate solutions of type T.
+	Factory evolve.Factory[T]
 
-// New creates an evolution engine.
-//
-// gen generates new random candidates solutions.
-// eval evaluates fitness scores of candidates.
-// epoch transforms a whole population into the next generation.
-func New(factory evolve.Factory, eval evolve.Evaluator, epoch evolve.Epocher, options ...func(*Engine) error) (*Engine, error) {
-	eng := Engine{
-		obs:     make(map[Observer]struct{}),
-		factory: factory,
-		eval:    eval,
-		epoch:   epoch,
-	}
-	for _, opt := range options {
-		if err := opt(&eng); err != nil {
-			return nil, err
-		}
-	}
+	// Evaluator evaluates candidate solutions fitness.
+	Evaluator evolve.Evaluator[T]
 
-	if eng.rng == nil {
-		seed := time.Now().UnixNano()
-		eng.rng = rand.New(mt19937.New(seed))
-	}
-	return &eng, nil
+	Epocher evolve.Epocher[T]
+
+	EndConditions []evolve.Condition[T]
+
+	// Observers of the evolution process.
+	Observers []Observer[T]
+
+	// Seeds provides the engine with a set of candidates to seed the starting
+	// population with. Successive calls to Seeds will replace the set of seed
+	// candidates set in the previous call.
+	Seeds []T
+
+	// RNG is the source of randomness of the engine. If nil, it's set to a
+	// mt19937 pseudo random number generator.
+	RNG *rand.Rand
+
+	// Number of concurrent processes to use (defaults to the number of cores).
+	Concurrency int
+
+	stats *evolve.Dataset
 }
 
 // AddObserver adds an observer of the evolution process.
-func (e *Engine) AddObserver(o Observer) {
-	e.obs[o] = struct{}{}
+func (e *Engine[T]) AddObserver(o Observer[T]) {
+	e.Observers = append(e.Observers, o)
 }
 
 // RemoveObserver removes an observer of the evolution process.
-func (e *Engine) RemoveObserver(o Observer) {
-	delete(e.obs, o)
-}
-
-// Rand sets rng as the source of randomness of the engine.
-func Rand(rng *rand.Rand) func(*Engine) error {
-	return func(eng *Engine) error {
-		eng.rng = rng
-		return nil
-	}
-}
-
-// Observe adds an observer of the evolution process.
-func Observe(o Observer) func(*Engine) error {
-	return func(eng *Engine) error {
-		eng.obs[o] = struct{}{}
-		return nil
-	}
-}
-
-// Elites defines the number of candidates preserved via elitism for the
-// engine. By default it is set to 0, no elitism is applied.
-//
-// In elitism, a subset of the population with the best fitness scores is
-// preserved, unchanged, and placed into the successive generation. Candidate
-// solutions that are preserved unchanged through elitism remain eligible for
-// selection for breeding the remainder of the next generation. This value must
-// be non-negative and less than the population size or Evolve will return en
-// error
-func Elites(n int) func(*Engine) error {
-	return func(eng *Engine) error {
-		if n < 0 || n >= eng.size {
-			return errors.New("invalid number of elites")
+func (e *Engine[T]) RemoveObserver(o Observer[T]) {
+	for i := range e.Observers {
+		if e.Observers[i] == o {
+			e.Observers = append(e.Observers[:i], e.Observers[i+1:]...)
+			return
 		}
-		eng.nelites = n
-		return nil
-	}
-}
-
-// Seeds provides the engine with a set of candidates to seed the starting
-// population with. Successive calls to Seeds will replace the set of seed
-// candidates set in the previous call.
-func Seeds(seeds []interface{}) func(*Engine) error {
-	return func(eng *Engine) error {
-		eng.seeds = seeds
-		return nil
-	}
-}
-
-// EndOn adds a termination condition to the engine. The engine stops
-// after one or more condition is met.
-func EndOn(cond evolve.Condition) func(*Engine) error {
-	return func(eng *Engine) error {
-		eng.conds = append(eng.conds, cond)
-		return nil
 	}
 }
 
@@ -125,40 +67,38 @@ func EndOn(cond evolve.Condition) func(*Engine) error {
 //
 // At least one termination condition must be defined with EndOn, or Evolve will
 // return an error.
-func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Population, []evolve.Condition, error) {
-	e.size = popsize
-	for _, opt := range options {
-		if err := opt(e); err != nil {
-			return nil, nil, err
-		}
-	}
-
+func (e *Engine[T]) Evolve(popsize int) (*evolve.Population[T], []evolve.Condition[T], error) {
 	if popsize <= 0 {
 		return nil, nil, errors.New("invalid population size")
 	}
-	if len(e.conds) == 0 {
+	if len(e.EndConditions) == 0 {
 		return nil, nil, errors.New("no termination condition specified")
 	}
 
-	// create the dataset
+	if e.Concurrency == 0 {
+		e.Concurrency = runtime.NumCPU()
+	}
+
+	if e.RNG == nil {
+		seed := time.Now().UnixNano()
+		e.RNG = rand.New(mt19937.New(seed))
+	}
+
+	// Track down evolution stats in a dataset.
 	e.stats = evolve.NewDataset(popsize)
 
 	var ngen int
 	start := time.Now()
 
-	pop, err := evolve.SeedPopulation(e.factory, popsize, e.seeds, e.rng)
-	if err != nil {
-		return nil, nil, fmt.Errorf("can't seed population: %v", err)
-	}
+	pop := evolve.SeedPopulation(e.Factory, popsize, e.Seeds, e.RNG)
 
-	var satisfied []evolve.Condition
+	var satisfied []evolve.Condition[T]
 
 	// Evaluate initial population fitness
-	evpop := evolve.EvaluatePopulation(pop, e.eval, true)
-
+	evpop := evolve.EvaluatePopulation(pop, e.Evaluator, e.Concurrency)
 	for {
 		// Sort population according to fitness.
-		if e.eval.IsNatural() {
+		if e.Evaluator.IsNatural() {
 			sort.Sort(sort.Reverse(evpop))
 		} else {
 			sort.Sort(evpop)
@@ -168,54 +108,50 @@ func (e *Engine) Evolve(popsize int, options ...func(*Engine) error) (evolve.Pop
 		data := e.updateStats(evpop, ngen, time.Since(start))
 
 		// check for termination conditions
-		satisfied = shouldContinue(data, e.conds...)
+		satisfied = satisfiedConditions(data, e.EndConditions)
 		if satisfied != nil {
 			break
 		}
 
 		// perform evolution
-		evpop = e.epoch.Epoch(evpop, e.nelites, e.rng)
+		evpop = e.Epocher.Epoch(evpop, e.RNG)
 
 		ngen++
 	}
 	return evpop, satisfied, nil
 }
 
-func (e *Engine) updateStats(pop evolve.Population, ngen int, elapsed time.Duration) *evolve.PopulationStats {
+func (e *Engine[T]) updateStats(pop *evolve.Population[T], ngen int, elapsed time.Duration) *evolve.PopulationStats[T] {
 	e.stats.Clear()
-	for _, cand := range pop {
-		e.stats.AddValue(cand.Fitness)
+	for i := 0; i < pop.Len(); i++ {
+		e.stats.AddValue(pop.Fitness[i])
 	}
 
 	// Notify observers with the population state
-	stats := evolve.PopulationStats{
-		BestCand:    pop[0].Candidate,
-		BestFitness: pop[0].Fitness,
+	stats := evolve.PopulationStats[T]{
+		Best:        pop.Candidates[0],
+		BestFitness: pop.Fitness[0],
 		Mean:        e.stats.ArithmeticMean(),
 		StdDev:      e.stats.StandardDeviation(),
-		Natural:     e.eval.IsNatural(),
+		Natural:     e.Evaluator.IsNatural(),
 		Size:        e.stats.Len(),
-		NumElites:   e.nelites,
-		GenNumber:   ngen,
+		Generation:  ngen,
 		Elapsed:     elapsed,
 	}
 
-	for o := range e.obs {
+	for _, o := range e.Observers {
 		o.Observe(&stats)
 	}
 	return &stats
 }
 
-// shouldContinue determines whether or not the evolution should continue.
-func shouldContinue(stats *evolve.PopulationStats, conds ...evolve.Condition) []evolve.Condition {
-	satisfied := make([]evolve.Condition, 0)
+// satisfiedConditions returns the satisfied conditions, or nil if none of them are.
+func satisfiedConditions[T any](stats *evolve.PopulationStats[T], conds []evolve.Condition[T]) []evolve.Condition[T] {
+	var c []evolve.Condition[T]
 	for _, cond := range conds {
 		if cond.IsSatisfied(stats) {
-			satisfied = append(satisfied, cond)
+			c = append(c, cond)
 		}
 	}
-	if len(satisfied) == 0 {
-		return nil
-	}
-	return satisfied
+	return c
 }

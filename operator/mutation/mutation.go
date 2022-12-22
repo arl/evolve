@@ -10,18 +10,18 @@ import (
 //
 // At individual level, mutation is applied through a Mutater, which performs
 // modification on a single element at once.
-type Mutation struct {
-	Mutater
+type Mutation[T any] struct {
+	Mutater[T]
 }
 
 // New Mutation returns an Operator based on mutater.
-func New(mutater Mutater) *Mutation {
-	return &Mutation{Mutater: mutater}
+func New[T any](mutater Mutater[T]) *Mutation[T] {
+	return &Mutation[T]{Mutater: mutater}
 }
 
 // Apply applies the mutation operator to all individuals in the provided population.
-func (op *Mutation) Apply(population []interface{}, rng *rand.Rand) []interface{} {
-	muted := make([]interface{}, len(population))
+func (op *Mutation[T]) Apply(population []T, rng *rand.Rand) []T {
+	muted := make([]T, len(population))
 	for i, cand := range population {
 		muted[i] = op.Mutate(cand, rng)
 	}
@@ -29,12 +29,11 @@ func (op *Mutation) Apply(population []interface{}, rng *rand.Rand) []interface{
 }
 
 // A Mutater mutates individuals.
-type Mutater interface {
-
+type Mutater[T any] interface {
 	// Mutate performs mutation on an individual.
 	//
 	// The original individual must be let untouched while the mutant is
 	// returned, unless no mutation is performed, in which case the original
 	// individual can be returned.
-	Mutate(interface{}, *rand.Rand) interface{}
+	Mutate(T, *rand.Rand) T
 }

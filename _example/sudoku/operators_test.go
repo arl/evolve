@@ -64,8 +64,8 @@ func TestRowMutationValidity(t *testing.T) {
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 
 	rmut := &rowMutation{
-		Number: generator.ConstInt(8),
-		Amount: generator.ConstInt(1),
+		Number: generator.Const[uint](8),
+		Amount: generator.Const[uint](1),
 	}
 	sudo, err := sudokuFromStrings([]string{
 		"1 2 8 5 4 3 9 6 7",
@@ -80,7 +80,7 @@ func TestRowMutationValidity(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	pop := []interface{}{sudo}
+	pop := []*sudoku{sudo}
 
 	counts := make(map[int]struct{})
 
@@ -88,7 +88,7 @@ func TestRowMutationValidity(t *testing.T) {
 		pop = rmut.Apply(pop, rng)
 		require.Len(t, pop, 1, "population size should not be affected by mutation")
 
-		mutated := pop[0].(*sudoku)
+		mutated := pop[0]
 		for j := 0; j < size; j++ {
 			row := mutated[j]
 			require.Lenf(t, row, size, "row %v has an invalid length", j)
@@ -110,8 +110,8 @@ func TestRowMutationValidity(t *testing.T) {
 // Check that the mutation never modifies the value of fixed cells.
 func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 	rmut := &rowMutation{
-		Number: generator.ConstInt(8),
-		Amount: generator.ConstInt(1),
+		Number: generator.Const[uint](8),
+		Amount: generator.Const[uint](1),
 	}
 
 	var sudo sudoku
@@ -123,10 +123,10 @@ func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 		}
 	}
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
-	pop := []interface{}{&sudo}
+	pop := []*sudoku{&sudo}
 	for i := 0; i < 100; i++ { // 100 generations of mutation.
 		pop = rmut.Apply(pop, rng)
-		mutated := pop[0].(*sudoku)
+		mutated := pop[0]
 		for row := 0; row < size; row++ {
 			for col := 0; col < size; col++ {
 				if row == col {

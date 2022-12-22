@@ -2,57 +2,65 @@ package engine
 
 import (
 	"math/rand"
+	"runtime"
 
 	"github.com/arl/evolve"
 )
 
 // Generational implements a general-purpose engine for generational
 // evolutionary algorithm.
-//
-// It supports optional concurrent fitness evaluations to take full advantage of
-// multi-processor, multi-core and hyper-threaded machines through the
-// concurrent evaluation of candidate's fitness.
-//
-// If multi-threading is enabled, evolution (mutation, crossover, etc.) occurs
-// on the request goroutine but fitness evaluations are delegated to a pool of
-// worker threads. All of the host's available processing units are used (i.e.
-// on a quad-core machine there will be four fitness evaluation worker threads).
-//
-// If multi-threading is disabled, all work is performed synchronously on the
-// request thread. This strategy is suitable for restricted/managed environments
-// where it is not permitted for applications to manage their own threads. If
-// there are no restrictions on concurrency, applications should enable
-// multi-threading for improved performance.
-type Generational struct {
-	Op   evolve.Operator
-	Eval evolve.Evaluator
-	Sel  evolve.Selection
+type Generational[T any] struct {
+	Operator  evolve.Operator[T]
+	Evaluator evolve.Evaluator[T]
+	Selection evolve.Selection[T]
+
+	// Elites defines the number of candidates preserved via elitism for the
+	// engine. By default it is set to 0, no elitism is applied.
+	//
+	// In elitism, a subset of the population with the best fitness scores is
+	// preserved, unchanged, and placed into the successive generation.
+	// Candidate solutions that are preserved unchanged through elitism remain
+	// eligible for selection for breeding the remainder of the next generation.
+	// This value must be non-negative and less than the population size or
+	// Evolve will return en error
+	Elites int
+
+	// Number of concurrent processes to use (defaults to the number of cores).
+	Concurrency int
+
+	init bool
 }
 
 // Epoch performs a single step/iteration of the evolutionary process.
 //
-// pop is the population at the beginning of the process.
-// nelites is the number of the fittest individuals that must be preserved.
+// pop is the population to evolve, sorted by fitness, the fittest first.
 //
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
-func (e *Generational) Epoch(pop evolve.Population, nelites int, rng *rand.Rand) evolve.Population {
-	nextpop := make([]interface{}, 0, len(pop))
+func (e *Generational[T]) Epoch(pop *evolve.Population[T], rng *rand.Rand) *evolve.Population[T] {
+	if !e.init {
+		if e.Concurrency == 0 {
+			e.Concurrency = runtime.NumCPU()
+		}
+		e.init = true
+	}
+
+	nextpop := make([]T, 0, pop.Len())
 
 	// Perform elitism: straightforward copy the n fittest candidates into the
 	// next generation, without any kind of selection.
-	elite := make([]interface{}, nelites)
-	for i := 0; i < nelites; i++ {
-		elite[i] = pop[i].Candidate
+	elite := make([]T, e.Elites)
+	for i := 0; i < e.Elites; i++ {
+		elite[i] = pop.Candidates[i]
 	}
 
-	// Select the rest of population through natural selection
-	selected := e.Sel.Select(pop, e.Eval.IsNatural(), len(pop)-nelites, rng)
+	// Select the rest of population through natural selection.
+	selected := e.Selection.Select(pop, e.Evaluator.IsNatural(), pop.Len()-e.Elites, rng)
 
-	// Apply genetic operators on the selected candidates
-	nextpop = e.Op.Apply(append(nextpop, selected...), rng)
+	// Apply genetic operators on the selected candidates.
+	nextpop = e.Operator.Apply(append(nextpop, selected...), rng)
 
-	// While the elite is added, untouched, to the next population
+	// While the elites, if any, are added, untouched, to the next population.
 	nextpop = append(nextpop, elite...)
-	return evolve.EvaluatePopulation(nextpop, e.Eval, true)
+	return evolve.EvaluatePopulation(nextpop, e.Evaluator, e.Concurrency)
 }

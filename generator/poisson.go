@@ -3,22 +3,24 @@ package generator
 import (
 	"math"
 	"math/rand"
+
+	"golang.org/x/exp/constraints"
 )
 
-// Poisson generates Poisson-distributed values.
-type Poisson struct {
+// Poisson generates Poisson-distributed values, that are always positive.
+type Poisson[I constraints.Integer] struct {
 	rng  *rand.Rand
 	mean Float
 }
 
-func NewPoisson(mean Float, rng *rand.Rand) *Poisson {
-	return &Poisson{mean: mean, rng: rng}
+func NewPoisson[I constraints.Integer](mean Float, rng *rand.Rand) *Poisson[I] {
+	return &Poisson[I]{mean: mean, rng: rng}
 }
 
 // Next returns the next generated Poisson-distributed value.
-func (p *Poisson) Next() int64 {
+func (p *Poisson[I]) Next() I {
 	var (
-		x int64
+		i I
 		t float64
 	)
 	for {
@@ -26,8 +28,8 @@ func (p *Poisson) Next() int64 {
 		if t > 1.0 {
 			break
 		}
-		x++
+		i++
 	}
 
-	return x
+	return i
 }

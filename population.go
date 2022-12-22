@@ -1,39 +1,29 @@
 package evolve
 
-import (
-	"fmt"
-	"strings"
-)
-
-// Individual associates a candidate solution with its fitness score.
-type Individual struct {
-	Candidate interface{}
-	Fitness   float64
+// A Population holds a group of candidates alongside their fitness.
+type Population[T any] struct {
+	Candidates []T
+	Fitness    []float64
 }
 
-// Population is a group of individual.
-// TODO: check if and where we would benefit of having a slice of structs
-// instead of pointers
-type Population []*Individual
+// NewPopulation creates a new population, pre-allocating the slices of
+// candidates and fitness to n items each.
+func NewPopulation[T any](n int) *Population[T] {
+	return &Population[T]{
+		Candidates: make([]T, n),
+		Fitness:    make([]float64, n),
+	}
+}
 
 // Len is the number of elements in the collection.
-func (s Population) Len() int { return len(s) }
+func (p *Population[T]) Len() int { return len(p.Candidates) }
 
 // Less reports whether the element with
 // index a should sort before the element with index b.
-func (s Population) Less(i, j int) bool { return s[i].Fitness < s[j].Fitness }
+func (p *Population[T]) Less(i, j int) bool { return p.Fitness[i] < p.Fitness[j] }
 
 // Swap swaps the elements with indexes i and j.
-func (s Population) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-
-func (s Population) String() string {
-	reprs := make([]string, 0, len(s))
-	for _, cand := range s {
-		if cand != nil {
-			reprs = append(reprs, fmt.Sprintf("%v|%v", cand.Candidate, cand.Fitness))
-		} else {
-			reprs = append(reprs, "nil")
-		}
-	}
-	return fmt.Sprintf("{%s}", strings.Join(reprs, ", "))
+func (p *Population[T]) Swap(i, j int) {
+	p.Fitness[i], p.Fitness[j] = p.Fitness[j], p.Fitness[i]
+	p.Candidates[i], p.Candidates[j] = p.Candidates[j], p.Candidates[i]
 }

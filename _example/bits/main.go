@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
+	"time"
 
+	"github.com/arl/bitstring"
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/engine"
@@ -11,7 +14,6 @@ import (
 	"github.com/arl/evolve/operator"
 	"github.com/arl/evolve/operator/mutation"
 	"github.com/arl/evolve/operator/xover"
-	"github.com/arl/evolve/pkg/bitstring"
 	"github.com/arl/evolve/selection"
 )
 
@@ -30,48 +32,52 @@ func check(err error) {
 // consist only of ones.
 func main() {
 	// Define the crossover
-	xover := xover.New(xover.BitstringMater{})
-	xover.Probability = generator.ConstFloat64(0.7)
-	xover.Points = generator.ConstInt(1)
+	xover := xover.New[*bitstring.Bitstring](xover.BitstringMater{})
+	xover.Probability = generator.Const(0.7)
+	xover.Points = generator.Const(1)
 
 	// Define the mutation
-	mut := mutation.New(&mutation.Bitstring{
-		Probability: generator.ConstFloat64(0.01),
-		FlipCount:   generator.ConstInt(1),
+	mut := mutation.New[*bitstring.Bitstring](&mutation.Bitstring{
+		Probability: generator.Const(0.01),
+		FlipCount:   generator.Const(1),
 	})
 
 	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)
-		func(cand interface{}, pop []interface{}) float64 {
+		func(cand *bitstring.Bitstring, pop []*bitstring.Bitstring) float64 {
 			// our evaluator counts the ones in the bitstring
-			return float64(cand.(*bitstring.Bitstring).OnesCount())
+			return float64(cand.OnesCount())
 		})
 
-	epocher := engine.Generational{
-		Op:   operator.Pipeline{xover, mut},
-		Eval: eval,
-		Sel:  selection.RouletteWheel,
+	epocher := engine.Generational[*bitstring.Bitstring]{
+		Operator:  operator.Pipeline[*bitstring.Bitstring]{xover, mut},
+		Evaluator: eval,
+		Selection: selection.RouletteWheel[*bitstring.Bitstring]{},
+		Elites:    2, // best 2 candidates gets copied to the next generation, no matter what.
 	}
 
-	eng, err := engine.New(generator.Bitstring(nbits), eval, &epocher)
-	check(err)
+	// bitstring.Random(length uint, rng *rand.Rand)
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	factory := evolve.FactoryFunc[*bitstring.Bitstring](func(*rand.Rand) *bitstring.Bitstring {
+		return bitstring.Random(nbits, rng)
+	})
 
-	eng.AddObserver(
-		engine.ObserverFunc(func(stats *evolve.PopulationStats) {
-			log.Printf("Generation %d: %s (%v)\n",
-				stats.GenNumber,
-				stats.BestCand,
-				stats.BestFitness)
-		}))
-
-	bests, _, err := eng.Evolve(
-		100,              // 100 candidates in the population
-		engine.Elites(2), // best 2 are put into next population
-		engine.EndOn(condition.TargetFitness{
+	eng := &engine.Engine[*bitstring.Bitstring]{
+		Factory:   factory,
+		Evaluator: eval,
+		Epocher:   &epocher,
+		EndConditions: []evolve.Condition[*bitstring.Bitstring]{condition.TargetFitness[*bitstring.Bitstring]{
 			Fitness: float64(nbits),
 			Natural: true,
-		}),
-	)
+		}},
+	}
+
+	eng.AddObserver(
+		engine.ObserverFunc(func(stats *evolve.PopulationStats[*bitstring.Bitstring]) {
+			log.Printf("Generation %d: %s (%v)\n", stats.Generation, stats.Best, stats.BestFitness)
+		}))
+
+	bests, _, err := eng.Evolve(100)
 	check(err)
-	fmt.Println(bests[0])
+	fmt.Println(bests.Candidates[0], "=>", bests.Fitness[0])
 }

@@ -12,13 +12,13 @@ import (
 type mater struct{}
 
 // sudokuMater applies crossover vertically on sudoku puzzles square grids
-func (m mater) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) []interface{} {
+func (m mater) Mate(p1, p2 *sudoku, nxpts int, rng *rand.Rand) (*sudoku, *sudoku) {
 	var off1, off2 sudoku
-	copy(off1[:], parent1.(*sudoku)[:])
-	copy(off2[:], parent2.(*sudoku)[:])
+	copy(off1[:], p1[:])
+	copy(off2[:], p2[:])
 
 	// Apply as many cross-overs as required.
-	for i := int64(0); i < nxpts; i++ {
+	for i := 0; i < nxpts; i++ {
 		// Cross-over index is always greater than zero and less than the length
 		// of the parent so that we always pick a point that will result in a
 		// meaningful cross-over.
@@ -28,7 +28,7 @@ func (m mater) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) [
 		}
 	}
 
-	return []interface{}{&off1, &off2}
+	return &off1, &off2
 }
 
 // rowMutation rows in a potential Sudoku solution by manipulating the order of
@@ -39,8 +39,8 @@ func (m mater) Mate(parent1, parent2 interface{}, nxpts int64, rng *rand.Rand) [
 // Amount is the number of positions by which a list element will be displaced
 // as a result of mutation
 type rowMutation struct { // nolint: maligned
-	Number generator.Int
-	Amount generator.Int
+	Number generator.Generator[uint]
+	Amount generator.Generator[uint]
 
 	// These look-up tables keep track of which values are fixed in which
 	// columns and sub-grids. Because the values are fixed, they are the same
@@ -55,13 +55,13 @@ type rowMutation struct { // nolint: maligned
 
 // Apply applies the mutation operator to each entry in the list of selected
 // candidates.
-func (rm *rowMutation) Apply(sel []interface{}, rng *rand.Rand) []interface{} {
+func (rm *rowMutation) Apply(sel []*sudoku, rng *rand.Rand) []*sudoku {
 	if !rm.cached {
-		rm.buildCache(sel[0].(*sudoku))
+		rm.buildCache(sel[0])
 	}
-	mutpop := make([]interface{}, len(sel))
+	mutpop := make([]*sudoku, len(sel))
 	for i, cand := range sel {
-		mutpop[i] = rm.mutate(cand.(*sudoku), rng)
+		mutpop[i] = rm.mutate(cand, rng)
 	}
 	return mutpop
 }

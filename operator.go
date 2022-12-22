@@ -14,8 +14,7 @@ import (
 // the evolution engine. Instead the operator should create and return new
 // candidate objects. However, an operator is not required to create copies of
 // unmodified individuals, they may be returned directly.
-type Operator interface {
-
+type Operator[T any] interface {
 	// Apply applies the operation to each entry in the list of selected
 	// candidates.
 	//
@@ -40,5 +39,5 @@ type Operator interface {
 	// should return a list that contains evolved copies of those candidates
 	// (umodified candidates can be included in the results without having to be
 	// copied).
-	Apply([]interface{}, *rand.Rand) []interface{}
+	Apply([]T, *rand.Rand) []T
 }
