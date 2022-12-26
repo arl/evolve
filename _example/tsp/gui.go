@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"image"
 	"image/color"
 	"sync/atomic"
 	"time"
@@ -181,12 +180,7 @@ func (ui *UI) Layout(gtx C) D {
 				Spacing: layout.SpaceEnd,
 			}.Layout(gtx,
 				layout.Rigid(func(gtx C) D {
-					// TODO(arl) we have a bug in property.List it should not
-					// take up all vertical space.
-					//
-					// gtx.Constraints.Min.X = 400
-					// gtx.Constraints.Max.X = 400
-					gtx.Constraints = layout.Exact(image.Pt(400, 200))
+					gtx.Constraints.Max.X = 400
 					return ui.list.Layout(ui.theme, gtx)
 				}),
 				layout.Rigid(func(gtx C) D {
