@@ -7,7 +7,7 @@ replace github.com/arl/evolve => ../../
 require (
 	gioui.org v0.0.0-20221223153152-aa2a948b863a
 	github.com/arl/evolve v0.0.0-00010101000000-000000000000
-	github.com/arl/gioexp v0.0.0-20221226162537-685526281d8e
+	github.com/arl/gioexp v0.0.0-20221230175344-f6ec1bef4ae8
 	github.com/arl/statsviz v0.5.1
 )
 

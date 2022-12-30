@@ -88,18 +88,21 @@ func (ui *UI) run(w *app.Window) error {
 	ui.startButton = &startButton{}
 	ui.pathWidget = newPathWidget(ui.state.tspf.Nodes)
 
-	gen := property.NewFloat64(0)
+	gen := property.NewInt(0)
 	gen.Editable = false
+	ui.list.Add("Generation", gen)
+
 	dist := property.NewFloat64(0)
 	dist.Editable = false
+	dist.SetFormat('f', 1)
+	ui.list.Add("Distance", dist)
+
 	stddev := property.NewFloat64(0)
 	stddev.Editable = false
+	ui.list.Add("Std dev", stddev)
+
 	elapsed := property.NewString("")
 	elapsed.Editable = false
-
-	ui.list.Add("Generation", gen)
-	ui.list.Add("Distance", dist)
-	ui.list.Add("Std dev", stddev)
 	ui.list.Add("Elapsed", elapsed)
 
 	solutions := make(chan *evolve.PopulationStats[[]int])
@@ -127,7 +130,6 @@ func (ui *UI) run(w *app.Window) error {
 		prev = stats.Elapsed
 		prevFitness = stats.BestFitness
 
-		// fmt.Printf("[%d]: distance: %.2f\n", stats.Generation, stats.BestFitness)
 		solutions <- stats
 	})
 
@@ -140,7 +142,7 @@ func (ui *UI) run(w *app.Window) error {
 			stats.Elapsed -= paused
 			ui.state.stats = stats
 
-			gen.SetValue(float64(stats.Generation))
+			gen.SetValue(stats.Generation)
 			dist.SetValue(stats.BestFitness)
 			stddev.SetValue(stats.StdDev)
 			elapsed.SetValue(fmt.Sprintf("%v", ui.state.stats.Elapsed.Round(time.Millisecond)))
