@@ -8,13 +8,14 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
+	"github.com/arl/evolve/operator"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	xover := New[*bitstring.Bitstring](BitstringMater{})
+	xover := operator.NewCrossover[*bitstring.Bitstring](BitstringMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 	f := factory.Bitstring(50)
@@ -34,7 +35,7 @@ func TestBitstringCrossover(t *testing.T) {
 
 func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	xover := New[*bitstring.Bitstring](BitstringMater{})
+	xover := operator.NewCrossover[*bitstring.Bitstring](BitstringMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 

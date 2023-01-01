@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/arl/evolve/generator"
+	"github.com/arl/evolve/operator"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStringMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New[string](StringMater{})
+	xover := operator.NewCrossover[string](StringMater{})
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
@@ -47,7 +48,7 @@ func TestStringMater(t *testing.T) {
 func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New[string](StringMater{})
+	xover := operator.NewCrossover[string](StringMater{})
 	pop := []string{"abcde", "fghijklm"}
 
 	assert.Panics(t, func() { xover.Apply(pop, rng) })
@@ -56,7 +57,7 @@ func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 func BenchmarkStringMater(b *testing.B) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New[string](StringMater{})
+	xover := operator.NewCrossover[string](StringMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 

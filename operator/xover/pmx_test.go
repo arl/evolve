@@ -5,14 +5,16 @@ import (
 	"testing"
 
 	"github.com/arl/evolve/generator"
+	"github.com/arl/evolve/operator"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/constraints"
 )
 
 func TestPMX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New[[]int](PMX[int]{})
+	xover := operator.NewCrossover[[]int](PMX[int]{})
 	xover.Points = generator.Const(2)
 	xover.Probability = generator.Const(1.0)
 
@@ -36,7 +38,7 @@ func TestPMX(t *testing.T) {
 func TestPMXDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New[[]int](PMX[int]{})
+	xover := operator.NewCrossover[[]int](PMX[int]{})
 	xover.Points = generator.Const(2)
 
 	pop := make([][]int, 2)
@@ -51,7 +53,7 @@ func TestPMXDifferentLength(t *testing.T) {
 func TestPMX2CrossoverPoints(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New[[]int](PMX[int]{})
+	xover := operator.NewCrossover[[]int](PMX[int]{})
 	xover.Points = generator.Const(3)
 
 	pop := make([][]int, 2)
@@ -126,4 +128,13 @@ func benchmarkPMX(seqlen int) func(*testing.B) {
 
 func BenchmarkPMX(b *testing.B) {
 	b.Run("seqlen=62", benchmarkPMX(62))
+}
+
+// seq returns a slice containing the sequence of consecutive numbers from 0 to n.
+func seq[T constraints.Integer | constraints.Float](n int) []T {
+	s := make([]T, n)
+	for i := 0; i < n; i++ {
+		s[i] = T(i)
+	}
+	return s
 }

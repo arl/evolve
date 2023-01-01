@@ -1,4 +1,4 @@
-package xover
+package operator
 
 import (
 	"math/rand"
@@ -32,11 +32,11 @@ type Crossover[T any] struct {
 	Points      generator.Generator[int]
 }
 
-// New creates a Crossover operator based off the provided Mater.
+// NewCrossover creates a Crossover operator based off the provided Mater.
 //
 // The returned Crossover performs a one point crossover with 1.0 (i.e always)
 // probability.
-func New[T any](mater Mater[T]) *Crossover[T] {
+func NewCrossover[T any](mater Mater[T]) *Crossover[T] {
 	return &Crossover[T]{Mater: mater}
 }
 

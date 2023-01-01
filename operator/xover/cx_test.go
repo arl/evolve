@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/arl/evolve/generator"
+	"github.com/arl/evolve/operator"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	xover := New[[]int](CX[int]{})
+	xover := operator.NewCrossover[[]int](CX[int]{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1) // unused
 
@@ -60,7 +61,7 @@ func TestCX(t *testing.T) {
 func TestCXDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := New[[]int](CX[int]{})
+	xover := operator.NewCrossover[[]int](CX[int]{})
 	xover.Points = generator.Const(2)
 
 	pop := make([][]int, 2)
