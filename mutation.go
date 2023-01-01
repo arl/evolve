@@ -1,4 +1,4 @@
-package mutation
+package evolve
 
 import (
 	"math/rand"
@@ -14,8 +14,8 @@ type Mutation[T any] struct {
 	Mutater[T]
 }
 
-// New Mutation returns an Operator based on mutater.
-func New[T any](mutater Mutater[T]) *Mutation[T] {
+// NewMutation returns a operator that mutates chromosomes with the given mutater.
+func NewMutation[T any](mutater Mutater[T]) *Mutation[T] {
 	return &Mutation[T]{Mutater: mutater}
 }
 

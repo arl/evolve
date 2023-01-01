@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 
 	"github.com/stretchr/testify/require"
@@ -18,7 +19,7 @@ func TestStringMutation(t *testing.T) {
 		Probability: generator.Const(0.5),
 	}
 
-	mut := New[string](sm)
+	mut := evolve.NewMutation[string](sm)
 
 	individual1 := "abcd"
 	individual2 := "abab"
