@@ -1,4 +1,4 @@
-package evolve
+package operator
 
 import (
 	"math/rand"
