@@ -1,6 +1,7 @@
 package main
 
 import (
+	"evolve/example/tsp/internal/tsp"
 	"fmt"
 	"math/rand"
 	"os"
@@ -18,8 +19,6 @@ import (
 	"github.com/arl/evolve/operator/xover"
 	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/arl/evolve/selection"
-
-	"evolve/example/tsp/internal/tsp"
 )
 
 type config struct {
@@ -31,7 +30,7 @@ func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], 
 	var pipeline operator.Pipeline[[]int]
 
 	// Define the crossover operator.
-	pmx := xover.New[[]int](xover.PMX[int]{})
+	pmx := operator.NewCrossover[[]int](xover.PMX[int]{})
 	pmx.Points = generator.Const(2) // unused for cycle crossover
 	pmx.Probability = generator.Const(1.0)
 

@@ -17,7 +17,6 @@ import (
 	"github.com/arl/evolve/engine"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
-	"github.com/arl/evolve/operator/xover"
 	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/arl/evolve/selection"
 )
@@ -59,7 +58,7 @@ func solveSudoku(pattern []string) error {
 
 	// Crossover rows between parents (so offspring is x rows from parent1 and y
 	// rows from parent2).
-	xover := xover.New[*sudoku](mater{})
+	xover := operator.NewCrossover[*sudoku](mater{})
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 

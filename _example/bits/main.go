@@ -32,12 +32,12 @@ func check(err error) {
 // consist only of ones.
 func main() {
 	// Define the crossover
-	xover := xover.New[*bitstring.Bitstring](xover.BitstringMater{})
+	xover := operator.NewCrossover[*bitstring.Bitstring](xover.BitstringMater{})
 	xover.Probability = generator.Const(0.7)
 	xover.Points = generator.Const(1)
 
 	// Define the mutation
-	mut := mutation.New[*bitstring.Bitstring](&mutation.Bitstring{
+	mut := operator.NewMutation[*bitstring.Bitstring](&mutation.Bitstring{
 		Probability: generator.Const(0.01),
 		FlipCount:   generator.Const(1),
 	})

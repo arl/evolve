@@ -65,11 +65,11 @@ func main() {
 
 	// Define our evolutionary operators, a string mutation where each rune has
 	// a probability of mutation of 0.02, plus a default string crossover.
-	mutation := mutation.New[string](&mutation.String{
+	mutation := operator.NewMutation[string](&mutation.String{
 		Alphabet:    alphabet,
 		Probability: generator.Const(0.02),
 	})
-	xover := xover.New[string](xover.StringMater{})
+	xover := operator.NewCrossover[string](xover.StringMater{})
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
