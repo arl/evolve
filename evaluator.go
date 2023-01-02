@@ -75,6 +75,6 @@ func (e evaluatorFunc[T]) IsNatural() bool                 { return e.n }
 // evaluators. If f is a function with the appropriate signature, EvaluatorFunc
 // returns an object satisfying the Evaluator interface, for which the Fitness
 // method calls f and IsNatural returns natural.
-func EvaluatorFunc[T any](natural bool, f FitnessFunc[T]) evaluatorFunc[T] { // nolint: golint
+func EvaluatorFunc[T any](natural bool, f FitnessFunc[T]) Evaluator[T] {
 	return evaluatorFunc[T]{f: f, n: natural}
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"sync/atomic"
 	"time"
@@ -134,7 +133,7 @@ func (ui *UI) run(w *app.Window) error {
 	})
 
 	var ops op.Ops
-
+	starting := false
 	for {
 		select {
 		case stats := <-solutions:
@@ -145,24 +144,33 @@ func (ui *UI) run(w *app.Window) error {
 			gen.SetValue(stats.Generation)
 			dist.SetValue(stats.BestFitness)
 			stddev.SetValue(stats.StdDev)
-			elapsed.SetValue(fmt.Sprintf("%v", ui.state.stats.Elapsed.Round(time.Millisecond)))
+			elapsed.SetValue(ui.state.stats.Elapsed.Truncate(time.Millisecond).String())
 
 		case e := <-w.Events():
 			switch e := e.(type) {
 			case system.FrameEvent:
 				gtx := layout.NewContext(&ops, e)
 
-				if firstClick := ui.startButton.handleClicked(); firstClick {
-					// Start the TSP generic algorithm.
-					go runTSP(config{cities: ui.state.tspf.Nodes, maxgen: 0}, observer)
-				}
+				starting = ui.startButton.handleClicked()
 
 				ui.Layout(gtx)
-
 				e.Frame(gtx.Ops)
 			case system.DestroyEvent:
 				return e.Err
 			}
+		}
+
+		if starting {
+			alg.cfg = config{cities: ui.state.tspf.Nodes, maxgen: 0}
+			alg.cfg.csvpath = "stats.csv"
+			if err := alg.setup(observer); err != nil {
+				return err
+			}
+			if alg.scsv != nil {
+				defer alg.scsv.Close()
+			}
+
+			go alg.run()
 		}
 	}
 }

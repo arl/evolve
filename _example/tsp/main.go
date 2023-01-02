@@ -13,6 +13,8 @@ import (
 	"gioui.org/widget/material"
 )
 
+var alg algorithm
+
 func main() {
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to `file`")
 	memprofile := flag.String("memprofile", "", "write memory profile to `file`")
@@ -40,7 +42,12 @@ func main() {
 	}
 
 	if *nogui {
-		runTSP(config{cities: tspf.Nodes, maxgen: *maxgen}, printStatsToCli())
+		alg.cfg = config{cities: tspf.Nodes, maxgen: *maxgen}
+		if err := alg.setup(printStatsToCli()); err != nil {
+			fmt.Println("setup failed:", err)
+			return
+		}
+		alg.run()
 		return
 	}
 

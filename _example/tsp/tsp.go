@@ -1,13 +1,14 @@
 package main
 
 import (
-	"evolve/example/tsp/internal/tsp"
 	"fmt"
 	"math/rand"
 	"os"
 	"os/signal"
 	"runtime"
 	"time"
+
+	"evolve/example/tsp/internal/tsp"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
@@ -21,12 +22,13 @@ import (
 	"github.com/arl/evolve/selection"
 )
 
-type config struct {
-	cities []tsp.Point2D
-	maxgen int
+type algorithm struct {
+	cfg  config
+	eng  engine.Engine[[]int]
+	scsv *evolve.StatsToCSV[[]int]
 }
 
-func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], *evolve.PopulationStats[[]int], error) {
+func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 	var pipeline operator.Pipeline[[]int]
 
 	// Define the crossover operator.
@@ -43,7 +45,7 @@ func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], 
 	mut := operator.NewSwitch[[]int](
 		&mutation.SliceOrder[int]{
 			Count:       generator.Const(1),
-			Amount:      generator.Uniform(1, len(cfg.cities), rng),
+			Amount:      generator.Uniform(1, len(a.cfg.cities), rng),
 			Probability: generator.Const(mutationRate),
 		},
 		&mutation.SRS[int]{
@@ -55,12 +57,12 @@ func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], 
 	)
 	pipeline = append(pipeline, mut)
 
-	indices := make([]int, len(cfg.cities))
-	for i := 0; i < len(cfg.cities); i++ {
+	indices := make([]int, len(a.cfg.cities))
+	for i := 0; i < len(a.cfg.cities); i++ {
 		indices[i] = i
 	}
 
-	eval := newRouteEvaluator(cfg.cities)
+	eval := newRouteEvaluator(a.cfg.cities)
 
 	generational := engine.Generational[[]int]{
 		Operator:  pipeline,
@@ -69,7 +71,7 @@ func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], 
 		Elites:    2,
 	}
 
-	eng := engine.Engine[[]int]{
+	a.eng = engine.Engine[[]int]{
 		Factory:     factory.Permutation[int](indices),
 		Evaluator:   eval,
 		Epocher:     &generational,
@@ -83,21 +85,34 @@ func runTSP(cfg config, obs engine.Observer[[]int]) (*evolve.Population[[]int], 
 		userAbort.Abort()
 	}()
 
-	eng.EndConditions = append(eng.EndConditions, &userAbort)
-	if cfg.maxgen != 0 {
-		eng.EndConditions = append(eng.EndConditions, condition.GenerationCount[[]int](cfg.maxgen))
+	a.eng.EndConditions = append(a.eng.EndConditions, &userAbort)
+	if a.cfg.maxgen != 0 {
+		a.eng.EndConditions = append(a.eng.EndConditions, condition.GenerationCount[[]int](a.cfg.maxgen))
 	}
 
-	var latestStats *evolve.PopulationStats[[]int]
-	eng.AddObserver(engine.ObserverFunc(func(stats *evolve.PopulationStats[[]int]) {
-		obs.Observe(stats)
-		latestStats = stats
-	}))
+	if a.cfg.csvpath != "" {
+		csv, err := evolve.NewStatsToCSV[[]int](a.cfg.csvpath)
+		if err != nil {
+			return err
+		}
+		a.scsv = csv
+		a.eng.AddObserver(csv)
+	}
 
-	pop, cond, err := eng.Evolve(150)
+	a.eng.AddObserver(obs)
+	return nil
+}
+
+func (a *algorithm) run() error {
+	_, cond, err := a.eng.Evolve(150)
 	fmt.Printf("TSP ended, reason: %v\n", cond)
+	return err
+}
 
-	return pop, latestStats, err
+type config struct {
+	cities  []tsp.Point2D
+	maxgen  int
+	csvpath string
 }
 
 func printStatsToCli() engine.Observer[[]int] {
