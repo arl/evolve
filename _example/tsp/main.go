@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
@@ -26,31 +25,32 @@ func main() {
 	flag.Parse()
 
 	stopProf := prof(*statsvizAddr, *cpuprofile, *memprofile, *memprofilerate)
-	defer stopProf()
 
 	// Fill config
-	f, err := os.Open(*tspfname)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	fmt.Println("loaded", *tspfname, "successfully")
-
-	tspf, err := tsp.Load(f)
+	tspf, err := tsp.LoadFromFile(*tspfname)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	if *nogui {
-		alg.cfg = config{cities: tspf.Nodes, maxgen: *maxgen}
-		if err := alg.setup(printStatsToCli()); err != nil {
-			fmt.Println("setup failed:", err)
-			return
-		}
-		alg.run()
+		cliRun(tspf.Nodes, *maxgen)
 		return
 	}
 
+	guiRun(tspf, *maxgen, stopProf)
+}
+
+func cliRun(cities []tsp.Point2D, maxgen int) {
+	alg.cfg = config{cities: cities, maxgen: maxgen}
+	if err := alg.setup(printStatsToCli()); err != nil {
+		log.Fatalf("setup failed: %v", err)
+	}
+	alg.run()
+}
+
+// guiRun runs the algorithm in a gio user interface.
+// beforeExit is called before os.Exit.
+func guiRun(tspf *tsp.File, maxgen int, beforeExit func()) {
 	go func() {
 		theme := material.NewTheme(gofont.Collection())
 
@@ -61,6 +61,9 @@ func main() {
 		)
 		if err := ui.run(w); err != nil {
 			log.Fatal(err)
+		}
+		if beforeExit != nil {
+			beforeExit()
 		}
 		os.Exit(0)
 	}()

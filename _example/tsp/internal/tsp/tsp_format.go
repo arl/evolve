@@ -10,6 +10,7 @@ import (
 	_ "embed"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -47,6 +48,16 @@ type File struct {
 
 // Point2D is the point coordinates in 2D space.
 type Point2D struct{ X, Y float64 }
+
+// Load fills a *File from a TSP file on the filesystem.
+func LoadFromFile(path string) (*File, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed loading tsp file %v: %v", path, err)
+	}
+	defer f.Close()
+	return Load(f)
+}
 
 // Load fills a *File from a reader reading a TSP file.
 func Load(r io.Reader) (*File, error) {
