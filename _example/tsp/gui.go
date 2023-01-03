@@ -120,12 +120,13 @@ func (ui *UI) run(w *app.Window) error {
 		paused += time.Since(before)
 
 		// In case of many consecutive improvements of the solution, we want
-		// anyway to limit us to to drawning 30 fps.
+		// anyway to limit us to to drawing 30 fps.
 		const refreshInterval = 1 * time.Second / 30
 		if stats.Elapsed-prev < refreshInterval &&
 			prevFitness == stats.BestFitness {
 			return
 		}
+
 		prev = stats.Elapsed
 		prevFitness = stats.BestFitness
 
@@ -150,9 +151,7 @@ func (ui *UI) run(w *app.Window) error {
 			switch e := e.(type) {
 			case system.FrameEvent:
 				gtx := layout.NewContext(&ops, e)
-
 				starting = ui.startButton.handleClicked()
-
 				ui.Layout(gtx)
 				e.Frame(gtx.Ops)
 			case system.DestroyEvent:
