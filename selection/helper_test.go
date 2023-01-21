@@ -62,7 +62,7 @@ func testFitnessBasedSelection(ss evolve.Selection[string], tpop testPopulation,
 		rng := rand.New(rand.NewSource(99))
 
 		// Create population.
-		pop := evolve.NewPopulation[string](len(tpop))
+		pop := evolve.NewPopulation[string](len(tpop), nil)
 		for i := range tpop {
 			pop.Candidates[i] = tpop[i].name
 			pop.Fitness[i] = tpop[i].fitness
@@ -102,7 +102,7 @@ func testRandomBasedSelection(s evolve.Selection[string], tpop testPopulation, n
 		seed := time.Now().UnixNano()
 		rng := rand.New(rand.NewSource(seed))
 
-		pop := evolve.NewPopulation[string](len(tpop))
+		pop := evolve.NewPopulation[string](len(tpop), nil)
 		for i := range tpop {
 			pop.Candidates[i] = tpop[i].name
 			pop.Fitness[i] = tpop[i].fitness

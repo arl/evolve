@@ -34,7 +34,7 @@ func (sel *SigmaScaling[T]) Select(pop *evolve.Population[T], natural bool, n in
 		stats.AddValue(pop.Fitness[i])
 	}
 
-	scaledPop := evolve.NewPopulation[T](pop.Len())
+	scaledPop := evolve.NewPopulation(pop.Len(), pop.Evaluator)
 	for i := 0; i < pop.Len(); i++ {
 		scaledPop.Candidates[i] = pop.Candidates[i]
 		scaledPop.Fitness[i] = sigmaScaledFitness(pop.Fitness[i], stats.ArithmeticMean(), stats.StandardDeviation())

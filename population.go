@@ -2,16 +2,21 @@ package evolve
 
 // A Population holds a group of candidates alongside their fitness.
 type Population[T any] struct {
-	Candidates []T
-	Fitness    []float64
+	Candidates       []T
+	Fitness          []float64
+	FitnessEvaluated []bool
+
+	Evaluator Evaluator[T]
 }
 
 // NewPopulation creates a new population, pre-allocating the slices of
 // candidates and fitness to n items each.
-func NewPopulation[T any](n int) *Population[T] {
+func NewPopulation[T any](n int, evaluator Evaluator[T]) *Population[T] {
 	return &Population[T]{
-		Candidates: make([]T, n),
-		Fitness:    make([]float64, n),
+		Candidates:       make([]T, n),
+		Fitness:          make([]float64, n),
+		FitnessEvaluated: make([]bool, n),
+		Evaluator:        evaluator,
 	}
 }
 
