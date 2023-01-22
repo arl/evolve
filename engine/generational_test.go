@@ -113,7 +113,7 @@ func checkB(b *testing.B, err error) {
 	}
 }
 
-// XXX: to prove useful in order to measure the difference between single and
+// XXX: To be proven useful in order to measure the difference between single and
 // multithreaded modes, the fitness evaluation must take a `long` time to
 // perform the job, otherwise the overhead of concurrent execution hides the
 // eventual performance gain.
@@ -194,7 +194,7 @@ type evaluator string
 
 func (s evaluator) Fitness(cand string) float64 {
 	var errors float64
-	for i := 0; 0 < len(cand); i++ {
+	for i := 0; i < len(cand); i++ {
 		if cand[i] != string(s)[i] {
 			errors++
 		}

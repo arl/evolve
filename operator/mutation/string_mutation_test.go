@@ -2,43 +2,45 @@ package mutation
 
 import (
 	"math/rand"
+	"strings"
 	"testing"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestStringMutation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	alphabet := "abcd"
 
-	sm := &String{
-		Alphabet:    alphabet,
-		Probability: generator.Const(0.5),
-	}
+	const alphabet = "abcd"
+	mut := operator.NewMutation[string](
+		&String{
+			Alphabet:    alphabet,
+			Probability: generator.Const(0.5),
+		},
+	)
 
-	mut := operator.NewMutation[string](sm)
-
-	individual1 := "abcd"
-	individual2 := "abab"
-	individual3 := "cccc"
-
-	items := []string{individual1, individual2, individual3}
+	items := []string{"abcd", "abab", "cccc"}
 	pop := evolve.NewPopulationOf(items, nil)
 
-	// Perform several iterations.
+	// Mutate the population multiple times, check the population size doesn't
+	// change and that mutants only contains characters of the alphabet.
 	for i := 0; i < 20; i++ {
 		mut.Apply(pop, rng)
-		require.Lenf(t, pop, 3, "Population size changed after mutation: %v", pop.Len())
+		if pop.Len() != 3 {
+			t.Errorf("pop.Len() = %d, want 3", pop.Len())
+		}
 
 		// Check that each individual is still valid
 		for _, ind := range pop.Candidates {
-			require.Lenf(t, ind, 4, "Individual size changed after mutation: %d", len(ind))
-			for _, c := range []byte(ind) {
-				require.Containsf(t, []byte(alphabet), c, "Mutation introduced invalid character: %v", c)
+			if len(ind) != 4 {
+				t.Errorf("len(ind) = %d, want 4", len(ind))
+			}
+			for _, c := range ind {
+				if !strings.Contains(alphabet, string(c)) {
+					t.Fatalf("invalid char introduced by mutation %v", c)
+				}
 			}
 		}
 	}

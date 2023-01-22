@@ -60,9 +60,9 @@ func (e *Generational[T]) Epoch(pop *evolve.Population[T], rng *rand.Rand) *evol
 
 	// Add selected candidates to the next population
 	nextpop.Candidates = append(nextpop.Candidates, selected...)
-	// Reslice fitness and fitness evaluated so their length match that of the candidates.
+	// Reslice the other slices to the same length of Candidates.
 	nextpop.Fitness = nextpop.Fitness[0:pop.Len()]
-	nextpop.FitnessEvaluated = nextpop.FitnessEvaluated[0:pop.Len()]
+	nextpop.Evaluated = nextpop.Evaluated[0:pop.Len()]
 
 	// Apply genetic operators on the selected candidates.
 	e.Operator.Apply(nextpop, rng)
@@ -71,7 +71,7 @@ func (e *Generational[T]) Epoch(pop *evolve.Population[T], rng *rand.Rand) *evol
 	nextpop.Candidates = append(nextpop.Candidates, elite...)
 	// Reslice again the 2 other slices..
 	nextpop.Fitness = nextpop.Fitness[0:pop.Len()]
-	nextpop.FitnessEvaluated = nextpop.FitnessEvaluated[0:pop.Len()]
+	nextpop.Evaluated = nextpop.Evaluated[0:pop.Len()]
 
 	nextpop.Evaluate(e.Concurrency)
 	return nextpop

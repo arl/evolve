@@ -4,65 +4,44 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/arl/bitstring"
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
 )
 
-// Ensures that mutation occurs correctly. Because of the random aspect we can't
-// actually make many assertions. This just ensures that there are no unexpected
-// exceptions and that the length of the bit strings remains as expected.
-func TestBitstringMutationRandom(t *testing.T) {
+func TestBitstringMutation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	bs := &Bitstring{
-		FlipCount:   generator.Const(1),
-		Probability: generator.Const(0.5),
+	bs, err := bitstring.NewFromString("111100101")
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	mut := operator.NewMutation[*bitstring.Bitstring](bs)
+	// Uses a probability of 1 to make the outcome predictable (all bits are
+	// flipped).
+	mut := operator.NewMutation[*bitstring.Bitstring](
+		&Bitstring{
+			FlipCount:   generator.Const(1),
+			Probability: generator.Const(0.5),
+		},
+	)
 
-	org, err := bitstring.NewFromString("111100101")
-	assert.NoError(t, err)
-
-	pop := evolve.NewPopulationOf([]*bitstring.Bitstring{org}, nil)
-	for i := 0; i < 20; i++ {
-		// Perform several iterations to get different mutations.
-		mut.Apply(pop, rng)
-		mutated := pop.Candidates[0]
-		assert.IsType(t, &bitstring.Bitstring{}, mutated)
-		assert.Equalf(t, 9, mutated.Len(), "want mutated.Len() = 9, got %v", mutated.Len())
-	}
-}
-
-// Ensures that mutation occurs correctly. Uses a probability of 1 to make the
-// outcome predictable (all bits will be flipped).
-func TestBitstringMutationSingleBit(t *testing.T) {
-	rng := rand.New(rand.NewSource(99))
-
-	bs := &Bitstring{
-		FlipCount:   generator.Const(1),
-		Probability: generator.Const(0.5),
-	}
-
-	mut := operator.NewMutation[*bitstring.Bitstring](bs)
-
-	org, err := bitstring.NewFromString("111100101")
-	assert.NoError(t, err)
-
-	pop := evolve.NewPopulationOf([]*bitstring.Bitstring{org}, nil)
+	org := bitstring.Clone(bs)
+	pop := evolve.NewPopulationOf([]*bitstring.Bitstring{bs}, nil)
 	mut.Apply(pop, rng)
 
 	mutated := pop.Candidates[0]
-	assert.IsType(t, &bitstring.Bitstring{}, mutated)
-
-	assert.False(t, mutated.Equals(org), "want mutant to be different from original, got equals")
-	assert.Equalf(t, 9, mutated.Len(), "want mutated bit string to not change length, 9, got %v", mutated.Len())
-	set := mutated.OnesCount()
-	unset := mutated.ZeroesCount()
-	assert.Truef(t, set == 5 || set == 7, "want 5 or 7 set bits in mutated bit string, got %v", set)
-	assert.Truef(t, unset == 2 || unset == 4, "want 2 or 4 unset bits in mutated bit string, got %v", unset)
+	if mutated.Equals(org) {
+		t.Errorf("mutated and original are equals, should be different")
+	}
+	if mutated.Len() != org.Len() {
+		t.Errorf("mutated.Len() = %v, want same length as original (%d)", mutated.Len(), org.Len())
+	}
+	if ones := mutated.OnesCount(); ones != 7 {
+		t.Errorf("mutated string has %d ones, want %d", ones, 7)
+	}
+	if zeroes := mutated.ZeroesCount(); zeroes != 2 {
+		t.Errorf("mutated string has %d zeroes, want %d", zeroes, 2)
+	}
 }

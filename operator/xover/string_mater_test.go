@@ -7,7 +7,6 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestStringMater(t *testing.T) {
@@ -17,43 +16,56 @@ func TestStringMater(t *testing.T) {
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
-	items := make([]string, 4)
-	items[0] = "abcde"
-	items[1] = "fghij"
-	items[2] = "klmno"
-	items[3] = "pqrst"
+	items := []string{"abcde", "fghij", "klmno", "pqrst"}
 
 	pop := evolve.NewPopulationOf(items, nil)
 
 	for i := 0; i < 20; i++ {
-		values := make(map[rune]struct{}, 20) // used as a set of runes
+		genes := make(map[rune]struct{}, 20) // used as a set of runes
 		xover.Apply(pop, rng)
 
-		assert.Lenf(t, pop, 4, "population size changed")
+		if pop.Len() != 4 {
+			t.Errorf("pop.Len() = %v, want 4", pop.Len())
+		}
 
 		for _, ind := range pop.Candidates {
-			assert.Lenf(t, ind, 5, "wrong individual length")
+			if len(ind) != 5 {
+				t.Errorf("len(ind) = %v, want 5", pop.Len())
+			}
 
 			for _, value := range ind {
-				values[value] = struct{}{}
+				genes[value] = struct{}{}
 			}
 		}
 
-		// All of the elements should still be present, just jumbled up between
+		// All of the genes should still be present, just mixed up up between
 		// individuals.
-		assert.Lenf(t, values, 20, "wrong number of individuals")
+		if len(genes) != 20 {
+			t.Errorf("got %d different genes, want 20", len(genes))
+		}
 	}
 }
 
-// StringMater is only defined to work on populations
-// containing strings of equal lengths. Any attempt to apply the operation to
-// populations that contain different length strings should panic.
 func TestStringMaterWithDifferentLengthParents(t *testing.T) {
+	// StringMater is only defined for population of strings of equal lengths
 	rng := rand.New(rand.NewSource(99))
 	xover := operator.NewCrossover[string](StringMater{})
 	pop := evolve.NewPopulationOf([]string{"abcde", "fghijklm"}, nil)
 
-	assert.Panics(t, func() { xover.Apply(pop, rng) })
+	if !didPanic(func() { xover.Apply(pop, rng) }) {
+		t.Fatalf("Should have panicked")
+	}
+}
+
+// didPanic returns true if the function passed to it panics
+func didPanic(f func()) (panicked bool) {
+	panicked = true
+	defer func() {
+		recover()
+	}()
+	f()
+	panicked = false
+	return
 }
 
 func BenchmarkStringMater(b *testing.B) {

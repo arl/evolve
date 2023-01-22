@@ -6,6 +6,8 @@ import (
 
 // An Epocher defines and implements an epoch, or generation, of an evolutionary
 // algorithm.
+//
+// TODO(arl) consider switching to func only (no interface)
 type Epocher[T any] interface {
 	// Epoch performs one epoch of the evolutionary process.
 	//
