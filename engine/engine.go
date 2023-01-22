@@ -61,7 +61,7 @@ func (e *Engine[T]) RemoveObserver(o Observer[T]) {
 // conditions is met, then return the entire population present during the final
 // generation.
 //
-// size is the number of candidate in the population. They whole population is
+// popsize is the number of candidate in the population. They whole population is
 // generated for the first generation, unless some seed candidates are provided
 // with Seeds. size must be at least 1 or Evolve will return en error.
 //
@@ -90,7 +90,7 @@ func (e *Engine[T]) Evolve(popsize int) (*evolve.Population[T], []evolve.Conditi
 	var ngen int
 	start := time.Now()
 
-	pop := evolve.SeedPopulation(e.Factory, popsize, e.Seeds, e.RNG)
+	pop := evolve.SeedPopulation(popsize, e.Seeds, e.Factory, e.Evaluator, e.RNG)
 
 	var satisfied []evolve.Condition[T]
 

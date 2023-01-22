@@ -7,31 +7,31 @@ import (
 
 // A Population holds a group of candidates alongside their fitness.
 type Population[T any] struct {
-	Candidates       []T
-	Fitness          []float64
-	FitnessEvaluated []bool
+	Candidates []T
+	Fitness    []float64
+	Evaluated  []bool
 
 	Evaluator Evaluator[T]
 }
 
-// NewPopulation creates a new population, pre-allocating internal slices to the
-// given length each.
-func NewPopulation[T any](len int, evaluator Evaluator[T]) *Population[T] {
+// NewPopulation creates a new population of n candidates. Candidates are the
+// zero-value of T.
+func NewPopulation[T any](n int, evaluator Evaluator[T]) *Population[T] {
 	return &Population[T]{
-		Candidates:       make([]T, len),
-		Fitness:          make([]float64, len),
-		FitnessEvaluated: make([]bool, len),
-		Evaluator:        evaluator,
+		Candidates: make([]T, n),
+		Fitness:    make([]float64, n),
+		Evaluated:  make([]bool, n),
+		Evaluator:  evaluator,
 	}
 }
 
-// NewPopulation creates a new population using the provided elements as candidates.
-func NewPopulationOf[T any](items []T, evaluator Evaluator[T]) *Population[T] {
+// NewPopulation creates a new population with the following candidates.
+func NewPopulationOf[T any](cands []T, evaluator Evaluator[T]) *Population[T] {
 	return &Population[T]{
-		Candidates:       items,
-		Fitness:          make([]float64, len(items)),
-		FitnessEvaluated: make([]bool, len(items)),
-		Evaluator:        evaluator,
+		Candidates: cands,
+		Fitness:    make([]float64, len(cands)),
+		Evaluated:  make([]bool, len(cands)),
+		Evaluator:  evaluator,
 	}
 }
 
@@ -39,10 +39,10 @@ func NewPopulationOf[T any](items []T, evaluator Evaluator[T]) *Population[T] {
 // slices to the given length and capacity each.
 func NewPopulationWithCapacity[T any](len, cap int, evaluator Evaluator[T]) *Population[T] {
 	return &Population[T]{
-		Candidates:       make([]T, len, cap),
-		Fitness:          make([]float64, len, cap),
-		FitnessEvaluated: make([]bool, len, cap),
-		Evaluator:        evaluator,
+		Candidates: make([]T, len, cap),
+		Fitness:    make([]float64, len, cap),
+		Evaluated:  make([]bool, len, cap),
+		Evaluator:  evaluator,
 	}
 }
 
@@ -57,6 +57,7 @@ func (p *Population[T]) Less(i, j int) bool { return p.Fitness[i] < p.Fitness[j]
 func (p *Population[T]) Swap(i, j int) {
 	p.Fitness[i], p.Fitness[j] = p.Fitness[j], p.Fitness[i]
 	p.Candidates[i], p.Candidates[j] = p.Candidates[j], p.Candidates[i]
+	p.Evaluated[i], p.Evaluated[j] = p.Evaluated[j], p.Evaluated[i]
 }
 
 // Evaluate evaluates all candidates that do not have a fitness yet.
@@ -66,8 +67,9 @@ func (p *Population[T]) Evaluate(concurrency int) {
 	if concurrency <= 1 {
 		// Synchronous evaluation
 		for i := 0; i < p.Len(); i++ {
-			if !p.FitnessEvaluated[i] {
+			if !p.Evaluated[i] {
 				p.Fitness[i] = p.Evaluator.Fitness(p.Candidates[i])
+				p.Evaluated[i] = true
 			}
 		}
 	}
@@ -76,7 +78,7 @@ func (p *Population[T]) Evaluate(concurrency int) {
 	wg.Add(p.Len())
 	sem := make(chan struct{}, concurrency)
 	for i := 0; i < p.Len(); i++ {
-		if p.FitnessEvaluated[i] {
+		if p.Evaluated[i] {
 			continue
 		}
 
@@ -84,6 +86,7 @@ func (p *Population[T]) Evaluate(concurrency int) {
 		sem <- struct{}{}
 		go func() {
 			p.Fitness[i] = p.Evaluator.Fitness(p.Candidates[i])
+			p.Evaluated[i] = true
 			wg.Done()
 			<-sem
 		}()
@@ -95,6 +98,8 @@ func (p *Population[T]) Evaluate(concurrency int) {
 //
 // It is used by evolution engine to increase genetic diversity and/or add new
 // candidates to a population.
+//
+// TODO(arl) consider switching to func only (no interface)
 type Factory[T any] interface {
 	// New returns a new random candidate, using the provided pseudo-random
 	// number generator.
@@ -109,37 +114,44 @@ type FactoryFunc[T any] func(*rand.Rand) T
 // New calls f(rng) and returns its return value.
 func (f FactoryFunc[T]) New(rng *rand.Rand) T { return f(rng) }
 
-// GeneratePopulation creates a population with n candidates randomly generated
-// using the provided factory.
-//
-// Note: the return Population doesn't have any Evaluator set.
-func GeneratePopulation[T any](fac Factory[T], n int, rng *rand.Rand) *Population[T] {
-	pop := NewPopulationWithCapacity[T](0, n, nil)
+// GeneratePopulation creates and initializes a new Population of n candidates
+// which are randomly generated using the given factory.
+func GeneratePopulation[T any](n int, fac Factory[T], e Evaluator[T], rng *rand.Rand) *Population[T] {
+	pop := NewPopulationWithCapacity(0, n, e)
 	for i := 0; i < n; i++ {
 		pop.Candidates = append(pop.Candidates, fac.New(rng))
 	}
 
 	// Reslice other slices
 	pop.Fitness = pop.Fitness[0:pop.Len()]
-	pop.FitnessEvaluated = pop.FitnessEvaluated[0:pop.Len()]
+	pop.Evaluated = pop.Evaluated[0:pop.Len()]
 	return pop
 }
 
-// SeedPopulation returns a slice of n candidates, where a part of them are
-// seeded while the rest is generated randomly using the provided factory.
+// SeedPopulation creates and initializes a new Population of n candidates, some
+// of which are seeded (from the provided seeds) and the rest are randomly
+// generated using the given factory. If len(seeds) > n then only the first n
+// seeds in the slice are used.
+//
 // Sometimes it is desirable to seed the initial population with some known good
 // candidates, providing some hints for the evolution process.
-//
-// Note: the return Population doesn't have any Evaluator set.
-func SeedPopulation[T any](fac Factory[T], n int, seeds []T, rng *rand.Rand) *Population[T] {
-	pop := NewPopulationWithCapacity[T](0, n, nil)
-	pop.Candidates = append(pop.Candidates, seeds...)
+func SeedPopulation[T any](n int, seeds []T, fac Factory[T], e Evaluator[T], rng *rand.Rand) *Population[T] {
+	pop := NewPopulationWithCapacity(0, n, e)
+
+	// Seed what we can.
+	min := n
+	if len(seeds) < n {
+		min = len(seeds)
+	}
+	pop.Candidates = append(pop.Candidates, seeds[:min]...)
+
+	// Generate the rest.
 	for pop.Len() < n {
 		pop.Candidates = append(pop.Candidates, fac.New(rng))
 	}
 
-	// Reslice other slices
+	// Reslice other slices.
 	pop.Fitness = pop.Fitness[0:pop.Len()]
-	pop.FitnessEvaluated = pop.FitnessEvaluated[0:pop.Len()]
+	pop.Evaluated = pop.Evaluated[0:pop.Len()]
 	return pop
 }

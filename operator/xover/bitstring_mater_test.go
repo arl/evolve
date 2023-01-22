@@ -20,7 +20,7 @@ func TestBitstringCrossover(t *testing.T) {
 	xover.Points = generator.Const(1)
 	f := factory.Bitstring(50)
 
-	pop := evolve.GeneratePopulation[*bitstring.Bitstring](f, 2, rng)
+	pop := evolve.GeneratePopulation[*bitstring.Bitstring](2, f, nil, rng)
 	// Test to make sure that crossover correctly preserves all genetic material
 	// originally present in the population and does not introduce anything new.
 	want := pop.Candidates[0].OnesCount() + pop.Candidates[1].OnesCount()
