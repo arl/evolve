@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
 	"github.com/google/go-cmp/cmp"
@@ -46,9 +47,9 @@ func TestCX(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pop := [][]int{tt.p0, tt.p1}
-			got := xover.Apply(pop, rng)
-			off0, off1 := got[0], got[1]
+			pop := evolve.NewPopulationOf([][]int{tt.p0, tt.p1}, nil)
+			xover.Apply(pop, rng)
+			off0, off1 := pop.Candidates[0], pop.Candidates[1]
 
 			if !(cmp.Equal(tt.off0, off0) && cmp.Equal(tt.off1, off1)) &&
 				!(cmp.Equal(tt.off0, off1) && cmp.Equal(tt.off1, off0)) {
@@ -64,10 +65,11 @@ func TestCXDifferentLength(t *testing.T) {
 	xover := operator.NewCrossover[[]int](CX[int]{})
 	xover.Points = generator.Const(2)
 
-	pop := make([][]int, 2)
-	pop[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
-	pop[1] = []int{3, 7, 5, 1}
+	items := make([][]int, 2)
+	items[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
+	items[1] = []int{3, 7, 5, 1}
 
+	pop := evolve.NewPopulationOf(items, nil)
 	assert.Panics(t, func() {
 		xover.Apply(pop, rng)
 	})

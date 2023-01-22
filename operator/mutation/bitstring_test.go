@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/arl/bitstring"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
 )
@@ -27,11 +28,11 @@ func TestBitstringMutationRandom(t *testing.T) {
 	org, err := bitstring.NewFromString("111100101")
 	assert.NoError(t, err)
 
-	pop := []*bitstring.Bitstring{org}
+	pop := evolve.NewPopulationOf([]*bitstring.Bitstring{org}, nil)
 	for i := 0; i < 20; i++ {
 		// Perform several iterations to get different mutations.
-		pop = mut.Apply(pop, rng)
-		mutated := pop[0]
+		mut.Apply(pop, rng)
+		mutated := pop.Candidates[0]
 		assert.IsType(t, &bitstring.Bitstring{}, mutated)
 		assert.Equalf(t, 9, mutated.Len(), "want mutated.Len() = 9, got %v", mutated.Len())
 	}
@@ -52,10 +53,10 @@ func TestBitstringMutationSingleBit(t *testing.T) {
 	org, err := bitstring.NewFromString("111100101")
 	assert.NoError(t, err)
 
-	pop := []*bitstring.Bitstring{org}
-	pop = mut.Apply(pop, rng)
+	pop := evolve.NewPopulationOf([]*bitstring.Bitstring{org}, nil)
+	mut.Apply(pop, rng)
 
-	mutated := pop[0]
+	mutated := pop.Candidates[0]
 	assert.IsType(t, &bitstring.Bitstring{}, mutated)
 
 	assert.False(t, mutated.Equals(org), "want mutant to be different from original, got equals")

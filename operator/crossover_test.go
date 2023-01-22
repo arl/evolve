@@ -6,15 +6,12 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator/xover"
 )
 
-type byteseq interface {
-	~string | ~[]byte
-}
-
-func sameStringPop[T byteseq](t *testing.T, a, b []T) {
+func sameStringPop(t *testing.T, a, b []string) {
 	t.Helper()
 
 	s1 := make([]string, 0)
@@ -35,24 +32,40 @@ func sameStringPop[T byteseq](t *testing.T, a, b []T) {
 func TestCrossoverApply(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
+	org := []string{
+		"abcde",
+		"fghij",
+		"klmno",
+		"pqrst",
+		"uvwxy",
+	}
+
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
-		pop := [][]byte{[]byte("abcde"), []byte("fghij"), []byte("klmno"), []byte("pqrst"), []byte("uvwxy")}
-		xover := NewCrossover[[]byte](xover.SliceMater[byte]{})
+		xover := NewCrossover[string](xover.StringMater{})
 		xover.Points = generator.Const(0)
 		xover.Probability = generator.Const(1.0)
 
-		got := xover.Apply(pop, rng)
-		sameStringPop(t, pop, got)
+		items := make([]string, len(org))
+		copy(items, org)
+
+		pop := evolve.NewPopulationOf(items, nil)
+
+		xover.Apply(pop, rng)
+		sameStringPop(t, pop.Candidates, org)
 	})
 
 	t.Run("zero_crossover_probability_is_noop", func(t *testing.T) {
-		pop := []string{string("abcde"), string("fghij"), string("klmno"), string("pqrst"), string("uvwxy")}
 		xover := NewCrossover[string](xover.StringMater{})
 		xover.Points = generator.Const(1)
 		xover.Probability = generator.Const(0.0)
 
-		got := xover.Apply(pop, rng)
-		sameStringPop(t, pop, got)
+		items := make([]string, len(org))
+		copy(items, org)
+
+		pop := evolve.NewPopulationOf(items, nil)
+
+		xover.Apply(pop, rng)
+		sameStringPop(t, pop.Candidates, org)
 	})
 }
 
@@ -62,7 +75,14 @@ func BenchmarkCrossoverApply(b *testing.B) {
 	b.ReportAllocs()
 	rng := rand.New(rand.NewSource(99))
 
-	pop := [][]byte{[]byte("abcde"), []byte("fghij"), []byte("klmno"), []byte("pqrst"), []byte("uvwxy")}
+	items := [][]byte{
+		[]byte("abcde"),
+		[]byte("fghij"),
+		[]byte("klmno"),
+		[]byte("pqrst"),
+		[]byte("uvwxy"),
+	}
+	pop := evolve.NewPopulationOf(items, nil)
 
 	b.ResetTimer()
 	var res [][]byte
@@ -70,7 +90,8 @@ func BenchmarkCrossoverApply(b *testing.B) {
 		xover := NewCrossover[[]byte](xover.SliceMater[byte]{})
 		xover.Points = generator.Const(1)
 		xover.Probability = generator.Const(1.0)
-		res = xover.Apply(pop, rng)
+
+		xover.Apply(pop, rng)
 	}
 
 	sink = res

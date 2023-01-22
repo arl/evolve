@@ -20,17 +20,20 @@ import (
 // Trivial test operator that mutates all integers into zeroes.
 type zeroIntMaker struct{}
 
-func (op zeroIntMaker) Apply(selectedCandidates []int, rng *rand.Rand) []int {
-	result := make([]int, len(selectedCandidates))
-	for i := range selectedCandidates {
-		result[i] = 0
+// Continuer ici
+
+// mais en fait, est-ce que operator.Apply ne devrait pas simplement agir sur la population donnée
+// au lieu d'en retourner une nouvelle?
+
+func (op zeroIntMaker) Apply(pop *evolve.Population[int], rng *rand.Rand) {
+	for i := range pop.Candidates {
+		pop.Candidates[i] = 0
 	}
-	return result
 }
 
 type intEvaluator struct{}
 
-func (intEvaluator) Fitness(cand int, pop []int) float64 {
+func (intEvaluator) Fitness(cand int) float64 {
 	return float64(cand)
 }
 
@@ -53,7 +56,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 			Operator:  zeroIntMaker{},
 			Evaluator: intEvaluator{},
 			Selection: selection.RouletteWheel[int]{},
-			Elites:    2,
+			NumElites: 2,
 		},
 		// Seed candidates, all better than any others that can possibly get
 		// into the population (since every other candidate will always be
@@ -141,7 +144,7 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 			},
 			Evaluator: evaluator(target),
 			Selection: selection.RouletteWheel[string]{},
-			Elites:    5,
+			NumElites: 5,
 		},
 		EndConditions: []evolve.Condition[string]{
 			condition.TargetFitness[string]{Fitness: 0, Natural: false},
@@ -189,7 +192,7 @@ func BenchmarkGenerationalEngineMultithread1000(b *testing.B) {
 // TODO: rename to charMatchEvaluator or something (maybe generalize for byteseq (~string | ~[]byte) , just maybe...)
 type evaluator string
 
-func (s evaluator) Fitness(cand string, pop []string) float64 {
+func (s evaluator) Fitness(cand string) float64 {
 	var errors float64
 	for i := 0; 0 < len(cand); i++ {
 		if cand[i] != string(s)[i] {

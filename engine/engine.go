@@ -95,17 +95,17 @@ func (e *Engine[T]) Evolve(popsize int) (*evolve.Population[T], []evolve.Conditi
 	var satisfied []evolve.Condition[T]
 
 	// Evaluate initial population fitness
-	evpop := evolve.EvaluatePopulation(pop, e.Evaluator, e.Concurrency)
+	pop.Evaluate(e.Concurrency)
 	for {
 		// Sort population according to fitness.
 		if e.Evaluator.IsNatural() {
-			sort.Sort(sort.Reverse(evpop))
+			sort.Sort(sort.Reverse(pop))
 		} else {
-			sort.Sort(evpop)
+			sort.Sort(pop)
 		}
 
 		// compute population stats
-		data := e.updateStats(evpop, ngen, time.Since(start))
+		data := e.updateStats(pop, ngen, time.Since(start))
 
 		// check for termination conditions
 		satisfied = satisfiedConditions(data, e.EndConditions)
@@ -114,11 +114,11 @@ func (e *Engine[T]) Evolve(popsize int) (*evolve.Population[T], []evolve.Conditi
 		}
 
 		// perform evolution
-		evpop = e.Epocher.Epoch(evpop, e.RNG)
+		pop = e.Epocher.Epoch(pop, e.RNG)
 
 		ngen++
 	}
-	return evpop, satisfied, nil
+	return pop, satisfied, nil
 }
 
 func (e *Engine[T]) updateStats(pop *evolve.Population[T], ngen int, elapsed time.Duration) *evolve.PopulationStats[T] {

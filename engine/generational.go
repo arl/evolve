@@ -14,7 +14,7 @@ type Generational[T any] struct {
 	Evaluator evolve.Evaluator[T]
 	Selection evolve.Selection[T]
 
-	// Elites defines the number of candidates preserved via elitism for the
+	// NumElites defines the number of candidates preserved via elitism for the
 	// engine. By default it is set to 0, no elitism is applied.
 	//
 	// In elitism, a subset of the population with the best fitness scores is
@@ -23,7 +23,7 @@ type Generational[T any] struct {
 	// eligible for selection for breeding the remainder of the next generation.
 	// This value must be non-negative and less than the population size or
 	// Evolve will return en error
-	Elites int
+	NumElites int
 
 	// Number of concurrent processes to use (defaults to the number of cores).
 	Concurrency int
@@ -45,22 +45,34 @@ func (e *Generational[T]) Epoch(pop *evolve.Population[T], rng *rand.Rand) *evol
 		e.init = true
 	}
 
-	nextpop := make([]T, 0, pop.Len())
+	// nextpop := make([]T, 0, pop.Len())
+	nextpop := evolve.NewPopulationWithCapacity(0, pop.Len(), e.Evaluator)
 
 	// Perform elitism: straightforward copy the n fittest candidates into the
 	// next generation, without any kind of selection.
-	elite := make([]T, e.Elites)
-	for i := 0; i < e.Elites; i++ {
+	elite := make([]T, e.NumElites)
+	for i := 0; i < e.NumElites; i++ {
 		elite[i] = pop.Candidates[i]
 	}
 
 	// Select the rest of population through natural selection.
-	selected := e.Selection.Select(pop, e.Evaluator.IsNatural(), pop.Len()-e.Elites, rng)
+	selected := e.Selection.Select(pop, e.Evaluator.IsNatural(), pop.Len()-e.NumElites, rng)
+
+	// Add selected candidates to the next population
+	nextpop.Candidates = append(nextpop.Candidates, selected...)
+	// Reslice fitness and fitness evaluated so their length match that of the candidates.
+	nextpop.Fitness = nextpop.Fitness[0:pop.Len()]
+	nextpop.FitnessEvaluated = nextpop.FitnessEvaluated[0:pop.Len()]
 
 	// Apply genetic operators on the selected candidates.
-	nextpop = e.Operator.Apply(append(nextpop, selected...), rng)
+	e.Operator.Apply(nextpop, rng)
 
-	// While the elites, if any, are added, untouched, to the next population.
-	nextpop = append(nextpop, elite...)
-	return evolve.EvaluatePopulation(nextpop, e.Evaluator, e.Concurrency)
+	// Finally, add elites (if any), untouched, to the next population.
+	nextpop.Candidates = append(nextpop.Candidates, elite...)
+	// Reslice again the 2 other slices..
+	nextpop.Fitness = nextpop.Fitness[0:pop.Len()]
+	nextpop.FitnessEvaluated = nextpop.FitnessEvaluated[0:pop.Len()]
+
+	nextpop.Evaluate(e.Concurrency)
+	return nextpop
 }

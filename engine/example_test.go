@@ -15,7 +15,7 @@ func ExampleNew() {
 		Epocher: &Generational[*bitstring.Bitstring]{},
 		Evaluator: evolve.EvaluatorFunc(
 			true, // natural fitness (higher is better)
-			func(cand *bitstring.Bitstring, pop []*bitstring.Bitstring) float64 {
+			func(cand *bitstring.Bitstring) float64 {
 				// our evaluator counts the ones in the bitstring
 				return float64(cand.OnesCount())
 			}),

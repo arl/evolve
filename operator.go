@@ -39,5 +39,9 @@ type Operator[T any] interface {
 	// should return a list that contains evolved copies of those candidates
 	// (umodified candidates can be included in the results without having to be
 	// copied).
-	Apply([]T, *rand.Rand) []T
+	//
+	// TODO(arl) rand shouldn't be passed, but a field of the operator (if
+	// needed) the big advantage is that we can chose a goroutine-safe rand or
+	// not depending on the needs.
+	Apply(*Population[T], *rand.Rand)
 }

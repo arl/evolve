@@ -21,7 +21,6 @@ import "sync"
 // unless the fitness evaluator ignores the second parameter to the
 // Evaluator.Fitness method, caching must not be used.
 type FitnessCache[T any] struct {
-
 	// Wrapped is the fitness evaluator for which we want to provide caching.
 	Wrapped Evaluator[T]
 	cache   sync.Map
@@ -33,13 +32,13 @@ type FitnessCache[T any] struct {
 // the fitness evaluator has already calculated the fitness score for the
 // specified candidate that score is returned without delegating to the wrapped
 // evaluator.
-func (c *FitnessCache[T]) Fitness(cand T, pop []T) float64 {
+func (c *FitnessCache[T]) Fitness(cand T) float64 {
 	var fitness float64
 	val, ok := c.cache.Load(cand)
 	if ok {
 		fitness = val.(float64)
 	} else {
-		fitness = c.Wrapped.Fitness(cand, pop)
+		fitness = c.Wrapped.Fitness(cand)
 		c.cache.Store(cand, fitness)
 	}
 	return fitness

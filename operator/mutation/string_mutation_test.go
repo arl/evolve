@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
 
@@ -25,15 +26,16 @@ func TestStringMutation(t *testing.T) {
 	individual2 := "abab"
 	individual3 := "cccc"
 
-	population := []string{individual1, individual2, individual3}
+	items := []string{individual1, individual2, individual3}
+	pop := evolve.NewPopulationOf(items, nil)
 
 	// Perform several iterations.
 	for i := 0; i < 20; i++ {
-		population = mut.Apply(population, rng)
-		require.Lenf(t, population, 3, "Population size changed after mutation: %v", len(population))
+		mut.Apply(pop, rng)
+		require.Lenf(t, pop, 3, "Population size changed after mutation: %v", pop.Len())
 
 		// Check that each individual is still valid
-		for _, ind := range population {
+		for _, ind := range pop.Candidates {
 			require.Lenf(t, ind, 4, "Individual size changed after mutation: %d", len(ind))
 			for _, c := range []byte(ind) {
 				require.Containsf(t, []byte(alphabet), c, "Mutation introduced invalid character: %v", c)

@@ -24,21 +24,15 @@ type Bitstring struct {
 }
 
 // Mutate modifies a bitstring.Bitstring with respect to a mutation probabilty.
-func (op *Bitstring) Mutate(bs *bitstring.Bitstring, rng *rand.Rand) *bitstring.Bitstring {
+func (op *Bitstring) Mutate(bs **bitstring.Bitstring, rng *rand.Rand) {
 	// Find out the mutation probabilty
 	prob := op.Probability.Next()
 
 	if rng.Float64() < prob {
-		mutated := bitstring.Clone(bs)
-
 		// Since there's a mutation to perform, find out how many bits to flip.
 		nmuts := op.FlipCount.Next()
 		for i := 0; i < nmuts; i++ {
-			mutated.FlipBit(rng.Intn(mutated.Len()))
+			(*bs).FlipBit(rng.Intn((*bs).Len()))
 		}
-
-		return mutated
 	}
-
-	return bs
 }

@@ -2,6 +2,8 @@ package operator
 
 import (
 	"math/rand"
+
+	"github.com/arl/evolve"
 )
 
 // Mutation implements the mutation evolutionnary operator. It modifies the
@@ -19,21 +21,19 @@ func NewMutation[T any](mutater Mutater[T]) *Mutation[T] {
 	return &Mutation[T]{Mutater: mutater}
 }
 
-// Apply applies the mutation operator to all individuals in the provided population.
-func (op *Mutation[T]) Apply(population []T, rng *rand.Rand) []T {
-	muted := make([]T, len(population))
-	for i, cand := range population {
-		muted[i] = op.Mutate(cand, rng)
+// Apply applies the mutation operator to all individuals in the provided
+// population.
+func (op *Mutation[T]) Apply(pop *evolve.Population[T], rng *rand.Rand) {
+	for i := 0; i < pop.Len(); i++ {
+		op.Mutate(&pop.Candidates[i], rng)
 	}
-	return muted
 }
 
 // A Mutater mutates individuals.
 type Mutater[T any] interface {
 	// Mutate performs mutation on an individual.
 	//
-	// The original individual must be let untouched while the mutant is
-	// returned, unless no mutation is performed, in which case the original
-	// individual can be returned.
-	Mutate(T, *rand.Rand) T
+	// The fact that an individual is mutated or not depends on the particular
+	// Mutater implementation.
+	Mutate(*T, *rand.Rand)
 }

@@ -14,8 +14,9 @@ func TestGeneratePopulation(t *testing.T) {
 		},
 	)
 
-	if pop := GeneratePopulation[int](fac, 10, rng); len(pop) != 10 {
-		t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+	pop := GeneratePopulation[int](fac, 10, rng)
+	if pop.Len() != 10 {
+		t.Errorf("pop.Len() = %d, want %d", pop.Len(), 10)
 	}
 }
 
@@ -28,6 +29,7 @@ func occurrences(vals []int) map[int]int {
 }
 
 func TestSeedPopulation(t *testing.T) {
+	// TODO(arl) convert to test table
 	rng := rand.New(rand.NewSource(99))
 
 	// Factory that generates -1 (so we can check later whether a candidate is a
@@ -41,10 +43,10 @@ func TestSeedPopulation(t *testing.T) {
 	t.Run("no seeds", func(t *testing.T) {
 		var seeds []int
 		pop := SeedPopulation[int](fac, 10, seeds, rng)
-		if len(pop) != 10 {
-			t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+		if pop.Len() != 10 {
+			t.Errorf("pop.Len() = %d, want %d", pop.Len(), 10)
 		}
-		m := occurrences(pop)
+		m := occurrences(pop.Candidates)
 		if m[-1] != 10 {
 			t.Errorf("got %d generated candidates (not seeded) in population, want %d", m[-1], 0)
 		}
@@ -53,10 +55,10 @@ func TestSeedPopulation(t *testing.T) {
 	t.Run("2 seeds", func(t *testing.T) {
 		seeds := []int{1, 2}
 		pop := SeedPopulation[int](fac, 10, seeds, rng)
-		if len(pop) != 10 {
-			t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+		if pop.Len() != 10 {
+			t.Errorf("pop.Len() = %d, want %d", pop.Len(), 10)
 		}
-		m := occurrences(pop)
+		m := occurrences(pop.Candidates)
 		if m[-1] != 8 {
 			t.Errorf("got %d generated candidates (not seeded) in population, want %d", m[-1], 8)
 		}
@@ -65,10 +67,10 @@ func TestSeedPopulation(t *testing.T) {
 	t.Run("only seeds", func(t *testing.T) {
 		seeds := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 		pop := SeedPopulation[int](fac, 10, seeds, rng)
-		if len(pop) != 10 {
-			t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+		if pop.Len() != 10 {
+			t.Errorf("pop.Len() = %d, want %d", pop.Len(), 10)
 		}
-		m := occurrences(pop)
+		m := occurrences(pop.Candidates)
 		if m[-1] != 0 {
 			t.Errorf("got %d generated candidates (not seeded) in population, want %d", m[-1], 0)
 		}
@@ -77,10 +79,10 @@ func TestSeedPopulation(t *testing.T) {
 	t.Run("len(seeds)>n", func(t *testing.T) {
 		seeds := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 		pop := SeedPopulation[int](fac, 10, seeds, rng)
-		if len(pop) != 10 {
-			t.Errorf("len(pop) = %d, want %d", len(pop), 10)
+		if pop.Len() != 10 {
+			t.Errorf("pop.Len() = %d, want %d", pop.Len(), 10)
 		}
-		m := occurrences(pop)
+		m := occurrences(pop.Candidates)
 		if m[-1] != 0 {
 			t.Errorf("got %d generated candidates (not seeded) in population, want %d", m[-1], 0)
 		}

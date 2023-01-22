@@ -11,7 +11,7 @@ type incrEvaluator struct {
 	count   int
 }
 
-func (ie *incrEvaluator) Fitness(cand int, pop []int) float64 {
+func (ie *incrEvaluator) Fitness(cand int) float64 {
 	ie.count++
 	return float64(ie.count)
 }
@@ -20,12 +20,12 @@ func (ie *incrEvaluator) IsNatural() bool { return ie.natural }
 
 func TestFitnessCacheMiss(t *testing.T) {
 	eval := FitnessCache[int]{Wrapped: &incrEvaluator{natural: true}}
-	fitness := eval.Fitness(101, nil)
+	fitness := eval.Fitness(101)
 	if fitness != 1 {
 		t.Errorf("wrong fitness, want 1, got %v", fitness)
 	}
 	// Different candidate so shouldn't return a cached value.
-	fitness = eval.Fitness(202, nil)
+	fitness = eval.Fitness(202)
 
 	if fitness != 2 {
 		t.Errorf("wrong fitness, want 2, got %v", fitness)
@@ -34,12 +34,12 @@ func TestFitnessCacheMiss(t *testing.T) {
 
 func TestFitnessCacheHit(t *testing.T) {
 	eval := FitnessCache[int]{Wrapped: &incrEvaluator{natural: true}}
-	fitness := eval.Fitness(101, nil)
+	fitness := eval.Fitness(101)
 	if fitness != 1 {
 		t.Errorf("wrong fitness, want 1, got %v", fitness)
 	}
 
-	fitness = eval.Fitness(101, nil)
+	fitness = eval.Fitness(101)
 	// If the value is found in the cache it won't have changed. If it is
 	// recalculated, it will have.
 	if fitness != 1 {

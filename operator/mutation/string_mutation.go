@@ -18,8 +18,8 @@ type String struct {
 }
 
 // Mutate modifies a string with respect to a mutation probabilty.
-func (op *String) Mutate(s string, rng *rand.Rand) string {
-	buf := []byte(s)
+func (op *String) Mutate(s *string, rng *rand.Rand) {
+	buf := []byte(*s)
 
 	// Find out the probability for this run.
 	prob := op.Probability.Next()
@@ -30,5 +30,6 @@ func (op *String) Mutate(s string, rng *rand.Rand) string {
 		}
 	}
 
-	return string(buf)
+	cpy := string(buf)
+	s = &cpy
 }

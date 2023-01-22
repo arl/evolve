@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
 	"github.com/stretchr/testify/assert"
@@ -16,19 +17,21 @@ func TestStringMater(t *testing.T) {
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
-	pop := make([]string, 4)
-	pop[0] = "abcde"
-	pop[1] = "fghij"
-	pop[2] = "klmno"
-	pop[3] = "pqrst"
+	items := make([]string, 4)
+	items[0] = "abcde"
+	items[1] = "fghij"
+	items[2] = "klmno"
+	items[3] = "pqrst"
+
+	pop := evolve.NewPopulationOf(items, nil)
 
 	for i := 0; i < 20; i++ {
 		values := make(map[rune]struct{}, 20) // used as a set of runes
-		pop = xover.Apply(pop, rng)
+		xover.Apply(pop, rng)
 
 		assert.Lenf(t, pop, 4, "population size changed")
 
-		for _, ind := range pop {
+		for _, ind := range pop.Candidates {
 			assert.Lenf(t, ind, 5, "wrong individual length")
 
 			for _, value := range ind {
@@ -47,9 +50,8 @@ func TestStringMater(t *testing.T) {
 // populations that contain different length strings should panic.
 func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-
 	xover := operator.NewCrossover[string](StringMater{})
-	pop := []string{"abcde", "fghijklm"}
+	pop := evolve.NewPopulationOf([]string{"abcde", "fghijklm"}, nil)
 
 	assert.Panics(t, func() { xover.Apply(pop, rng) })
 }
@@ -61,11 +63,11 @@ func BenchmarkStringMater(b *testing.B) {
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 
-	pop := []string{"abcde", "fghij", "klmno", "pqrst"}
+	pop := evolve.NewPopulationOf([]string{"abcde", "fghij", "klmno", "pqrst"}, nil)
 
 	b.ReportAllocs()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		pop = xover.Apply(pop, rng)
+		xover.Apply(pop, rng)
 	}
 }
