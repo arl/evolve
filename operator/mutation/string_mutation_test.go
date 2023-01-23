@@ -8,6 +8,7 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator"
+	"github.com/arl/evolve/pkg/set"
 )
 
 func TestStringMutation(t *testing.T) {
@@ -25,14 +26,17 @@ func TestStringMutation(t *testing.T) {
 	pop := evolve.NewPopulationOf(items, nil)
 
 	// Mutate the population multiple times, check the population size doesn't
-	// change and that mutants only contains characters of the alphabet.
+	// change and that mutants only contains characters of the alphabet. Also,
+	// keep track in a set of the various mutatied candidates we obtained, in
+	// order to check that mutation does its job.
+	set := set.NewOf[string]()
 	for i := 0; i < 20; i++ {
 		mut.Apply(pop, rng)
 		if pop.Len() != 3 {
 			t.Errorf("pop.Len() = %d, want 3", pop.Len())
 		}
 
-		// Check that each individual is still valid
+		// Check that each individual is still valid.
 		for _, ind := range pop.Candidates {
 			if len(ind) != 4 {
 				t.Errorf("len(ind) = %d, want 4", len(ind))
@@ -42,6 +46,11 @@ func TestStringMutation(t *testing.T) {
 					t.Fatalf("invalid char introduced by mutation %v", c)
 				}
 			}
+			set.Insert(ind)
 		}
+	}
+
+	if set.Len() == 3 {
+		t.Fatalf("mutation hasn't created a single mutant")
 	}
 }

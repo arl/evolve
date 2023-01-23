@@ -30,6 +30,5 @@ func (op *String) Mutate(s *string, rng *rand.Rand) {
 		}
 	}
 
-	cpy := string(buf)
-	s = &cpy
+	*s = string(buf)
 }
