@@ -33,7 +33,7 @@ func newRouteEvaluator(cities []tsp.Point2D) *routeEvaluator {
 }
 
 // Fitness computes the perimeter of the polygon formed by the closed path.
-func (e *routeEvaluator) Fitness(ind []int, pop [][]int) float64 {
+func (e *routeEvaluator) Fitness(ind []int) float64 {
 	var tot float64
 	for i := 0; i < len(ind)-1; i++ {
 		tot += e.dists[ind[i]][ind[i+1]]

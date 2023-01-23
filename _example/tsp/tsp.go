@@ -1,14 +1,13 @@
 package main
 
 import (
+	"evolve/example/tsp/internal/tsp"
 	"fmt"
 	"math/rand"
 	"os"
 	"os/signal"
 	"runtime"
 	"time"
-
-	"evolve/example/tsp/internal/tsp"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
@@ -43,7 +42,7 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 	// Define the mutation operator.
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 	mut := operator.NewSwitch[[]int](
-		&mutation.SliceOrder[int]{
+		&mutation.Permutation[int]{
 			Count:       generator.Const(1),
 			Amount:      generator.Uniform(1, len(a.cfg.cities), rng),
 			Probability: generator.Const(mutationRate),
@@ -68,7 +67,7 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 		Operator:  pipeline,
 		Evaluator: eval,
 		Selection: &selection.RouletteWheel[[]int]{},
-		Elites:    2,
+		NumElites: 2,
 	}
 
 	a.eng = engine.Engine[[]int]{
