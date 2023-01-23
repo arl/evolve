@@ -9,11 +9,10 @@ import (
 	"github.com/arl/bitstring"
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
+	"github.com/arl/evolve/crossover"
 	"github.com/arl/evolve/engine"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
-	"github.com/arl/evolve/operator/mutation"
-	"github.com/arl/evolve/operator/xover"
+	"github.com/arl/evolve/mutation"
 	"github.com/arl/evolve/selection"
 )
 
@@ -32,12 +31,12 @@ func check(err error) {
 // consist only of ones.
 func main() {
 	// Define the crossover
-	xover := operator.NewCrossover[*bitstring.Bitstring](xover.BitstringMater{})
+	xover := evolve.NewCrossover[*bitstring.Bitstring](crossover.BitstringMater{})
 	xover.Probability = generator.Const(0.7)
 	xover.Points = generator.Const(1)
 
 	// Define the mutation
-	mut := operator.NewMutation[*bitstring.Bitstring](&mutation.Bitstring{
+	mut := evolve.NewMutation[*bitstring.Bitstring](&mutation.Bitstring{
 		Probability: generator.Const(0.01),
 		FlipCount:   generator.Const(1),
 	})
@@ -50,7 +49,7 @@ func main() {
 		})
 
 	epocher := engine.Generational[*bitstring.Bitstring]{
-		Operator:  operator.Pipeline[*bitstring.Bitstring]{xover, mut},
+		Operator:  evolve.Pipeline[*bitstring.Bitstring]{xover, mut},
 		Evaluator: eval,
 		Selection: selection.RouletteWheel[*bitstring.Bitstring]{},
 		NumElites: 2, // best 2 candidates gets copied to the next generation, no matter what.
