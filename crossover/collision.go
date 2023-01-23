@@ -1,4 +1,4 @@
-package xover
+package crossover
 
 import "math/rand"
 

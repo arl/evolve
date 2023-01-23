@@ -7,10 +7,10 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
+	"github.com/arl/evolve/crossover"
 	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator/mutation"
-	"github.com/arl/evolve/operator/xover"
+	"github.com/arl/evolve/mutation"
 	"github.com/arl/evolve/selection"
 )
 
@@ -127,7 +127,7 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 					Alphabet:    alphabet,
 					Probability: generator.Const(0.02),
 				}),
-				evolve.NewCrossover[string](xover.StringMater{}),
+				evolve.NewCrossover[string](crossover.StringMater{}),
 			},
 			Evaluator: evaluator(target),
 			Selection: selection.RouletteWheel[string]{},

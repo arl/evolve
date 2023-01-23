@@ -1,20 +1,17 @@
-package xover
+package crossover
 
 import "math/rand"
 
-// SliceMater mates a pair of slices to produce a new pair of slices.
-type SliceMater[T any] struct{}
+// StringMater mates a pair of strings to produce a new pair of bit strings
+type StringMater struct{}
 
 // Mate performs crossover on a pair of parents to generate a pair of offspring.
-func (m SliceMater[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
+func (m StringMater) Mate(p1, p2 string, nxpts int, rng *rand.Rand) (string, string) {
 	if len(p1) != len(p2) {
-		panic("SliceMater only mates slices of the same length")
+		panic("StringMater only mates string having the same length")
 	}
 
-	off1 = make([]T, len(p1))
-	off2 = make([]T, len(p2))
-	copy(off1, p1)
-	copy(off2, p2)
+	off1, off2 := []byte(p1), []byte(p2)
 
 	// Apply as many crossovers as required.
 	for i := 0; i < nxpts; i++ {
@@ -27,6 +24,5 @@ func (m SliceMater[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 [
 			off1[j], off2[j] = off2[j], off1[j]
 		}
 	}
-
-	return
+	return string(off1), string(off2)
 }

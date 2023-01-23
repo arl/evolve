@@ -6,8 +6,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/arl/evolve/crossover"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator/xover"
 )
 
 func sameStringPop(t *testing.T, a, b []string) {
@@ -40,7 +40,7 @@ func TestCrossoverApply(t *testing.T) {
 	}
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
-		xover := NewCrossover[string](xover.StringMater{})
+		xover := NewCrossover[string](crossover.StringMater{})
 		xover.Points = generator.Const(0)
 		xover.Probability = generator.Const(1.0)
 
@@ -54,7 +54,7 @@ func TestCrossoverApply(t *testing.T) {
 	})
 
 	t.Run("zero_crossover_probability_is_noop", func(t *testing.T) {
-		xover := NewCrossover[string](xover.StringMater{})
+		xover := NewCrossover[string](crossover.StringMater{})
 		xover.Points = generator.Const(1)
 		xover.Probability = generator.Const(0.0)
 
@@ -86,7 +86,7 @@ func BenchmarkCrossoverApply(b *testing.B) {
 	b.ResetTimer()
 	var res [][]byte
 	for n := 0; n < b.N; n++ {
-		xover := NewCrossover[[]byte](xover.SliceMater[byte]{})
+		xover := NewCrossover[[]byte](crossover.SliceMater[byte]{})
 		xover.Points = generator.Const(1)
 		xover.Probability = generator.Const(1.0)
 
