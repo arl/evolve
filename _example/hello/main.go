@@ -9,11 +9,10 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
+	"github.com/arl/evolve/crossover"
 	"github.com/arl/evolve/engine"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
-	"github.com/arl/evolve/operator/mutation"
-	"github.com/arl/evolve/operator/xover"
+	"github.com/arl/evolve/mutation"
 	"github.com/arl/evolve/selection"
 )
 
@@ -65,17 +64,17 @@ func main() {
 
 	// Define our evolutionary operators, a string mutation where each rune has
 	// a probability of mutation of 0.02, plus a default string crossover.
-	mutation := operator.NewMutation[string](&mutation.String{
+	mutation := evolve.NewMutation[string](&mutation.String{
 		Alphabet:    alphabet,
 		Probability: generator.Const(0.02),
 	})
-	xover := operator.NewCrossover[string](xover.StringMater{})
+	xover := evolve.NewCrossover[string](crossover.StringMater{})
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
 	// Define a composite evolutionary operator, that is a pipeline that applies
 	// to each candidate a string mutation followed by a crossover
-	pipeline := operator.Pipeline[string]{mutation, xover}
+	pipeline := evolve.Pipeline[string]{mutation, xover}
 
 	generational := &engine.Generational[string]{
 		Operator:  pipeline,
