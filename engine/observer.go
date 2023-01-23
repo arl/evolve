@@ -13,10 +13,6 @@ type Observer[T any] interface {
 	Observe(*evolve.PopulationStats[T])
 }
 
-type observerFunc[T any] struct {
-	f func(*evolve.PopulationStats[T])
-}
-
 // The ObserverFunc type is an adapter to allow the use of
 // ordinary functions as evolution observers. If f is a function
 // with the appropriate signature, ObserverFunc(f) is an
@@ -25,4 +21,10 @@ func ObserverFunc[T any](f func(*evolve.PopulationStats[T])) Observer[T] {
 	return &observerFunc[T]{f: f}
 }
 
-func (obs *observerFunc[T]) Observe(stats *evolve.PopulationStats[T]) { obs.f(stats) }
+type observerFunc[T any] struct {
+	f func(*evolve.PopulationStats[T])
+}
+
+func (obs *observerFunc[T]) Observe(stats *evolve.PopulationStats[T]) {
+	obs.f(stats)
+}
