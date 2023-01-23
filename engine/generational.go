@@ -27,8 +27,6 @@ type Generational[T any] struct {
 
 	// Number of concurrent processes to use (defaults to the number of cores).
 	Concurrency int
-
-	init bool
 }
 
 // Epoch performs a single step/iteration of the evolutionary process.
@@ -38,11 +36,8 @@ type Generational[T any] struct {
 // Returns the updated population after the evolutionary process has proceeded
 // by one step/iteration.
 func (e *Generational[T]) Epoch(pop *evolve.Population[T], rng *rand.Rand) *evolve.Population[T] {
-	if !e.init {
-		if e.Concurrency == 0 {
-			e.Concurrency = runtime.NumCPU()
-		}
-		e.init = true
+	if e.Concurrency == 0 {
+		e.Concurrency = runtime.NumCPU()
 	}
 
 	// nextpop := make([]T, 0, pop.Len())

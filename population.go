@@ -65,13 +65,13 @@ func (p *Population[T]) Swap(i, j int) {
 // Concurrency controls the number of goroutines to use in the process.
 func (p *Population[T]) Evaluate(concurrency int) {
 	if concurrency <= 1 {
-		// Synchronous evaluation
 		for i := 0; i < p.Len(); i++ {
 			if !p.Evaluated[i] {
 				p.Fitness[i] = p.Evaluator.Fitness(p.Candidates[i])
 				p.Evaluated[i] = true
 			}
 		}
+		return
 	}
 
 	wg := sync.WaitGroup{}
