@@ -53,7 +53,7 @@ func main() {
 	// Our candidate evaluator assigns one "fitness point" for every character
 	// in the candidate string that doesn't match the corresponding position in
 	// the target string.
-	evaluator := evolve.EvaluatorFunc[string](false, func(cand string, _ []string) float64 {
+	evaluator := evolve.EvaluatorFunc[string](false, func(cand string) float64 {
 		var n int
 		for i := range cand {
 			if cand[i] != target[i] {
@@ -81,7 +81,7 @@ func main() {
 		Operator:  pipeline,
 		Evaluator: evaluator,
 		Selection: selection.RouletteWheel[string]{},
-		Elites:    5,
+		NumElites: 5,
 	}
 
 	// Define the components of our engine
@@ -94,6 +94,7 @@ func main() {
 			// are different from the target string).
 			condition.TargetFitness[string]{Fitness: 0, Natural: false},
 		},
+		Concurrency: 1,
 	}
 
 	// Define an observer
