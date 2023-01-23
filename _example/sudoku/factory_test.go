@@ -1,13 +1,13 @@
 package main
 
 import (
+	"errors"
 	"math/rand"
 	"testing"
 	"time"
 
 	"github.com/arl/evolve"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/arl/evolve/pkg/set"
 )
 
 func checkCellVal(t *testing.T, s *sudoku, i, j, want int) {
@@ -40,12 +40,15 @@ func TestGeneratorValidity(t *testing.T) {
 		"...1.....",
 		"........9",
 	})
-
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	pop := evolve.GeneratePopulation[*sudoku](gen, 20, rng)
-	for _, sudo := range pop {
+	pop := evolve.GeneratePopulation[*sudoku](20, gen, nil, rng)
+	for i := 0; i < pop.Len(); i++ {
+		sudo := pop.Candidates[i]
+
 		// Check givens are correctly placed.
 		checkCellFixed(t, sudo, 2, 8)
 		checkCellVal(t, sudo, 2, 8, 5)
@@ -63,13 +66,15 @@ func TestGeneratorValidity(t *testing.T) {
 		checkCellVal(t, sudo, 8, 8, 9)
 
 		// Check that each row has no duplicates.
-		set := make(map[int]struct{})
+		counts := set.NewOf[int]()
 		for i := 0; i < 9; i++ {
 			row := sudo[i]
 			for _, cell := range row {
-				set[cell.val] = struct{}{}
+				counts.Insert(cell.val)
 			}
-			require.Lenf(t, set, 9, "in\n%v\nrow %v contains duplicates", sudo, i)
+			if counts.Len() != 9 {
+				t.Errorf("row %d has some duplicated values", 9)
+			}
 		}
 	}
 }
@@ -124,8 +129,9 @@ func TestGeneratorInvalidPatterns(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := newFactory(tt.pattern)
-			assert.ErrorIs(t, err, tt.wantErr)
+			if _, err := newFactory(tt.pattern); !errors.Is(err, tt.wantErr) {
+				t.Errorf("newFactory returned %v, want %v", err, tt.wantErr)
+			}
 		})
 	}
 }

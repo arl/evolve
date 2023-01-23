@@ -39,7 +39,7 @@ func (m mater) Mate(p1, p2 *sudoku, nxpts int, rng *rand.Rand) (*sudoku, *sudoku
 // Number is the number of mutation to apply to each row in a sudoku solution.
 // Amount is the number of positions by which a list element will be displaced
 // as a result of mutation
-type rowMutation struct { // nolint: maligned
+type rowMutation struct {
 	Number generator.Generator[uint]
 	Amount generator.Generator[uint]
 

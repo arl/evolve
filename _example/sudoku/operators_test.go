@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/pkg/mt19937"
-
-	"github.com/stretchr/testify/require"
+	"github.com/arl/evolve/pkg/set"
 )
 
 func sudokuFromStrings(strs []string) (*sudoku, error) {
@@ -40,7 +40,9 @@ func TestSudokuMater(t *testing.T) {
 		"8 8 8 8 8 8 8 8 8",
 		"9 9 9 9 9 9 9 9 9",
 	})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	p2, err := sudokuFromStrings([]string{
 		"9 9 9 9 9 9 9 9 9",
@@ -53,7 +55,9 @@ func TestSudokuMater(t *testing.T) {
 		"2 2 2 2 2 2 2 2 2",
 		"1 1 1 1 1 1 1 1 1",
 	})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	mater{}.Mate(p1, p2, 1, rand.New(mt19937.New(2)))
 }
@@ -78,31 +82,34 @@ func TestRowMutationValidity(t *testing.T) {
 		"9 4 6 8 5 7 3 2 1",
 		"2 3 7 1 9 4 6 8 5",
 	})
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	pop := []*sudoku{sudo}
+	pop := evolve.NewPopulationOf[*sudoku]([]*sudoku{sudo}, nil)
 
-	counts := make(map[int]struct{})
+	counts := set.NewOf[int]()
 
 	for i := 0; i < 20; i++ {
-		pop = rmut.Apply(pop, rng)
-		require.Len(t, pop, 1, "population size should not be affected by mutation")
-
-		mutated := pop[0]
+		rmut.Apply(pop, rng)
+		mutated := pop.Candidates[0]
 		for j := 0; j < size; j++ {
 			row := mutated[j]
-			require.Lenf(t, row, size, "row %v has an invalid length", j)
+			if len(row) != size {
+				t.Fatalf("len(row) = %v, want %v", len(row), size)
+			}
 
 			for _, cell := range row {
 				if cell.val <= 0 || cell.val > size {
 					t.Errorf("on row %v cell value is out of range, got %v", j, cell.val)
 				}
-				counts[cell.val] = struct{}{}
+				counts.Insert(cell.val)
 			}
-			require.Lenf(t, counts, size, "row %v contains some duplicated values", j)
+			if counts.Len() != size {
+				t.Errorf("row %d has some duplicated values", j)
+			}
 
-			// Clear map
-			counts = make(map[int]struct{})
+			counts.Clear()
 		}
 	}
 }
@@ -123,10 +130,11 @@ func TestRowMutationFixedConstraints(t *testing.T) { // nolint: gocyclo
 		}
 	}
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
-	pop := []*sudoku{&sudo}
+	pop := evolve.NewPopulationOf[*sudoku]([]*sudoku{&sudo}, nil)
+
 	for i := 0; i < 100; i++ { // 100 generations of mutation.
-		pop = rmut.Apply(pop, rng)
-		mutated := pop[0]
+		rmut.Apply(pop, rng)
+		mutated := pop.Candidates[0]
 		for row := 0; row < size; row++ {
 			for col := 0; col < size; col++ {
 				if row == col {

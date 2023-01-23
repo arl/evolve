@@ -2,8 +2,6 @@ package main
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestSudokuEvaluator(t *testing.T) {
@@ -56,10 +54,14 @@ func TestSudokuEvaluator(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		sud, err := sudokuFromStrings(tt.cand)
-		require.NoError(t, err)
+		sudo, err := sudokuFromStrings(tt.cand)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-		ev := evaluator{}
-		require.Equal(t, tt.want, ev.Fitness(sud, nil), "wrong expected fitness")
+		fitness := evaluator{}.Fitness(sudo)
+		if fitness != tt.want {
+			t.Errorf("evaluator.Fitness() = %v, want %v", fitness, tt.want)
+		}
 	}
 }
