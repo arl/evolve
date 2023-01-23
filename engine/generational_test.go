@@ -5,8 +5,6 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/factory"
@@ -17,15 +15,10 @@ import (
 	"github.com/arl/evolve/selection"
 )
 
-// Trivial test operator that mutates all integers into zeroes.
-type zeroIntMaker struct{}
+// Dummy operator acting on populations of numbers by setting all candidates to 0.
+type zeroMaker struct{}
 
-// Continuer ici
-
-// mais en fait, est-ce que operator.Apply ne devrait pas simplement agir sur la population donnée
-// au lieu d'en retourner une nouvelle?
-
-func (op zeroIntMaker) Apply(pop *evolve.Population[int], rng *rand.Rand) {
+func (op zeroMaker) Apply(pop *evolve.Population[int], rng *rand.Rand) {
 	for i := range pop.Candidates {
 		pop.Candidates[i] = 0
 	}
@@ -39,13 +32,6 @@ func (intEvaluator) Fitness(cand int) float64 {
 
 func (intEvaluator) IsNatural() bool { return true }
 
-func check(t *testing.T, err error) {
-	t.Helper()
-	if err != nil {
-		t.Error(err)
-	}
-}
-
 var zeroFactory = evolve.FactoryFunc[int](func(_ *rand.Rand) int { return 0 })
 
 func TestGenerationalEngineElitism(t *testing.T) {
@@ -53,7 +39,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 		Factory:   zeroFactory,
 		Evaluator: intEvaluator{},
 		Epocher: &Generational[int]{
-			Operator:  zeroIntMaker{},
+			Operator:  zeroMaker{},
 			Evaluator: intEvaluator{},
 			Selection: selection.RouletteWheel[int]{},
 			NumElites: 2,
@@ -69,21 +55,20 @@ func TestGenerationalEngineElitism(t *testing.T) {
 
 	// Add an observer that records the mean fitness at each generation.
 	var avgfitness float64
-	obs := ObserverFunc(func(stats *evolve.PopulationStats[int]) {
+	eng.AddObserver(ObserverFunc(func(stats *evolve.PopulationStats[int]) {
 		avgfitness = stats.Mean
-	})
-	eng.AddObserver(obs)
-	_, _, err := eng.Evolve(10)
-	check(t, err)
+	}))
 
-	// Then when we have run the evolution, if the elite canidates were
-	// preserved they will lift the average fitness above zero. The exact value
-	// of the expected average fitness is easy to calculate, it is the aggregate
-	// fitness divided by the population size.
-	assert.Equalf(t, 24.0/10.0, avgfitness,
-		"elite candidates not preserved correctly: want %v, got %v",
-		24.0/10.0, avgfitness)
-	eng.RemoveObserver(obs)
+	if _, _, err := eng.Evolve(10); err != nil {
+		t.Fatal(err)
+	}
+
+	// Run the evolution. We verify that the 2 best candidates have been kept by
+	// using the expected average fitness.
+	const want = (11 + 13) / 10.
+	if avgfitness != want {
+		t.Errorf("average fitness = %v, want %v", avgfitness, want)
+	}
 }
 
 func TestGenerationalEngineSatisfiedConditions(t *testing.T) {
@@ -91,7 +76,7 @@ func TestGenerationalEngineSatisfiedConditions(t *testing.T) {
 		Factory:   zeroFactory,
 		Evaluator: intEvaluator{},
 		Epocher: &Generational[int]{
-			Operator:  zeroIntMaker{},
+			Operator:  zeroMaker{},
 			Evaluator: intEvaluator{},
 			Selection: selection.RouletteWheel[int]{},
 		},
@@ -101,9 +86,12 @@ func TestGenerationalEngineSatisfiedConditions(t *testing.T) {
 	}
 
 	_, satisfied, err := eng.Evolve(10)
-	check(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	if len(satisfied) != 1 {
-		t.Errorf("want len(satisfied) = 1, got %v", len(satisfied))
+		t.Errorf("len(satisfied) = %d, want 1", len(satisfied))
 	}
 }
 
