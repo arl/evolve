@@ -44,7 +44,7 @@ func main() {
 
 	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)
-		func(cand *bitstring.Bitstring, pop []*bitstring.Bitstring) float64 {
+		func(cand *bitstring.Bitstring) float64 {
 			// our evaluator counts the ones in the bitstring
 			return float64(cand.OnesCount())
 		})
@@ -53,7 +53,7 @@ func main() {
 		Operator:  operator.Pipeline[*bitstring.Bitstring]{xover, mut},
 		Evaluator: eval,
 		Selection: selection.RouletteWheel[*bitstring.Bitstring]{},
-		Elites:    2, // best 2 candidates gets copied to the next generation, no matter what.
+		NumElites: 2, // best 2 candidates gets copied to the next generation, no matter what.
 	}
 
 	// bitstring.Random(length uint, rng *rand.Rand)
