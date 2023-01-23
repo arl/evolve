@@ -3,74 +3,66 @@ package mutation
 import (
 	"math/rand"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 )
 
 // SRS (Swap and Reverse Sections) is a mutation operator creating a permutation
 // of the original candidate. To do so, the candidate is divided into 3 sections
-// by randomly choosing 2 cut points. The middle section is copied as is to the
-// mutant, while the right and left are swapped. Before copying, the elements of
-// the left section are reversed.
+// by randomly choosing 2 cut points. The middle section remains as-is while the
+// left and right are swapped. Before the swap, the elements of the left
+// sections are reversed.
 //
-// Example:
+// Let's take for example the following candidate, with 2 random cut points of 2
+// and 4:
 //
-//	[1, 2, 3, 4, 5, 6, 7].
+//	[1, 2, 3, 4, 5, 6, 7]
+//	      |     |
+//	    cut-1  cut-2
 //
-// 2 cut points are chosen randomly, for example xp1 = 2 and xp2 = 4:
+// If the randomly selected number for that candidate, with respect to
+// Probability, allows it to be mutated, it will become:
 //
-//	[   1    2    3    4    5    6    7]
-//	           |          |
-//	     left  |  middle  |    right
-//	          xp1        xp2
-//
-// Then if the random probability allows for the candidate to be mutated, the
-// resulting candidate will be:
-//
-//	[5, 6, 7, 3, 4, 2, 1],
-//
-// SRS is undefined for candidates with less than 3 elements.
+//	[5, 6, 7, 3, 4, 2, 1]
+//	         |     |
+//	       cut-1  cut-2
 type SRS[T any] struct {
 	//  Probability is the probability for each candidate to be mutated.
 	Probability generator.Float
 }
 
-func (op *SRS[T]) Apply(sel [][]T, rng *rand.Rand) [][]T {
-	mutpop := make([][]T, len(sel))
-	for i := range sel {
-		// Copy current candidate.
-		cand := sel[i]
-		cpy := make([]T, len(cand))
-		copy(cpy, cand)
+func (op *SRS[T]) Apply(pop *evolve.Population[[]T], rng *rand.Rand) {
+	// lazily created scratch buffer for the reverse+swap.
+	var scratch []T
 
-		// Find out the probability of mutation for this candidate.
-		prob := op.Probability.Next()
-		var xp1, xp2 int
-		if rng.Float64() < prob {
-			//  Find 2 cut points between 1 and len(can)-1
-			xp1 = 1 + rng.Intn(len(cand)-1)
-			for {
-				xp2 = 1 + rng.Intn(len(cand)-1)
-				if xp2 != xp1 {
-					if xp2 < xp1 {
-						xp1, xp2 = xp2, xp1
-					}
-					break
-				}
-			}
-			srs(cand, cpy, xp1, xp2)
+	for i := 0; i < pop.Len(); i++ {
+		if rng.Float64() >= op.Probability.Next() {
+			continue
 		}
-		mutpop[i] = cpy
-	}
 
-	return mutpop
+		cand := pop.Candidates[i]
+		//  Find 2 cut points between 0 and len(can)
+		xp1 := rng.Intn(len(cand))     // 0 -> len-1
+		xp2 := 1 + rng.Intn(len(cand)) // 1 -> len
+
+		if xp2 < xp1 {
+			xp1, xp2 = xp2, xp1
+		}
+
+		if len(scratch) < len(cand) {
+			scratch = append(scratch, make([]T, len(cand))...)
+		}
+		copy(scratch, cand)
+		srs(scratch, cand, xp1, xp2)
+	}
 }
 
 // srs performs the 'swap and reverse sections' mutation.
-func srs[T any](org, mut []T, xp1, xp2 int) {
-	copy(mut, org[xp2:])
-	copy(mut[len(org)-xp2:], org[xp1:xp2])
-	copy(mut[len(org)-xp1:], org[:xp1])
-	reverse(mut[len(org)-xp1:])
+func srs[T any](cpy, mut []T, xp1, xp2 int) {
+	copy(mut, cpy[xp2:])
+	copy(mut[len(cpy)-xp2:], cpy[xp1:xp2])
+	copy(mut[len(cpy)-xp1:], cpy[:xp1])
+	reverse(mut[len(cpy)-xp1:])
 }
 
 func reverse[T any](s []T) {
