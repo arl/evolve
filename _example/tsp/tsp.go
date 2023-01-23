@@ -11,12 +11,11 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
+	"github.com/arl/evolve/crossover"
 	"github.com/arl/evolve/engine"
 	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
-	"github.com/arl/evolve/operator/mutation"
-	"github.com/arl/evolve/operator/xover"
+	"github.com/arl/evolve/mutation"
 	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/arl/evolve/selection"
 )
@@ -28,10 +27,10 @@ type algorithm struct {
 }
 
 func (a *algorithm) setup(obs engine.Observer[[]int]) error {
-	var pipeline operator.Pipeline[[]int]
+	var pipeline evolve.Pipeline[[]int]
 
 	// Define the crossover operator.
-	pmx := operator.NewCrossover[[]int](xover.PMX[int]{})
+	pmx := evolve.NewCrossover[[]int](crossover.PMX[int]{})
 	pmx.Points = generator.Const(2) // unused for cycle crossover
 	pmx.Probability = generator.Const(1.0)
 
@@ -41,7 +40,7 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 
 	// Define the mutation operator.
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
-	mut := operator.NewSwitch[[]int](
+	mut := evolve.NewSwitch[[]int](
 		&mutation.Permutation[int]{
 			Count:       generator.Const(1),
 			Amount:      generator.Uniform(1, len(a.cfg.cities), rng),
