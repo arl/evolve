@@ -45,3 +45,19 @@ type Operator[T any] interface {
 	// not depending on the needs.
 	Apply(*Population[T], *rand.Rand)
 }
+
+// The OperatorFunc type is an adapter to allow the use of
+// ordinary functions as evolutionary operators. If f is a function
+// with the appropriate signature, OperatorFunc(f) is an
+// Operator that calls f.
+func OperatorFunc[T any](f func(*Population[T], *rand.Rand)) Operator[T] {
+	return &operatorFunc[T]{f: f}
+}
+
+type operatorFunc[T any] struct {
+	f func(*Population[T], *rand.Rand)
+}
+
+func (op *operatorFunc[T]) Apply(pop *Population[T], rng *rand.Rand) {
+	op.f(pop, rng)
+}
