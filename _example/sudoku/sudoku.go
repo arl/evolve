@@ -36,7 +36,7 @@ func (s *sudoku) String() string {
 // fitter individual.
 type evaluator struct{}
 
-func (evaluator) Fitness(cand *sudoku, pop []*sudoku) float64 { // nolint: golint
+func (evaluator) Fitness(cand *sudoku) float64 { // nolint: golint
 	// We can assume that there are no duplicates in any rows because the
 	// candidate generator and evolutionary operators we use do not permit rows
 	// to contain duplicates.

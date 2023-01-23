@@ -3,6 +3,7 @@ package main
 import (
 	"math/rand"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 )
 
@@ -55,15 +56,13 @@ type rowMutation struct { // nolint: maligned
 
 // Apply applies the mutation operator to each entry in the list of selected
 // candidates.
-func (rm *rowMutation) Apply(sel []*sudoku, rng *rand.Rand) []*sudoku {
+func (rm *rowMutation) Apply(pop *evolve.Population[*sudoku], rng *rand.Rand) {
 	if !rm.cached {
-		rm.buildCache(sel[0])
+		rm.buildCache(pop.Candidates[0])
 	}
-	mutpop := make([]*sudoku, len(sel))
-	for i, cand := range sel {
-		mutpop[i] = rm.mutate(cand, rng)
+	for i := 0; i < pop.Len(); i++ {
+		pop.Candidates[i] = rm.mutate(pop.Candidates[i], rng)
 	}
-	return mutpop
 }
 
 func (rm *rowMutation) buildCache(sudo *sudoku) {

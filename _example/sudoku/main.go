@@ -80,7 +80,7 @@ func solveSudoku(pattern []string) error {
 		Operator:  pipeline,
 		Evaluator: evaluator{},
 		Selection: selector,
-		Elites:    nelites,
+		NumElites: nelites,
 	}
 
 	var userAbort condition.UserAbort[*sudoku]
