@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/arl/evolve"
+	"github.com/arl/evolve/pkg/dataset"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/constraints"
 )
@@ -13,7 +13,7 @@ func checkGaussianDistribution(t *testing.T, g Float, wantMean, wantStdDev float
 	t.Helper()
 
 	const iterations = 10000
-	ds := evolve.NewDataset(iterations)
+	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		ds.AddValue(g.Next())
 	}
@@ -31,7 +31,7 @@ func checkBinomialDistribution[T constraints.Integer | constraints.Float](t *tes
 
 	const iterations = 10000
 
-	ds := evolve.NewDataset(iterations)
+	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		val := g.Next()
 		if val < 0 || val > n {
@@ -53,7 +53,7 @@ func checkExponentialDistribution(t *testing.T, g Float, rate float64) {
 	t.Helper()
 
 	const iterations = 10000
-	ds := evolve.NewDataset(iterations)
+	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		ds.AddValue(g.Next())
 	}
@@ -80,7 +80,7 @@ func checkPoissonDistribution[U constraints.Unsigned](t *testing.T, g *Poisson[U
 	t.Helper()
 
 	const iterations = 10000
-	ds := evolve.NewDataset(iterations)
+	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		val := g.Next()
 		if val < 0 {
@@ -103,7 +103,7 @@ func checkUniformDistribution[T constraints.Integer | constraints.Float](t *test
 	t.Helper()
 
 	const iterations = 10000
-	ds := evolve.NewDataset(iterations)
+	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		val := g.Next()
 		if val < 0 {

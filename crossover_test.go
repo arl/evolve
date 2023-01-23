@@ -1,4 +1,4 @@
-package operator
+package evolve
 
 import (
 	"math/rand"
@@ -6,7 +6,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/operator/xover"
 )
@@ -48,7 +47,7 @@ func TestCrossoverApply(t *testing.T) {
 		items := make([]string, len(org))
 		copy(items, org)
 
-		pop := evolve.NewPopulationOf(items, nil)
+		pop := NewPopulationOf(items, nil)
 
 		xover.Apply(pop, rng)
 		sameStringPop(t, pop.Candidates, org)
@@ -62,7 +61,7 @@ func TestCrossoverApply(t *testing.T) {
 		items := make([]string, len(org))
 		copy(items, org)
 
-		pop := evolve.NewPopulationOf(items, nil)
+		pop := NewPopulationOf(items, nil)
 
 		xover.Apply(pop, rng)
 		sameStringPop(t, pop.Candidates, org)
@@ -82,7 +81,7 @@ func BenchmarkCrossoverApply(b *testing.B) {
 		[]byte("pqrst"),
 		[]byte("uvwxy"),
 	}
-	pop := evolve.NewPopulationOf(items, nil)
+	pop := NewPopulationOf(items, nil)
 
 	b.ResetTimer()
 	var res [][]byte

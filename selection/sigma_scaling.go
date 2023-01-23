@@ -4,6 +4,7 @@ import (
 	"math/rand"
 
 	"github.com/arl/evolve"
+	"github.com/arl/evolve/pkg/dataset"
 )
 
 // SigmaScaling creates a sigma-scaled selection strategy. This is an
@@ -29,7 +30,7 @@ func (sel *SigmaScaling[T]) Select(pop *evolve.Population[T], natural bool, n in
 		sel.Selector = SUS[T]{}
 	}
 
-	stats := evolve.NewDataset(pop.Len())
+	stats := dataset.New(pop.Len())
 	for i := 0; i < pop.Len(); i++ {
 		stats.AddValue(pop.Fitness[i])
 	}

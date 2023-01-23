@@ -9,7 +9,6 @@ import (
 	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
 	"github.com/arl/evolve/operator/mutation"
 	"github.com/arl/evolve/operator/xover"
 	"github.com/arl/evolve/selection"
@@ -123,12 +122,12 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 		Evaluator: evaluator(target),
 		Epocher: &Generational[string]{
 			// Create a operator pipeline that first apply a string muration then a crossover.
-			Operator: operator.Pipeline[string]{
-				operator.NewMutation[string](&mutation.String{
+			Operator: evolve.Pipeline[string]{
+				evolve.NewMutation[string](&mutation.String{
 					Alphabet:    alphabet,
 					Probability: generator.Const(0.02),
 				}),
-				operator.NewCrossover[string](xover.StringMater{}),
+				evolve.NewCrossover[string](xover.StringMater{}),
 			},
 			Evaluator: evaluator(target),
 			Selection: selection.RouletteWheel[string]{},

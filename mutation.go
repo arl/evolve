@@ -1,9 +1,7 @@
-package operator
+package evolve
 
 import (
 	"math/rand"
-
-	"github.com/arl/evolve"
 )
 
 // Mutation implements the mutation evolutionnary operator. It modifies the
@@ -23,7 +21,7 @@ func NewMutation[T any](mutater Mutater[T]) *Mutation[T] {
 
 // Apply applies the mutation operator to all individuals in the provided
 // population.
-func (op *Mutation[T]) Apply(pop *evolve.Population[T], rng *rand.Rand) {
+func (op *Mutation[T]) Apply(pop *Population[T], rng *rand.Rand) {
 	for i := 0; i < pop.Len(); i++ {
 		op.Mutate(&pop.Candidates[i], rng)
 	}

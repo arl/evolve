@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/arl/evolve"
+	"github.com/arl/evolve/pkg/dataset"
 	"github.com/arl/evolve/pkg/mt19937"
 )
 
@@ -39,7 +40,7 @@ type Engine[T any] struct {
 	// Concurrency is the number of concurrent workers (defaults to the number of cores).
 	Concurrency int
 
-	stats *evolve.Dataset
+	stats *dataset.Dataset
 }
 
 // AddObserver adds an observer of the evolution process.
@@ -85,7 +86,7 @@ func (e *Engine[T]) Evolve(popsize int) (*evolve.Population[T], []evolve.Conditi
 	}
 
 	// Track down evolution stats in a dataset.
-	e.stats = evolve.NewDataset(popsize)
+	e.stats = dataset.New(popsize)
 
 	var ngen int
 	start := time.Now()

@@ -6,13 +6,12 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
 )
 
 func TestStringMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := operator.NewCrossover[string](StringMater{})
+	xover := evolve.NewCrossover[string](StringMater{})
 	xover.Points = generator.Const(1)
 	xover.Probability = generator.Const(1.0)
 
@@ -49,7 +48,7 @@ func TestStringMater(t *testing.T) {
 func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 	// StringMater is only defined for population of strings of equal lengths
 	rng := rand.New(rand.NewSource(99))
-	xover := operator.NewCrossover[string](StringMater{})
+	xover := evolve.NewCrossover[string](StringMater{})
 	pop := evolve.NewPopulationOf([]string{"abcde", "fghijklm"}, nil)
 
 	if !didPanic(func() { xover.Apply(pop, rng) }) {
@@ -71,7 +70,7 @@ func didPanic(f func()) (panicked bool) {
 func BenchmarkStringMater(b *testing.B) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := operator.NewCrossover[string](StringMater{})
+	xover := evolve.NewCrossover[string](StringMater{})
 	xover.Probability = generator.Const(1.0)
 	xover.Points = generator.Const(1)
 

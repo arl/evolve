@@ -1,4 +1,4 @@
-package evolve
+package dataset
 
 import (
 	"math"
@@ -18,7 +18,7 @@ type Dataset struct {
 // NewDataset creates an empty data set with the provided initial capacity. The
 // initial capacity corresponds to the number of values that can be added
 // without further allocations.
-func NewDataset(capacity int) *Dataset {
+func New(capacity int) *Dataset {
 	return &Dataset{
 		min:      math.MaxFloat64,
 		max:      math.SmallestNonzeroFloat64,

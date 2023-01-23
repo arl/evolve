@@ -1,16 +1,14 @@
-package operator
+package evolve
 
 import (
 	"math/rand"
 	"testing"
-
-	"github.com/arl/evolve"
 )
 
 // adjustInt mutates integers candidates by adding a fixed offset.
 type adjustInt int
 
-func (op adjustInt) Apply(pop *evolve.Population[int], rng *rand.Rand) {
+func (op adjustInt) Apply(pop *Population[int], rng *rand.Rand) {
 	for i, c := range pop.Candidates {
 		pop.Candidates[i] = c + int(op)
 	}
@@ -20,7 +18,7 @@ func TestEvolutionPipeline(t *testing.T) {
 	// Make sure that multiple operators in a pipeline are applied correctly
 	// to the population and validate the cumulative effects.
 	rng := rand.New(rand.NewSource(99))
-	pop := evolve.NewPopulation[int](10, nil)
+	pop := NewPopulation[int](10, nil)
 	for i := range pop.Candidates {
 		pop.Candidates[i] = 10 + i*10
 	}

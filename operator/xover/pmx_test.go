@@ -6,7 +6,6 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/constraints"
@@ -15,7 +14,7 @@ import (
 func TestPMX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := operator.NewCrossover[[]int](PMX[int]{})
+	xover := evolve.NewCrossover[[]int](PMX[int]{})
 	xover.Points = generator.Const(2)
 	xover.Probability = generator.Const(1.0)
 
@@ -41,7 +40,7 @@ func TestPMX(t *testing.T) {
 func TestPMXDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := operator.NewCrossover[[]int](PMX[int]{})
+	xover := evolve.NewCrossover[[]int](PMX[int]{})
 	xover.Points = generator.Const(2)
 
 	items := make([][]int, 2)
@@ -58,7 +57,7 @@ func TestPMXDifferentLength(t *testing.T) {
 func TestPMX2CrossoverPoints(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := operator.NewCrossover[[]int](PMX[int]{})
+	xover := evolve.NewCrossover[[]int](PMX[int]{})
 	xover.Points = generator.Const(3)
 
 	items := make([][]int, 2)

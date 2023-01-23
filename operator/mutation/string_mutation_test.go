@@ -7,7 +7,6 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
 	"github.com/arl/evolve/pkg/set"
 )
 
@@ -15,7 +14,7 @@ func TestStringMutation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	const alphabet = "abcd"
-	mut := operator.NewMutation[string](
+	mut := evolve.NewMutation[string](
 		&String{
 			Alphabet:    alphabet,
 			Probability: generator.Const(0.5),

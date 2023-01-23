@@ -1,14 +1,14 @@
-package evolve
+package dataset_test
 
 import (
 	"math"
 	"testing"
+
+	"github.com/arl/evolve/pkg/dataset"
 )
 
-// Make sure that the data set's capacity grows correctly as
-// more values are added.
-func TestDataSetCapacityIncrease(t *testing.T) {
-	data := NewDataset(3)
+func TestDatasetLength(t *testing.T) {
+	data := dataset.New(3)
 	if data.Len() != 0 {
 		t.Fatalf("Len() = %v, want %v", data.Len(), 0)
 	}
@@ -25,18 +25,18 @@ func TestDataSetCapacityIncrease(t *testing.T) {
 	}
 }
 
-func TestDataSetAggregate(t *testing.T) {
+func TestDatasetAggregate(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	if got := math.Round(data.Sum()); got != 15 {
 		t.Errorf("got %v, want %v", got, 15)
 	}
 }
 
-func TestDataSetProduct(t *testing.T) {
+func TestDatasetProduct(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	product := 1.0
 	for _, v := range vals {
@@ -47,8 +47,8 @@ func TestDataSetProduct(t *testing.T) {
 	}
 }
 
-func TestDataSetMinimum(t *testing.T) {
-	data := NewDataset(0)
+func TestDatasetMinimum(t *testing.T) {
+	data := dataset.New(0)
 	data.AddValue(4)
 	if data.Min() != 4 {
 		t.Errorf("got %v, want %v", data.Min(), 4)
@@ -67,8 +67,8 @@ func TestDataSetMinimum(t *testing.T) {
 	}
 }
 
-func TestDataSetMaximum(t *testing.T) {
-	data := NewDataset(0)
+func TestDatasetMaximum(t *testing.T) {
+	data := dataset.New(0)
 	data.AddValue(9)
 	if data.Max() != 9 {
 		t.Errorf("got %v, want %v", data.Max(), 9)
@@ -87,8 +87,8 @@ func TestDataSetMaximum(t *testing.T) {
 	}
 }
 
-func TestDataSetMedian(t *testing.T) {
-	data := NewDataset(0)
+func TestDatasetMedian(t *testing.T) {
+	data := dataset.New(0)
 	data.AddValue(15)
 	if data.Median() != 15 {
 		t.Errorf("got %v, want %v", data.Median(), 15)
@@ -103,18 +103,18 @@ func TestDataSetMedian(t *testing.T) {
 	}
 }
 
-func TestDataSetArithmeticMean(t *testing.T) {
+func TestDatasetArithmeticMean(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	if data.ArithmeticMean() != 3 {
 		t.Errorf("got %v, want %v", data.ArithmeticMean(), 3)
 	}
 }
 
-func TestDataSetGeometricMean(t *testing.T) {
+func TestDatasetGeometricMean(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	product := 1.0
 	for _, v := range vals {
@@ -127,8 +127,8 @@ func TestDataSetGeometricMean(t *testing.T) {
 	}
 }
 
-func TestDataSetHarmonicMean(t *testing.T) {
-	data := NewDataset(0)
+func TestDatasetHarmonicMean(t *testing.T) {
+	data := dataset.New(0)
 	data.AddValues(1, 2, 4, 4)
 	// Reciprocals are 1, 1/2, 1/4 and 1/4.
 	// Sum of reciprocals is 2.  Therefore, harmonic mean is 4/2 = 2.
@@ -137,45 +137,45 @@ func TestDataSetHarmonicMean(t *testing.T) {
 	}
 }
 
-func TestDataSetMeanDeviation(t *testing.T) {
+func TestDatasetMeanDeviation(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	if data.MeanDeviation() != 1.2 {
 		t.Errorf("got %v, want %v", data.MeanDeviation(), 1.2)
 	}
 }
 
-func TestDataSetPopulationVariance(t *testing.T) {
+func TestDatasetPopulationVariance(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	if data.Variance() != 2 {
 		t.Errorf("got %v, want %v", data.Variance(), 2)
 	}
 }
 
-func TestDataSetSampleVariance(t *testing.T) {
+func TestDatasetSampleVariance(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	if data.SampleVariance() != 2.5 {
 		t.Errorf("got %v, want %v", data.SampleVariance(), 2.5)
 	}
 }
 
-func TestDataSetPopulationStandardDeviation(t *testing.T) {
+func TestDatasetPopulationStandardDeviation(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	if data.StandardDeviation() != math.Sqrt(2) {
 		t.Errorf("got %v, want %v", data.StandardDeviation(), math.Sqrt(2))
 	}
 }
 
-func TestDataSetSampleStandardDeviation(t *testing.T) {
+func TestDatasetSampleStandardDeviation(t *testing.T) {
 	vals := []float64{1, 2, 3, 4, 5}
-	data := NewDataset(len(vals))
+	data := dataset.New(len(vals))
 	data.AddValues(vals...)
 	if data.SampleStandardDeviation() != math.Sqrt(2.5) {
 		t.Errorf("got %v, want %v", data.SampleStandardDeviation(), math.Sqrt(2.5))
@@ -184,7 +184,7 @@ func TestDataSetSampleStandardDeviation(t *testing.T) {
 
 // Check that an appropriate exception is thrown when attempting to
 // calculate stats without any data.
-func TestDataSetEmptyDataSet(t *testing.T) {
+func TestDatasetEmptyDataset(t *testing.T) {
 	didpanic := false
 	defer func() {
 		if r := recover(); r != nil {
@@ -192,7 +192,7 @@ func TestDataSetEmptyDataSet(t *testing.T) {
 		}
 	}()
 
-	NewDataset(10).ArithmeticMean()
+	dataset.New(10).ArithmeticMean()
 	if !didpanic {
 		t.Errorf("ArithmeticMean on empty dataset should have panicked")
 	}

@@ -7,7 +7,6 @@ import (
 	"github.com/arl/bitstring"
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
-	"github.com/arl/evolve/operator"
 )
 
 func TestBitstringMutation(t *testing.T) {
@@ -20,7 +19,7 @@ func TestBitstringMutation(t *testing.T) {
 
 	// Uses a probability of 1 to make the outcome predictable (all bits are
 	// flipped).
-	mut := operator.NewMutation[*bitstring.Bitstring](
+	mut := evolve.NewMutation[*bitstring.Bitstring](
 		&Bitstring{
 			FlipCount:   generator.Const(1),
 			Probability: generator.Const(0.5),
