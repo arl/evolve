@@ -1,8 +1,6 @@
 package crossover
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 // The CX or Cycle Crossover, first proposed by Oliver I, builds offspring in
 // such a way that cycles are kept, and copied from parents to offsprings.

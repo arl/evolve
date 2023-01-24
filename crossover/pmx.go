@@ -1,15 +1,13 @@
 package crossover
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 // PMX implements the partially mapped crossover algorithm or PMX, on slices.
 //
-// This crossover is indicated when chromosomes hold lists of a predefined set
-// of elements, for example indexes of cities in TSP. It creates offsprings that
-// are permutations of the parents by choosing 2 random crossover points and
-// exchanging elements positions.
+// This crossover is indicated when chromosomes hold permutations, such as
+// indexes of cities in the TSP. It creates offsprings that are permutations of
+// the parents by choosing 2 random crossover points and exchanging elements
+// positions.
 type PMX[T comparable] struct{}
 
 // Mate mates 2 parents and generates a pair of offsprings with PMX. Only
