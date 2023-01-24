@@ -14,9 +14,11 @@ import (
 func TestPMX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := evolve.NewCrossover[[]int](PMX[int]{})
-	xover.Points = generator.Const(2)
-	xover.Probability = generator.Const(1.0)
+	xover := evolve.Crossover[[]int]{
+		Mater:       PMX[int]{},
+		Points:      generator.Const(2),
+		Probability: generator.Const(1.0),
+	}
 
 	items := [][]int{
 		{1, 2, 3, 4, 5, 6, 7, 8},
@@ -40,8 +42,10 @@ func TestPMX(t *testing.T) {
 func TestPMXDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := evolve.NewCrossover[[]int](PMX[int]{})
-	xover.Points = generator.Const(2)
+	xover := evolve.Crossover[[]int]{
+		Mater:  PMX[int]{},
+		Points: generator.Const(2),
+	}
 
 	items := make([][]int, 2)
 	items[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
@@ -57,8 +61,10 @@ func TestPMXDifferentLength(t *testing.T) {
 func TestPMX2CrossoverPoints(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := evolve.NewCrossover[[]int](PMX[int]{})
-	xover.Points = generator.Const(3)
+	xover := evolve.Crossover[[]int]{
+		Mater:  PMX[int]{},
+		Points: generator.Const(3),
+	}
 
 	items := make([][]int, 2)
 	items[0] = []int{1, 2, 3, 4}

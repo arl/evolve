@@ -12,9 +12,11 @@ import (
 
 func TestCX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	xover := evolve.NewCrossover[[]int](CX[int]{})
-	xover.Probability = generator.Const(1.0)
-	xover.Points = generator.Const(1) // unused
+	xover := evolve.Crossover[[]int]{
+		Mater:       CX[int]{},
+		Probability: generator.Const(1.0),
+		Points:      generator.Const(1),
+	}
 
 	tests := []struct {
 		name       string
@@ -61,8 +63,10 @@ func TestCX(t *testing.T) {
 func TestCXDifferentLength(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := evolve.NewCrossover[[]int](CX[int]{})
-	xover.Points = generator.Const(2)
+	xover := evolve.Crossover[[]int]{
+		Mater:  CX[int]{},
+		Points: generator.Const(2),
+	}
 
 	items := make([][]int, 2)
 	items[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}

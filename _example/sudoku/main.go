@@ -57,9 +57,11 @@ func solveSudoku(pattern []string) error {
 
 	// Crossover rows between parents (so offspring is x rows from parent1 and y
 	// rows from parent2).
-	xover := evolve.NewCrossover[*sudoku](mater{})
-	xover.Points = generator.Const(1)
-	xover.Probability = generator.Const(1.0)
+	xover := &evolve.Crossover[*sudoku]{
+		Mater:       mater{},
+		Points:      generator.Const(1),
+		Probability: generator.Const(1.),
+	}
 
 	rng := rand.New(mt19937.New(time.Now().UnixNano()))
 

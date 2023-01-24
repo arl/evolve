@@ -41,9 +41,11 @@ func TestCrossoverApply(t *testing.T) {
 	}
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
-		xover := evolve.NewCrossover[string](crossover.StringMater{})
-		xover.Points = generator.Const(0)
-		xover.Probability = generator.Const(1.0)
+		xover := evolve.Crossover[string]{
+			Mater:       crossover.StringMater{},
+			Points:      generator.Const(0),
+			Probability: generator.Const(1.0),
+		}
 
 		items := make([]string, len(org))
 		copy(items, org)
@@ -55,9 +57,11 @@ func TestCrossoverApply(t *testing.T) {
 	})
 
 	t.Run("zero_crossover_probability_is_noop", func(t *testing.T) {
-		xover := evolve.NewCrossover[string](crossover.StringMater{})
-		xover.Points = generator.Const(1)
-		xover.Probability = generator.Const(0.0)
+		xover := evolve.Crossover[string]{
+			Mater:       crossover.StringMater{},
+			Points:      generator.Const(1),
+			Probability: generator.Const(0.),
+		}
 
 		items := make([]string, len(org))
 		copy(items, org)
@@ -87,9 +91,11 @@ func BenchmarkCrossoverApply(b *testing.B) {
 	b.ResetTimer()
 	var res [][]byte
 	for n := 0; n < b.N; n++ {
-		xover := evolve.NewCrossover[[]byte](crossover.SliceMater[byte]{})
-		xover.Points = generator.Const(1)
-		xover.Probability = generator.Const(1.0)
+		xover := evolve.Crossover[[]byte]{
+			Mater:       crossover.SliceMater[byte]{},
+			Points:      generator.Const(1),
+			Probability: generator.Const(1.0),
+		}
 
 		xover.Apply(pop, rng)
 	}

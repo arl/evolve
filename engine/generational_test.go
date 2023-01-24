@@ -127,7 +127,9 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 					Alphabet:    alphabet,
 					Probability: generator.Const(0.02),
 				}),
-				evolve.NewCrossover[string](crossover.StringMater{}),
+				&evolve.Crossover[string]{
+					Mater: crossover.StringMater{},
+				},
 			},
 			Evaluator: evaluator(target),
 			Selection: selection.RouletteWheel[string]{},

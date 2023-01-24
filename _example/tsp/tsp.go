@@ -30,11 +30,13 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 	var pipeline evolve.Pipeline[[]int]
 
 	// Define the crossover operator.
-	pmx := evolve.NewCrossover[[]int](crossover.PMX[int]{})
-	pmx.Points = generator.Const(2) // unused for cycle crossover
-	pmx.Probability = generator.Const(1.0)
+	xover := &evolve.Crossover[[]int]{
+		Mater:       crossover.PMX[int]{},
+		Points:      generator.Const(2), // unused for cycle crossover
+		Probability: generator.Const(1.),
+	}
 
-	pipeline = append(pipeline, pmx)
+	pipeline = append(pipeline, xover)
 
 	const mutationRate = 0.05
 
@@ -60,7 +62,9 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 		indices[i] = i
 	}
 
-	eval := newRouteEvaluator(a.cfg.cities)
+	eval := &evolve.FitnessCache[[]int]{
+		Wrapped: newRouteEvaluator(a.cfg.cities),
+	}
 
 	generational := engine.Generational[[]int]{
 		Operator:  pipeline,

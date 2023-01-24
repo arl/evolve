@@ -31,9 +31,11 @@ func check(err error) {
 // consist only of ones.
 func main() {
 	// Define the crossover
-	xover := evolve.NewCrossover[*bitstring.Bitstring](crossover.BitstringMater{})
-	xover.Probability = generator.Const(0.7)
-	xover.Points = generator.Const(1)
+	xover := &evolve.Crossover[*bitstring.Bitstring]{
+		Mater:       crossover.BitstringMater{},
+		Points:      generator.Const(1),
+		Probability: generator.Const(0.7),
+	}
 
 	// Define the mutation
 	mut := evolve.NewMutation[*bitstring.Bitstring](&mutation.Bitstring{

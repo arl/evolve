@@ -14,12 +14,16 @@ import (
 
 func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	xover := evolve.NewCrossover[*bitstring.Bitstring](BitstringMater{})
-	xover.Probability = generator.Const(1.0)
-	xover.Points = generator.Const(1)
+	xover := evolve.Crossover[*bitstring.Bitstring]{
+		Mater:       BitstringMater{},
+		Probability: generator.Const(1.0),
+		Points:      generator.Const(1),
+	}
+
 	f := factory.Bitstring(50)
 
 	pop := evolve.GeneratePopulation[*bitstring.Bitstring](2, f, nil, rng)
+
 	// Test to make sure that crossover correctly preserves all genetic material
 	// originally present in the population and does not introduce anything new.
 	want := pop.Candidates[0].OnesCount() + pop.Candidates[1].OnesCount()
@@ -34,9 +38,11 @@ func TestBitstringCrossover(t *testing.T) {
 
 func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
-	xover := evolve.NewCrossover[*bitstring.Bitstring](BitstringMater{})
-	xover.Probability = generator.Const(1.0)
-	xover.Points = generator.Const(1)
+	xover := evolve.Crossover[*bitstring.Bitstring]{
+		Mater:       BitstringMater{},
+		Probability: generator.Const(1.0),
+		Points:      generator.Const(1),
+	}
 
 	bs1 := bitstring.Random(32, rng)
 	bs2 := bitstring.Random(33, rng)

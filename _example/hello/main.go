@@ -68,9 +68,12 @@ func main() {
 		Alphabet:    alphabet,
 		Probability: generator.Const(0.02),
 	})
-	xover := evolve.NewCrossover[string](crossover.StringMater{})
-	xover.Points = generator.Const(1)
-	xover.Probability = generator.Const(1.0)
+
+	xover := &evolve.Crossover[string]{
+		Mater:       crossover.StringMater{},
+		Points:      generator.Const(1),
+		Probability: generator.Const(1.0),
+	}
 
 	// Define a composite evolutionary operator, that is a pipeline that applies
 	// to each candidate a string mutation followed by a crossover

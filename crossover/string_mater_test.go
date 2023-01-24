@@ -11,9 +11,11 @@ import (
 func TestStringMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := evolve.NewCrossover[string](StringMater{})
-	xover.Points = generator.Const(1)
-	xover.Probability = generator.Const(1.0)
+	xover := evolve.Crossover[string]{
+		Mater:       StringMater{},
+		Points:      generator.Const(2),
+		Probability: generator.Const(1.0),
+	}
 
 	items := []string{"abcde", "fghij", "klmno", "pqrst"}
 
@@ -48,7 +50,11 @@ func TestStringMater(t *testing.T) {
 func TestStringMaterWithDifferentLengthParents(t *testing.T) {
 	// StringMater is only defined for population of strings of equal lengths
 	rng := rand.New(rand.NewSource(99))
-	xover := evolve.NewCrossover[string](StringMater{})
+
+	xover := evolve.Crossover[string]{
+		Mater: StringMater{},
+	}
+
 	pop := evolve.NewPopulationOf([]string{"abcde", "fghijklm"}, nil)
 
 	if !didPanic(func() { xover.Apply(pop, rng) }) {
@@ -70,9 +76,11 @@ func didPanic(f func()) (panicked bool) {
 func BenchmarkStringMater(b *testing.B) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := evolve.NewCrossover[string](StringMater{})
-	xover.Probability = generator.Const(1.0)
-	xover.Points = generator.Const(1)
+	xover := evolve.Crossover[string]{
+		Mater:       StringMater{},
+		Points:      generator.Const(1),
+		Probability: generator.Const(1.0),
+	}
 
 	pop := evolve.NewPopulationOf([]string{"abcde", "fghij", "klmno", "pqrst"}, nil)
 
