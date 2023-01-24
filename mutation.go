@@ -1,8 +1,6 @@
 package evolve
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 // Mutation implements the mutation evolutionnary operator. It modifies the
 // genetic content of individuals in order to maintain diversity from one
