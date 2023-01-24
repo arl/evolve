@@ -1,4 +1,4 @@
-package evolve
+package evolve_test
 
 import (
 	"math/rand"
@@ -6,6 +6,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/crossover"
 	"github.com/arl/evolve/generator"
 )
@@ -40,28 +41,28 @@ func TestCrossoverApply(t *testing.T) {
 	}
 
 	t.Run("zero_crossover_points_is_noop", func(t *testing.T) {
-		xover := NewCrossover[string](crossover.StringMater{})
+		xover := evolve.NewCrossover[string](crossover.StringMater{})
 		xover.Points = generator.Const(0)
 		xover.Probability = generator.Const(1.0)
 
 		items := make([]string, len(org))
 		copy(items, org)
 
-		pop := NewPopulationOf(items, nil)
+		pop := evolve.NewPopulationOf(items, nil)
 
 		xover.Apply(pop, rng)
 		sameStringPop(t, pop.Candidates, org)
 	})
 
 	t.Run("zero_crossover_probability_is_noop", func(t *testing.T) {
-		xover := NewCrossover[string](crossover.StringMater{})
+		xover := evolve.NewCrossover[string](crossover.StringMater{})
 		xover.Points = generator.Const(1)
 		xover.Probability = generator.Const(0.0)
 
 		items := make([]string, len(org))
 		copy(items, org)
 
-		pop := NewPopulationOf(items, nil)
+		pop := evolve.NewPopulationOf(items, nil)
 
 		xover.Apply(pop, rng)
 		sameStringPop(t, pop.Candidates, org)
@@ -81,12 +82,12 @@ func BenchmarkCrossoverApply(b *testing.B) {
 		[]byte("pqrst"),
 		[]byte("uvwxy"),
 	}
-	pop := NewPopulationOf(items, nil)
+	pop := evolve.NewPopulationOf(items, nil)
 
 	b.ResetTimer()
 	var res [][]byte
 	for n := 0; n < b.N; n++ {
-		xover := NewCrossover[[]byte](crossover.SliceMater[byte]{})
+		xover := evolve.NewCrossover[[]byte](crossover.SliceMater[byte]{})
 		xover.Points = generator.Const(1)
 		xover.Probability = generator.Const(1.0)
 
