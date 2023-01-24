@@ -6,7 +6,6 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPermutation(t *testing.T) {
@@ -44,9 +43,13 @@ func TestPermutation(t *testing.T) {
 			next := (i + 1) % len(org)
 			prev := ((i - 1) + len(org)) % len(org)
 			matchAdjacent := (org[i] == mutant[next]) != (org[i] == mutant[prev])
-			assert.True(t, matchAdjacent, "Mutated item is not in one of the expected positions")
+			if !matchAdjacent {
+				t.Errorf("mutant is not in one of the expected positions")
+			}
 		}
 	}
 
-	assert.Equal(t, matches, len(org)-2, "All but 2 positions should be unchanged.")
+	if matches != len(org)-2 {
+		t.Errorf("got %d unchanged positions, want all but 2 (%d-%d)", matches, len(org), 2)
+	}
 }
