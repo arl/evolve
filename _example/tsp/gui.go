@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"evolve/example/tsp/internal/tsp"
+	"github.com/arl/evolve/_example/tsp/internal/tsp"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/engine"
@@ -108,7 +108,7 @@ func (ui *UI) run(w *app.Window) error {
 	var prev, paused time.Duration
 	prevFitness := 0.0
 
-	var observer = engine.ObserverFunc(func(stats *evolve.PopulationStats[[]int]) {
+	observer := engine.ObserverFunc(func(stats *evolve.PopulationStats[[]int]) {
 		// Handle paused UI. We can do this here since evolution observers are
 		// all executed synchronously after each epoch, so blocking here means
 		// blocking the whole evolution ^-^.

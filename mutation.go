@@ -12,11 +12,6 @@ type Mutation[T any] struct {
 	Mutater[T]
 }
 
-// NewMutation returns a operator that mutates chromosomes with the given mutater.
-func NewMutation[T any](mutater Mutater[T]) *Mutation[T] {
-	return &Mutation[T]{Mutater: mutater}
-}
-
 // Apply applies the mutation operator to all individuals in the provided
 // population.
 func (op *Mutation[T]) Apply(pop *Population[T], rng *rand.Rand) {

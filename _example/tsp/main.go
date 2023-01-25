@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"evolve/example/tsp/internal/tsp"
+	"github.com/arl/evolve/_example/tsp/internal/tsp"
 
 	"gioui.org/app"
 	"gioui.org/font/gofont"

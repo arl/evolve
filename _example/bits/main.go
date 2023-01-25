@@ -38,10 +38,10 @@ func main() {
 	}
 
 	// Define the mutation
-	mut := evolve.NewMutation[*bitstring.Bitstring](&mutation.Bitstring{
+	mut := &mutation.Bitstring{
 		Probability: generator.Const(0.01),
 		FlipCount:   generator.Const(1),
-	})
+	}
 
 	eval := evolve.EvaluatorFunc(
 		true, // natural fitness (higher is better)

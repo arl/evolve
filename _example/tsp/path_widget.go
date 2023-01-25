@@ -1,10 +1,11 @@
 package main
 
 import (
-	"evolve/example/tsp/internal/tsp"
 	"fmt"
 	"image"
 	"image/color"
+
+	"github.com/arl/evolve/_example/tsp/internal/tsp"
 
 	"gioui.org/f32"
 	"gioui.org/layout"

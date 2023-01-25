@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"evolve/example/tsp/internal/tsp"
+	"github.com/arl/evolve/_example/tsp/internal/tsp"
 )
 
 func TestRouteEvaluator(t *testing.T) {
@@ -50,7 +50,7 @@ func TestRouteEvaluator(t *testing.T) {
 	}
 
 	if !t.Failed() {
-		got := e.Fitness([]int{0, 1, 2, 3}, nil)
+		got := e.Fitness([]int{0, 1, 2, 3})
 		if got != tot {
 			t.Errorf("got total distance = %v, want %v", got, tot)
 		}
@@ -75,5 +75,5 @@ func TestBerlin52Optimum(t *testing.T) {
 	}
 
 	e := newRouteEvaluator(tspf.Nodes)
-	fmt.Println(e.Fitness(opt, nil))
+	fmt.Println(e.Fitness(opt))
 }

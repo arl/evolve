@@ -123,10 +123,10 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 		Epocher: &Generational[string]{
 			// Create a operator pipeline that first apply a string muration then a crossover.
 			Operator: evolve.Pipeline[string]{
-				evolve.NewMutation[string](&mutation.String{
+				&mutation.String{
 					Alphabet:    alphabet,
 					Probability: generator.Const(0.02),
-				}),
+				},
 				&evolve.Crossover[string]{
 					Mater: crossover.StringMater{},
 				},

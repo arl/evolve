@@ -3,32 +3,33 @@ package mutation
 import (
 	"math/rand"
 
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 )
 
 // String mutates individual characters (single bytes) in a string according to
 // some mutation probabilty.
 //
-// Probability governs the probabilty for each character to be modified by
-// Mutate. If this mutation happens, the mutated character gets replaced by any
-// character in Alphabet.
+// Probability governs the probabilty for a character to be mutated. When
+// mutation happens, a new character gets randomly picked in the provided
+// Alphabet.
 type String struct {
 	Alphabet    string
 	Probability generator.Float
 }
 
-// Mutate modifies a string with respect to a mutation probabilty.
-func (op *String) Mutate(s *string, rng *rand.Rand) {
-	buf := []byte(*s)
+// Apply mutates the provided population.
+func (op *String) Apply(pop *evolve.Population[string], rng *rand.Rand) {
+	for i := 0; i < pop.Len(); i++ {
+		// Find out the probability for this candidate.
+		prob := op.Probability.Next()
 
-	// Find out the probability for this run.
-	prob := op.Probability.Next()
-
-	for i := range buf {
-		if rng.Float64() < prob {
-			buf[i] = op.Alphabet[rng.Intn(len(op.Alphabet))]
+		buf := []byte(pop.Candidates[i])
+		for j := range buf {
+			if rng.Float64() < prob {
+				buf[j] = op.Alphabet[rng.Intn(len(op.Alphabet))]
+			}
 		}
+		pop.Candidates[i] = string(buf)
 	}
-
-	*s = string(buf)
 }

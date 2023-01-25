@@ -1,38 +1,35 @@
 package mutation
 
 import (
-	"errors"
 	"math/rand"
 
 	"github.com/arl/bitstring"
+	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 )
 
-// ErrInvalidMutationCount is the error returned when trying to set an invalid
-// mutation count
-var ErrInvalidMutationCount = errors.New("mutation count must be in [0, MaxInt32]")
-
-// A Bitstring mutates individual bits in a bitstring.Bitstring according to
-// some probability.
+// Bitstring mutation mutates random individual bits in a population of
+// *bitstring.Bitstring.
 //
-// Probability is the probability of a bitstring being mutated at all.
-// FlipCount is the the number of bits to flip on the bitstring in case it's
-// selected for mutation.
+// Probability governs the probability of a bitstring to be mutated. FlipCount
+// governs the number of bits to flip on a bitstring selected for mutation.
 type Bitstring struct {
 	Probability generator.Float
 	FlipCount   generator.Generator[int]
 }
 
-// Mutate modifies a bitstring.Bitstring with respect to a mutation probabilty.
-func (op *Bitstring) Mutate(bs **bitstring.Bitstring, rng *rand.Rand) {
-	// Find out the mutation probabilty
-	prob := op.Probability.Next()
+// Apply mutates the provided population.
+func (op *Bitstring) Apply(pop *evolve.Population[*bitstring.Bitstring], rng *rand.Rand) {
+	for i := 0; i < pop.Len(); i++ {
+		if rng.Float64() >= op.Probability.Next() {
+			continue
+		}
 
-	if rng.Float64() < prob {
-		// Since there's a mutation to perform, find out how many bits to flip.
-		nmuts := op.FlipCount.Next()
-		for i := 0; i < nmuts; i++ {
-			(*bs).FlipBit(rng.Intn((*bs).Len()))
+		// This candidate will be mutated. Find out the number of bits to flip.
+		cand := pop.Candidates[i]
+		nbits := op.FlipCount.Next()
+		for i := 0; i < nbits; i++ {
+			cand.FlipBit(rng.Intn(cand.Len()))
 		}
 	}
 }

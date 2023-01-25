@@ -19,12 +19,10 @@ func TestBitstringMutation(t *testing.T) {
 
 	// Uses a probability of 1 to make the outcome predictable (all bits are
 	// flipped).
-	mut := evolve.NewMutation[*bitstring.Bitstring](
-		&Bitstring{
-			FlipCount:   generator.Const(1),
-			Probability: generator.Const(0.5),
-		},
-	)
+	mut := &Bitstring{
+		FlipCount:   generator.Const(1),
+		Probability: generator.Const(0.5),
+	}
 
 	org := bitstring.Clone(bs)
 	pop := evolve.NewPopulationOf([]*bitstring.Bitstring{bs}, nil)

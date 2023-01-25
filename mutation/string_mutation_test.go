@@ -14,12 +14,10 @@ func TestStringMutation(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	const alphabet = "abcd"
-	mut := evolve.NewMutation[string](
-		&String{
-			Alphabet:    alphabet,
-			Probability: generator.Const(0.5),
-		},
-	)
+	mut := &String{
+		Alphabet:    alphabet,
+		Probability: generator.Const(0.5),
+	}
 
 	items := []string{"abcd", "abab", "cccc"}
 	pop := evolve.NewPopulationOf(items, nil)

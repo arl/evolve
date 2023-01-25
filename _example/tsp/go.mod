@@ -1,4 +1,4 @@
-module evolve/example/tsp
+module github.com/arl/evolve/_example/tsp
 
 go 1.19
 

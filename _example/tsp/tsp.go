@@ -1,13 +1,14 @@
 package main
 
 import (
-	"evolve/example/tsp/internal/tsp"
 	"fmt"
 	"math/rand"
 	"os"
 	"os/signal"
 	"runtime"
 	"time"
+
+	"github.com/arl/evolve/_example/tsp/internal/tsp"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
@@ -62,9 +63,7 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 		indices[i] = i
 	}
 
-	eval := &evolve.FitnessCache[[]int]{
-		Wrapped: newRouteEvaluator(a.cfg.cities),
-	}
+	eval := newRouteEvaluator(a.cfg.cities)
 
 	generational := engine.Generational[[]int]{
 		Operator:  pipeline,

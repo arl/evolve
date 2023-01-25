@@ -3,7 +3,7 @@ package main
 import (
 	"math"
 
-	"evolve/example/tsp/internal/tsp"
+	"github.com/arl/evolve/_example/tsp/internal/tsp"
 )
 
 type routeEvaluator struct {
