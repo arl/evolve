@@ -49,7 +49,8 @@ func (z *Zoomable) Layout(gtx C, zoomed layout.Widget) D {
 		case pointer.Drag:
 			z.dragCur = z.dragOrg.Sub(ev.Position)
 		case pointer.Release:
-			z.offset = z.offset.Sub(z.dragOrg).Add(ev.Position)
+			z.mouse = ev.Position
+			z.offset = z.offset.Sub(z.dragOrg).Add(z.mouse)
 			z.dragCur = f32.Point{}
 		}
 	}
@@ -61,12 +62,13 @@ func (z *Zoomable) Layout(gtx C, zoomed layout.Widget) D {
 		} else {
 			change = 1.1
 		}
-		z.tr = z.tr.Scale(z.mouse, f32.Pt(change, change))
+		mouse := z.mouse.Sub(z.offset)
+		z.tr = z.tr.Scale(mouse, f32.Pt(change, change))
 	}
 
 	op.Affine(z.tr).Add(gtx.Ops)
 
-	// Divide offset by scaling factor (sx == sy)
+	// Adapt the offset to the scaling factor.
 	sx, _, _, _, _, _ := z.tr.Elems()
 	off := z.offset.Sub(z.dragCur).Div(sx)
 	op.Offset(off.Round()).Add(gtx.Ops)
