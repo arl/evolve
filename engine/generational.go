@@ -40,7 +40,6 @@ func (e *Generational[T]) Epoch(pop *evolve.Population[T], rng *rand.Rand) *evol
 		e.Concurrency = runtime.NumCPU()
 	}
 
-	// nextpop := make([]T, 0, pop.Len())
 	nextpop := evolve.NewPopulationWithCapacity(0, pop.Len(), e.Evaluator)
 
 	// Perform elitism: straightforward copy the n fittest candidates into the

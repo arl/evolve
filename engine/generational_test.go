@@ -104,7 +104,7 @@ func checkB(b *testing.B, err error) {
 // multithreaded modes, the fitness evaluation must take a `long` time to
 // perform the job, otherwise the overhead of concurrent execution hides the
 // eventual performance gain.
-func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
+func benchmarkGenerationalEngine(b *testing.B, popsize, strlen int) {
 	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 	// create the target string
@@ -128,7 +128,10 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 					Probability: generator.Const(0.02),
 				},
 				&evolve.Crossover[string]{
-					Mater: crossover.StringMater{},
+					Probability: generator.Const(1.),
+					Mater: &crossover.StringMater{
+						Points: generator.Const(1),
+					},
 				},
 			},
 			Evaluator: evaluator(target),
@@ -136,43 +139,27 @@ func benchmarkGenerationalEngine(b *testing.B, multithread bool, strlen int) {
 			NumElites: 5,
 		},
 		EndConditions: []evolve.Condition[string]{
-			condition.TargetFitness[string]{Fitness: 0, Natural: false},
+			condition.GenerationCount[string](1000),
 		},
 	}
 
 	b.ResetTimer()
-	var best interface{}
 	for n := 0; n < b.N; n++ {
-		best, _, err = eng.Evolve(100000)
-		checkB(b, err)
+		_, _, err = eng.Evolve(popsize)
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
-	if best.(string) != target {
-		b.Errorf("want target string \"%v\", got \"%v\"", target, best.(string))
+}
+
+func BenchmarkGenerationalEngine(b *testing.B) {
+	for _, popsize := range []int{50, 100, 150} {
+		for _, strlen := range []int{10, 100, 1000} {
+			b.Run(fmt.Sprintf("popsize=%d/strlen=%d", popsize, strlen), func(b *testing.B) {
+				benchmarkGenerationalEngine(b, popsize, strlen)
+			})
+		}
 	}
-}
-
-func BenchmarkGenerationalEngineSingleThread10(b *testing.B) {
-	benchmarkGenerationalEngine(b, false, 10)
-}
-
-func BenchmarkGenerationalEngineMultithread10(b *testing.B) {
-	benchmarkGenerationalEngine(b, true, 10)
-}
-
-func BenchmarkGenerationalEngineSingleThread100(b *testing.B) {
-	benchmarkGenerationalEngine(b, false, 100)
-}
-
-func BenchmarkGenerationalEngineMultithread100(b *testing.B) {
-	benchmarkGenerationalEngine(b, true, 100)
-}
-
-func BenchmarkGenerationalEngineSingleThread1000(b *testing.B) {
-	benchmarkGenerationalEngine(b, false, 1000)
-}
-
-func BenchmarkGenerationalEngineMultithread1000(b *testing.B) {
-	benchmarkGenerationalEngine(b, true, 1000)
 }
 
 // This 'evaluator' assigns one "fitness point" for every character in the
