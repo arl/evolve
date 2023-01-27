@@ -8,7 +8,6 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/engine"
 	"github.com/arl/evolve/pkg/tsp"
-	"github.com/arl/gioexp/component/property"
 
 	"gioui.org/app"
 	"gioui.org/io/system"
@@ -17,6 +16,7 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"github.com/arl/gioexp/component/property"
 )
 
 var (
