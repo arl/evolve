@@ -64,7 +64,8 @@ func (p *Population[T]) Swap(i, j int) {
 
 // Evaluate evaluates all candidates that do not have a fitness yet.
 //
-// Concurrency controls the number of goroutines to use in the process.
+// The concurrency controls the number of goroutines concurrently that will
+// concurrently process the candidates.
 func (p *Population[T]) Evaluate(concurrency int) {
 	if concurrency <= 1 {
 		for i := 0; i < p.Len(); i++ {
@@ -76,24 +77,26 @@ func (p *Population[T]) Evaluate(concurrency int) {
 		return
 	}
 
-	wg := sync.WaitGroup{}
-	wg.Add(p.Len())
-	sem := make(chan struct{}, concurrency)
-	for i := 0; i < p.Len(); i++ {
-		if p.Evaluated[i] {
-			continue
-		}
-
-		i := i
-		sem <- struct{}{}
+	var wg sync.WaitGroup
+	defer wg.Wait()
+	queue := make(chan int, concurrency)
+	for k := 0; k < concurrency; k++ {
+		wg.Add(1)
 		go func() {
-			p.Fitness[i] = p.Evaluator.Fitness(p.Candidates[i])
-			p.Evaluated[i] = true
-			wg.Done()
-			<-sem
+			defer wg.Done()
+			for i := range queue {
+				p.Fitness[i] = p.Evaluator.Fitness(p.Candidates[i])
+				p.Evaluated[i] = true
+			}
 		}()
 	}
-	wg.Wait()
+
+	for i := 0; i < p.Len(); i++ {
+		if !p.Evaluated[i] {
+			queue <- i
+		}
+	}
+	close(queue)
 }
 
 // A Factory generates random candidates.
