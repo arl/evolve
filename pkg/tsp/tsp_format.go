@@ -7,7 +7,6 @@ package tsp
 
 import (
 	"bufio"
-	_ "embed"
 	"fmt"
 	"io"
 	"os"

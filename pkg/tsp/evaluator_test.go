@@ -1,12 +1,11 @@
-package main
+package tsp
 
 import (
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"testing"
-
-	"github.com/arl/evolve/_example/tsp/internal/tsp"
 )
 
 func TestRouteEvaluator(t *testing.T) {
@@ -16,13 +15,13 @@ func TestRouteEvaluator(t *testing.T) {
 	// |            \
 	// d_____________c
 	//
-	a := tsp.Point2D{X: 0, Y: 20}  // cities[0]
-	b := tsp.Point2D{X: 20, Y: 20} // cities[1]
-	c := tsp.Point2D{X: 30, Y: 0}  // cities[2]
-	d := tsp.Point2D{X: 0, Y: 0}   // cities[3]
-	cities := []tsp.Point2D{a, b, c, d}
+	a := Point2D{X: 0, Y: 20}  // cities[0]
+	b := Point2D{X: 20, Y: 20} // cities[1]
+	c := Point2D{X: 30, Y: 0}  // cities[2]
+	d := Point2D{X: 0, Y: 0}   // cities[3]
+	cities := []Point2D{a, b, c, d}
 
-	e := newRouteEvaluator(cities)
+	e := NewSymmetricEvaluator(cities)
 
 	tests := []struct {
 		a, b int
@@ -36,8 +35,8 @@ func TestRouteEvaluator(t *testing.T) {
 
 	var tot float64
 	for _, tt := range tests {
-		ab := e.dists[tt.a][tt.b]
-		ba := e.dists[tt.b][tt.a]
+		ab := e.Distances[tt.a][tt.b]
+		ba := e.Distances[tt.b][tt.a]
 
 		if ab != ba {
 			t.Errorf("got dists[a][b] != dists[b][a] (%v and %v)", ab, ba)
@@ -64,16 +63,16 @@ func TestBerlin52Optimum(t *testing.T) {
 		opt[i] = opt[i] - 1
 	}
 
-	f, err := os.Open("berlin52.tsp")
+	f, err := os.Open(filepath.Join("testdata", "berlin52.tsp"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer f.Close()
-	tspf, err := tsp.Load(f)
+	tspf, err := Load(f)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	e := newRouteEvaluator(tspf.Nodes)
+	e := NewSymmetricEvaluator(tspf.Nodes)
 	fmt.Println(e.Fitness(opt))
 }

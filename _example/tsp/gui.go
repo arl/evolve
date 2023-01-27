@@ -5,10 +5,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/arl/evolve/_example/tsp/internal/tsp"
-
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/engine"
+	"github.com/arl/evolve/pkg/tsp"
 	"github.com/arl/gioexp/component/property"
 
 	"gioui.org/app"

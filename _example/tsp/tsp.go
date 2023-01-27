@@ -8,8 +8,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/arl/evolve/_example/tsp/internal/tsp"
-
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
 	"github.com/arl/evolve/crossover"
@@ -18,6 +16,7 @@ import (
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/mutation"
 	"github.com/arl/evolve/pkg/mt19937"
+	"github.com/arl/evolve/pkg/tsp"
 	"github.com/arl/evolve/selection"
 )
 
@@ -63,7 +62,7 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 		indices[i] = i
 	}
 
-	eval := newRouteEvaluator(a.cfg.cities)
+	eval := tsp.NewSymmetricEvaluator(a.cfg.cities)
 
 	generational := engine.Generational[[]int]{
 		Operator:  pipeline,

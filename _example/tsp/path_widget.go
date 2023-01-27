@@ -5,7 +5,7 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/arl/evolve/_example/tsp/internal/tsp"
+	"github.com/arl/evolve/pkg/tsp"
 
 	"gioui.org/f32"
 	"gioui.org/layout"

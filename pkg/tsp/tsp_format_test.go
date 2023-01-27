@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-//go:embed berlin52.tsp
+//go:embed testdata/berlin52.tsp
 var berlin52 []byte
 
 func TestLoad_berlin52(t *testing.T) {
@@ -22,7 +22,7 @@ func TestLoad_berlin52(t *testing.T) {
 
 // optimum 629
 //
-//go:embed eil101.tsp
+//go:embed testdata/eil101.tsp
 var eil101 []byte
 
 func TestLoad_eil101(t *testing.T) {
