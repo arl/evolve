@@ -14,7 +14,7 @@ type Mater[T any] interface {
 	//
 	// parent1 and parent2 are the two individuals that provides the source
 	// material for generating offspring.
-	Mate(parent1, parent2 T, nxpts int, rng *rand.Rand) (T, T)
+	Mate(parent1, parent2 T, rng *rand.Rand) (T, T)
 }
 
 // Crossover implements a standard crossover operator.
@@ -29,7 +29,6 @@ type Mater[T any] interface {
 type Crossover[T any] struct {
 	Mater[T]
 	Probability generator.Float
-	Points      generator.Generator[int]
 }
 
 // Apply applies the crossover operation to the selected candidates.
@@ -44,7 +43,7 @@ type Crossover[T any] struct {
 func (op *Crossover[T]) Apply(pop *Population[T], rng *rand.Rand) {
 	// Shuffle candidates so that evolution is not biased by previous
 	// operations.
-	rand.Shuffle(pop.Len(), pop.Swap)
+	rng.Shuffle(pop.Len(), pop.Swap)
 
 	for i := 0; i < pop.Len()-1; i += 2 {
 		j := i + 1
@@ -58,9 +57,8 @@ func (op *Crossover[T]) Apply(pop *Population[T], rng *rand.Rand) {
 			continue // Nothing to do
 		}
 
-		// Decide the number of cut points.
-		npts := int(op.Points.Next())
-		off1, off2 := op.Mate(p1, p2, npts, rng)
+		// Delegate actual crossover to the mater.
+		off1, off2 := op.Mate(p1, p2, rng)
 		pop.Candidates[i] = off1
 		pop.Candidates[j] = off2
 	}

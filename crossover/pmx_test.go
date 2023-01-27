@@ -15,9 +15,8 @@ func TestPMX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := evolve.Crossover[[]int]{
-		Mater:       PMX[int]{},
-		Points:      generator.Const(2),
 		Probability: generator.Const(1.0),
+		Mater:       PMX[int]{},
 	}
 
 	items := [][]int{
@@ -37,44 +36,6 @@ func TestPMX(t *testing.T) {
 			}
 		}
 	}
-}
-
-func TestPMXDifferentLength(t *testing.T) {
-	rng := rand.New(rand.NewSource(99))
-
-	xover := evolve.Crossover[[]int]{
-		Mater:  PMX[int]{},
-		Points: generator.Const(2),
-	}
-
-	items := make([][]int, 2)
-	items[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
-	items[1] = []int{3, 7, 5, 1}
-
-	pop := evolve.NewPopulationOf(items, nil)
-
-	assert.Panics(t, func() {
-		xover.Apply(pop, rng)
-	})
-}
-
-func TestPMX2CrossoverPoints(t *testing.T) {
-	rng := rand.New(rand.NewSource(99))
-
-	xover := evolve.Crossover[[]int]{
-		Mater:  PMX[int]{},
-		Points: generator.Const(3),
-	}
-
-	items := make([][]int, 2)
-	items[0] = []int{1, 2, 3, 4}
-	items[1] = []int{3, 7, 5, 1}
-
-	pop := evolve.NewPopulationOf(items, nil)
-
-	assert.Panics(t, func() {
-		xover.Apply(pop, rng)
-	})
 }
 
 func Test_mapBasedPMX(t *testing.T) {
@@ -131,7 +92,7 @@ func benchmarkPMX(seqlen int) func(*testing.B) {
 		b.ReportAllocs()
 		b.ResetTimer()
 		for n := 0; n < b.N; n++ {
-			off1, off2 := pmx.Mate(p1, p2, nxpts, rng)
+			off1, off2 := pmx.Mate(p1, p2, rng)
 			p1 = off1
 			p2 = off2
 		}

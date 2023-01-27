@@ -7,15 +7,13 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCX(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	xover := evolve.Crossover[[]int]{
-		Mater:       CX[int]{},
 		Probability: generator.Const(1.0),
-		Points:      generator.Const(1),
+		Mater:       CX[int]{},
 	}
 
 	tests := []struct {
@@ -58,22 +56,4 @@ func TestCX(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestCXDifferentLength(t *testing.T) {
-	rng := rand.New(rand.NewSource(99))
-
-	xover := evolve.Crossover[[]int]{
-		Mater:  CX[int]{},
-		Points: generator.Const(2),
-	}
-
-	items := make([][]int, 2)
-	items[0] = []int{1, 2, 3, 4, 5, 6, 7, 8}
-	items[1] = []int{3, 7, 5, 1}
-
-	pop := evolve.NewPopulationOf(items, nil)
-	assert.Panics(t, func() {
-		xover.Apply(pop, rng)
-	})
 }

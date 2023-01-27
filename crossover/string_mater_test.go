@@ -12,9 +12,10 @@ func TestStringMater(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := evolve.Crossover[string]{
-		Mater:       StringMater{},
-		Points:      generator.Const(2),
 		Probability: generator.Const(1.0),
+		Mater: &StringMater{
+			Points: generator.Const(2),
+		},
 	}
 
 	items := []string{"abcde", "fghij", "klmno", "pqrst"}
@@ -47,39 +48,31 @@ func TestStringMater(t *testing.T) {
 	}
 }
 
-func TestStringMaterWithDifferentLengthParents(t *testing.T) {
-	// StringMater is only defined for population of strings of equal lengths
+func TestStringMaterZeroPoints(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 
-	xover := evolve.Crossover[string]{
-		Mater: StringMater{},
+	m := StringMater{Points: generator.Const(0)}
+
+	p1 := "abcde"
+	p2 := "fghij"
+
+	off1, off2 := m.Mate(p1, p2, rng)
+	if off1 != p1 {
+		t.Errorf("got offspring1 = %v, want %v", off1, p1)
 	}
-
-	pop := evolve.NewPopulationOf([]string{"abcde", "fghijklm"}, nil)
-
-	if !didPanic(func() { xover.Apply(pop, rng) }) {
-		t.Fatalf("Should have panicked")
+	if off2 != p2 {
+		t.Errorf("got offspring2 = %v, want %v", off2, p2)
 	}
-}
-
-// didPanic returns true if the function passed to it panics
-func didPanic(f func()) (panicked bool) {
-	panicked = true
-	defer func() {
-		recover()
-	}()
-	f()
-	panicked = false
-	return
 }
 
 func BenchmarkStringMater(b *testing.B) {
 	rng := rand.New(rand.NewSource(99))
 
 	xover := evolve.Crossover[string]{
-		Mater:       StringMater{},
-		Points:      generator.Const(1),
 		Probability: generator.Const(1.0),
+		Mater: &StringMater{
+			Points: generator.Const(1),
+		},
 	}
 
 	pop := evolve.NewPopulationOf([]string{"abcde", "fghij", "klmno", "pqrst"}, nil)

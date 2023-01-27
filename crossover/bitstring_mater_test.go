@@ -15,9 +15,10 @@ import (
 func TestBitstringCrossover(t *testing.T) {
 	rng := rand.New(rand.NewSource(99))
 	xover := evolve.Crossover[*bitstring.Bitstring]{
-		Mater:       BitstringMater{},
 		Probability: generator.Const(1.0),
-		Points:      generator.Const(1),
+		Mater: &BitstringMater{
+			Points: generator.Const(1),
+		},
 	}
 
 	f := factory.Bitstring(50)
@@ -34,21 +35,4 @@ func TestBitstringCrossover(t *testing.T) {
 		got := pop.Candidates[0].OnesCount() + pop.Candidates[1].OnesCount()
 		assert.Equal(t, got, want, "bitstring crossover should not change the total number of set bits in population")
 	}
-}
-
-func TestBitstringCrossoveWithDifferentLengthParents(t *testing.T) {
-	rng := rand.New(rand.NewSource(99))
-	xover := evolve.Crossover[*bitstring.Bitstring]{
-		Mater:       BitstringMater{},
-		Probability: generator.Const(1.0),
-		Points:      generator.Const(1),
-	}
-
-	bs1 := bitstring.Random(32, rng)
-	bs2 := bitstring.Random(33, rng)
-	pop := evolve.NewPopulationOf([]*bitstring.Bitstring{bs1, bs2}, nil)
-
-	assert.Panics(t, func() {
-		xover.Apply(pop, rng)
-	})
 }

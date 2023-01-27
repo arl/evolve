@@ -1,20 +1,28 @@
 package crossover
 
-import "math/rand"
+import (
+	"math/rand"
 
-// StringMater mates a pair of strings to produce a new pair of bit strings
-type StringMater struct{}
+	"github.com/arl/evolve/generator"
+)
 
-// Mate performs crossover on a pair of parents to generate a pair of offspring.
-func (m StringMater) Mate(p1, p2 string, nxpts int, rng *rand.Rand) (string, string) {
-	if len(p1) != len(p2) {
-		panic("StringMater only mates string having the same length")
-	}
+// StringMater is a crossover helper that mates pairs of parent strings and
+// produces pairs of offsprings.
+type StringMater struct {
+	// Points generator decided the number of cut points to apply, for each mating.
+	Points generator.Generator[int]
+}
+
+// Mate performs crossover on a pair of parent strings and generate a pair of
+// offsprings. Mate is undefined if p1 and p2 do not have the same length (in bytes).
+func (m *StringMater) Mate(p1, p2 string, rng *rand.Rand) (string, string) {
+	// Decide the number of cut points.
+	npts := int(m.Points.Next())
 
 	off1, off2 := []byte(p1), []byte(p2)
 
 	// Apply as many crossovers as required.
-	for i := 0; i < nxpts; i++ {
+	for i := 0; i < npts; i++ {
 		// Cross-over index is always greater than zero and less than the length
 		// of the parent so that we always pick a point that will result in a
 		// meaningful crossover.

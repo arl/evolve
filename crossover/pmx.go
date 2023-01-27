@@ -2,32 +2,23 @@ package crossover
 
 import "math/rand"
 
-// PMX implements the partially mapped crossover algorithm or PMX, on slices.
+// PMX is a Mater for slices representing permutations of a list, implementing
+// the Partially Mapped Crossover algorithm or PMX.
 //
-// This crossover is indicated when chromosomes hold permutations, such as
-// indexes of cities in the TSP. It creates offsprings that are permutations of
-// the parents by choosing 2 random crossover points and exchanging elements
-// positions.
+// It creates offsprings that are permutations of the parents by choosing 2
+// random crossover points and exchanging elements positions.
 type PMX[T comparable] struct{}
 
-// Mate mates 2 parents and generates a pair of offsprings with PMX. Only
-// defined for 2 cut points, panics if nxpts != 2.
-// TODO(arl) if nxpts is fixed, then no need to be a mater, must be an operator.
-func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
-	if nxpts != 2 {
-		panic("PMX is only defined for 2 cut points")
-	}
-
-	if len(p1) != len(p2) {
-		panic("PMX cannot mate parents of different lengths")
-	}
-
+// Mate performs PMX crossover on a pair of parent strings and generate a pair
+// of offsprings. Mate is undefined if p1 and p2 do not have the same length.
+func (p PMX[T]) Mate(p1, p2 []T, rng *rand.Rand) (off1, off2 []T) {
 	// Create identical copies.
 	off1 = make([]T, len(p1))
 	off2 = make([]T, len(p1))
 	copy(off1, p1)
 	copy(off2, p2)
 
+	// Generate the 2 cut points.
 	pt1, pt2 := rng.Intn(len(p1)), rng.Intn(len(p1))
 	mapBasedPMX(p1, p2, off1, off2, pt1, pt2)
 	return

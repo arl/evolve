@@ -2,19 +2,16 @@ package crossover
 
 import "math/rand"
 
-// The CX or Cycle Crossover, first proposed by Oliver I, builds offspring in
-// such a way that cycles are kept, and copied from parents to offsprings.
+// CX is a Mater for slices representating permutations of a list, implementing
+// the Cycle Crossover. The Cycle Crossover was first proposed by Oliver I, it
+// builds offspring in such a way that cycles are kept, and copied from parents
+// to offsprings.
 type CX[T comparable] struct{}
 
-// Mate mates 2 parents and generates a pair of offsprings with CX. the number
-// of cut points is unused.
-// TODO(arl) if the cut points param is unused, then CX should be an Operator.
-func (p CX[T]) Mate(x1, x2 []T, nxpts int, rng *rand.Rand) (y1, y2 []T) {
-	if len(x1) != len(x2) {
-		panic("CX cannot mate parents of different lengths")
-	}
-
-	// Create empty genotypes.
+// Mate performs CX crossover on a pair of parent strings and generate a pair of
+// offsprings. Mate is undefined if p1 and p2 do not have the same length.
+func (p CX[T]) Mate(x1, x2 []T, rng *rand.Rand) (y1, y2 []T) {
+	// Create empty chromosomes.
 	y1 = make([]T, len(x1))
 	y2 = make([]T, len(x1))
 
