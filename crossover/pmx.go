@@ -12,6 +12,7 @@ type PMX[T comparable] struct{}
 
 // Mate mates 2 parents and generates a pair of offsprings with PMX. Only
 // defined for 2 cut points, panics if nxpts != 2.
+// TODO(arl) if nxpts is fixed, then no need to be a mater, must be an operator.
 func (p PMX[T]) Mate(p1, p2 []T, nxpts int, rng *rand.Rand) (off1, off2 []T) {
 	if nxpts != 2 {
 		panic("PMX is only defined for 2 cut points")

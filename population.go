@@ -7,6 +7,8 @@ import (
 
 // A Population holds a group of candidates alongside their fitness.
 type Population[T any] struct {
+	// TODO(arl) switch candidates to slice of struct instead of struct of
+	// slice. This way we can add methods on candidate struct: Fitness()
 	Candidates []T
 	Fitness    []float64
 	Evaluated  []bool

@@ -67,6 +67,7 @@ func (op *Crossover[T]) Apply(pop *Population[T], rng *rand.Rand) {
 }
 
 // seq returns a slice containing the sequence of consecutive numbers from 0 to n.
+// TODO(arl) remove
 func seq[T constraints.Integer | constraints.Float](n int) []T {
 	s := make([]T, n)
 	for i := 0; i < n; i++ {

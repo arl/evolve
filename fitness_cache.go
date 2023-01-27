@@ -20,6 +20,10 @@ import "sync"
 // candidates are evaluated against the other members of the population. So
 // unless the fitness evaluator ignores the second parameter to the
 // Evaluator.Fitness method, caching must not be used.
+//
+// TODO(arl) document that T must not be a slice. Also, we might want to think
+// about the new Candidate type and the possibility for the user to provide itw
+// own candidate-hashing function.
 type FitnessCache[T any] struct {
 	// Wrapped is the fitness evaluator for which we want to provide caching.
 	Wrapped Evaluator[T]
