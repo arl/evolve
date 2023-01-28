@@ -43,6 +43,7 @@ func TestGenerationalEngineElitism(t *testing.T) {
 			Selection: selection.RouletteWheel[int]{},
 			NumElites: 2,
 		},
+
 		// Seed candidates, all better than any others that can possibly get
 		// into the population (since every other candidate will always be
 		// zero). Though elitism should discard 7.
@@ -119,7 +120,7 @@ func benchmarkGenerationalEngine(b *testing.B, popsize, strlen int) {
 
 	eng := Engine[string]{
 		Factory:   factory,
-		Evaluator: evaluator(target),
+		Evaluator: matchChars(target),
 		Epocher: &Generational[string]{
 			// Create a operator pipeline that first apply a string muration then a crossover.
 			Operator: evolve.Pipeline[string]{
@@ -134,7 +135,7 @@ func benchmarkGenerationalEngine(b *testing.B, popsize, strlen int) {
 					},
 				},
 			},
-			Evaluator: evaluator(target),
+			Evaluator: matchChars(target),
 			Selection: selection.RouletteWheel[string]{},
 			NumElites: 5,
 		},
@@ -162,13 +163,12 @@ func BenchmarkGenerationalEngine(b *testing.B) {
 	}
 }
 
-// This 'evaluator' assigns one "fitness point" for every character in the
+// matchChars evaluator assigns one fitness point for every character in the
 // candidate string that doesn't match the corresponding position in the target
 // string.
-// TODO: rename to charMatchEvaluator or something (maybe generalize for byteseq (~string | ~[]byte) , just maybe...)
-type evaluator string
+type matchChars string
 
-func (s evaluator) Fitness(cand string) float64 {
+func (s matchChars) Fitness(cand string) float64 {
 	var errors float64
 	for i := 0; i < len(cand); i++ {
 		if cand[i] != string(s)[i] {
@@ -180,4 +180,4 @@ func (s evaluator) Fitness(cand string) float64 {
 
 // Fitness is not natural, one fitness point represents an error, so the lower
 // is better
-func (evaluator) IsNatural() bool { return false }
+func (matchChars) IsNatural() bool { return false }
