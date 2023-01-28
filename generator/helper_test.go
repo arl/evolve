@@ -12,7 +12,7 @@ import (
 func checkGaussianDistribution(t *testing.T, g Float, wantMean, wantStdDev float64) {
 	t.Helper()
 
-	const iterations = 10000
+	const iterations = 50000
 	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		ds.AddValue(g.Next())
@@ -52,7 +52,7 @@ func checkBinomialDistribution[T constraints.Integer | constraints.Float](t *tes
 func checkExponentialDistribution(t *testing.T, g Float, rate float64) {
 	t.Helper()
 
-	const iterations = 10000
+	const iterations = 50000
 	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		ds.AddValue(g.Next())
@@ -79,7 +79,7 @@ func checkExponentialDistribution(t *testing.T, g Float, rate float64) {
 func checkPoissonDistribution[U constraints.Unsigned](t *testing.T, g *Poisson[U], wantMean float64) {
 	t.Helper()
 
-	const iterations = 10000
+	const iterations = 50000
 	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		val := g.Next()
@@ -102,7 +102,7 @@ func checkPoissonDistribution[U constraints.Unsigned](t *testing.T, g *Poisson[U
 func checkUniformDistribution[T constraints.Integer | constraints.Float](t *testing.T, g Generator[T], wantMean, wantStddev float64) {
 	t.Helper()
 
-	const iterations = 10000
+	const iterations = 50000
 	ds := dataset.New(iterations)
 	for i := 0; i < iterations; i++ {
 		val := g.Next()
