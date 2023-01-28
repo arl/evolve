@@ -25,6 +25,8 @@
 // package.
 package mt19937
 
+import "encoding/binary"
+
 const (
 	n = 312
 	m = 156
@@ -44,28 +46,24 @@ const (
 // more than one goroutine accesses the PRNG, the callers must synchronise
 // access using sync.Mutex or similar.
 type MT19937 struct {
-	state []uint64
+	state [n]uint64
 	index int
 }
-
-// TODO: provide another version of the constructor that is safe for concurrent
-// use by multiple goroutines
 
 // New returns a new instance of the 64bit Mersenne Twister with the specified
 // seed.
 func New(seed int64) *MT19937 {
-	res := MT19937{state: make([]uint64, n)}
-	res.Seed(seed)
-	return &res
+	var mt MT19937
+	mt.Seed(seed)
+	return &mt
 }
 
 // Seed uses the given 64bit value to initialise the generator state.
 // This method is part of the rand.Source interface.
 func (mt *MT19937) Seed(seed int64) {
-	x := mt.state
-	x[0] = uint64(seed)
+	mt.state[0] = uint64(seed)
 	for i := uint64(1); i < n; i++ {
-		x[i] = 6364136223846793005*(x[i-1]^(x[i-1]>>62)) + i
+		mt.state[i] = 6364136223846793005*(mt.state[i-1]^(mt.state[i-1]>>62)) + i
 	}
 	mt.index = n
 }
@@ -75,7 +73,6 @@ func (mt *MT19937) Seed(seed int64) {
 func (mt *MT19937) SeedFromSlice(key []uint64) {
 	mt.Seed(19650218)
 
-	x := mt.state
 	i := uint64(1)
 	j := 0
 	k := len(key)
@@ -83,11 +80,11 @@ func (mt *MT19937) SeedFromSlice(key []uint64) {
 		k = n
 	}
 	for k > 0 {
-		x[i] = (x[i] ^ ((x[i-1] ^ (x[i-1] >> 62)) * 3935559000370003845) +
+		mt.state[i] = (mt.state[i] ^ ((mt.state[i-1] ^ (mt.state[i-1] >> 62)) * 3935559000370003845) +
 			key[j] + uint64(j))
 		i++
 		if i >= n {
-			x[0] = x[n-1]
+			mt.state[0] = mt.state[n-1]
 			i = 1
 		}
 		j++
@@ -97,35 +94,34 @@ func (mt *MT19937) SeedFromSlice(key []uint64) {
 		k--
 	}
 	for j := uint64(0); j < n-1; j++ {
-		x[i] = x[i] ^ ((x[i-1] ^ (x[i-1] >> 62)) * 2862933555777941757) - i
+		mt.state[i] = mt.state[i] ^ ((mt.state[i-1] ^ (mt.state[i-1] >> 62)) * 2862933555777941757) - i
 		i++
 		if i >= n {
-			x[0] = x[n-1]
+			mt.state[0] = mt.state[n-1]
 			i = 1
 		}
 	}
-	x[0] = 1 << 63
+	mt.state[0] = 1 << 63
 }
 
 // Uint64 generates a (pseudo-)random 64bit value. The output can be
 // used as a replacement for a sequence of independent, uniformly
 // distributed samples in the range 0, 1, ..., 2^64-1.
 func (mt *MT19937) Uint64() uint64 {
-	x := mt.state
 	if mt.index >= n {
 		for i := 0; i < n-m; i++ {
-			y := (x[i] & himask) | (x[i+1] & lomask)
-			x[i] = x[i+m] ^ (y >> 1) ^ ((y & 1) * matrixa)
+			y := (mt.state[i] & himask) | (mt.state[i+1] & lomask)
+			mt.state[i] = mt.state[i+m] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		}
 		for i := n - m; i < n-1; i++ {
-			y := (x[i] & himask) | (x[i+1] & lomask)
-			x[i] = x[i+(m-n)] ^ (y >> 1) ^ ((y & 1) * matrixa)
+			y := (mt.state[i] & himask) | (mt.state[i+1] & lomask)
+			mt.state[i] = mt.state[i+(m-n)] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		}
-		y := (x[n-1] & himask) | (x[0] & lomask)
-		x[n-1] = x[m-1] ^ (y >> 1) ^ ((y & 1) * matrixa)
+		y := (mt.state[n-1] & himask) | (mt.state[0] & lomask)
+		mt.state[n-1] = mt.state[m-1] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		mt.index = 0
 	}
-	y := x[mt.index]
+	y := mt.state[mt.index]
 	y ^= (y >> 29) & 0x5555555555555555
 	y ^= (y << 17) & 0x71D67FFFEDA60000
 	y ^= (y << 37) & 0xFFF7EEE000000000
@@ -139,21 +135,20 @@ func (mt *MT19937) Uint64() uint64 {
 // distributed samples in the range 0, 1, ..., 2^63-1.  This method is
 // part of the rand.Source interface.
 func (mt *MT19937) Int63() int64 {
-	x := mt.state
 	if mt.index >= n {
 		for i := 0; i < n-m; i++ {
-			y := (x[i] & himask) | (x[i+1] & lomask)
-			x[i] = x[i+m] ^ (y >> 1) ^ ((y & 1) * matrixa)
+			y := (mt.state[i] & himask) | (mt.state[i+1] & lomask)
+			mt.state[i] = mt.state[i+m] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		}
 		for i := n - m; i < n-1; i++ {
-			y := (x[i] & himask) | (x[i+1] & lomask)
-			x[i] = x[i+(m-n)] ^ (y >> 1) ^ ((y & 1) * matrixa)
+			y := (mt.state[i] & himask) | (mt.state[i+1] & lomask)
+			mt.state[i] = mt.state[i+(m-n)] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		}
-		y := (x[n-1] & himask) | (x[0] & lomask)
-		x[n-1] = x[m-1] ^ (y >> 1) ^ ((y & 1) * matrixa)
+		y := (mt.state[n-1] & himask) | (mt.state[0] & lomask)
+		mt.state[n-1] = mt.state[m-1] ^ (y >> 1) ^ ((y & 1) * matrixa)
 		mt.index = 0
 	}
-	y := x[mt.index]
+	y := mt.state[mt.index]
 	y ^= (y >> 29) & 0x5555555555555555
 	y ^= (y << 17) & 0x71D67FFFEDA60000
 	y ^= (y << 37) & 0xFFF7EEE000000000
@@ -167,20 +162,12 @@ func (mt *MT19937) Int63() int64 {
 // `len(p)` and `err` is always nil.
 func (mt *MT19937) Read(p []byte) (n int, err error) {
 	for n+8 <= len(p) {
-		ui64 := mt.Uint64()
-		p[n] = byte(ui64)
-		p[n+1] = byte(ui64 >> 8)
-		p[n+2] = byte(ui64 >> 16)
-		p[n+3] = byte(ui64 >> 24)
-		p[n+4] = byte(ui64 >> 32)
-		p[n+5] = byte(ui64 >> 40)
-		p[n+6] = byte(ui64 >> 48)
-		p[n+7] = byte(ui64 >> 56)
+		binary.LittleEndian.PutUint64(p[n:], mt.Uint64())
 		n += 8
 	}
 	if n < len(p) {
-		ui64 := mt.Uint64()
 		for n < len(p) {
+			ui64 := mt.Uint64()
 			p[n] = byte(ui64)
 			ui64 >>= 8
 			n++

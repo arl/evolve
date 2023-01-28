@@ -101,3 +101,11 @@ func calculateSampleStdDev(rng *rand.Rand, max, iterations int) float64 {
 	variance := sqdiffs / float64(iterations-1)
 	return math.Sqrt(variance)
 }
+
+func BenchmarkMT19937(b *testing.B) {
+	r := mt19937.New(12923794)
+	p := make([]byte, 32)
+	for n := 0; n < b.N; n++ {
+		r.Read(p)
+	}
+}
