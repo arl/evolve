@@ -8,8 +8,6 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestBitstringCrossover(t *testing.T) {
@@ -32,7 +30,8 @@ func TestBitstringCrossover(t *testing.T) {
 		// Test several generations.
 		xover.Apply(pop, rng)
 
-		got := pop.Candidates[0].OnesCount() + pop.Candidates[1].OnesCount()
-		assert.Equal(t, got, want, "bitstring crossover should not change the total number of set bits in population")
+		if got := pop.Candidates[0].OnesCount() + pop.Candidates[1].OnesCount(); got != want {
+			t.Errorf("bitstring crossover should not change the total number of set bits in population")
+		}
 	}
 }

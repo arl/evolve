@@ -7,8 +7,8 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/constraints"
+	"golang.org/x/exp/slices"
 )
 
 func TestPMX(t *testing.T) {
@@ -32,7 +32,9 @@ func TestPMX(t *testing.T) {
 
 		for _, ind := range pop.Candidates {
 			for j := 1; j <= 8; j++ {
-				assert.Containsf(t, ind, j, "offspring is missing element %d in slice ")
+				if !slices.Contains(ind, j) {
+					t.Errorf("offspring is missing element %d", j)
+				}
 			}
 		}
 	}
