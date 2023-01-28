@@ -1,11 +1,12 @@
 package generator
 
 import (
+	"errors"
+	"fmt"
 	"math"
 	"testing"
 
 	"github.com/arl/evolve/pkg/dataset"
-	"github.com/stretchr/testify/assert"
 	"golang.org/x/exp/constraints"
 )
 
@@ -20,10 +21,10 @@ func checkGaussianDistribution(t *testing.T, g Float, wantMean, wantStdDev float
 
 	const ε = 0.02
 
-	assert.InEpsilon(t, wantMean, ds.ArithmeticMean(), ε, "observed mean is outside of acceptable range")
+	assertInEpsilon(t, wantMean, ds.ArithmeticMean(), ε, "mean")
 	// Expected median is the same as expected mean.
-	assert.InEpsilon(t, wantMean, ds.Median(), ε, "observed median is outside of acceptable range")
-	assert.InEpsilon(t, wantStdDev, ds.SampleStandardDeviation(), ε, "observed standard deviation is outside of acceptable range")
+	assertInEpsilon(t, wantMean, ds.Median(), ε, "median")
+	assertInEpsilon(t, wantStdDev, ds.SampleStandardDeviation(), ε, "sample stddev")
 }
 
 func checkBinomialDistribution[T constraints.Integer | constraints.Float](t *testing.T, g Generator[T], n T, p float64) {
@@ -45,8 +46,8 @@ func checkBinomialDistribution[T constraints.Integer | constraints.Float](t *tes
 	wantMean := float64(n) * p
 	wantStdDev := math.Sqrt(float64(n) * p * (1 - p))
 
-	assert.InEpsilon(t, wantMean, ds.ArithmeticMean(), ε, "observed mean is outside of acceptable range")
-	assert.InEpsilon(t, wantStdDev, ds.SampleStandardDeviation(), ε, "observed standard deviation is outside of acceptable range")
+	assertInEpsilon(t, wantMean, ds.ArithmeticMean(), ε, "mean")
+	assertInEpsilon(t, wantStdDev, ds.SampleStandardDeviation(), ε, "sample stddev")
 }
 
 func checkExponentialDistribution(t *testing.T, g Float, rate float64) {
@@ -68,12 +69,9 @@ func checkExponentialDistribution(t *testing.T, g Float, rate float64) {
 	wantStdDev := math.Sqrt(1 / (rate * rate))
 	wantMedian := math.Log(2) / rate
 
-	assert.InEpsilon(t, wantMean, ds.ArithmeticMean(), ε,
-		"observed mean is outside of acceptable range")
-	assert.InEpsilon(t, wantStdDev, ds.SampleStandardDeviation(), ε,
-		"observed standard deviation is outside of acceptable range")
-	assert.InEpsilon(t, wantMedian, ds.Median(), ε,
-		"observed median is outside of acceptable range")
+	assertInEpsilon(t, wantMean, ds.ArithmeticMean(), ε, "mean")
+	assertInEpsilon(t, wantStdDev, ds.SampleStandardDeviation(), ε, "sample stddev")
+	assertInEpsilon(t, wantMedian, ds.Median(), ε, "median")
 }
 
 func checkPoissonDistribution[U constraints.Unsigned](t *testing.T, g *Poisson[U], wantMean float64) {
@@ -91,12 +89,9 @@ func checkPoissonDistribution[U constraints.Unsigned](t *testing.T, g *Poisson[U
 
 	ε := 0.02
 
-	assert.InEpsilon(t, wantMean, ds.ArithmeticMean(), ε,
-		"observed mean is outside of acceptable range")
-
+	assertInEpsilon(t, wantMean, ds.ArithmeticMean(), ε, "mean")
 	// Variance of a Possion distribution equals its mean.
-	assert.InEpsilon(t, math.Sqrt(wantMean), ds.SampleStandardDeviation(), ε,
-		"observed standard deviation is outside of acceptable range")
+	assertInEpsilon(t, math.Sqrt(wantMean), ds.SampleStandardDeviation(), ε, "sample stddev")
 }
 
 func checkUniformDistribution[T constraints.Integer | constraints.Float](t *testing.T, g Generator[T], wantMean, wantStddev float64) {
@@ -114,12 +109,43 @@ func checkUniformDistribution[T constraints.Integer | constraints.Float](t *test
 
 	ε := 0.02
 
-	assert.InEpsilon(t, wantMean, ds.ArithmeticMean(), ε,
-		"observed mean is outside of acceptable range")
+	assertInEpsilon(t, wantMean, ds.ArithmeticMean(), ε, "mean")
+	assertInEpsilon(t, wantStddev, ds.SampleStandardDeviation(), ε, "sample stddev")
+	assertInEpsilon(t, wantMean, ds.Median(), ε, "median")
+}
 
-	assert.InEpsilon(t, wantStddev, ds.SampleStandardDeviation(), ε,
-		"observed standard deviation is outside of acceptable range")
+// assertInEpsilon checks that the relative error between the value we want and
+// the value we got is less than epsilon. observed is the name of the observed
+// value and is used in the error message.
+func assertInEpsilon(tb testing.TB, want, got, epsilon float64, observed string) {
+	tb.Helper()
 
-	assert.InEpsilon(t, wantMean, ds.Median(), ε,
-		"observed median outside of acceptable range")
+	if math.IsNaN(epsilon) {
+		tb.Fatalf("assertInEpsilon(%s), epsilon must not be NaN", observed)
+	}
+	actualEpsilon, err := calcRelativeError(want, got)
+	if err != nil {
+		tb.Fatalf("assertInEpsilon(%s), %v", observed, err.Error())
+	}
+	if actualEpsilon > epsilon {
+		tb.Fatalf("assertInEpsilon(%s), relative error is too high.\n"+
+			" (actual) %f > %f (expected)", observed, actualEpsilon, epsilon)
+	}
+}
+
+func calcRelativeError(want, got float64) (float64, error) {
+	if math.IsNaN(want) && math.IsNaN(got) {
+		return 0, nil
+	}
+	if math.IsNaN(want) {
+		return 0, errors.New("expected value must not be NaN")
+	}
+	if want == 0 {
+		return 0, fmt.Errorf("expected value must have a value other than zero to calculate the relative error")
+	}
+	if math.IsNaN(got) {
+		return 0, errors.New("actual value must not be NaN")
+	}
+
+	return math.Abs(want-got) / math.Abs(want), nil
 }
