@@ -81,8 +81,7 @@ func (e *Engine[T]) Evolve(popsize int) (*evolve.Population[T], []evolve.Conditi
 	}
 
 	if e.RNG == nil {
-		seed := time.Now().UnixNano()
-		e.RNG = rand.New(mt19937.New(seed))
+		e.RNG = rand.New(mt19937.New())
 	}
 
 	// Track down evolution stats in a dataset.

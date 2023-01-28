@@ -10,7 +10,7 @@ import (
 func TestGaussian(t *testing.T) {
 	const mean, stddev float64 = 147, 17
 
-	rng := rand.New(mt19937.New(99))
+	rng := rand.New(mt19937.New())
 
 	g := NewGaussian(Const(mean), Const(stddev), rng)
 	checkGaussianDistribution(t, g, mean, stddev)
@@ -19,7 +19,7 @@ func TestGaussian(t *testing.T) {
 func TestGaussianDynamic(t *testing.T) {
 	const mean, stddev float64 = 147, 17
 
-	rng := rand.New(mt19937.New(99))
+	rng := rand.New(mt19937.New())
 
 	gmean := NewSwappable(Const(mean))
 	gstddev := NewSwappable(Const(stddev))

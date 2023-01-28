@@ -28,7 +28,7 @@ func testUniform[T constraints.Unsigned | constraints.Float](min, max T, t *test
 	// n/sqrt(12).
 	stddev := float64(diff) / math.Sqrt(12)
 
-	rng := rand.New(mt19937.New(0))
+	rng := rand.New(mt19937.New())
 	g := Uniform(min, max, rng)
 
 	checkUniformDistribution(t, g, float64(mean), stddev)

@@ -1,6 +1,7 @@
 package mt19937_test
 
 import (
+	"hash/maphash"
 	"math"
 	"math/rand"
 	"reflect"
@@ -13,17 +14,21 @@ import (
 // Test to ensure that two distinct RNGs with the same seed return the same
 // sequence of numbers.
 func TestMT19937Repeatability(t *testing.T) {
-	seed := int64(time.Now().UnixNano())
+	const size = 512
 
-	const size = 100
-	// Generate 2 sequences of the same size, starring from the sam seed.
-	rng1, rng2 := rand.New(mt19937.New(seed)), rand.New(mt19937.New(seed))
+	// Generate 2 sequences of the same size, using the same seed.
+	var mt1, mt2 mt19937.MT19937
+	seed := time.Now().UnixNano()
+	mt1.Seed(seed)
+	mt2.Seed(seed)
+	rng1, rng2 := rand.New(&mt1), rand.New(&mt2)
 	seq1 := make([]byte, size)
 	rng1.Read(seq1)
 	seq2 := make([]byte, size)
 	rng2.Read(seq2)
 
 	if !reflect.DeepEqual(seq1, seq2) {
+		t.Logf("used seed: %d", seed)
 		t.Errorf("sequences are not matching\n%v\n\n%v\n", seq1, seq2)
 	}
 }
@@ -32,8 +37,7 @@ func TestMT19937Repeatability(t *testing.T) {
 // not detect the subtle statistical anomalies that would be picked up by
 // Diehard, but it provides a simple check for major problems with the output.
 func TestMT19937Distribution(t *testing.T) {
-	seed := int64(time.Now().UnixNano())
-	pi := monteCarloValueForPi(rand.New(mt19937.New(seed)), 1000000)
+	pi := monteCarloValueForPi(rand.New(mt19937.New()), 1000000)
 
 	diff := absDiff(pi, math.Pi)
 	if diff > 0.01 {
@@ -67,8 +71,7 @@ func monteCarloValueForPi(rng *rand.Rand, iterations int) float64 {
 }
 
 func TestStandardDeviation(t *testing.T) {
-	seed := int64(time.Now().UnixNano())
-	rng := rand.New(mt19937.New(seed))
+	rng := rand.New(mt19937.New())
 
 	// The standard deviation for a uniformly distributed population of values
 	// in the range 0..n approaches n/sqrt(12).
@@ -102,10 +105,27 @@ func calculateSampleStdDev(rng *rand.Rand, max, iterations int) float64 {
 	return math.Sqrt(variance)
 }
 
-func BenchmarkMT19937(b *testing.B) {
-	r := mt19937.New(12923794)
+func BenchmarkMT19937Read(b *testing.B) {
+	r := mt19937.New()
 	p := make([]byte, 32)
 	for n := 0; n < b.N; n++ {
 		r.Read(p)
+	}
+}
+
+var sink uint64
+
+func BenchmarkMT19937Uint64(b *testing.B) {
+	r := mt19937.New()
+	for n := 0; n < b.N; n++ {
+		sink = r.Uint64()
+	}
+}
+
+func BenchmarkStdRandUint64(b *testing.B) {
+	seed := int64(new(maphash.Hash).Sum64())
+	r := rand.New(rand.NewSource(seed))
+	for n := 0; n < b.N; n++ {
+		sink = r.Uint64()
 	}
 }

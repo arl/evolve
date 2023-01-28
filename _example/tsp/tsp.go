@@ -41,7 +41,7 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 	const mutationRate = 0.05
 
 	// Define the mutation operator.
-	rng := rand.New(mt19937.New(time.Now().UnixNano()))
+	rng := rand.New(mt19937.New())
 	mut := evolve.NewSwitch[[]int](
 		&mutation.Permutation[int]{
 			Count:       generator.Const(1),

@@ -1,4 +1,5 @@
-// mt19937.go - an implementation of the 64bit Mersenne Twister PRNG
+// Adapted from an implementation of the 64bit Mersenne Twister PRNG
+// original copyright:
 // Copyright (C) 2013  Jochen Voss <voss@seehuhn.de>
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,18 +15,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Package mt19937 implements a Mersenne Twister source of random numbers
+// Package mt19937 implements a b4-bit Mersenne Twister source of random numbers
 // satisfying the rand.Source64 interface.
 //
-// Structs in mt19937 package are not safe for concurrent access by different
-// goroutines. If more than one goroutine accesses the PRNG, the callers must
-// synchronise access using sync.Mutex or similar.
+// A single mt19937.MT19937 instance is not safe for concurrent access by different
+// goroutines.
 //
 // For random numbers suitable for security-sensitive work, see the crypto/rand
 // package.
 package mt19937
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"hash/maphash"
+)
 
 const (
 	n = 312
@@ -37,29 +40,30 @@ const (
 	matrixa uint64 = 0xB5026F5AA96619E9
 )
 
-// MT19937 holds the state of one instance of the Mersenne Twister PRNG.
-// New instances can be allocated using the mt19937.New() function. MT19937
-// implements the rand.Source64 interface and rand.New() from the math/rand
-// package can be used to generate different distributions from a MT19937 PRNG.
+// MT19937 holds the state of a 64-bit Mersenne Twister PRNG.
+//
+// Use New to create a new, randomly seeded MT19937 instance. The zero-value of
+// MT19937 is not valid instance.
 //
 // This struct is not safe for concurrent access by different goroutines. If
-// more than one goroutine accesses the PRNG, the callers must synchronise
-// access using sync.Mutex or similar.
+// more than one goroutine accesses the PRNG, callers must synchronise access
+// using sync.Mutex or similar.
 type MT19937 struct {
 	state [n]uint64
 	index int
 }
 
-// New returns a new instance of the 64bit Mersenne Twister with the specified
-// seed.
-func New(seed int64) *MT19937 {
+// New creates and initializes a 64bit Mersenne Twister PRNG, seeded with a
+// source of randomness.
+func New() *MT19937 {
 	var mt MT19937
-	mt.Seed(seed)
+	mt.Seed(int64(new(maphash.Hash).Sum64()))
 	return &mt
 }
 
-// Seed uses the given 64bit value to initialise the generator state.
-// This method is part of the rand.Source interface.
+// Seed uses the provided seed value to initialize the generator to a
+// deterministic state. Seed should not be called concurrently with any other
+// MT19937 method.
 func (mt *MT19937) Seed(seed int64) {
 	mt.state[0] = uint64(seed)
 	for i := uint64(1); i < n; i++ {
@@ -104,9 +108,7 @@ func (mt *MT19937) SeedFromSlice(key []uint64) {
 	mt.state[0] = 1 << 63
 }
 
-// Uint64 generates a (pseudo-)random 64bit value. The output can be
-// used as a replacement for a sequence of independent, uniformly
-// distributed samples in the range 0, 1, ..., 2^64-1.
+// Uint64 returns a pseudo-random 64-bit value as a uint64.
 func (mt *MT19937) Uint64() uint64 {
 	if mt.index >= n {
 		for i := 0; i < n-m; i++ {
@@ -130,10 +132,7 @@ func (mt *MT19937) Uint64() uint64 {
 	return y
 }
 
-// Int63 generates a (pseudo-)random 63bit value.  The output can be
-// used as a replacement for a sequence of independent, uniformly
-// distributed samples in the range 0, 1, ..., 2^63-1.  This method is
-// part of the rand.Source interface.
+// Int63 returns a non-negative pseudo-random 63-bit integer as an int64.
 func (mt *MT19937) Int63() int64 {
 	if mt.index >= n {
 		for i := 0; i < n-m; i++ {
@@ -157,9 +156,9 @@ func (mt *MT19937) Int63() int64 {
 	return int64(y & 0x7fffffffffffffff)
 }
 
-// Read fills `p` with (pseudo-)random bytes.  This method implements
-// the io.Reader interface. The returned length `n` always equals
-// `len(p)` and `err` is always nil.
+// Read generates len(p) random bytes and writes them into p. It
+// always returns len(p) and a nil error.
+// Read should not be called concurrently with any other MT19937 method.
 func (mt *MT19937) Read(p []byte) (n int, err error) {
 	for n+8 <= len(p) {
 		binary.LittleEndian.PutUint64(p[n:], mt.Uint64())
