@@ -5,11 +5,12 @@ import (
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
+	"golang.org/x/exp/constraints"
 	"golang.org/x/exp/slices"
 )
 
 // The Collision crossover ...
-type Collision struct {
+type Collision[T constraints.Integer] struct {
 	// Probability is the probability to apply the Collision crossover on a pair
 	// of candidates.
 	Probability generator.Float
@@ -18,7 +19,7 @@ type Collision struct {
 }
 
 // paper: https://arxiv.org/pdf/1801.02335.pdf
-func (op *Collision) Apply(pop *evolve.Population[[]int], rng *rand.Rand) {
+func (op *Collision[T]) Apply(pop *evolve.Population[[]T], rng *rand.Rand) {
 	// Shuffle candidates so that evolution is not biased by previous
 	// operations.
 	rand.Shuffle(pop.Len(), pop.Swap)
@@ -58,13 +59,13 @@ func (op *Collision) Apply(pop *evolve.Population[[]int], rng *rand.Rand) {
 //
 // This is based on the C# implementation of the Collision Crossover, courtesy
 // of Prof. Ahmad Hassanat which kindly shared his unpublished code with me.
-func (op *Collision) collide(x1, x2 []int, cost1, cost2 int, cut int, rng *rand.Rand) (y1, y2 []int) {
+func (op *Collision[T]) collide(x1, x2 []T, cost1, cost2 int, cut int, rng *rand.Rand) (y1, y2 []T) {
 	if len(x1) != len(x2) {
 		panic("Collision cannot mate parents of different lengths")
 	}
 
-	tempCh1 := make([]int, 0, len(x1))
-	tempCh2 := make([]int, 0, len(x1))
+	tempCh1 := make([]T, 0, len(x1))
+	tempCh2 := make([]T, 0, len(x1))
 
 	// TODO(arl) uses a bitset (bitstring)
 	visited1 := make([]bool, len(x1))
@@ -90,8 +91,8 @@ func (op *Collision) collide(x1, x2 []int, cost1, cost2 int, cut int, rng *rand.
 	v2 = -v2
 
 	for j := 1; j < len(x1)-1; j++ {
-		m1 = op.CalcDistance(x1[j-1], x1[j]) + op.CalcDistance(x1[j], x1[j+1])
-		m2 = op.CalcDistance(x2[j-1], x2[j]) + op.CalcDistance(x2[j], x2[j+1])
+		m1 = op.CalcDistance(int(x1[j-1]), int(x1[j])) + op.CalcDistance(int(x1[j]), int(x1[j+1]))
+		m2 = op.CalcDistance(int(x2[j-1]), int(x2[j])) + op.CalcDistance(int(x2[j]), int(x2[j+1]))
 
 		v1p = (v1 * (m1 - m2) / (m1 + m2)) + (v2 * 2.0 * m2 / (m1 + m2))
 		v2p = (v1 * 2.0 * m1 / (m1 + m2)) - (v2 * (m1 - m2) / (m1 + m2))
@@ -116,16 +117,10 @@ func (op *Collision) collide(x1, x2 []int, cost1, cost2 int, cut int, rng *rand.
 	// Do it for the last gene
 	jj := len(x1) - 1
 
-	m1 = op.CalcDistance(x1[jj-1], x1[jj]) +
-
-		op.CalcDistance(x1[jj], x1[0])
-
-	m2 = op.CalcDistance(x2[jj-1], x2[jj]) +
-
-		op.CalcDistance(x2[jj], x2[0])
+	m1 = op.CalcDistance(int(x1[jj-1]), int(x1[jj])) + op.CalcDistance(int(x1[jj]), int(x1[0]))
+	m2 = op.CalcDistance(int(x2[jj-1]), int(x2[jj])) + op.CalcDistance(int(x2[jj]), int(x2[0]))
 
 	v1p = (v1 * (m1 - m2) / (m1 + m2)) + (v2 * 2.0 * m2 / (m1 + m2))
-
 	v2p = (v1 * 2.0 * m1 / (m1 + m2)) - (v2 * (m1 - m2) / (m1 + m2))
 
 	// add to ch1
@@ -133,7 +128,6 @@ func (op *Collision) collide(x1, x2 []int, cost1, cost2 int, cut int, rng *rand.
 	if v1p <= 0 {
 		// if the city refelected or stopped in parent1
 		tempCh1 = append(tempCh1, x1[jj])
-
 		visited1[x1[jj]] = true
 	} else {
 		tempCh1 = append(tempCh1, 0)
@@ -142,7 +136,6 @@ func (op *Collision) collide(x1, x2 []int, cost1, cost2 int, cut int, rng *rand.
 	if v2p <= 0 {
 		// if the city refelected or stopped in parent1
 		tempCh2 = append(tempCh2, x2[jj])
-
 		visited2[x2[jj]] = true
 	} else {
 		tempCh2 = append(tempCh2, 0)

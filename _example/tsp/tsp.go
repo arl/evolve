@@ -28,7 +28,7 @@ type algorithm struct {
 }
 
 func (a *algorithm) setup(obs engine.Observer[[]byte]) error {
-	eval := tsp.NewSymmetricEvaluator[byte](a.cfg.cities)
+	eval := tsp.NewSymmetricTSPEvaluator[byte](a.cfg.cities)
 
 	var pipeline evolve.Pipeline[[]byte]
 

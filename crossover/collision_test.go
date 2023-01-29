@@ -75,14 +75,14 @@ func TestCollisionCrossover(t *testing.T) {
 		{X: 0, Y: 250},
 		{X: 0, Y: 100},
 	}
-	eval := tsp.NewSymmetricEvaluator(cities)
+	eval := tsp.NewSymmetricTSPEvaluator[int](cities)
 	pop := evolve.NewPopulationOf[[]int]([][]int{
 		{0, 4, 2, 5, 3, 1}, // AECFDB
 		{0, 2, 5, 3, 1, 4}, // ACFDBE
 		// {0, 3, 4, 2, 1, 5}, // ADECBF
 	}, eval)
 
-	xover := Collision{
+	xover := Collision[int]{
 		Probability: generator.Const(1.),
 		CalcDistance: func(i, j int) float64 {
 			return eval.Distances[i][j]

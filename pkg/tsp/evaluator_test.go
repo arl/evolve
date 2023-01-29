@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestRouteEvaluator(t *testing.T) {
+func TestSymmetricTSPEvaluator(t *testing.T) {
 	//
 	// a----------b
 	// |           \
@@ -21,7 +21,7 @@ func TestRouteEvaluator(t *testing.T) {
 	d := Point2D{X: 0, Y: 0}   // cities[3]
 	cities := []Point2D{a, b, c, d}
 
-	e := NewSymmetricEvaluator(cities)
+	e := NewSymmetricTSPEvaluator[int](cities)
 
 	tests := []struct {
 		a, b int
@@ -73,6 +73,6 @@ func TestBerlin52Optimum(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	e := NewSymmetricEvaluator(tspf.Nodes)
+	e := NewSymmetricTSPEvaluator[int](tspf.Nodes)
 	fmt.Println(e.Fitness(opt))
 }
