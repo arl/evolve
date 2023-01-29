@@ -2,12 +2,14 @@ package tsp
 
 import (
 	"math"
+
+	"golang.org/x/exp/constraints"
 )
 
 // SymmetricEvaluator evaluates candidates for the symmetric, unweighted
 // traveling sales person. Symmetric means the distance between two cities is
 // the same in each opposite direction.
-type SymmetricEvaluator struct {
+type SymmetricEvaluator[T constraints.Integer] struct {
 	// Distances holds the distances between every city pair.
 	Distances [][]float64
 }
@@ -15,7 +17,7 @@ type SymmetricEvaluator struct {
 // NewSymmetricEvaluator creates and initializes a symmetric TSP evaluator for
 // the given list of citites. Euclidian distance between each city is
 // precomputed, taking up len(cities)² space.
-func NewSymmetricEvaluator(cities []Point2D) *SymmetricEvaluator {
+func NewSymmetricEvaluator[T constraints.Integer](cities []Point2D) *SymmetricEvaluator[T] {
 	dists := make([][]float64, len(cities))
 	for i := 0; i < len(cities); i++ {
 		dists[i] = make([]float64, len(cities))
@@ -29,14 +31,14 @@ func NewSymmetricEvaluator(cities []Point2D) *SymmetricEvaluator {
 		}
 	}
 
-	return &SymmetricEvaluator{
+	return &SymmetricEvaluator[T]{
 		Distances: dists,
 	}
 }
 
 // Fitness computes the perimeter of the polygon formed by the closed path
 // passing through all all the cities in the order given by the candidate.
-func (e *SymmetricEvaluator) Fitness(cand []int) float64 {
+func (e *SymmetricEvaluator[T]) Fitness(cand []T) float64 {
 	var tot float64
 	for i := 0; i < len(cand)-1; i++ {
 		tot += e.Distances[cand[i]][cand[i+1]]
@@ -46,7 +48,7 @@ func (e *SymmetricEvaluator) Fitness(cand []int) float64 {
 	return tot
 }
 
-func (e *SymmetricEvaluator) IsNatural() bool {
+func (e *SymmetricEvaluator[T]) IsNatural() bool {
 	// TSP optimizes for the shortest route.
 	return false
 }

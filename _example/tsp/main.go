@@ -42,7 +42,7 @@ func main() {
 
 func cliRun(cities []tsp.Point2D, maxgen int) {
 	alg.cfg = config{cities: cities, maxgen: maxgen}
-	if err := alg.setup(printStatsToCli()); err != nil {
+	if err := alg.setup(printStatsToCli[byte]()); err != nil {
 		log.Fatalf("setup failed: %v", err)
 	}
 	alg.run()

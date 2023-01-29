@@ -6,6 +6,7 @@ import (
 	"image/color"
 
 	"github.com/arl/evolve/pkg/tsp"
+	"golang.org/x/exp/constraints"
 
 	"gioui.org/f32"
 	"gioui.org/layout"
@@ -19,14 +20,14 @@ var (
 	dotColor  = color.NRGBA{R: 200, A: 255}
 )
 
-type pathWidget struct {
+type pathWidget[T constraints.Integer] struct {
 	citymax f32.Point
 	cities  []tsp.Point2D
 
 	zoomable Zoomable
 }
 
-func newPathWidget(cities []tsp.Point2D) *pathWidget {
+func newPathWidget[T constraints.Integer](cities []tsp.Point2D) *pathWidget[T] {
 	max := func(a, b float32) float32 {
 		if a > b {
 			return a
@@ -42,10 +43,10 @@ func newPathWidget(cities []tsp.Point2D) *pathWidget {
 	}
 	fmt.Println("world bounds", citymax)
 
-	return &pathWidget{cities: cities, citymax: citymax}
+	return &pathWidget[T]{cities: cities, citymax: citymax}
 }
 
-func (pw *pathWidget) Layout(onlyCities bool, sol []int, gtx C) D {
+func (pw *pathWidget[T]) Layout(onlyCities bool, sol []T, gtx C) D {
 	return pw.zoomable.Layout(gtx, func(gtx C) D {
 		// Draw cities as red dots
 		const cityRadius = 5

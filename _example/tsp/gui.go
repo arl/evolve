@@ -56,7 +56,7 @@ type (
 
 // state holds the application state
 type state struct {
-	stats *evolve.PopulationStats[[]int]
+	stats *evolve.PopulationStats[[]byte]
 	tspf  *tsp.File
 }
 
@@ -68,7 +68,7 @@ type UI struct {
 
 	startButton *startButton
 	zoomable    *Zoomable
-	pathWidget  *pathWidget
+	pathWidget  *pathWidget[byte]
 }
 
 func newUI(theme *material.Theme, tspf *tsp.File) *UI {
@@ -76,7 +76,7 @@ func newUI(theme *material.Theme, tspf *tsp.File) *UI {
 		theme: theme,
 		state: state{
 			tspf:  tspf,
-			stats: &evolve.PopulationStats[[]int]{},
+			stats: &evolve.PopulationStats[[]byte]{},
 		},
 		list: property.NewList(),
 	}
@@ -84,7 +84,7 @@ func newUI(theme *material.Theme, tspf *tsp.File) *UI {
 
 func (ui *UI) run(w *app.Window) error {
 	ui.startButton = &startButton{}
-	ui.pathWidget = newPathWidget(ui.state.tspf.Nodes)
+	ui.pathWidget = newPathWidget[byte](ui.state.tspf.Nodes)
 
 	gen := property.NewInt(0)
 	gen.Editable = false
@@ -103,11 +103,11 @@ func (ui *UI) run(w *app.Window) error {
 	elapsed.Editable = false
 	ui.list.Add("Elapsed", elapsed)
 
-	solutions := make(chan *evolve.PopulationStats[[]int])
+	solutions := make(chan *evolve.PopulationStats[[]byte])
 	var prev, paused time.Duration
 	prevFitness := 0.0
 
-	observer := engine.ObserverFunc(func(stats *evolve.PopulationStats[[]int]) {
+	observer := engine.ObserverFunc(func(stats *evolve.PopulationStats[[]byte]) {
 		// Handle paused UI. We can do this here since evolution observers are
 		// all executed synchronously after each epoch, so blocking here means
 		// blocking the whole evolution ^-^.

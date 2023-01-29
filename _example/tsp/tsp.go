@@ -18,21 +18,23 @@ import (
 	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/arl/evolve/pkg/tsp"
 	"github.com/arl/evolve/selection"
+	"golang.org/x/exp/constraints"
 )
 
 type algorithm struct {
 	cfg  config
-	eng  engine.Engine[[]int]
-	scsv *evolve.StatsToCSV[[]int]
+	eng  engine.Engine[[]byte]
+	scsv *evolve.StatsToCSV[[]byte]
 }
 
-func (a *algorithm) setup(obs engine.Observer[[]int]) error {
-	var pipeline evolve.Pipeline[[]int]
+func (a *algorithm) setup(obs engine.Observer[[]byte]) error {
+	eval := tsp.NewSymmetricEvaluator[byte](a.cfg.cities)
+
+	var pipeline evolve.Pipeline[[]byte]
 
 	// Define the crossover operator.
-	xover := &evolve.Crossover[[]int]{
-		Mater:       crossover.PMX[int]{},
-		Points:      generator.Const(2), // unused for cycle crossover
+	xover := &evolve.Crossover[[]byte]{
+		Mater:       crossover.PMX[byte]{},
 		Probability: generator.Const(1.),
 	}
 
@@ -42,42 +44,40 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 
 	// Define the mutation operator.
 	rng := rand.New(mt19937.New())
-	mut := evolve.NewSwitch[[]int](
-		&mutation.Permutation[int]{
+	mut := evolve.NewSwitch[[]byte](
+		&mutation.Permutation[byte]{
 			Count:       generator.Const(1),
-			Amount:      generator.Uniform(1, len(a.cfg.cities), rng),
+			Amount:      generator.Uniform(1, 3, rng),
 			Probability: generator.Const(mutationRate),
 		},
-		&mutation.SRS[int]{
+		&mutation.SRS[byte]{
 			Probability: generator.Const(mutationRate),
 		},
-		&mutation.CIM[int]{
+		&mutation.CIM[byte]{
 			Probability: generator.Const(mutationRate),
 		},
 	)
 	pipeline = append(pipeline, mut)
 
-	indices := make([]int, len(a.cfg.cities))
+	indices := make([]byte, len(a.cfg.cities))
 	for i := 0; i < len(a.cfg.cities); i++ {
-		indices[i] = i
+		indices[i] = byte(i)
 	}
 
-	eval := tsp.NewSymmetricEvaluator(a.cfg.cities)
-
-	generational := engine.Generational[[]int]{
+	generational := engine.Generational[[]byte]{
 		Operator:  pipeline,
 		Evaluator: eval,
-		Selection: &selection.RouletteWheel[[]int]{},
 		NumElites: 2,
+		Selection: &selection.RouletteWheel[[]byte]{},
 	}
 
-	a.eng = engine.Engine[[]int]{
-		Factory:     factory.Permutation[int](indices),
+	a.eng = engine.Engine[[]byte]{
+		Factory:     factory.Permutation[byte](indices),
 		Evaluator:   eval,
 		Epocher:     &generational,
 		Concurrency: runtime.NumCPU(),
 	}
-	var userAbort condition.UserAbort[[]int]
+	var userAbort condition.UserAbort[[]byte]
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)
@@ -87,11 +87,11 @@ func (a *algorithm) setup(obs engine.Observer[[]int]) error {
 
 	a.eng.EndConditions = append(a.eng.EndConditions, &userAbort)
 	if a.cfg.maxgen != 0 {
-		a.eng.EndConditions = append(a.eng.EndConditions, condition.GenerationCount[[]int](a.cfg.maxgen))
+		a.eng.EndConditions = append(a.eng.EndConditions, condition.GenerationCount[[]byte](a.cfg.maxgen))
 	}
 
 	if a.cfg.csvpath != "" {
-		csv, err := evolve.NewStatsToCSV[[]int](a.cfg.csvpath)
+		csv, err := evolve.NewStatsToCSV[[]byte](a.cfg.csvpath)
 		if err != nil {
 			return err
 		}
@@ -115,13 +115,13 @@ type config struct {
 	csvpath string
 }
 
-func printStatsToCli() engine.Observer[[]int] {
+func printStatsToCli[T constraints.Integer]() engine.Observer[[]T] {
 	start := time.Now()
 	last := start
 	prevFitness := 0.0
 	const refreshInterval = 1 * time.Second
 
-	return engine.ObserverFunc(func(stats *evolve.PopulationStats[[]int]) {
+	return engine.ObserverFunc(func(stats *evolve.PopulationStats[[]T]) {
 		now := time.Now()
 		if now.Sub(last) < refreshInterval && (stats.Generation%100 != 0 || prevFitness == stats.BestFitness) {
 			return
