@@ -104,9 +104,12 @@ func (ui *UI) run(w *app.Window) error {
 	ui.list.Add("Elapsed", elapsed)
 
 	solutions := make(chan *evolve.PopulationStats[[]byte])
-	var prev, paused time.Duration
-	prevFitness := 0.0
 
+	var (
+		prev        time.Duration
+		paused      atomic.Int64
+		prevFitness float64
+	)
 	observer := engine.ObserverFunc(func(stats *evolve.PopulationStats[[]byte]) {
 		// Handle paused UI. We can do this here since evolution observers are
 		// all executed synchronously after each epoch, so blocking here means
@@ -116,7 +119,7 @@ func (ui *UI) run(w *app.Window) error {
 			// UI is paused
 			time.Sleep(100 * time.Millisecond)
 		}
-		paused += time.Since(before)
+		paused.Add(int64(time.Since(before)))
 
 		// In case of many consecutive improvements of the solution, we want
 		// anyway to limit us to to drawing 30 fps.
@@ -138,7 +141,7 @@ func (ui *UI) run(w *app.Window) error {
 		select {
 		case stats := <-solutions:
 			// Substract paused time
-			stats.Elapsed -= paused
+			stats.Elapsed -= time.Duration(paused.Load())
 			ui.state.stats = stats
 
 			gen.SetValue(stats.Generation)
