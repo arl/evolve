@@ -14,10 +14,10 @@ type SymmetricTSPEvaluator[T constraints.Integer] struct {
 	Distances [][]float64
 }
 
-// NewSymmetricTSPEvaluator creates and initializes a symmetric TSP evaluator for
+// NewSymmetricEvaluator creates and initializes a symmetric TSP evaluator for
 // the given list of citites. Euclidian distance between each city is
 // precomputed, taking up len(cities)² space.
-func NewSymmetricTSPEvaluator[T constraints.Integer](cities []Point2D) *SymmetricTSPEvaluator[T] {
+func NewSymmetricEvaluator[T constraints.Integer](cities []Point2D) *SymmetricTSPEvaluator[T] {
 	dists := make([][]float64, len(cities))
 	for i := 0; i < len(cities); i++ {
 		dists[i] = make([]float64, len(cities))

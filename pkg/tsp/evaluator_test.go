@@ -21,7 +21,7 @@ func TestSymmetricTSPEvaluator(t *testing.T) {
 	d := Point2D{X: 0, Y: 0}   // cities[3]
 	cities := []Point2D{a, b, c, d}
 
-	e := NewSymmetricTSPEvaluator[int](cities)
+	e := NewSymmetricEvaluator[int](cities)
 
 	tests := []struct {
 		a, b int
@@ -73,6 +73,6 @@ func TestBerlin52Optimum(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	e := NewSymmetricTSPEvaluator[int](tspf.Nodes)
+	e := NewSymmetricEvaluator[int](tspf.Nodes)
 	fmt.Println(e.Fitness(opt))
 }
