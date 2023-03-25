@@ -7,7 +7,6 @@ import (
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/generator"
 	"github.com/google/go-cmp/cmp"
-	"golang.org/x/exp/constraints"
 	"golang.org/x/exp/slices"
 )
 
@@ -103,13 +102,4 @@ func benchmarkPMX(seqlen int) func(*testing.B) {
 
 func BenchmarkPMX(b *testing.B) {
 	b.Run("seqlen=62", benchmarkPMX(62))
-}
-
-// seq returns a slice containing the sequence of consecutive numbers from 0 to n.
-func seq[T constraints.Integer | constraints.Float](n int) []T {
-	s := make([]T, n)
-	for i := 0; i < n; i++ {
-		s[i] = T(i)
-	}
-	return s
 }
