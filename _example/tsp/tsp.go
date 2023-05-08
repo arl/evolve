@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
 	"os/signal"
 	"runtime"
 	"time"
+
+	"golang.org/x/exp/constraints"
 
 	"github.com/arl/evolve"
 	"github.com/arl/evolve/condition"
@@ -15,10 +16,8 @@ import (
 	"github.com/arl/evolve/factory"
 	"github.com/arl/evolve/generator"
 	"github.com/arl/evolve/mutation"
-	"github.com/arl/evolve/pkg/mt19937"
 	"github.com/arl/evolve/pkg/tsp"
 	"github.com/arl/evolve/selection"
-	"golang.org/x/exp/constraints"
 )
 
 type algorithm struct {
@@ -38,18 +37,26 @@ func (a *algorithm) setup(obs engine.Observer[[]byte]) error {
 		Probability: generator.Const(1.),
 	}
 
+	// Collision crossover
+	// xover := &crossover.Collision2[byte]{
+	// 	Probability: generator.Const(1.),
+	// 	EdgeWeight: func(i, j int) float64 {
+	// 		return eval.Distances[i][j]
+	// 	},
+	// }
+
 	pipeline = append(pipeline, xover)
 
 	const mutationRate = 0.05
 
 	// Define the mutation operator.
-	rng := rand.New(mt19937.New())
+	// rng := rand.New(mt19937.New())
 	mut := evolve.NewSwitch[[]byte](
-		&mutation.Permutation[byte]{
-			Count:       generator.Const(1),
-			Amount:      generator.Uniform(1, 3, rng),
-			Probability: generator.Const(mutationRate),
-		},
+		// &mutation.Permutation[byte]{
+		// 	Count:       generator.Const(1),
+		// 	Amount:      generator.Uniform(1, 4 /*len(a.cfg.cities)*/, rng),
+		// 	Probability: generator.Const(mutationRate),
+		// },
 		&mutation.SRS[byte]{
 			Probability: generator.Const(mutationRate),
 		},
@@ -67,8 +74,9 @@ func (a *algorithm) setup(obs engine.Observer[[]byte]) error {
 	generational := engine.Generational[[]byte]{
 		Operator:  pipeline,
 		Evaluator: eval,
-		NumElites: 2,
 		Selection: &selection.RouletteWheel[[]byte]{},
+		// Selection: &selection.SUS[[]byte]{},
+		NumElites: 4,
 	}
 
 	a.eng = engine.Engine[[]byte]{

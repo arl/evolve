@@ -52,7 +52,6 @@ func (op *Crossover[T]) Apply(pop *Population[T], rng *rand.Rand) {
 
 		// Probability for this pair to be mated
 		p := op.Probability.Next()
-
 		if rng.Float64() >= p {
 			continue // Nothing to do
 		}

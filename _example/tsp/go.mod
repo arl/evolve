@@ -9,6 +9,7 @@ require (
 	github.com/arl/evolve v0.0.0-00010101000000-000000000000
 	github.com/arl/gioexp v0.0.0-20221230175344-f6ec1bef4ae8
 	github.com/arl/statsviz v0.5.1
+	golang.org/x/exp v0.0.0-20221114191408-850992195362
 )
 
 require (
@@ -20,7 +21,6 @@ require (
 	github.com/go-text/typesetting v0.0.0-20221214153724-0399769901d5 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/stretchr/testify v1.7.3 // indirect
-	golang.org/x/exp v0.0.0-20221114191408-850992195362 // indirect
 	golang.org/x/exp/shiny v0.0.0-20220827204233-334a2380cb91 // indirect
 	golang.org/x/image v0.6.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect

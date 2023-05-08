@@ -33,19 +33,20 @@ func main() {
 	}
 
 	if *nogui {
-		cliRun(tspf.Nodes, *maxgen)
+		cliRun(tspf.Nodes, *maxgen, stopProf)
 		return
 	}
 
 	guiRun(tspf, *maxgen, stopProf)
 }
 
-func cliRun(cities []tsp.Point2D, maxgen int) {
+func cliRun(cities []tsp.Point2D, maxgen int, beforeExit func()) {
 	alg.cfg = config{cities: cities, maxgen: maxgen}
 	if err := alg.setup(printStatsToCli[byte]()); err != nil {
 		log.Fatalf("setup failed: %v", err)
 	}
 	alg.run()
+	beforeExit()
 }
 
 // guiRun runs the algorithm in a gio user interface.

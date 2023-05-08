@@ -42,7 +42,8 @@ type Operator[T any] interface {
 	//
 	// TODO(arl) rand shouldn't be passed, but a field of the operator (if
 	// needed) the big advantage is that we can chose a goroutine-safe rand or
-	// not depending on the needs.
+	// not depending on the needs. But careful that if we do that then Apply can
+	// not be called concurrently (or we'd need one Operator instance per goroutine)
 	Apply(*Population[T], *rand.Rand)
 }
 
